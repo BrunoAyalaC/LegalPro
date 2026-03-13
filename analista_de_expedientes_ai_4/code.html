@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Análisis de Contexto Multidoc IA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0f1a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .no-scrollbar::-webkit-scrollbar { display: none; }
+            .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            .font-fill { font-variation-settings: 'FILL' 1; }
+            .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        }
+        body {
+            height: 100dvh;
+            overflow: hidden;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex flex-col h-screen w-full overflow-hidden">
+<header class="flex items-center justify-between bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex flex-col items-center">
+<h1 class="text-[15px] font-bold leading-tight">Análisis Multidoc</h1>
+<span class="text-[10px] text-primary font-bold flex items-center gap-1 uppercase tracking-wider">
+<span class="material-symbols-outlined !text-xs font-fill">auto_awesome</span>
+                Lex.ia Advanced Analysis
+            </span>
+</div>
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">folder_open</span>
+</button>
+</header>
+<div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0">
+<div class="flex overflow-x-auto no-scrollbar px-4 py-2 gap-2 items-center">
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-semibold whitespace-nowrap">
+<span class="material-symbols-outlined !text-[16px]">description</span> Contrato
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-transparent rounded-lg text-xs font-medium whitespace-nowrap">
+<span class="material-symbols-outlined !text-[16px]">add_notes</span> Adenda
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-transparent rounded-lg text-xs font-medium whitespace-nowrap">
+<span class="material-symbols-outlined !text-[16px]">mail</span> Carta Notarial
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-transparent rounded-lg text-xs font-medium whitespace-nowrap">
+<span class="material-symbols-outlined !text-[16px]">gavel</span> Demanda
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-transparent rounded-lg text-xs font-medium whitespace-nowrap">
+<span class="material-symbols-outlined !text-[16px]">policy</span> Anexos
+            </button>
+</div>
+</div>
+<main class="flex-1 flex flex-col overflow-hidden">
+<div class="relative h-[40%] bg-slate-200 dark:bg-slate-950 overflow-y-auto border-b border-slate-300 dark:border-slate-800 shadow-inner">
+<div class="p-4 max-w-lg mx-auto">
+<div class="bg-white dark:bg-slate-900 shadow-xl rounded-sm p-6 min-h-[500px] relative text-[11px] leading-relaxed text-slate-700 dark:text-slate-300 font-serif">
+<p class="font-bold mb-4 text-center text-sm border-b pb-2">CONTRATO DE ARRENDAMIENTO</p>
+<p class="mb-4">...CLAUSULA QUINTA: El arrendatario se compromete al pago mensual de S/ 2,500 soles los primeros 05 días de cada mes...</p>
+<div class="relative bg-amber-50 dark:bg-amber-900/20 border-l-2 border-amber-500 px-2 my-4 py-2 group">
+<p class="italic text-amber-800 dark:text-amber-200">"El plazo de vigencia del presente contrato es de un (01) año forzoso para ambas partes..."</p>
+<div class="absolute -right-2 top-0 translate-x-full hidden md:flex bg-amber-500 text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold items-center gap-1">
+<span class="material-symbols-outlined !text-[12px]">compare_arrows</span>
+                            Conflicto con Adenda
+                        </div>
+</div>
+<p class="mb-4">...CLAUSULA SEXTA: Cualquier modificación deberá constar por escrito mediante adenda suscrita por las partes...</p>
+<div class="relative bg-blue-50 dark:bg-blue-900/20 border-l-2 border-primary px-2 my-4 py-2">
+<p>...bajo apercibimiento de resolución contractual inmediata según el Art. 1428 del Código Civil...</p>
+<div class="absolute -right-2 top-0 translate-x-full hidden md:flex bg-primary text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold items-center gap-1">
+<span class="material-symbols-outlined !text-[12px]">gavel</span>
+                            Base Legal
+                        </div>
+</div>
+</div>
+</div>
+<div class="absolute top-4 right-4 bg-black/60 backdrop-blur-md text-white text-[9px] px-2 py-1 rounded-full flex items-center gap-1.5">
+<span class="material-symbols-outlined !text-xs">layers</span>
+                Doc 1 de 12
+            </div>
+</div>
+<div class="h-[60%] flex flex-col bg-white dark:bg-background-dark relative">
+<div class="flex flex-col shrink-0 border-b border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-slate-900/50">
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">CONTEXTO GLOBAL</span>
+<div class="relative inline-flex h-5 w-9 items-center rounded-full bg-primary/20 cursor-pointer">
+<span class="translate-x-4 inline-block h-4 w-4 transform rounded-full bg-primary transition"></span>
+</div>
+<span class="text-[10px] text-primary font-bold">(10+ DOCS)</span>
+</div>
+<div class="flex items-center gap-1 text-[10px] text-slate-400">
+<span class="material-symbols-outlined !text-[14px]">bolt</span>
+                        Lex.ia
+                    </div>
+</div>
+<div class="flex overflow-x-auto gap-2 p-3 no-scrollbar shrink-0">
+<button class="whitespace-nowrap bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined !text-sm">compare_arrows</span>
+                        Cruzado (A vs C)
+                    </button>
+<button class="whitespace-nowrap bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined !text-sm">analytics</span>
+                        Resumir Hechos
+                    </button>
+<button class="whitespace-nowrap bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined !text-sm">balance</span>
+                        Base Legal
+                    </button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="flex gap-3 max-w-[90%]">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white !text-lg font-fill">auto_awesome</span>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none border-l-4 border-amber-400">
+<div class="flex items-center gap-1 mb-1 text-amber-600 dark:text-amber-400 font-bold text-[10px] uppercase tracking-wider">
+<span class="material-symbols-outlined !text-xs">difference</span> Insight de Referencia Cruzada
+                        </div>
+<p class="text-[12px] leading-relaxed">
+                            He identificado una discrepancia crítica: <br/>
+<strong class="text-slate-900 dark:text-white">Documento A (Contrato):</strong> Establece una vigencia de 12 meses (Cláusula 5). <br/>
+<strong class="text-slate-900 dark:text-white">Documento C (Adenda):</strong> En el folio 2, menciona que el plazo fue reducido a 6 meses por mutuo acuerdo, contradiciendo el contrato original.
+                        </p>
+<span class="text-[9px] text-slate-400 mt-2 block">Analizado en 10+ documentos</span>
+</div>
+</div>
+<div class="flex gap-3 max-w-[85%] ml-auto flex-row-reverse">
+<div class="size-8 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400 !text-lg">person</span>
+</div>
+<div class="bg-primary text-white p-3 rounded-2xl rounded-tr-none shadow-md">
+<p class="text-[12px] leading-relaxed">¿Cómo afecta esto a la Carta Notarial enviada ayer?</p>
+</div>
+</div>
+<div class="flex gap-3 max-w-[85%]">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white !text-lg font-fill">auto_awesome</span>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 px-4 py-3 rounded-2xl rounded-tl-none border border-primary/20">
+<div class="flex gap-1.5">
+<div class="size-1.5 bg-primary/40 rounded-full animate-bounce"></div>
+<div class="size-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+<div class="size-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0 pb-safe">
+<div class="relative flex items-center gap-2">
+<div class="flex-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 px-4 py-2.5 flex items-center">
+<input class="bg-transparent border-none focus:ring-0 text-[13px] w-full placeholder:text-slate-400" placeholder="Pregunta sobre todo el expediente..." type="text"/>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined !text-xl">attach_file</span>
+</button>
+</div>
+<button class="size-10 bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<nav class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 shrink-0">
+<div class="flex h-16 items-center justify-around px-2 pb-safe">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">folder_copy</span>
+<p class="text-[10px] font-medium">Archivos</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-fill">hub</span>
+<p class="text-[10px] font-medium">Contexto</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">quick_reference</span>
+<p class="text-[10px] font-medium">Referencias</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<p class="text-[10px] font-medium">Perfil</p>
+</a>
+</div>
+</nav>
+</div>
+
+</body></html>

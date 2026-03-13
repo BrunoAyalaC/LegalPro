@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex flex-col min-h-screen max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl relative overflow-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-10 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 border-b border-slate-200 dark:border-slate-800 justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">arrow_back_ios</span>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">Caso: Exp. 0422-2023</h1>
+<p class="text-xs text-primary font-medium">Analizado por Lex.ia</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Hero Card -->
+<div class="p-4">
+<div class="bg-primary/10 border border-primary/20 rounded-xl p-5 mb-6">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<h2 class="text-sm font-semibold uppercase tracking-wider text-primary">Resumen Ejecutivo</h2>
+</div>
+<p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                        Análisis integral de la demanda por indemnización de daños y perjuicios. Se identifican contingencias procesales de nivel medio en la etapa de saneamiento.
+                    </p>
+</div>
+<!-- Section: Hechos Relevantes -->
+<section class="mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">list_alt</span>
+                        Hechos Relevantes
+                    </h3>
+<div class="space-y-1">
+<label class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors">
+<input checked="" class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-700 bg-transparent text-primary focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-slate-700 dark:text-slate-300">Presentación de la demanda por indemnización el 15/01/2024.</span>
+</label>
+<label class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors">
+<input checked="" class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-700 bg-transparent text-primary focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-slate-700 dark:text-slate-300">Notificación válida a la parte demandada bajo puerta el 22/01/2024.</span>
+</label>
+<label class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors">
+<input class="mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-700 bg-transparent text-primary focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="text-sm text-slate-700 dark:text-slate-300">Contestación de demanda pendiente de calificación por el juzgado.</span>
+</label>
+</div>
+</section>
+<!-- Section: Base Legal -->
+<section class="mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">gavel</span>
+                        Base Legal Aplicable
+                    </h3>
+<div class="flex flex-col gap-2">
+<a class="flex items-center justify-between p-3 bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg" href="#">
+<span class="text-sm font-medium">Cód. Civil Art. 1969</span>
+<span class="material-symbols-outlined text-slate-400">open_in_new</span>
+</a>
+<a class="flex items-center justify-between p-3 bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg" href="#">
+<span class="text-sm font-medium">Cód. Proc. Civil Art. 424</span>
+<span class="material-symbols-outlined text-slate-400">open_in_new</span>
+</a>
+</div>
+</section>
+<!-- Section: SWOT -->
+<section class="mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">balance</span>
+                        Fortalezas y Debilidades
+                    </h3>
+<div class="grid grid-cols-2 gap-3">
+<div class="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+<p class="text-[10px] uppercase font-bold text-green-600 dark:text-green-400 mb-2">Fortalezas</p>
+<ul class="text-[12px] space-y-2 text-slate-700 dark:text-slate-300 leading-tight">
+<li>• Prueba documental sólida (peritaje).</li>
+<li>• Jurisprudencia vinculante favorable.</li>
+</ul>
+</div>
+<div class="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+<p class="text-[10px] uppercase font-bold text-red-600 dark:text-red-400 mb-2">Debilidades</p>
+<ul class="text-[12px] space-y-2 text-slate-700 dark:text-slate-300 leading-tight">
+<li>• Prescripción alegada por contraparte.</li>
+<li>• Testigo clave no localizado.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Section: Strategy -->
+<section class="mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 text-base font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">lightbulb</span>
+                        Estrategia Sugerida
+                    </h3>
+<div class="bg-slate-100 dark:bg-slate-800/60 p-4 rounded-xl border-l-4 border-primary">
+<p class="text-sm text-slate-700 dark:text-slate-300 italic leading-relaxed">
+                            "Priorizar la tacha de documentos presentados en la contestación. Solicitar audiencia de pruebas anticipada para asegurar la declaración de los peritos antes de la etapa intermedia."
+                        </p>
+</div>
+</section>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-3 pt-4">
+<button class="flex items-center justify-center gap-2 bg-primary text-white py-3 px-4 rounded-xl font-bold transition-transform active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">description</span>
+                        Exportar a PDF / Word
+                    </button>
+<button class="flex items-center justify-center gap-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 py-3 px-4 rounded-xl font-bold transition-transform active:scale-95">
+<span class="material-symbols-outlined">mail</span>
+                        Enviar por Correo
+                    </button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="absolute bottom-0 left-0 right-0 border-t border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg px-4 pb-6 pt-2 flex justify-between items-center">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined text-[24px]">folder</span>
+<span class="text-[10px] font-medium leading-none">Casos</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="text-[10px] font-medium leading-none">Búsqueda</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px] fill-current">description</span>
+<span class="text-[10px] font-medium leading-none">Resumen</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="text-[10px] font-medium leading-none">Ajustes</span>
+</a>
+</nav>
+</div>
+</body></html>

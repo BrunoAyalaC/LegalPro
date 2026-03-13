@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Estrategia de Interrogatorio NCPP</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "accent-gold": "#d4af37",
+                        "court-red": "#b91c1c"
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Header -->
+<header class="flex items-center bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 p-4 shrink-0">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">balance</span>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">Estrategia NCPP</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400">Asistente de Estrategia · Juicio Oral</p>
+</div>
+</div>
+<div class="ml-auto flex gap-2">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-xl">search</span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-xl">smart_toy</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto no-scrollbar pb-24">
+<!-- Witness Selector Horizontal Scroll -->
+<section class="py-4">
+<div class="px-4 flex items-center justify-between mb-3">
+<h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Testigos y Peritos</h2>
+<span class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full font-medium">8 Registrados</span>
+</div>
+<div class="flex gap-3 px-4 overflow-x-auto no-scrollbar">
+<!-- Active Witness Card -->
+<button class="flex shrink-0 w-48 flex-col gap-2 rounded-xl border-2 border-primary bg-primary/5 p-3 text-left">
+<div class="flex items-center gap-2">
+<div class="h-10 w-10 rounded-full bg-cover bg-center" data-alt="Portrait of a male forensic expert" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDTBQm39vkcmIuYm32ZVSmBabD7tZ98Plj8AXzjUm8ER7nB5P2_XhOe3dvAtelOzwfz03sIINlh5dsXBY4Rb4JqjLewdK3ZPcplaqzg3G6D9FdjDhTPR7N_IEBjb1oHd6DI0r05E8E7bErvkfreATaDAVQFRkYNKF6BwUZF_5cEkTyDgknJ063_R0Nn_7-XSjNEdZhLapn16EZ4b8ajzILsDAw1lgggxBOMpO2bhw81P-scAs6Hsv8nJV19B6q4KLSeaYMKnn4TeZA')"></div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">Dr. Ricardo Palma</p>
+<p class="text-[10px] text-primary font-medium italic">Perito Balístico</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">priority_high</span>
+<p class="text-[10px] font-semibold">Teoría: Error Trayect.</p>
+</div>
+</button>
+<!-- Inactive Witness Card -->
+<button class="flex shrink-0 w-40 flex-col gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-3 text-left opacity-70">
+<div class="flex items-center gap-2">
+<div class="h-10 w-10 rounded-full bg-cover bg-center" data-alt="Portrait of a female witness" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQWSO59ik_-B04QaKTNewYOvtD-IPzZZIb73g0pkHOhfYaOQWOmeg6AJ3coRnfCNy3ZVw_NMxjSY64OwyBDivUvRBnuvIq_OfOHWbV-UDOGK6_b1iigfWH2H4xhvx0FAZWXc1bLhnK-xZmbqZhe-EFin0A7aapIhLVavKydNz4OhNYFul_CTo259Wq_Fde_xog9vC8pyna_9twXNdJgXWQxeFhA7s6E8S3NlXu2FNM3JHOYv1xT94r7goGthy4bZj-gEWulAU6GPM')"></div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">Sra. Elena Ríos</p>
+<p class="text-[10px] text-slate-500 font-medium">Testigo Presencial</p>
+</div>
+</div>
+</button>
+<!-- Another Inactive -->
+<button class="flex shrink-0 w-40 flex-col gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-3 text-left opacity-70">
+<div class="flex items-center gap-2">
+<div class="h-10 w-10 rounded-full bg-cover bg-center" data-alt="Portrait of a police officer" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAwfXeQvYsCM41rp9G8kfSr3m4lR4LEfnsfrNd1jFEG1I6CcALtBr56yZcrxMrbzv-0mA9Kk2pN8rfCT5mx_d0Eo7KmCcD2fxYYXi95S4-6P4lGuYL2z3PQmvKC6yBO16b4-8wSQDomAIzVRB5X-D1OLRReKr7o0FtdLVxg6G-4V28hzFkAHMDIeN7nkWghQWJKASlz8UNxUYOLznItLGTLncOPiH0J26H7RAyfGWe9-ltOpbkVJJVU7dn_1HPmPKSd_u0PwekfOy0')"></div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">Cmdte. J. Vargas</p>
+<p class="text-[10px] text-slate-500 font-medium">PNP - Captura</p>
+</div>
+</div>
+</button>
+</div>
+</section>
+<!-- Strategy Detail -->
+<div class="px-4 flex flex-col gap-6 mt-2">
+<!-- AI Objectives Panel -->
+<div class="rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="bg-primary/10 px-4 py-2 border-b border-primary/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">target</span>
+<h3 class="text-xs font-bold uppercase text-primary">Objetivos del Interrogatorio</h3>
+</div>
+<div class="p-4 space-y-3">
+<div class="flex gap-3">
+<span class="h-5 w-5 flex items-center justify-center rounded-full bg-primary text-white text-[10px] font-bold">1</span>
+<p class="text-sm leading-snug">Cuestionar la metodología del peritaje (Art. 378.5 NCPP) respecto al ángulo de incidencia.</p>
+</div>
+<div class="flex gap-3">
+<span class="h-5 w-5 flex items-center justify-center rounded-full bg-primary text-white text-[10px] font-bold">2</span>
+<p class="text-sm leading-snug">Acreditar la falta de mantenimiento del equipo de medición utilizado en el informe.</p>
+</div>
+</div>
+</div>
+<!-- Suggested Questions -->
+<div>
+<div class="flex items-center justify-between mb-3 px-1">
+<h3 class="text-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">chat_bubble</span>
+                            Preguntas Sugeridas
+                        </h3>
+<div class="flex bg-slate-200 dark:bg-slate-800 rounded-lg p-0.5">
+<button class="px-3 py-1 text-[10px] font-bold rounded-md bg-white dark:bg-slate-700 shadow-sm">DIRECTO</button>
+<button class="px-3 py-1 text-[10px] font-bold rounded-md text-slate-500">CONTRA</button>
+</div>
+</div>
+<div class="space-y-3">
+<div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40">
+<p class="text-xs text-slate-500 mb-1 italic">Pregunta de acreditación</p>
+<p class="text-sm font-medium">"¿Podría explicar al colegiado cuántas pericias de este tipo ha realizado en el último año?"</p>
+</div>
+<div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40">
+<p class="text-xs text-slate-500 mb-1 italic">Abierta (Art. 375)</p>
+<p class="text-sm font-medium">"¿Cuál fue el procedimiento exacto que siguió para determinar la trayectoria del proyectil?"</p>
+</div>
+</div>
+</div>
+<!-- Objection Alert Panel -->
+<div class="rounded-xl border border-court-red/30 bg-court-red/5 p-4">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-court-red">warning</span>
+<h3 class="text-sm font-bold text-court-red uppercase">Alerta de Objeciones (Fiscalía)</h3>
+</div>
+<div class="space-y-2">
+<div class="flex items-start gap-2 bg-white/50 dark:bg-slate-900/50 p-2 rounded-lg border border-court-red/10">
+<span class="text-[10px] font-bold bg-court-red text-white px-1.5 py-0.5 rounded">SUGESTIVA</span>
+<p class="text-[11px] leading-tight">Evite preguntar: "¿No es cierto que el arma falló?". La fiscalía objetará de inmediato.</p>
+</div>
+<div class="flex items-start gap-2 bg-white/50 dark:bg-slate-900/50 p-2 rounded-lg border border-court-red/10">
+<span class="text-[10px] font-bold bg-court-red text-white px-1.5 py-0.5 rounded">IMPERTINENTE</span>
+<p class="text-[11px] leading-tight">Cualquier mención a la vida privada del perito sin relación a su idoneidad técnica.</p>
+</div>
+</div>
+</div>
+<!-- Confrontation Points -->
+<div class="mb-8">
+<h3 class="text-sm font-bold flex items-center gap-2 mb-3 px-1">
+<span class="material-symbols-outlined text-accent-gold">error</span>
+                        Puntos de Confrontación
+                    </h3>
+<div class="relative pl-6 space-y-4 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+<div class="relative">
+<div class="absolute -left-[19px] top-1 h-3 w-3 rounded-full bg-accent-gold border-2 border-background-light dark:border-background-dark"></div>
+<p class="text-xs font-bold text-accent-gold uppercase mb-1">Contradicción Doc. 142</p>
+<div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+<p class="text-[11px] italic text-slate-500">En la declaración previa (pág 4) afirmó que la iluminación era 'nula', hoy dice que era 'suficiente'.</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[19px] top-1 h-3 w-3 rounded-full bg-accent-gold border-2 border-background-light dark:border-background-dark"></div>
+<p class="text-xs font-bold text-accent-gold uppercase mb-1">Contradicción Pericial</p>
+<div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
+<p class="text-[11px] italic text-slate-500">Inconsistencia técnica entre las fotos del hallazgo y el diagrama de trayectoria A-12.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="absolute bottom-0 left-0 right-0 flex items-center justify-around border-t border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark px-4 pb-6 pt-2">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-[10px] font-medium">Expediente</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">gavel</span>
+<span class="text-[10px] font-medium">Estrategia</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium">Audiencia</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</a>
+</nav>
+<!-- Quick AI Action Floating Button -->
+<div class="absolute bottom-20 right-4">
+<button class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40">
+<span class="material-symbols-outlined text-2xl">mic</span>
+</button>
+</div>
+</div>
+</body></html>

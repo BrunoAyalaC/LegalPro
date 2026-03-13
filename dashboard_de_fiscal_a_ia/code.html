@@ -1,0 +1,197 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41121",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#1a0d0e",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-primary/20 px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-2 rounded-lg">
+<span class="material-symbols-outlined text-white">gavel</span>
+</div>
+<div>
+<h1 class="text-sm font-bold leading-tight">Fiscalía IA</h1>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ministerio Público - Perú</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-8 rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden border border-primary/30">
+<img alt="User Profile" data-alt="Portrait of a formal prosecutor in professional attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUNv4EIOjADkzd4GvL-PXMbCfmbI2m837xhaS1tbwqg1npxKblKWWETcpPa_Ps-eWS1H9-LWB3l6-8498cHerYLRXH1ohpdIv3CTDeRB653oZPkEhabb3sk2nmZ3X7099GItpA0AJpm8RjakBOr3pskkosrjSNyiKBxif9YeZcu7hg1-sL3nNoQyWAjcHEIELnwp-qp0hCQIUGf7_klfsLBhpLkNTkMp5d_GAFr5-rO3nRbDLx8-mmlyPmIFry95x9osw1g-jV9YM"/>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Section: Carga de Elementos de Convicción -->
+<section class="px-4 pt-6">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-lg font-bold tracking-tight">Carga de Elementos</h2>
+<button class="text-primary text-xs font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">add_circle</span> Nuevo
+                </button>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/20 p-4 rounded-xl">
+<span class="material-symbols-outlined text-primary mb-2">description</span>
+<h3 class="font-bold text-sm">Actas Policiales</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">12 archivos</p>
+</div>
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/20 p-4 rounded-xl">
+<span class="material-symbols-outlined text-primary mb-2">record_voice_over</span>
+<h3 class="font-bold text-sm">Declaraciones</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">5 testimonios</p>
+</div>
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/20 p-4 rounded-xl">
+<span class="material-symbols-outlined text-primary mb-2">biotech</span>
+<h3 class="font-bold text-sm">Peritajes</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">2 informes</p>
+</div>
+<div class="bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/20 p-4 rounded-xl">
+<span class="material-symbols-outlined text-primary mb-2">folder_zip</span>
+<h3 class="font-bold text-sm">Documentales</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">8 folios</p>
+</div>
+</div>
+</section>
+<!-- Monitor de Plazos -->
+<section class="px-4 pt-8">
+<h2 class="text-lg font-bold tracking-tight mb-4">Monitor de Plazos</h2>
+<div class="space-y-3">
+<div class="bg-slate-100 dark:bg-slate-900/50 p-4 rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">Prisión Preventiva</h4>
+<p class="text-xs text-slate-500">Exp. 00452-2023</p>
+</div>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded">URGENTE</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[85%]"></div>
+</div>
+<p class="text-[10px] mt-2 text-right font-medium">Faltan 3 días (Vence 14 Nov)</p>
+</div>
+<div class="bg-slate-100 dark:bg-slate-900/50 p-4 rounded-xl border-l-4 border-slate-400">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-bold text-sm">Investigación Preparatoria</h4>
+<p class="text-xs text-slate-500">Exp. 00128-2024</p>
+</div>
+<span class="bg-slate-200 dark:bg-slate-800 text-slate-500 text-[10px] font-bold px-2 py-1 rounded">EN CURSO</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-slate-400 h-full w-[40%]"></div>
+</div>
+<p class="text-[10px] mt-2 text-right font-medium">Faltan 45 días</p>
+</div>
+</div>
+</section>
+<!-- AI Tipicidad y Subsunción -->
+<section class="px-4 pt-8">
+<div class="bg-gradient-to-br from-primary to-rose-900 rounded-2xl p-5 text-white shadow-xl">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined fill-icon text-white">auto_awesome</span>
+<h2 class="font-bold">Análisis de Tipicidad IA</h2>
+</div>
+<p class="text-sm opacity-90 mb-4">El análisis ha identificado los siguientes elementos de subsunción penal:</p>
+<div class="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20 mb-4">
+<p class="text-xs font-bold uppercase tracking-wider opacity-70 mb-1">Delito Propuesto</p>
+<p class="text-sm font-semibold">Peculado Doloso (Art. 387 CP)</p>
+<div class="mt-3 flex gap-2">
+<span class="bg-white/20 px-2 py-1 rounded text-[10px] font-medium">Certeza: 92%</span>
+<span class="bg-white/20 px-2 py-1 rounded text-[10px] font-medium">3 agravantes hallados</span>
+</div>
+</div>
+<button class="w-full bg-white text-primary py-2 rounded-lg font-bold text-sm">Ver Informe de Subsunción</button>
+</div>
+</section>
+<!-- Quick Access -->
+<section class="px-4 pt-8">
+<h2 class="text-lg font-bold tracking-tight mb-4">Base de Conocimientos</h2>
+<div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+<div class="min-w-[140px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl flex flex-col items-center text-center">
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-full mb-3">
+<span class="material-symbols-outlined text-primary">local_library</span>
+</div>
+<p class="text-xs font-bold leading-tight">Precedentes Vinculantes</p>
+</div>
+<div class="min-w-[140px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl flex flex-col items-center text-center">
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-full mb-3">
+<span class="material-symbols-outlined text-primary">science</span>
+</div>
+<p class="text-xs font-bold leading-tight">Base de Pericias (IML)</p>
+</div>
+<div class="min-w-[140px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-xl flex flex-col items-center text-center">
+<div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-full mb-3">
+<span class="material-symbols-outlined text-primary">menu_book</span>
+</div>
+<p class="text-xs font-bold leading-tight">Código Penal 2024</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Navigation Bar -->
+<nav class="fixed bottom-0 w-full bg-white dark:bg-[#1a0d0e] border-t border-slate-200 dark:border-primary/20 px-6 py-3 flex justify-between items-center pb-8">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-icon">dashboard</span>
+<span class="text-[10px] font-bold">Casos</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium">Análisis</span>
+</a>
+<div class="relative -top-6">
+<button class="bg-primary size-14 rounded-full shadow-lg shadow-primary/40 flex items-center justify-center text-white border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="text-[10px] font-medium">Plazos</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</a>
+</nav>
+
+```</body></html>

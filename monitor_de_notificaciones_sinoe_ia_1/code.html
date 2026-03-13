@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analizador de Audios de Audiencia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0f18",
+                        "surface-dark": "#161c2a",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Public Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .waveform-bar {
+            @apply bg-primary/40 rounded-full w-1;
+        }
+        .waveform-bar.active {
+            @apply bg-primary;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark text-slate-100 min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto overflow-x-hidden border-x border-slate-800 shadow-2xl">
+<header class="sticky top-0 z-20 bg-background-dark/80 backdrop-blur-xl border-b border-slate-800 p-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 p-2 rounded-xl">
+<span class="material-symbols-outlined text-primary">mic</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight">Analizador de Audios</h1>
+<p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Lex.ia • Legal AI</p>
+</div>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</button>
+</div>
+</header>
+<main class="flex-1 pb-24">
+<section class="p-4">
+<div class="bg-surface-dark border border-slate-800 rounded-2xl p-4 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Subir Audio de Audiencia</span>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">WAV / MP3</span>
+</div>
+<div class="h-16 flex items-center justify-center gap-[3px] mb-4 bg-background-dark/50 rounded-xl px-4">
+<div class="waveform-bar h-4"></div>
+<div class="waveform-bar h-8"></div>
+<div class="waveform-bar h-12"></div>
+<div class="waveform-bar h-6"></div>
+<div class="waveform-bar active h-10"></div>
+<div class="waveform-bar active h-14"></div>
+<div class="waveform-bar active h-10"></div>
+<div class="waveform-bar active h-6"></div>
+<div class="waveform-bar active h-12"></div>
+<div class="waveform-bar active h-8"></div>
+<div class="waveform-bar h-4"></div>
+<div class="waveform-bar h-10"></div>
+<div class="waveform-bar h-6"></div>
+<div class="waveform-bar h-12"></div>
+<div class="waveform-bar h-14"></div>
+<div class="waveform-bar h-8"></div>
+<div class="waveform-bar h-4"></div>
+<div class="waveform-bar h-10"></div>
+<div class="waveform-bar h-6"></div>
+<div class="waveform-bar h-12"></div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<button class="bg-primary text-white p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+<span class="text-xs font-mono text-slate-400">05:24 / 45:10</span>
+</div>
+<button class="flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold transition-all border border-slate-700">
+<span class="material-symbols-outlined text-sm">upload_file</span>
+                            Nuevo Audio
+                        </button>
+</div>
+</div>
+</section>
+<div class="px-4 mb-4">
+<div class="flex bg-surface-dark p-1 rounded-xl border border-slate-800">
+<button class="flex-1 py-2 text-xs font-bold rounded-lg bg-slate-800 text-primary shadow-sm">Transcripción</button>
+<button class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-400">Análisis Estratégico</button>
+</div>
+</div>
+<section class="px-4 space-y-4 mb-8">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest px-1">Transcripción Inteligente</h3>
+<button class="text-[10px] text-primary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">auto_awesome</span> 
+                        IA REFINADA
+                    </button>
+</div>
+<div class="bg-surface-dark/50 border-l-2 border-slate-700 p-3 rounded-r-xl">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[10px] font-bold text-slate-400 uppercase">Juez • 05:15</span>
+</div>
+<p class="text-sm text-slate-300 leading-relaxed">¿Señor testigo, puede confirmar su relación con el imputado al momento de los hechos?</p>
+</div>
+<div class="bg-surface-dark border border-slate-800 p-3 rounded-xl">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[10px] font-bold text-orange-400 uppercase">Testigo • 05:20</span>
+<span class="material-symbols-outlined text-red-500 text-sm">warning</span>
+</div>
+<p class="text-sm text-slate-100 leading-relaxed font-medium">No lo conocía de nada, nunca lo había visto antes de esa noche en la plaza.</p>
+</div>
+<div class="bg-red-900/10 border border-red-500/20 rounded-xl p-4 mt-6">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-red-500">psychology</span>
+<h4 class="text-xs font-bold text-red-500 uppercase tracking-widest">Contradicciones Detectadas</h4>
+</div>
+<div class="space-y-3">
+<div class="p-3 bg-red-950/20 rounded-lg border-l-2 border-red-500">
+<p class="text-xs text-red-200 leading-relaxed">
+<strong class="text-red-400">Alerta:</strong> El testigo cambió su versión respecto al minuto 05:20. En la declaración previa (Folio 45), afirmó ser vecino del imputado por 2 años.
+                            </p>
+</div>
+</div>
+</div>
+<div class="bg-primary/5 border border-primary/20 rounded-xl p-4">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary">format_list_bulleted</span>
+<h4 class="text-xs font-bold text-primary uppercase tracking-widest">Líneas de Interrogatorio</h4>
+</div>
+<ul class="space-y-3">
+<li class="flex gap-2">
+<span class="text-primary font-bold text-xs">1.</span>
+<p class="text-xs text-slate-300">Confrontar sobre el domicilio registrado en la ficha RENIEC del testigo y del imputado.</p>
+</li>
+<li class="flex gap-2">
+<span class="text-primary font-bold text-xs">2.</span>
+<p class="text-xs text-slate-300">Preguntar por el evento social del 15 de enero donde ambos aparecen en fotografías.</p>
+</li>
+</ul>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 text-slate-900 rounded-xl font-bold text-sm shadow-lg shadow-white/5 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">gavel</span>
+                    Citar Base Legal (NCPP)
+                </button>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-background-dark/95 backdrop-blur-md border-t border-slate-800 px-6 py-3 flex justify-between items-center z-30">
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">analytics</span>
+<span class="text-[10px] font-bold">Análisis</span>
+</a>
+<div class="relative -top-6">
+<button class="h-14 w-14 rounded-full bg-primary text-white shadow-xl shadow-primary/30 flex items-center justify-center border-4 border-background-dark">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-[10px] font-medium">Librería</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</a>
+</nav>
+</div>
+
+</body></html>

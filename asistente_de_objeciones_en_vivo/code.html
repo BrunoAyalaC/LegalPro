@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Asistente de Objeciones en Vivo</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+<div class="relative flex min-h-screen w-full flex-col max-w-[430px] mx-auto bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden">
+<!-- Header / Status Bar -->
+<header class="flex items-center justify-between p-4 pt-6 bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<div class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-[28px]">gavel</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">LegalAI Pro</h1>
+<p class="text-[10px] font-semibold uppercase tracking-widest text-primary/80">Lex.ia Real-time</p>
+</div>
+</div>
+<button class="flex size-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<!-- Live Status Section -->
+<div class="flex flex-col gap-4 p-6 bg-slate-50 dark:bg-slate-900/50">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+</span>
+<p class="text-sm font-bold uppercase tracking-[0.1em] text-red-500">Escuchando Audiencia...</p>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 bg-primary/20 rounded-lg">
+<span class="material-symbols-outlined text-sm text-primary">analytics</span>
+<p class="text-xs font-bold text-primary">Confianza: 98%</p>
+</div>
+</div>
+<div class="relative h-12 w-full flex items-center gap-1 overflow-hidden px-1">
+<!-- Visualizer Representation -->
+<div class="h-4 w-1 bg-primary/40 rounded-full"></div>
+<div class="h-6 w-1 bg-primary/60 rounded-full"></div>
+<div class="h-10 w-1 bg-primary rounded-full"></div>
+<div class="h-4 w-1 bg-primary/40 rounded-full"></div>
+<div class="h-8 w-1 bg-primary/80 rounded-full"></div>
+<div class="h-5 w-1 bg-primary/50 rounded-full"></div>
+<div class="h-7 w-1 bg-primary/70 rounded-full"></div>
+<div class="h-3 w-1 bg-primary/30 rounded-full"></div>
+<div class="h-9 w-1 bg-primary/90 rounded-full"></div>
+<div class="h-6 w-1 bg-primary/60 rounded-full"></div>
+<div class="h-12 w-1 bg-primary rounded-full"></div>
+<div class="h-8 w-1 bg-primary/80 rounded-full"></div>
+<div class="h-4 w-1 bg-primary/40 rounded-full"></div>
+<div class="h-7 w-1 bg-primary/70 rounded-full"></div>
+<div class="h-10 w-1 bg-primary rounded-full"></div>
+<div class="h-5 w-1 bg-primary/50 rounded-full"></div>
+<div class="h-3 w-1 bg-primary/30 rounded-full"></div>
+<div class="h-8 w-1 bg-primary/80 rounded-full"></div>
+<div class="h-11 w-1 bg-primary rounded-full"></div>
+<div class="h-6 w-1 bg-primary/60 rounded-full"></div>
+<div class="h-4 w-1 bg-primary/40 rounded-full"></div>
+<div class="h-9 w-1 bg-primary/90 rounded-full"></div>
+<div class="h-7 w-1 bg-primary/70 rounded-full"></div>
+</div>
+<div class="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-3 mt-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400">vibration</span>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Vibrar al Detectar</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Alerts Section -->
+<main class="flex-1 p-4 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Alertas en Tiempo Real</h2>
+<span class="text-[10px] font-bold text-slate-400">NCPP PERÚ</span>
+</div>
+<!-- Active High Priority Alert -->
+<div class="relative overflow-hidden group">
+<div class="absolute inset-0 bg-red-500/10 rounded-xl"></div>
+<div class="relative bg-white dark:bg-slate-800/80 border-2 border-red-500 rounded-xl p-5 shadow-lg">
+<div class="flex items-center justify-between mb-4">
+<span class="flex items-center gap-2 px-3 py-1 bg-red-500 text-white rounded-full text-[10px] font-bold tracking-tighter uppercase">
+<span class="material-symbols-outlined text-xs">warning</span> Objeción Detectada
+                        </span>
+<span class="text-[10px] text-slate-400 font-mono">HACE 2S</span>
+</div>
+<h3 class="text-2xl font-black text-slate-900 dark:text-white leading-tight mb-2 tracking-tight">SUGESTIVA / CAPCIOSA</h3>
+<p class="text-sm text-slate-600 dark:text-slate-300 mb-5 leading-relaxed italic border-l-2 border-red-500/30 pl-3">
+                        "¿No es verdad que usted vio al acusado salir con el arma?"
+                    </p>
+<div class="bg-slate-50 dark:bg-slate-900/80 rounded-lg p-4 mb-5 border border-slate-200 dark:border-slate-700">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">menu_book</span>
+<div>
+<p class="text-xs font-bold text-primary mb-1">Base Legal: Art. 376 NCPP</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-normal">
+                                    "No se admiten preguntas sugestivas, capciosas o impertinentes durante el interrogatorio directo..."
+                                </p>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined">gavel</span>
+<span>FUNDAMENTAR OBJECIÓN</span>
+</button>
+</div>
+</div>
+<!-- Secondary Alert -->
+<div class="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl p-5 opacity-60">
+<div class="flex items-center justify-between mb-3">
+<span class="flex items-center gap-2 px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full text-[10px] font-bold tracking-tighter uppercase">
+                        Impertinente
+                    </span>
+<span class="text-[10px] text-slate-500 font-mono">HACE 1M</span>
+</div>
+<h3 class="text-lg font-bold text-slate-700 dark:text-slate-300">Pregunta sobre vida privada</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">La pregunta no guarda relación directa con el objeto de la prueba.</p>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="flex items-center justify-around p-2 pb-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+<a class="flex flex-col items-center gap-1 p-2 text-primary" href="#">
+<span class="material-symbols-outlined text-2xl">mic</span>
+<span class="text-[10px] font-bold">En Vivo</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">history</span>
+<span class="text-[10px] font-bold">Historial</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">auto_stories</span>
+<span class="text-[10px] font-bold">Código NCPP</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="text-[10px] font-bold">Perfil</span>
+</a>
+</nav>
+<!-- iPhone Notch/Indicator Overlay Sim -->
+<div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></div>
+</div>
+</body></html>
