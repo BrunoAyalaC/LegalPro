@@ -1,0 +1,186 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#135bec",
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+            "vault-card": "#1a2133",
+            "integrity-green": "#00e676",
+          },
+          fontFamily: {
+            "display": ["Public Sans"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body { font-family: 'Public Sans', sans-serif; }
+    .glass-effect { background: rgba(19, 91, 236, 0.05); backdrop-filter: blur(10px); }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">shield_lock</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">Bóveda Digital</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+<span class="size-2 bg-integrity-green rounded-full animate-pulse"></span>
+            Conexión Encriptada Activa
+          </p>
+</div>
+</div>
+<button class="size-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">fingerprint</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Stats Dashboard -->
+<div class="p-4 grid grid-cols-2 gap-4">
+<div class="bg-vault-card border border-slate-800 rounded-xl p-4 flex flex-col gap-1">
+<span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Custodia Digital</span>
+<span class="text-2xl font-bold text-integrity-green">100% Integra</span>
+<div class="flex items-center gap-1 mt-1 text-[10px] text-slate-500">
+<span class="material-symbols-outlined text-[12px]">verified_user</span> 
+          Blockchain Verified
+        </div>
+</div>
+<div class="bg-vault-card border border-slate-800 rounded-xl p-4 flex flex-col gap-1">
+<span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Evidencias</span>
+<span class="text-2xl font-bold">42</span>
+<div class="flex items-center gap-1 mt-1 text-[10px] text-primary">
+<span class="material-symbols-outlined text-[12px]">add_circle</span>
+          +5 esta semana
+        </div>
+</div>
+</div>
+<!-- Category Filter -->
+<div class="flex gap-2 px-4 py-2 overflow-x-auto no-scrollbar">
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-primary text-white text-sm font-medium">Todas</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-slate-800 text-slate-300 text-sm font-medium border border-slate-700">Testimonial</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-slate-800 text-slate-300 text-sm font-medium border border-slate-700">Documental</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-slate-800 text-slate-300 text-sm font-medium border border-slate-700">Pericial</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-slate-800 text-slate-300 text-sm font-medium border border-slate-700">Digital (A/V)</button>
+</div>
+<!-- Evidence List -->
+<div class="px-4 mt-6">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-base font-semibold">Evidencias Recientes</h2>
+<button class="text-primary text-sm font-medium flex items-center gap-1">
+          Ver todo <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</div>
+<!-- Evidence Item 1 -->
+<div class="bg-vault-card border border-slate-800 rounded-xl p-4 mb-4">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">video_library</span>
+</div>
+<div>
+<h3 class="font-medium text-sm">Grabación_CCTV_042.mp4</h3>
+<p class="text-[10px] text-slate-500 font-mono">HASH: 8f3a...b2e9</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-integrity-green/10 text-integrity-green text-[10px] font-bold uppercase tracking-tight border border-integrity-green/20">Válido</span>
+</div>
+<!-- Gemini Insight -->
+<div class="bg-primary/5 border border-primary/20 rounded-lg p-3 mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-[16px]">auto_awesome</span>
+<span class="text-[11px] font-semibold text-primary uppercase">Análisis de Pertinencia (Art. 155 NCPP)</span>
+</div>
+<p class="text-xs text-slate-300 leading-relaxed">
+            La prueba es <span class="text-primary font-bold">conducente y útil</span>. Acredita la ubicación del imputado en la escena. Cumple estándares de legalidad procesal.
+          </p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-primary rounded-lg text-white text-xs font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">gavel</span>
+            Compartir con Juzgado
+          </button>
+<button class="size-9 bg-slate-800 border border-slate-700 rounded-lg flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Evidence Item 2 -->
+<div class="bg-vault-card border border-slate-800 rounded-xl p-4 mb-4 opacity-80">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<h3 class="font-medium text-sm text-slate-300">Informe_Pericial_Balistica.pdf</h3>
+<p class="text-[10px] text-slate-500 font-mono">HASH: a1c4...f902</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-slate-700 text-slate-400 text-[10px] font-bold uppercase tracking-tight">Pendiente</span>
+</div>
+<div class="bg-slate-800/50 border border-slate-700 rounded-lg p-3 mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-slate-500 text-[16px]">auto_awesome</span>
+<span class="text-[11px] font-semibold text-slate-500 uppercase">Procesando análisis...</span>
+</div>
+<div class="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden mt-2">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-slate-700 rounded-lg text-slate-400 text-xs font-bold flex items-center justify-center gap-2 cursor-not-allowed">
+<span class="material-symbols-outlined text-sm">lock</span>
+            Encriptando...
+          </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 pb-6 pt-2 px-6 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-[1]">shield_lock</span>
+<span class="text-[10px] font-medium">Bóveda</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-[10px] font-medium">Casos</span>
+</a>
+<div class="relative -top-8">
+<button class="size-14 bg-primary text-white rounded-full shadow-lg shadow-primary/40 flex items-center justify-center ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="text-[10px] font-medium">Asistente</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</a>
+</nav>
+</body></html>

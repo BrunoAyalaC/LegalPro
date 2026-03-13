@@ -1,0 +1,161 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 p-4 justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">gavel</span>
+<h1 class="text-lg font-bold leading-tight tracking-tight">Simulador IA</h1>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center rounded-full p-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="flex items-center justify-center rounded-full p-2 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Role Selection -->
+<div class="px-4 py-6">
+<h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Tu Rol en la Audiencia</h2>
+<div class="flex bg-slate-200 dark:bg-slate-800 p-1 rounded-xl">
+<label class="flex-1 cursor-pointer">
+<input class="hidden peer" name="role" type="radio" value="juez"/>
+<div class="text-center py-2 rounded-lg text-sm font-medium transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400">Juez</div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="hidden peer" name="role" type="radio" value="fiscal"/>
+<div class="text-center py-2 rounded-lg text-sm font-medium transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400">Fiscal</div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input checked="" class="hidden peer" name="role" type="radio" value="abogado"/>
+<div class="text-center py-2 rounded-lg text-sm font-medium transition-all peer-checked:bg-primary peer-checked:text-white text-slate-600 dark:text-slate-400">Abogado</div>
+</label>
+</div>
+</div>
+<!-- Case Summary -->
+<div class="px-4 mb-6">
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+<div class="h-32 bg-slate-200 dark:bg-slate-800 relative" data-alt="Official law court gavel and scales of justice" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBq3oS68keunaKH5SMzjxz-K1JE0sDhQ1ahKyFGW0hiS-KIapNJJ8MVRDxtzmMo9jSeCJ4cD7HdsCCHfMcJ2cDcr4IOjAW9YumF_Gllc6_bv8Mr2AsV7pmdSbwtSuE14zYLM3uGeAAsyiHVD5C_fXiYNXseapJ8MZW36wknDAALz8MdXnSJ14-rN_SgEiXZsjSLOUWpvPL4iUd3S7x_o_Obgp_0j_wKFFot3VvvGGrAoPRrNHgaaI1Okt5TkiToT1qQcMYJhd0qrYo'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+<div class="absolute bottom-3 left-4">
+<span class="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Penal</span>
+<h3 class="text-white font-bold mt-1">Exp. 00123-2023-JR-PE</h3>
+</div>
+</div>
+<div class="p-4">
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                        Acusación por colusión agravada en la licitación del Puente Tarata III. Análisis de tipicidad según el Código Procesal Penal peruano.
+                    </p>
+<div class="flex items-center gap-2 text-xs font-medium text-primary">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+<span>Jurisprudencia: R.N. 123-2022 Lima</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Gemini Feedback Panel -->
+<div class="px-4 mb-6">
+<div class="bg-primary/10 border border-primary/20 rounded-xl p-4">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-xl">temp_preferences_custom</span>
+<span class="text-sm font-bold text-primary uppercase tracking-tight">Análisis Inteligente</span>
+</div>
+<div class="space-y-3">
+<div class="flex gap-3">
+<div class="mt-1">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Fortaleza Legal</p>
+<p class="text-xs text-slate-600 dark:text-slate-400">Correcta citación del Art. 384 del CP. El argumento sobre el perjuicio patrimonial es sólido.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="mt-1">
+<span class="material-symbols-outlined text-amber-500 text-lg">warning</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Sugerencia Estratégica</p>
+<p class="text-xs text-slate-600 dark:text-slate-400">Refuerce la conexión entre la conducta del imputado y el acuerdo colusorio detectado en los chats.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Area Simulation -->
+<div class="px-4 space-y-4 pb-4">
+<div class="flex justify-start">
+<div class="max-w-[85%] bg-slate-200 dark:bg-slate-800 rounded-2xl rounded-tl-none p-3 shadow-sm">
+<p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Juez de Investigación</p>
+<p class="text-sm">Señor Abogado, ¿cuál es su fundamento respecto a la falta de pruebas de concertación previa?</p>
+</div>
+</div>
+<div class="flex justify-end">
+<div class="max-w-[85%] bg-primary text-white rounded-2xl rounded-tr-none p-3 shadow-sm">
+<p class="text-xs font-bold opacity-80 mb-1 uppercase">Tú (Abogado Defensor)</p>
+<p class="text-sm">Señor Juez, conforme al Art. 384, no existe evidencia directa de pacto ilícito. Las reuniones citadas por Fiscalía son de carácter técnico y administrativo...</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Chat Input / Action Bar -->
+<div class="fixed bottom-[72px] left-0 right-0 p-4 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-800">
+<div class="flex gap-2 items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-4 pr-1 py-1 shadow-md">
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2" placeholder="Escribe tu argumento legal..." type="text"/>
+<button class="bg-primary text-white rounded-full p-2 flex items-center justify-center">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 flex border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-5 pt-2 z-20">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-[10px] font-medium">Casos</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">chat_bubble</span>
+<span class="text-[10px] font-medium">Simulación</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</nav>
+</body></html>

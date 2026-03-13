@@ -1,0 +1,165 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#135bec",
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+          },
+          fontFamily: {
+            "display": ["Public Sans"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center p-4 justify-between max-w-md mx-auto w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100 cursor-pointer">arrow_back</span>
+<h1 class="text-lg font-bold tracking-tight">Alegatos de Clausura IA</h1>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<div class="max-w-md mx-auto w-full p-4 space-y-6">
+<!-- Upload Section -->
+<section class="bg-primary/5 border border-primary/20 rounded-xl p-5">
+<div class="flex flex-col gap-1 mb-4">
+<h2 class="text-base font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">upload_file</span>
+            Cargar Resumen de Audiencia
+          </h2>
+<p class="text-slate-600 dark:text-slate-400 text-sm">Sube el acta o transcripción de la audiencia para que Lex.ia procese las pruebas.</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 rounded-lg py-3 bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+          Cargar PDF / Audio
+        </button>
+</section>
+<!-- Settings Selector -->
+<section class="space-y-3">
+<label class="text-sm font-bold text-slate-500 uppercase tracking-wider">Tono del Discurso
+<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="flex-none px-4 py-2 rounded-full bg-primary text-white text-xs font-semibold">Persuasivo</button>
+<button class="flex-none px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">Técnico</button>
+<button class="flex-none px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">Agresivo</button>
+<button class="flex-none px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">Conciliador</button>
+</div>
+</label></section>
+<!-- AI Content Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-bold">Estructura del Alegato</h2>
+<span class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-bold uppercase">Lex.ia</span>
+</div>
+<!-- Section 1: Lema -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+<div class="flex items-center gap-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-lg">campaign</span>
+<h3 class="font-bold text-sm uppercase">1. Lema / Frase Impactante</h3>
+</div>
+<p class="italic text-lg font-medium text-slate-800 dark:text-slate-200 border-l-4 border-primary pl-4 py-1">
+            "La duda no es la ausencia de pruebas, sino la presencia de una verdad que la fiscalía no ha podido ocultar."
+          </p>
+</div>
+<!-- Section 2: Resumen de Pruebas -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+<div class="flex items-center gap-2 mb-3 text-primary">
+<span class="material-symbols-outlined text-lg">fact_check</span>
+<h3 class="font-bold text-sm uppercase">2. Resumen de Pruebas Actuadas</h3>
+</div>
+<div class="space-y-3">
+<div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border-l-2 border-slate-300 dark:border-slate-700">
+<p class="text-xs font-bold text-primary mb-1">Hecho 01: Presencia en el lugar</p>
+<p class="text-sm text-slate-600 dark:text-slate-400">Desvirtuado por el Peritaje de Geolocalización N° 45-2024 que ubica a mi patrocinado a 5km del epicentro.</p>
+</div>
+<div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border-l-2 border-slate-300 dark:border-slate-700">
+<p class="text-xs font-bold text-primary mb-1">Hecho 02: Intencionalidad</p>
+<p class="text-sm text-slate-600 dark:text-slate-400">La declaración del testigo clave 'Alpha' resultó contradictoria bajo contrainterrogatorio (Sesión 3, Min 14:20).</p>
+</div>
+</div>
+</div>
+<!-- Section 3: Subsunción Jurídica -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+<div class="flex items-center gap-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-lg">gavel</span>
+<h3 class="font-bold text-sm uppercase">3. Subsunción Jurídica</h3>
+</div>
+<div class="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+<p>Conforme al <span class="text-primary font-semibold">Art. 106 del Código Penal</span>, no se configura el tipo penal por ausencia del elemento subjetivo del dolo.</p>
+<p>Aplicación del principio <span class="italic">In Dubio Pro Reo</span> conforme al <span class="text-primary font-semibold">NCPP Art. II Título Preliminar</span>.</p>
+</div>
+</div>
+<!-- Section 4: Petitorio -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+<div class="flex items-center gap-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-lg">priority_high</span>
+<h3 class="font-bold text-sm uppercase">4. Conclusión / Petitorio</h3>
+</div>
+<p class="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
+            Se solicita a este honorable juzgado la ABSOLUCIÓN inmediata de mi patrocinado por insuficiencia probatoria y vulneración a la presunción de inocencia.
+          </p>
+</div>
+</section>
+<!-- Teleprompter CTA -->
+<div class="bg-slate-900 rounded-xl p-6 text-center space-y-4 border border-slate-700">
+<span class="material-symbols-outlined text-4xl text-primary">fluid</span>
+<div class="space-y-1">
+<h3 class="text-white font-bold">Modo Teleprompter</h3>
+<p class="text-slate-400 text-xs">Optimizado para lectura fluida en audiencia desde tu móvil o tablet.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-full font-bold text-sm transition-all">
+          Iniciar Vista de Lectura
+        </button>
+</div>
+</div>
+</main>
+<!-- Bottom Nav Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-background-light dark:bg-[#1c1f27] border-t border-slate-200 dark:border-[#282e39] max-w-md mx-auto w-full">
+<div class="flex gap-2 px-4 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-[#9da6b9]" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal tracking-[0.015em]">Inicio</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-[#9da6b9]" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<p class="text-[10px] font-medium leading-normal tracking-[0.015em]">Casos</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">description</span>
+<p class="text-[10px] font-medium leading-normal tracking-[0.015em]">Borradores</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-[#9da6b9]" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-[10px] font-medium leading-normal tracking-[0.015em]">Ajustes</p>
+</a>
+</div>
+</nav>
+</body></html>

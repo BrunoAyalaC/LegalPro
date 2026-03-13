@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestión de Expediente Multidoc</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        .ios-status-bar {
+            height: 44px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header / Navigation -->
+<div class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="ios-status-bar flex items-end justify-center pb-1">
+<div class="flex gap-1 items-center">
+<div class="w-16 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></div>
+</div>
+</div>
+<div class="flex items-center p-4 justify-between">
+<div class="flex items-center gap-3">
+<button class="p-2 -ml-2 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">Expediente Digital</h1>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-primary">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="p-2 text-primary">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+<main class="flex-1 pb-24">
+<!-- Contexto Unificado Section -->
+<div class="px-4 pt-6 pb-4">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-xl">hub</span>
+<h2 class="text-lg font-bold">Contexto Unificado</h2>
+</div>
+<div class="p-5 rounded-xl border border-primary/30 bg-primary/10 dark:bg-primary/5">
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1">
+<p class="text-sm font-semibold text-primary uppercase tracking-wider">Análisis Cruzado Inteligente</p>
+<p class="text-slate-700 dark:text-slate-300 text-base">
+                                Vinculando <span class="font-bold text-slate-900 dark:text-white">Contrato vs. Facturas</span> y <span class="font-bold text-slate-900 dark:text-white">Testimonios vs. Peritaje</span> para detectar inconsistencias.
+                            </p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white rounded-lg h-12 font-bold transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-xl">auto_awesome</span>
+<span>Analizar Todo el Caso</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Documents Grid -->
+<div class="px-4 mt-4">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold">Documentos del Caso</h3>
+<span class="text-sm text-slate-500 font-medium">12 archivos</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Upload Button -->
+<button class="flex flex-col items-center justify-center gap-2 aspect-square rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<span class="text-sm font-semibold">Cargar Archivo</span>
+</button>
+<!-- Document Card 1 -->
+<div class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm">
+<div class="flex items-start justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex items-center gap-1 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-700 dark:text-green-400">Analizado</span>
+</div>
+</div>
+<p class="text-sm font-bold truncate">Contrato_Principal.pdf</p>
+<p class="text-[11px] text-slate-500 mt-1">2.4 MB • 15 abr</p>
+</div>
+<!-- Document Card 2 -->
+<div class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm">
+<div class="flex items-start justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex items-center gap-1 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">
+<div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+<span class="text-[10px] font-bold text-amber-700 dark:text-amber-400">Procesando</span>
+</div>
+</div>
+<p class="text-sm font-bold truncate">Testimonio_Juan.docx</p>
+<p class="text-[11px] text-slate-500 mt-1">45 KB • Hoy</p>
+</div>
+<!-- Document Card 3 -->
+<div class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm">
+<div class="flex items-start justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div class="flex items-center gap-1 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-full">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-700 dark:text-green-400">Analizado</span>
+</div>
+</div>
+<p class="text-sm font-bold truncate">Peritaje_Grafico.jpg</p>
+<p class="text-[11px] text-slate-500 mt-1">1.2 MB • 14 abr</p>
+</div>
+<!-- Document Card 4 -->
+<div class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm">
+<div class="flex items-start justify-between mb-3">
+<div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600">
+<span class="material-symbols-outlined">file_present</span>
+</div>
+</div>
+<p class="text-sm font-bold truncate">Factura_001_2024.pdf</p>
+<p class="text-[11px] text-slate-500 mt-1">150 KB • 12 abr</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Tab Bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 px-4 pb-8 pt-2">
+<div class="flex items-center justify-around">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="text-[10px] font-medium uppercase tracking-tight">Casos</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="text-[10px] font-medium uppercase tracking-tight">IA Assistant</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">description</span>
+<span class="text-[10px] font-medium uppercase tracking-tight">Documentos</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium uppercase tracking-tight">Ajustes</span>
+</a>
+</div>
+</div>
+</div>
+</body></html>

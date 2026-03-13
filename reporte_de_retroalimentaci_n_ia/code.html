@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Reporte de Retroalimentación IA</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+</button>
+<h1 class="text-lg font-bold flex-1 text-center">Reporte de Desempeño Procesal</h1>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Progress Section -->
+<section class="p-6 flex flex-col items-center">
+<div class="relative flex items-center justify-center mb-4">
+<svg class="w-40 h-40 transform -rotate-90">
+<circle class="text-slate-200 dark:text-slate-800" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="66" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-bold">85</span>
+<span class="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">Puntaje</span>
+</div>
+</div>
+<div class="text-center">
+<h2 class="text-xl font-bold mb-1">Índice de Precisión Legal</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Tu desempeño está por encima del 92% de los usuarios en Lima</p>
+</div>
+</section>
+<!-- Simulation Timeline -->
+<section class="px-6 py-4">
+<h3 class="text-lg font-bold mb-4">Línea de Tiempo de la Simulación</h3>
+<div class="space-y-0">
+<!-- Item 1: Acierto -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="z-10 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500 ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div class="w-0.5 h-full bg-slate-200 dark:bg-slate-800"></div>
+</div>
+<div class="pb-8">
+<span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-500 mb-1">Acierto</span>
+<h4 class="font-semibold text-base">Alegatos de Apertura</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Excelente fundamentación dogmática. Aplicó correctamente el Art. 139 de la Constitución Política.</p>
+</div>
+</div>
+<!-- Item 2: Error Crítico -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="z-10 flex h-8 w-8 items-center justify-center rounded-full bg-rose-500/20 text-rose-500 ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div class="w-0.5 h-full bg-slate-200 dark:bg-slate-800"></div>
+</div>
+<div class="pb-8">
+<span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-500/10 text-rose-500 mb-1">Error Crítico</span>
+<h4 class="font-semibold text-base">Interrogatorio de Testigo</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1 italic">"No invocó la excepción de prescripción según el Art. 80 del Código Penal durante la tacha del testigo."</p>
+</div>
+</div>
+<!-- Item 3: Acierto -->
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="z-10 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-500 ring-4 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+</div>
+<div class="pb-4">
+<span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-500 mb-1">Acierto</span>
+<h4 class="font-semibold text-base">Conclusiones Finales</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Uso efectivo de la Casación 432-2020/Cusco para desvirtuar la prueba indiciaria.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Gemini Recommendation -->
+<section class="mx-4 p-5 rounded-xl bg-primary/10 border border-primary/20 mt-4 mb-6">
+<div class="flex items-center gap-2 mb-3">
+<div class="bg-primary p-1.5 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[20px]">auto_awesome</span>
+</div>
+<h3 class="font-bold text-primary">Recomendación Estratégica</h3>
+</div>
+<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                Para mejorar tu estrategia en el juicio real, te sugiero priorizar la impugnación de la temporalidad del delito. Tu omisión del Art. 80 CP es subsanable si introduces la excepción antes del cierre de la etapa probatoria. Refuerza tu postura sobre la prescripción ordinaria citando el Pleno Jurisdiccional 2023.
+            </p>
+</section>
+<!-- Action Button -->
+<div class="px-4">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">folder_shared</span>
+                Guardar en Expediente
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 pb-6 pt-2 px-4 flex justify-between items-center z-20">
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">play_circle</span>
+<span class="text-[10px] font-medium">Simulación</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">assignment</span>
+<span class="text-[10px] font-medium">Reportes</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-[10px] font-medium">Leyes</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</nav>
+</body></html>
