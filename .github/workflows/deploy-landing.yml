@@ -40,16 +40,9 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Remove old docs folder
-        run: rm -rf docs
-
-      - name: Move dist to docs
-        run: mv dist docs
-
-      - name: Commit and Push build
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add docs/
-          git commit -m "ci: deploy landing page [skip ci]" || echo "No changes to commit"
-          git push origin main
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          cname: brunoayalac.github.io
