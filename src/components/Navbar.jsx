@@ -9,6 +9,8 @@ const navLinks = [
   { label: 'Precios', href: '#pricing' },
 ]
 
+// Deploy trigger fix
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
