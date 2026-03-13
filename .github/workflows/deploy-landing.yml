@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: ⏱️ Start Build
@@ -43,18 +43,21 @@ jobs:
       - name: Build
         run: npm run build && echo "✅ Build complete: $(date -u +'%H:%M:%S UTC')"
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
+      - name: Remove old docs folder
+        run: |
+          rm -rf docs
+          echo "✅ Old docs removed"
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Move dist to docs
+        run: |
+          mv dist docs
+          echo "✅ dist → docs"
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/
+          git commit -m "ci: deploy landing page [skip ci]" || echo "No changes to commit"
+          git push origin main
+          echo "✅ Deployed: $(date -u +'%H:%M:%S UTC')"
