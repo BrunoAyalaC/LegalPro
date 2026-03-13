@@ -40,9 +40,15 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          cname: brunoayalac.github.io
+      - name: Copy dist to docs
+        run: |
+          rm -rf docs
+          cp -r dist docs
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/
+          git commit -m "ci: deploy to docs folder [skip ci]" || echo "No changes"
+          git push origin main
