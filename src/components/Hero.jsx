@@ -17,7 +17,7 @@ export default function Hero() {
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover z-0"
-        src="/bg_hero.mp4"
+        src={import.meta.env.BASE_URL + 'bg_hero.mp4'}
       />
       {/* Dark overlay para legibilidad */}
       <div className="absolute inset-0 z-0" style={{ background: 'rgba(10,15,46,0.72)' }} />

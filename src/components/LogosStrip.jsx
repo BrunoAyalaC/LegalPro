@@ -23,7 +23,7 @@ const INSTITUTIONS = rawInstitutions.map(inst => {
     style: {
       width: `${Math.round(inst.srcW * scale)}px`,
       height: `${TARGET_H}px`,
-      backgroundImage: "url('/institutions_sprite.png')",
+      backgroundImage: `url('${import.meta.env.BASE_URL}institutions_sprite.png')`,
       backgroundRepeat: 'no-repeat',
       backgroundPosition: `${Math.round(inst.bgX * scale)}px ${Math.round(inst.bgY * scale)}px`,
       backgroundSize: `${Math.round(SPRITE_W * scale)}px ${Math.round(SPRITE_H * scale)}px`,

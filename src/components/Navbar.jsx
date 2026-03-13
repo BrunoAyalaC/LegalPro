@@ -37,7 +37,7 @@ export default function Navbar() {
               className="flex items-center no-underline"
               whileHover={{ scale: 1.02 }}
             >
-              <img src="/logo.png" alt="Lex.ia" style={{ height: '40px', width: 'auto' }} />
+              <img src={import.meta.env.BASE_URL + 'logo.png'} alt="Lex.ia" style={{ height: '40px', width: 'auto' }} />
             </motion.a>
 
             {/* Desktop Nav */}

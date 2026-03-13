@@ -24,6 +24,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: ⏱️ Start Build
+        run: echo "🚀 BUILD START: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -35,10 +38,10 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci && echo "✅ Dependencies ready: $(date -u +'%H:%M:%S UTC')"
 
       - name: Build
-        run: npm run build
+        run: npm run build && echo "✅ Build complete: $(date -u +'%H:%M:%S UTC')"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
