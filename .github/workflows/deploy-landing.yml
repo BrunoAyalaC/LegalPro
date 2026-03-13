@@ -1,4 +1,4 @@
-name: Deploy Lex.ia Landing → GitHub Pages
+name: Deploy Lex.ia Landing to GitHub Pages
 
 on:
   push:
@@ -24,9 +24,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: ⏱️ Start Build
-        run: echo "🚀 BUILD START: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -38,26 +35,21 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm ci && echo "✅ Dependencies ready: $(date -u +'%H:%M:%S UTC')"
+        run: npm ci
 
       - name: Build
-        run: npm run build && echo "✅ Build complete: $(date -u +'%H:%M:%S UTC')"
+        run: npm run build
 
       - name: Remove old docs folder
-        run: |
-          rm -rf docs
-          echo "✅ Old docs removed"
+        run: rm -rf docs
 
       - name: Move dist to docs
-        run: |
-          mv dist docs
-          echo "✅ dist → docs"
+        run: mv dist docs
 
-      - name: Commit and Push
+      - name: Commit and Push build
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add docs/
           git commit -m "ci: deploy landing page [skip ci]" || echo "No changes to commit"
           git push origin main
-          echo "✅ Deployed: $(date -u +'%H:%M:%S UTC')"
