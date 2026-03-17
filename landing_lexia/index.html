@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lex.ia — La Inteligencia Artificial al servicio de la Justicia Peruana</title>
+  <meta name="description" content="Gestiona expedientes, predice resultados y redacta escritos legales con IA avanzada. La plataforma legal más moderna del Perú." />
+  <meta property="og:title" content="Lex.ia — IA para la Justicia Peruana" />
+  <meta property="og:description" content="13 herramientas de IA para abogados, fiscales y jueces peruanos." />
+  <meta property="og:image" content="assets/img/logo-og.webp" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="assets/img/logo-favicon.ico" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -45,6 +52,71 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg-void); }
     ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
+    /* ─── SCROLL PROGRESS BAR ─────────────────────────────── */
+    #scroll-progress-bar {
+      position: fixed; top: 0; left: 0; z-index: 2000;
+      height: 2px; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--gold));
+      transition: width 0.05s linear; pointer-events: none;
+    }
+
+    /* ─── VIDEO BACKGROUNDS ───────────────────────────────── */
+    .video-bg-wrap {
+      position: absolute; inset: 0; overflow: hidden; z-index: 0;
+    }
+    .video-bg-wrap video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0;
+      transition: opacity 1s ease;
+      will-change: transform;
+    }
+    .video-bg-wrap video.loaded { opacity: 1; }
+    .video-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      transition: opacity 0.4s ease;
+    }
+    /* Hero overlay — más oscuro para legibilidad del título */
+    .video-overlay-hero {
+      background: linear-gradient(
+        180deg,
+        rgba(5,5,8,0.55) 0%,
+        rgba(5,5,8,0.35) 40%,
+        rgba(5,5,8,0.70) 100%
+      );
+    }
+    /* Chapter overlay */
+    .video-overlay-chapter {
+      background: linear-gradient(
+        135deg,
+        rgba(5,5,8,0.82) 0%,
+        rgba(5,5,8,0.60) 100%
+      );
+    }
+    /* Neural overlay */
+    .video-overlay-neural {
+      background: radial-gradient(
+        ellipse at center,
+        rgba(5,5,8,0.50) 0%,
+        rgba(5,5,8,0.85) 100%
+      );
+    }
+    /* CTA overlay */
+    .video-overlay-cta {
+      background: linear-gradient(
+        180deg,
+        rgba(5,5,8,0.72) 0%,
+        rgba(5,5,8,0.45) 50%,
+        rgba(5,5,8,0.78) 100%
+      );
+    }
+    /* Chapter number — visible animation class */
+    .chapter-num-visible {
+      animation: chapter-num-in 0.8s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes chapter-num-in {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
 
     /* ─── CANVAS + OVERLAYS ──────────────────────────────────────── */
     #neural-canvas {
@@ -850,6 +922,8 @@
 </head>
 <body>
 
+<div id="scroll-progress-bar" aria-hidden="true"></div>
+
 <canvas id="neural-canvas" aria-hidden="true"></canvas>
 <div class="noise-overlay" aria-hidden="true"></div>
 <div class="blob blob-1" aria-hidden="true"></div>
@@ -903,9 +977,18 @@
   <!-- ══════════════════════════════════════════════════
        HERO
   ══════════════════════════════════════════════════ -->
-  <section id="inicio">
-    <div class="hero">
-      <div class="hero-bg"></div>
+  <section id="inicio" data-video-section>
+    <div class="hero" style="position:relative;">
+      <!-- Video background hero -->
+      <div class="video-bg-wrap" aria-hidden="true">
+        <video id="video-hero-bg" autoplay muted loop playsinline
+          poster="assets/img/hero-poster.webp"
+          oncanplay="this.classList.add('loaded')">
+          <source src="assets/videos/hero-bg.webm" type="video/webm" />
+          <source src="assets/videos/hero-bg.mp4" type="video/mp4" />
+        </video>
+        <div class="video-overlay video-overlay-hero"></div>
+      </div>
 
       <!-- Contenido izquierdo -->
       <div class="hero-content">
@@ -1025,7 +1108,17 @@
   <!-- ══════════════════════════════════════════════════
        CINEMATIC CHAPTERS
   ══════════════════════════════════════════════════ -->
-  <section class="chapters-section" id="funciones">
+  <section class="chapters-section" id="funciones" data-video-section style="position:relative;overflow:hidden;">
+    <!-- Video background capítulos -->
+    <div class="video-bg-wrap" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;">
+      <video id="video-chapter-bg" autoplay muted loop playsinline
+        poster="assets/img/chapter-poster.webp"
+        oncanplay="this.classList.add('loaded')">
+        <source src="assets/videos/chapter-bg.webm" type="video/webm" />
+        <source src="assets/videos/chapter-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay video-overlay-chapter"></div>
+    </div>
     <div class="chapters-header reveal">
       <div class="section-tag">CAPÍTULOS CINEMATOGRÁFICOS</div>
       <h2 class="section-title">Las 4 herramientas <span class="gradient-text-cyan">más poderosas</span></h2>
@@ -1197,7 +1290,17 @@
   <!-- ══════════════════════════════════════════════════
        PRODUCT DEMO
   ══════════════════════════════════════════════════ -->
-  <section class="demo-section" id="nosotros">
+  <section class="demo-section" id="nosotros" data-video-section style="position:relative;overflow:hidden;">
+    <!-- Video background neural globe -->
+    <div class="video-bg-wrap" aria-hidden="true">
+      <video id="video-neural" autoplay muted loop playsinline
+        poster="assets/img/neural-poster.webp"
+        oncanplay="this.classList.add('loaded')">
+        <source src="assets/videos/neural-globe.webm" type="video/webm" />
+        <source src="assets/videos/neural-globe.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay video-overlay-neural"></div>
+    </div>
     <div class="container">
       <div class="section-header">
         <div class="section-tag">PRODUCTO</div>
@@ -1497,8 +1600,17 @@
   <!-- ══════════════════════════════════════════════════
        FINAL CTA
   ══════════════════════════════════════════════════ -->
-  <section class="cta-final">
-    <div class="cta-inner">
+  <section class="cta-final" id="cta-section" data-video-section style="position:relative;overflow:hidden;">
+    <!-- Video justice reveal — controlado por scroll -->
+    <div class="video-bg-wrap" aria-hidden="true">
+      <video id="video-justice" muted playsinline preload="auto"
+        poster="assets/img/justice-poster.webp"
+        oncanplay="this.classList.add('loaded')">
+        <source src="assets/videos/justice-reveal.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay video-overlay-cta"></div>
+    </div>
+    <div class="cta-inner" style="position:relative;z-index:2;">
       <div style="display:flex;justify-content:center;"><div class="section-tag">COMIENZA HOY</div></div>
       <h2 class="cta-title reveal">
         Únete a <span class="gradient-text-cyan">15,000+</span><br>
@@ -1725,5 +1837,9 @@ document.addEventListener('visibilitychange', () => {
 let mouse = { x: -999, y: -999 };
 window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
 </script>
+
+<!-- Motor de scroll interactivo + video parallax -->
+<script src="scroll-engine.js" type="module"></script>
+
 </body>
 </html>
