@@ -1,18 +1,25 @@
 ﻿import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTenant } from '../context/TenantContext';
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useTenant();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
-      return;
+    // Leer auth directamente de localStorage — no depender de contexto que puede crashear
+    const token = localStorage.getItem('legalpro_token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (!payload.exp || payload.exp * 1000 > Date.now()) {
+          navigate('/dashboard', { replace: true });
+          return;
+        }
+      } catch {
+        // Token inválido — redirigir a landing
+      }
     }
     window.location.replace('/landing/');
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
   return (
     <div style={{ minHeight: '100dvh', background: '#050508', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
