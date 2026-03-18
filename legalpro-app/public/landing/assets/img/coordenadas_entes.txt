@@ -1,0 +1,41 @@
+SUNARp:
+
+.sprite {
+	background: url('imgs/institutions_sprite.png') no-repeat 0 -17px;
+	width: 381px;
+	height: 206px;
+}
+SUNAT:
+
+.sprite {
+	background: url('imgs/institutions_sprite.png') no-repeat -441px -48px;
+	width: 484px;
+	height: 141px;
+}
+PODER JUDICIAL:
+.sprite {
+	background: url('imgs/institutions_sprite.png') no-repeat -969px -20px;
+	width: 351px;
+	height: 239px;
+}
+MINISTERIO PUBLICO:
+
+.sprite {
+	background: url('imgs/institutions_sprite.png') no-repeat -4px -366px;
+	width: 794px;
+	height: 284px;
+}
+INDECOPI:
+
+.sprite {
+	background: url('imgs/institutions_sprite.png') no-repeat -855px -320px;
+	width: 454px;
+	height: 131px;
+}
+OSIPTEL:
+
+.sprite {
+	background: url('imgs/institutions_sprite.png') no-repeat -893px -471px;
+	width: 426px;
+	height: 102px;
+}

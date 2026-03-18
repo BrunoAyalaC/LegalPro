@@ -1,0 +1,390 @@
+Row 1: [1]glowing cyan brain with circuits (IA Análisis),
+.sprite {
+	background: url('imgs/sprite.png') no-repeat 0 0;
+	width: 123px;
+	height: 102px;
+} 
+       [2]chrome gavel with gold sparks (Simulador Juicios),
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -141px -4px;
+	width: 116px;
+	height: 99px;
+}
+       [3]mini balanced scales cyan glow (Predictor),
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -282px -3px;
+	width: 112px;
+	height: 101px;
+}
+       [4]parchment scroll gold ribbon (Escritos),
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -424px -3px;
+	width: 98px;
+	height: 101px;
+}
+       [5]books stack magnifying glass (Jurisprudencia),
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -558px -5px;
+	width: 110px;
+	height: 96px;
+}
+       [6]metal vault door cyan lock (Bóveda)
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -836px -3px;
+	width: 104px;
+	height: 100px;
+}
+Row 2: [7]bronze clock cyan digital overlay (Plazos),
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -973px -2px;
+	width: 108px;
+	height: 103px;
+}
+       [8]silver mic cyan soundwaves (Objeciones),
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1107px -4px;
+	width: 110px;
+	height: 99px;
+}
+       [9]holographic bell wifi signal (SINOE Monitor),
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -289px -134px;
+	width: 98px;
+	height: 109px;
+}
+       [10]chrome folder lightning bolt (Expedientes),
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -424px -144px;
+	width: 104px;
+	height: 92px;
+}
+       [11]bar chart + mini gavel (Resultados),
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -563px -143px;
+	width: 108px;
+	height: 95px;
+}
+       [12]spotlight beam gold shadow (Interrogatorio)
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -698px -139px;
+	width: 108px;
+	height: 125px;
+}
+Row 3: [13]clapperboard gold frame scales (Simulador IA),
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -839px -138px;
+	width: 95px;
+	height: 99px;
+}
+
+
+LOTE B — Navegación (6) + Acciones (18):
+
+Row 1 NAVEGACIÓN: [14]house dashboard cyan,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -970px -139px;
+	width: 109px;
+	height: 99px;
+} 
+[15]folder stack,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1108px -139px;
+	width: 109px;
+	height: 99px;
+}
+
+  [16]tools wrench gold, 
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1249px -145px;
+	width: 105px;
+	height: 91px;
+}
+[17]user silhouette cyan, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -157px -274px;
+	width: 83px;
+	height: 87px;
+}
+  [18]chat bubble IA, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -572px -277px;
+	width: 90px;
+	height: 82px;
+}
+[19]search magnifier glow
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -699px -269px;
+	width: 90px;
+	height: 92px;
+}
+Row 2-4 ACCIONES: [20]plus circle cyan add, 
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -928px -277px;
+	width: 79px;
+	height: 80px;
+}
+[21]pencil edit gold,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1037px -274px;
+	width: 82px;
+	height: 86px;
+}
+  [22]trash bin red glow, 
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1150px -275px;
+	width: 84px;
+	height: 89px;
+}
+[23]share arrow cyan,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1269px -274px;
+	width: 78px;
+	height: 85px;
+}
+  [24]download arrow down, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -604px -381px;
+	width: 39px;
+	height: 51px;
+}
+[25]upload arrow up,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -719px -381px;
+	width: 38px;
+	height: 51px;
+}
+  [26]filter funnel gold, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -134px -382px;
+	width: 65px;
+	height: 65px;
+}
+[27]sort arrows, 
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -251px -382px;
+	width: 60px;
+	height: 64px;
+}
+[28]refresh rotate,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1051px -381px;
+	width: 64px;
+	height: 66px;
+}
+  [29]eye view cyan, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1154px -388px;
+	width: 86px;
+	height: 53px;
+}
+[30]lock closed gold, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1280px -367px;
+	width: 63px;
+	height: 78px;
+}
+[31]external link,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -15px -465px;
+	width: 72px;
+	height: 73px;
+}
+  [32]copy pages, 
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -132px -463px;
+	width: 67px;
+	height: 80px;
+}
+[33]attach paperclip, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -241px -462px;
+	width: 78px;
+	height: 81px;
+}
+[34]photo camera,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -353px -469px;
+	width: 84px;
+	height: 65px;
+}
+  [35]calendar event, 
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -475px -463px;
+	width: 69px;
+	height: 77px;
+}
+[36]clock time, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -584px -463px;
+	width: 79px;
+	height: 80px;
+}
+[37]location pin cyan,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -710px -464px;
+	width: 55px;
+	height: 79px;
+}
+  [38]star favorite gold,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -813px -463px;
+	width: 81px;
+	height: 77px;
+}
+
+
+LOTE C — Estados (6) + Roles (4) + Misc (12):
+
+ESTADOS: [39]checkmark circle green glow, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -925px -459px;
+	width: 86px;
+	height: 86px;
+}
+[40]X circle red,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1041px -459px;
+	width: 85px;
+	height: 86px;
+}
+  [41]warning triangle gold, 
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1156px -465px;
+	width: 82px;
+	height: 73px;
+}
+[42]info circle cyan,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1273px -463px;
+	width: 77px;
+	height: 78px;
+}
+  [43]loading spinner cyan, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -121px -564px;
+	width: 85px;
+	height: 86px;
+}
+[44]success badge gold
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -239px -564px;
+	width: 82px;
+	height: 82px;
+}
+ROLES: [45]briefcase lawyer cyan (Abogado icon),
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -920px -560px;
+	width: 98px;
+	height: 85px;
+}
+  [46]badge shield prosecutor (Fiscal icon),
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1045px -560px;
+	width: 75px;
+	height: 89px;
+}
+  [47]gavel + robe Judge (Juez icon),
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1154px -562px;
+	width: 86px;
+	height: 85px;
+}
+  [48]calculator accountant gold (Contador icon)
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1279px -562px;
+	width: 65px;
+	height: 85px;
+}
+MISC: [49]settings cog chrome, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -7px -669px;
+	width: 88px;
+	height: 89px;
+}
+[50]bell notification cyan,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -122px -670px;
+	width: 86px;
+	height: 85px;
+}
+  [51]user account circle,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -237px -669px;
+	width: 86px;
+	height: 87px;
+} 
+[52]menu hamburger,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -353px -682px;
+	width: 83px;
+	height: 61px;
+}
+  [53]arrow back left, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -466px -673px;
+	width: 86px;
+	height: 79px;
+}
+[54]arrow forward right,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -581px -673px;
+	width: 86px;
+	height: 79px;
+}
+  [55]expand arrows, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -809px -668px;
+	width: 89px;
+	height: 89px;
+}
+[56]collapse arrows,
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -925px -668px;
+	width: 87px;
+	height: 88px;
+}
+  [57]mail envelope gold, 
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1040px -674px;
+	width: 92px;
+	height: 69px;
+}
+[58]phone cyan,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1154px -669px;
+	width: 86px;
+	height: 87px;
+}
+  [59]question help circle,
+
+.sprite {
+	background: url('imgs/sprite.png') no-repeat -1268px -669px;
+	width: 86px;
+	height: 87px;
+}
+
+
