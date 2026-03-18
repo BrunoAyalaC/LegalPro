@@ -1,0 +1,40 @@
+# ── Build stage: compila el frontend Vite ──────────────────────
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --ignore-scripts
+
+# Copiar todo el fuente (src, public, index.html, vite.config, etc.)
+COPY . .
+
+# Las VITE_* vars deben pasarse en build-time via --build-arg
+ARG VITE_NODE_API_URL
+ARG VITE_DOTNET_API_URL
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_APK_URL
+
+ENV VITE_NODE_API_URL=$VITE_NODE_API_URL
+ENV VITE_DOTNET_API_URL=$VITE_DOTNET_API_URL
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+ENV VITE_APK_URL=$VITE_APK_URL
+
+RUN npm run build
+
+# ── Runtime stage: nginx sirve dist correctamente ──────────────
+FROM nginx:alpine AS final
+WORKDIR /app
+
+# Copiar build y config nginx
+COPY --from=builder /app/dist /app/dist
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# nginx escucha en 3000 (Railway lo espera)
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget -qO- http://localhost:3000 || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]
