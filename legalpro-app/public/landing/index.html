@@ -1,0 +1,1846 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lex.ia — La Inteligencia Artificial al servicio de la Justicia Peruana</title>
+  <meta name="description" content="Gestiona expedientes, predice resultados y redacta escritos legales con IA avanzada. La plataforma legal más moderna del Perú." />
+  <meta property="og:title" content="Lex.ia — IA para la Justicia Peruana" />
+  <meta property="og:description" content="13 herramientas de IA para abogados, fiscales y jueces peruanos." />
+  <meta property="og:image" content="assets/img/logo-og.webp" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="assets/img/logo-favicon.ico" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── DESIGN TOKENS 06-J ─────────────────────────────────────── */
+    :root {
+      --bg-void:      #050508;
+      --bg-deep:      #0A0A0F;
+      --bg-card:      #0F0F17;
+      --bg-surface:   #16161F;
+      --bg-hover:     #1C1C28;
+      --cyan:         #06B6D4;
+      --cyan-bright:  #22D3EE;
+      --cyan-soft:    #67E8F9;
+      --cyan-ghost:   rgba(6,182,212,0.1);
+      --gold:         #C9A84C;
+      --gold-bright:  #E6C060;
+      --gold-ghost:   rgba(201,168,76,0.1);
+      --text-white:   #F8FAFC;
+      --text-body:    #CBD5E1;
+      --text-muted:   #8896A8;
+      --green:        #10B981;
+      --border-base:  rgba(255,255,255,0.06);
+      --border-cyan:  rgba(6,182,212,0.25);
+      --border-gold:  rgba(201,168,76,0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-white);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-void); }
+    ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
+    /* ─── SCROLL PROGRESS BAR ─────────────────────────────── */
+    #scroll-progress-bar {
+      position: fixed; top: 0; left: 0; z-index: 2000;
+      height: 2px; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--gold));
+      transition: width 0.05s linear; pointer-events: none;
+    }
+
+    /* ─── VIDEO BACKGROUNDS ───────────────────────────────── */
+    .video-bg-wrap {
+      position: absolute; inset: 0; overflow: hidden; z-index: 0;
+    }
+    .video-bg-wrap video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0;
+      transition: opacity 1s ease;
+      will-change: transform;
+    }
+    .video-bg-wrap video.loaded { opacity: 1; }
+    .video-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      transition: opacity 0.4s ease;
+    }
+    /* Hero overlay — más oscuro para legibilidad del título */
+    .video-overlay-hero {
+      background: linear-gradient(
+        180deg,
+        rgba(5,5,8,0.55) 0%,
+        rgba(5,5,8,0.35) 40%,
+        rgba(5,5,8,0.70) 100%
+      );
+    }
+    /* Chapter overlay */
+    .video-overlay-chapter {
+      background: linear-gradient(
+        135deg,
+        rgba(5,5,8,0.82) 0%,
+        rgba(5,5,8,0.60) 100%
+      );
+    }
+    /* Neural overlay */
+    .video-overlay-neural {
+      background: radial-gradient(
+        ellipse at center,
+        rgba(5,5,8,0.50) 0%,
+        rgba(5,5,8,0.85) 100%
+      );
+    }
+    /* CTA overlay */
+    .video-overlay-cta {
+      background: linear-gradient(
+        180deg,
+        rgba(5,5,8,0.72) 0%,
+        rgba(5,5,8,0.45) 50%,
+        rgba(5,5,8,0.78) 100%
+      );
+    }
+    /* Chapter number — visible animation class */
+    .chapter-num-visible {
+      animation: chapter-num-in 0.8s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes chapter-num-in {
+      from { opacity: 0; transform: translateX(-40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ─── CANVAS + OVERLAYS ──────────────────────────────────────── */
+    #neural-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.5;
+    }
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(130px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 700px; height: 700px; background: rgba(6,182,212,0.07); top: -200px; left: -200px; }
+    .blob-2 { width: 500px; height: 500px; background: rgba(201,168,76,0.05); top: 50%; right: -150px; }
+    .blob-3 { width: 450px; height: 450px; background: rgba(6,182,212,0.05); bottom: 0; left: 30%; }
+    .page { position: relative; z-index: 2; }
+
+    /* ─── UTILITIES ──────────────────────────────────────────────── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .gradient-text-cyan {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-soft) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .gradient-text-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 30px rgba(201,168,76,0.5));
+    }
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--cyan-ghost);
+      border: 1px solid var(--border-cyan);
+      border-radius: 6px;
+      padding: 5px 14px;
+      font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--cyan-bright);
+      margin-bottom: 20px;
+    }
+    .section-tag::before {
+      content: ''; width: 5px; height: 5px;
+      background: var(--cyan); border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .section-tag-gold {
+      background: var(--gold-ghost);
+      border-color: var(--border-gold);
+      color: var(--gold-bright);
+    }
+    .section-tag-gold::before { background: var(--gold); animation: none; }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.6); }
+    }
+
+    /* ─── BUTTONS ────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 26px; border-radius: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.25s ease;
+      text-decoration: none; border: none; outline: none;
+      white-space: nowrap; letter-spacing: -0.2px;
+    }
+    .btn-primary {
+      background: var(--cyan);
+      color: var(--bg-void);
+      box-shadow: 0 0 24px rgba(6,182,212,0.35);
+    }
+    .btn-primary:hover {
+      background: var(--cyan-bright);
+      box-shadow: 0 0 40px rgba(6,182,212,0.55);
+      transform: translateY(-2px);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-white);
+      border: 1.5px solid rgba(248,250,252,0.2);
+    }
+    .btn-ghost:hover {
+      border-color: var(--border-cyan);
+      background: var(--cyan-ghost);
+      transform: translateY(-2px);
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--bg-void);
+      box-shadow: 0 0 24px rgba(201,168,76,0.3);
+      font-weight: 700;
+    }
+    .btn-gold:hover { background: var(--gold-bright); transform: translateY(-2px); }
+    .btn-sm { padding: 9px 18px; font-size: 13px; }
+
+    /* ─── SECTION BASE ───────────────────────────────────────────── */
+    .section { padding: 100px 24px; }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px,5vw,56px);
+      font-weight: 900; letter-spacing: -1.5px; line-height: 1.1;
+      color: var(--text-white); margin-bottom: 16px;
+    }
+    .section-subtitle { font-size: 17px; color: var(--text-muted); max-width: 540px; margin: 0 auto; line-height: 1.6; }
+
+    /* ─── REVEAL ANIMATION ───────────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════════════════════════ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0 24px; height: 70px;
+      display: flex; align-items: center;
+      background: rgba(5,5,8,0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.3s ease;
+    }
+    .navbar.scrolled { background: rgba(5,5,8,0.96); }
+    .navbar-inner {
+      max-width: 1200px; margin: 0 auto; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .navbar-logo {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .navbar-logo .logo-icon {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .navbar-logo .logo-text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 21px; font-weight: 800; letter-spacing: -0.5px;
+      color: var(--text-white);
+    }
+    .navbar-logo .logo-text .ia { color: var(--cyan); }
+    .navbar-links {
+      display: flex; align-items: center; gap: 36px; list-style: none;
+    }
+    .navbar-links a {
+      font-size: 14px; font-weight: 500; color: var(--text-muted);
+      text-decoration: none; transition: color 0.2s; position: relative;
+    }
+    .navbar-links a:hover, .navbar-links a.active { color: var(--text-white); }
+    .navbar-links a.active::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 2px; background: var(--cyan); border-radius: 2px;
+    }
+    .navbar-actions { display: flex; align-items: center; gap: 10px; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text-white); border-radius: 2px; transition: all 0.3s; }
+    .mobile-menu {
+      display: none; position: fixed; top: 70px; left: 0; right: 0;
+      background: rgba(5,5,8,0.98); backdrop-filter: blur(20px);
+      padding: 24px; z-index: 999; border-bottom: 1px solid var(--border-base);
+    }
+    .mobile-menu.open { display: flex; flex-direction: column; gap: 16px; }
+    .mobile-menu a { color: var(--text-body); text-decoration: none; font-size: 16px; padding: 8px 0; border-bottom: 1px solid var(--border-base); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 60px;
+      padding: 130px 24px 80px;
+      max-width: 1200px; margin: 0 auto;
+      position: relative;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(180deg, rgba(5,5,8,0.3) 0%, transparent 40%, rgba(5,5,8,0.6) 100%),
+        linear-gradient(135deg,
+          #080C14 0%, #0D1520 30%, #0A1018 60%, #050508 100%);
+      z-index: -1; margin: 0 -24px;
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.06'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(6,182,212,0.08);
+      border: 1px solid rgba(6,182,212,0.3);
+      border-radius: 8px; padding: 7px 16px;
+      font-size: 12px; font-weight: 700; color: var(--cyan-bright);
+      letter-spacing: 0.5px;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.5s ease both;
+    }
+    .hero-badge svg { width: 13px; height: 13px; }
+    .hero-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(40px, 5.5vw, 68px);
+      font-weight: 900; line-height: 1.1; letter-spacing: -2px;
+      color: var(--text-white);
+      margin-bottom: 8px;
+      animation: fadeInUp 0.5s ease 0.1s both;
+    }
+    .hero-title-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 60%, var(--gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(201,168,76,0.4));
+    }
+    .hero-separator {
+      width: 72px; height: 3px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+      border-radius: 2px; margin: 22px 0;
+      animation: fadeInUp 0.5s ease 0.2s both;
+    }
+    .hero-subtitle {
+      font-size: clamp(15px, 1.8vw, 18px);
+      color: rgba(203,213,225,0.75);
+      max-width: 500px; line-height: 1.65;
+      margin-bottom: 36px;
+      animation: fadeInUp 0.5s ease 0.25s both;
+    }
+    .hero-ctas {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      margin-bottom: 40px;
+      animation: fadeInUp 0.5s ease 0.3s both;
+    }
+    .hero-stats {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      animation: fadeInUp 0.5s ease 0.4s both;
+    }
+    .stat-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(5,5,8,0.7);
+      border: 1px solid rgba(6,182,212,0.2);
+      border-radius: 10px; padding: 8px 14px;
+      font-size: 13px; font-weight: 600; color: var(--text-white);
+      backdrop-filter: blur(10px);
+    }
+    .stat-badge.gold-border { border-color: rgba(201,168,76,0.3); }
+    .stat-badge span.emoji { font-size: 14px; }
+    .hero-visual {
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      animation: fadeInUp 0.7s ease 0.5s both;
+    }
+    .hero-phone-wrap { position: relative; }
+    .hero-phone-glow-b {
+      position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
+      width: 200px; height: 80px;
+      background: radial-gradient(ellipse, rgba(6,182,212,0.3) 0%, transparent 70%);
+      filter: blur(20px); pointer-events: none;
+    }
+    .hero-phone-glow-t {
+      position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+      width: 160px; height: 60px;
+      background: radial-gradient(ellipse, rgba(201,168,76,0.2) 0%, transparent 70%);
+      filter: blur(16px); pointer-events: none;
+    }
+    .hero-phone {
+      width: 270px; height: 540px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 44px;
+      position: relative; overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(6,182,212,0.12),
+        0 40px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      animation: float 5s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    .phone-notch {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      width: 90px; height: 22px; background: #000; border-radius: 12px; z-index: 10;
+    }
+    .phone-screen {
+      width: 100%; height: 100%; padding: 40px 10px 10px;
+      background: linear-gradient(180deg, #0D1320 0%, #080C18 100%);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .ps-topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 8px 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .ps-logo { font-size: 10px; font-weight: 800; color: var(--cyan); font-family: 'Plus Jakarta Sans',sans-serif; }
+    .ps-avatar { width: 20px; height: 20px; background: var(--cyan); border-radius: 50%; opacity: 0.8; }
+    .ps-card {
+      margin: 0 4px; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 8px 10px;
+    }
+    .ps-card-label { font-size: 8px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+    .ps-card-value { font-size: 15px; font-weight: 900; color: var(--cyan); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .ps-bars { display: flex; gap: 3px; align-items: flex-end; height: 28px; margin-top: 4px; }
+    .ps-bar { flex: 1; border-radius: 2px; background: linear-gradient(180deg, var(--cyan) 0%, rgba(6,182,212,0.2) 100%); opacity: 0.75; }
+    .ps-progress-row { margin: 0 4px; }
+    .ps-progress-label { font-size: 7px; color: var(--green); margin-bottom: 3px; }
+    .ps-progress-track { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+    .ps-progress-fill { height: 100%; width: 72%; background: linear-gradient(90deg, var(--cyan), var(--gold)); border-radius: 2px; }
+    .ps-item {
+      display: flex; align-items: center; gap: 6px;
+      margin: 0 4px; padding: 5px 7px;
+      background: rgba(255,255,255,0.03); border-radius: 7px;
+    }
+    .ps-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .ps-line { height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; }
+    .ps-action {
+      margin: auto 4px 4px;
+      background: linear-gradient(135deg, var(--cyan), rgba(6,182,212,0.7));
+      border-radius: 10px; padding: 9px; text-align: center;
+      font-size: 8px; font-weight: 700; color: var(--bg-void);
+    }
+    .float-badge {
+      position: absolute; border-radius: 12px; padding: 10px 14px;
+      background: rgba(5,5,8,0.85); border: 1px solid; backdrop-filter: blur(12px);
+    }
+    .float-badge .fb-label { font-size: 9px; color: var(--text-muted); margin-bottom: 2px; }
+    .float-badge .fb-value { font-size: 18px; font-weight: 900; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .float-badge-green { border-color: rgba(16,185,129,0.3); top: 50px; right: -30px; }
+    .float-badge-green .fb-value { color: var(--green); }
+    .float-badge-gold { border-color: rgba(201,168,76,0.3); bottom: 90px; left: -30px; }
+    .float-badge-gold .fb-value { color: var(--gold); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       INSTITUTIONS STRIP
+    ═══════════════════════════════════════════════════════════════ */
+    .institutions-strip {
+      padding: 22px 24px;
+      background: rgba(255,255,255,0.015);
+      border-top: 1px solid var(--border-base);
+      border-bottom: 1px solid var(--border-base);
+      overflow: hidden;
+    }
+    .institutions-label {
+      text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;
+    }
+    .inst-track {
+      display: flex; align-items: center; gap: 0;
+      animation: scroll-logos 22s linear infinite; width: max-content;
+    }
+    .inst-item {
+      display: flex; align-items: center; gap: 0;
+      font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.22);
+      white-space: nowrap; padding: 0 28px;
+    }
+    .inst-sep { color: var(--cyan); opacity: 0.4; margin: 0 4px; }
+    @keyframes scroll-logos { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CINEMATIC CHAPTERS
+    ═══════════════════════════════════════════════════════════════ */
+    .chapters-section { padding: 80px 0; }
+    .chapters-header { text-align: center; padding: 0 24px; margin-bottom: 60px; }
+    .chapter-block {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 480px; position: relative; overflow: hidden;
+    }
+    .chapter-block:nth-child(odd) { background: linear-gradient(135deg, rgba(6,182,212,0.025) 0%, var(--bg-deep) 60%); }
+    .chapter-block:nth-child(even) { background: linear-gradient(135deg, rgba(201,168,76,0.02) 0%, var(--bg-deep) 60%); }
+    .chapter-block:nth-child(even) .chapter-content { order: 2; }
+    .chapter-block:nth-child(even) .chapter-visual { order: 1; }
+    .chapter-content {
+      padding: 64px 60px 64px 80px;
+      display: flex; flex-direction: column; justify-content: center; gap: 16px;
+      position: relative; z-index: 1;
+    }
+    .chapter-number {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(72px, 9vw, 110px);
+      font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, var(--gold) 0%, rgba(201,168,76,0.3) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: -4px; margin-bottom: -8px;
+    }
+    .chapter-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(22px, 2.5vw, 32px); font-weight: 800;
+      color: var(--cyan-bright); letter-spacing: 2px; text-transform: uppercase;
+    }
+    .chapter-desc {
+      font-size: 16px; color: var(--text-body); line-height: 1.7;
+      max-width: 440px;
+    }
+    .chapter-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 14px; font-weight: 700; color: var(--cyan);
+      text-decoration: none; margin-top: 8px; transition: gap 0.2s;
+    }
+    .chapter-link:hover { gap: 14px; }
+    .chapter-title--gold { color: var(--gold-bright); }
+    .chapter-link--gold { color: var(--gold); }
+    .chapter-visual {
+      padding: 40px; display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .chapter-device {
+      width: 100%; max-width: 460px;
+      background: rgba(15,15,23,0.95);
+      border: 1px solid rgba(6,182,212,0.18);
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 0 60px rgba(6,182,212,0.07), 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .chapter-block:nth-child(even) .chapter-device { border-color: rgba(201,168,76,0.18); box-shadow: 0 0 60px rgba(201,168,76,0.06), 0 20px 40px rgba(0,0,0,0.4); }
+    .device-topbar {
+      background: #0A0A14; padding: 12px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border-base);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #FF5F57; } .dot-y { background: #FEBC2E; } .dot-g { background: #28C840; }
+    .device-url { flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px; padding: 4px 10px; font-size: 11px; color: var(--text-muted); text-align: center; }
+    .device-body { padding: 16px; min-height: 240px; display: flex; flex-direction: column; gap: 10px; }
+    .device-row { display: flex; gap: 10px; }
+    .device-card-sm {
+      flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border-base);
+      border-radius: 10px; padding: 12px;
+    }
+    .device-card-label { font-size: 8px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .device-card-val { font-size: 18px; font-weight: 900; color: var(--cyan); font-family: 'Plus Jakarta Sans',sans-serif; }
+    .device-card-val.gold { color: var(--gold); }
+    .device-bar-row { display: flex; gap: 2px; align-items: flex-end; height: 28px; margin-top: 4px; }
+    .device-bar { flex: 1; border-radius: 2px; background: linear-gradient(180deg, var(--cyan), rgba(6,182,212,0.2)); }
+    .device-text-lines { display: flex; flex-direction: column; gap: 5px; padding: 8px 0; }
+    .device-line { height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; }
+    .device-ai-row {
+      background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.12);
+      border-radius: 10px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .device-ai-icon { font-size: 18px; }
+    .device-ai-text { font-size: 10px; color: var(--cyan-bright); font-weight: 600; }
+    .device-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.2);
+      border-radius: 6px; padding: 4px 10px; font-size: 9px; font-weight: 700;
+      color: var(--cyan); letter-spacing: 1px; text-transform: uppercase;
+    }
+    .device-tag.gold-tag { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.2); color: var(--gold); }
+    .device-list { display: flex; flex-direction: column; gap: 6px; }
+    .device-list-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 10px; color: var(--text-body);
+      background: rgba(255,255,255,0.02); border-radius: 6px; padding: 6px 8px;
+    }
+    .device-list-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PRODUCT DEMO
+    ═══════════════════════════════════════════════════════════════ */
+    .demo-section { padding: 100px 24px; text-align: center; }
+    .demo-browser {
+      max-width: 960px; margin: 48px auto 0;
+      background: var(--bg-card); border: 1px solid rgba(6,182,212,0.2);
+      border-radius: 18px; overflow: hidden;
+      box-shadow:
+        0 0 100px rgba(6,182,212,0.12),
+        0 0 50px rgba(201,168,76,0.06),
+        0 40px 80px rgba(0,0,0,0.5);
+    }
+    .browser-bar {
+      background: #0A0A14; padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--border-base);
+    }
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-url {
+      flex: 1; background: rgba(255,255,255,0.04); border-radius: 8px;
+      padding: 6px 12px; font-size: 12px; color: var(--text-muted);
+      text-align: center; max-width: 300px; margin: 0 auto;
+    }
+    .browser-body {
+      display: grid; grid-template-columns: 220px 1fr;
+      min-height: 380px; background: #0A0A14;
+    }
+    .browser-sidebar {
+      background: rgba(255,255,255,0.02);
+      border-right: 1px solid var(--border-base);
+      padding: 20px 0;
+    }
+    .bs-logo { padding: 0 16px 16px; font-size: 14px; font-weight: 800; color: var(--cyan); font-family: 'Plus Jakarta Sans',sans-serif; border-bottom: 1px solid var(--border-base); margin-bottom: 16px; }
+    .bs-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px; font-size: 12px; color: var(--text-muted); cursor: pointer;
+      transition: background 0.2s;
+    }
+    .bs-item:hover { background: rgba(255,255,255,0.03); }
+    .bs-item.active { background: rgba(6,182,212,0.08); color: var(--cyan-bright); }
+    .bs-icon { width: 18px; height: 18px; background: rgba(255,255,255,0.06); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+    .bs-item.active .bs-icon { background: rgba(6,182,212,0.15); }
+    .browser-main { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .bm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .bm-title { font-size: 18px; font-weight: 800; color: var(--text-white); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .bm-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .bm-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border-base);
+      border-radius: 12px; padding: 14px;
+    }
+    .bm-card-label { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .bm-card-val { font-size: 22px; font-weight: 900; font-family: 'Plus Jakarta Sans',sans-serif; }
+    .bm-card-val.cyan { color: var(--cyan); }
+    .bm-card-val.gold { color: var(--gold); }
+    .bm-card-val.green { color: var(--green); }
+    .bm-ai-block {
+      background: rgba(6,182,212,0.05); border: 1px solid rgba(6,182,212,0.15);
+      border-radius: 12px; padding: 14px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .bm-ai-ava { width: 32px; height: 32px; background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .bm-ai-text { font-size: 12px; color: var(--text-body); line-height: 1.5; }
+    .bm-ai-text strong { color: var(--cyan-bright); }
+    .bm-rows { display: flex; flex-direction: column; gap: 6px; }
+    .bm-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.02); border-radius: 8px; padding: 8px 12px;
+      font-size: 12px; color: var(--text-body);
+    }
+    .bm-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+    .bm-status.open { background: rgba(6,182,212,0.12); color: var(--cyan); }
+    .bm-status.won { background: rgba(16,185,129,0.12); color: var(--green); }
+    .bm-status.review { background: rgba(201,168,76,0.12); color: var(--gold); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       13 FEATURES GRID
+    ═══════════════════════════════════════════════════════════════ */
+    .features-section { padding: 100px 24px; }
+    .features-grid-13 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .feat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 16px; padding: 20px;
+      cursor: pointer; transition: all 0.3s ease;
+      position: relative; overflow: hidden;
+    }
+    .feat-card::before {
+      content: ''; position: absolute; inset: 0; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(6,182,212,0.05) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feat-card:hover::before { opacity: 1; }
+    .feat-card:hover { border-color: rgba(6,182,212,0.25); transform: translateY(-4px); box-shadow: 0 0 30px rgba(6,182,212,0.07); }
+    .feat-card.gold-accent::before { background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, transparent 60%); }
+    .feat-card.gold-accent:hover { border-color: rgba(201,168,76,0.3); box-shadow: 0 0 30px rgba(201,168,76,0.07); }
+    .feat-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; margin-bottom: 14px;
+    }
+    .feat-icon.gold { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.2); }
+    .feat-name { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 14px; font-weight: 700; color: var(--text-white); margin-bottom: 6px; line-height: 1.3; }
+    .feat-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       ROLES SECTION
+    ═══════════════════════════════════════════════════════════════ */
+    .roles-section { padding: 100px 24px; background: rgba(255,255,255,0.01); }
+    .roles-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+    .role-card {
+      background: var(--bg-card); border: 1px solid var(--border-base);
+      border-radius: 20px; padding: 28px;
+      transition: all 0.3s ease; position: relative;
+    }
+    .role-card:hover { border-color: var(--border-cyan); transform: translateY(-4px); box-shadow: 0 0 40px rgba(6,182,212,0.07); }
+    .role-badge {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: var(--gold-ghost); border: 1px solid var(--border-gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 900; color: var(--gold);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin-bottom: 16px;
+    }
+    .role-emoji { font-size: 28px; margin-bottom: 4px; }
+    .role-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 17px; font-weight: 800; color: var(--text-white); margin-bottom: 4px; }
+    .role-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+    .role-features { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .role-features li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-body); }
+    .role-features li::before { content: '›'; color: var(--cyan); font-weight: 700; font-size: 14px; flex-shrink: 0; margin-top: -1px; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       STATS ROW
+    ═══════════════════════════════════════════════════════════════ */
+    .stats-row {
+      padding: 80px 24px;
+      background: linear-gradient(135deg, rgba(6,182,212,0.04) 0%, rgba(201,168,76,0.02) 100%);
+      border-top: 1px solid var(--border-base); border-bottom: 1px solid var(--border-base);
+    }
+    .stats-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 40px; text-align: center; }
+    .stat-num {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(48px,6vw,72px); font-weight: 900;
+      letter-spacing: -2px; line-height: 1; margin-bottom: 8px;
+    }
+    .stat-num.cyan { color: var(--cyan); text-shadow: 0 0 40px rgba(6,182,212,0.4); }
+    .stat-num.gold { color: var(--gold); text-shadow: 0 0 40px rgba(201,168,76,0.35); }
+    .stat-lbl { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════════════════════════════ */
+    .testimonials-section { padding: 100px 24px; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+    .testi-card {
+      background: var(--bg-card); border: 1px solid var(--border-base);
+      border-radius: 20px; padding: 30px;
+      transition: all 0.3s ease;
+    }
+    .testi-card:hover { border-color: var(--border-gold); transform: translateY(-4px); }
+    .testi-quote { font-size: 40px; line-height: 0.8; color: var(--gold); font-family: Georgia,serif; margin-bottom: 14px; }
+    .testi-text { font-size: 14px; color: var(--text-body); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-ava {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), rgba(6,182,212,0.4));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: var(--bg-void);
+      font-family: 'Plus Jakarta Sans', sans-serif; flex-shrink: 0;
+    }
+    .testi-name { font-size: 14px; font-weight: 700; color: var(--text-white); }
+    .testi-role { font-size: 12px; color: var(--cyan); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PRICING
+    ═══════════════════════════════════════════════════════════════ */
+    .pricing-section { padding: 100px 24px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 1000px; margin: 0 auto; align-items: center; }
+    .price-card {
+      background: var(--bg-card); border: 1px solid var(--border-base);
+      border-radius: 22px; padding: 30px; position: relative;
+      transition: all 0.3s ease;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+    .price-card.featured {
+      background: rgba(6,182,212,0.04); border: 1.5px solid rgba(6,182,212,0.4);
+      transform: scale(1.04);
+      box-shadow: 0 0 60px rgba(6,182,212,0.12), 0 0 30px rgba(6,182,212,0.05);
+    }
+    .price-card.featured:hover { transform: scale(1.04) translateY(-4px); }
+    .price-card.enterprise { border-color: var(--border-gold); }
+    .popular-badge {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      background: var(--cyan); color: var(--bg-void);
+      font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 16px; border-radius: 6px; white-space: nowrap;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .price-plan-name { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 15px; font-weight: 700; color: var(--text-white); margin-bottom: 4px; }
+    .price-tagline { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+    .price-amount {
+      font-family: 'Plus Jakarta Sans',sans-serif;
+      font-size: 52px; font-weight: 900; letter-spacing: -2px;
+      color: var(--text-white); line-height: 1;
+    }
+    .price-card.featured .price-amount { color: var(--cyan); }
+    .price-card.enterprise .price-amount { color: var(--gold); font-size: 40px; }
+    .price-currency { font-size: 18px; font-weight: 700; color: var(--text-muted); vertical-align: top; line-height: 2; }
+    .price-period { font-size: 13px; color: var(--text-muted); margin-top: 4px; margin-bottom: 20px; }
+    .price-divider { height: 1px; background: var(--border-base); margin: 20px 0; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .price-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-body); }
+    .price-check { color: var(--green); font-size: 13px; flex-shrink: 0; margin-top: 2px; }
+    .price-security { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 24px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .price-security span { display: flex; align-items: center; gap: 4px; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FINAL CTA
+    ═══════════════════════════════════════════════════════════════ */
+    .cta-final {
+      padding: 100px 24px;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(6,182,212,0.07) 0%, var(--bg-deep) 70%);
+      border-top: 1px solid rgba(6,182,212,0.12);
+      text-align: center;
+    }
+    .cta-inner { max-width: 720px; margin: 0 auto; }
+    .cta-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(32px, 5vw, 56px); font-weight: 900;
+      letter-spacing: -1.5px; line-height: 1.1;
+      color: var(--text-white); margin-bottom: 16px;
+    }
+    .cta-subtitle { font-size: 17px; color: var(--text-muted); max-width: 480px; margin: 0 auto 40px; line-height: 1.6; }
+    .cta-buttons { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════════ */
+    .footer {
+      background: var(--bg-void); border-top: 1px solid var(--border-base);
+      padding: 64px 24px 32px;
+    }
+    .footer-grid { display: grid; grid-template-columns: 280px 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; margin-bottom: 14px;
+    }
+    .footer-logo-text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px; font-weight: 800; color: var(--text-white);
+    }
+    .footer-logo-text .ia-grad {
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .footer-tagline { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 22px; }
+    .footer-social { display: flex; gap: 8px; }
+    .social-btn {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border-base);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); text-decoration: none; font-size: 13px;
+      transition: all 0.2s;
+    }
+    .social-btn:hover { background: var(--cyan-ghost); border-color: var(--border-cyan); color: var(--cyan); }
+    .footer-col-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-white); margin-bottom: 18px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { font-size: 14px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text-white); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 28px; border-top: 1px solid var(--border-base);
+      font-size: 13px; color: var(--text-muted);
+    }
+    .footer-legal { display: flex; gap: 20px; }
+    .footer-legal a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    .footer-legal a:hover { color: var(--text-white); }
+    .footer-powered { display: flex; align-items: center; gap: 6px; }
+    .powered-dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes progress-anim {
+      0% { width: 30%; } 50% { width: 85%; } 100% { width: 55%; }
+    }
+    .feat-13 { grid-column: 1 / -1; justify-self: center; width: calc((100% - 3 * 16px) / 4); }
+    @media (max-width: 1024px) { .feat-13 { grid-column: auto; justify-self: auto; width: 100%; } }
+    @media (max-width: 768px) { .feat-13 { grid-column: auto; } }
+    @media (max-width: 480px) { .feat-13 { grid-column: auto; } }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; padding-top: 110px; }
+      .hero-visual { display: none; }
+      .features-grid-13 { grid-template-columns: repeat(3,1fr); }
+      .roles-grid { grid-template-columns: repeat(2,1fr); }
+      .chapter-block { grid-template-columns: 1fr; min-height: auto; }
+      .chapter-block:nth-child(even) .chapter-content { order: 1; }
+      .chapter-block:nth-child(even) .chapter-visual { order: 2; }
+      .chapter-content { padding: 40px 32px; }
+      .browser-body { grid-template-columns: 1fr; }
+      .browser-sidebar { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 440px; }
+      .price-card.featured { transform: scale(1); }
+      .price-card.featured:hover { transform: translateY(-4px); }
+      .testimonials-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 768px) {
+      .navbar-links { display: none; }
+      .navbar-actions .btn-ghost { display: none; }
+      .hamburger { display: flex; }
+      .features-grid-13 { grid-template-columns: repeat(2,1fr); }
+      .roles-grid { grid-template-columns: 1fr; }
+      .stats-grid-4 { grid-template-columns: repeat(2,1fr); gap: 32px; }
+      .bm-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
+      .footer-legal { flex-wrap: wrap; justify-content: center; }
+      .hero-stats { flex-direction: column; align-items: flex-start; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .section { padding: 70px 16px; }
+      .features-grid-13 { grid-template-columns: 1fr; }
+      .stats-grid-4 { grid-template-columns: 1fr; }
+      .cta-final { padding: 70px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="scroll-progress-bar" aria-hidden="true"></div>
+
+<canvas id="neural-canvas" aria-hidden="true"></canvas>
+<div class="noise-overlay" aria-hidden="true"></div>
+<div class="blob blob-1" aria-hidden="true"></div>
+<div class="blob blob-2" aria-hidden="true"></div>
+<div class="blob blob-3" aria-hidden="true"></div>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="navbar-logo">
+        <div class="logo-icon">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <ellipse cx="15" cy="15" rx="13" ry="5" stroke="#06B6D4" stroke-width="1.5" fill="none" opacity="0.9"/>
+            <ellipse cx="15" cy="15" rx="13" ry="5" stroke="#06B6D4" stroke-width="1.5" fill="none" opacity="0.6" transform="rotate(60 15 15)"/>
+            <ellipse cx="15" cy="15" rx="13" ry="5" stroke="#06B6D4" stroke-width="1.5" fill="none" opacity="0.4" transform="rotate(120 15 15)"/>
+            <circle cx="15" cy="15" r="3" fill="#C9A84C"/>
+            <line x1="15" y1="2" x2="15" y2="28" stroke="rgba(248,250,252,0.5)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="logo-text">Lex<span class="ia">.ia</span></div>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="#inicio" class="active">Inicio</a></li>
+        <li><a href="#funciones">Funciones</a></li>
+        <li><a href="#precios">Precios</a></li>
+        <li><a href="#nosotros">Sobre nosotros</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+      <div class="navbar-actions">
+        <a href="/login" class="btn btn-ghost btn-sm">Iniciar Sesión</a>
+        <a href="/descargar" class="btn btn-primary btn-sm">Descargar App</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#inicio">Inicio</a>
+    <a href="#funciones">Funciones</a>
+    <a href="#precios">Precios</a>
+    <a href="#nosotros">Sobre nosotros</a>
+    <a href="#">Blog</a>
+    <a href="/descargar" class="btn btn-primary" style="text-align:center;justify-content:center;">Descargar App</a>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════════ -->
+  <section id="inicio" data-video-section>
+    <div class="hero" style="position:relative;">
+      <!-- Video background hero -->
+      <div class="video-bg-wrap" aria-hidden="true">
+        <video id="video-hero-bg" autoplay muted loop playsinline
+          poster="assets/img/hero-poster.webp"
+          oncanplay="this.classList.add('loaded')">
+          <source src="assets/videos/hero-bg.webm" type="video/webm" />
+          <source src="assets/videos/hero-bg.mp4" type="video/mp4" />
+        </video>
+        <div class="video-overlay video-overlay-hero"></div>
+      </div>
+
+      <!-- Contenido izquierdo -->
+      <div class="hero-content">
+        <div class="hero-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          POWERED BY GEMINI AI ⚡
+        </div>
+
+        <h1 class="hero-title">
+          La Inteligencia<br>
+          Artificial al servicio<br>
+          de la <span class="hero-title-gold">Justicia</span> Peruana
+        </h1>
+
+        <div class="hero-separator"></div>
+
+        <p class="hero-subtitle">
+          Gestiona expedientes, predice resultados y redacta escritos legales con IA avanzada. La plataforma legal más moderna del Perú.
+        </p>
+
+        <div class="hero-ctas">
+          <a href="/login" class="btn btn-primary" style="font-size:16px;padding:15px 30px;">
+            Comienza Gratis →
+          </a>
+          <a href="/descargar" class="btn btn-ghost" style="font-size:16px;padding:15px 30px;">
+            Ver Demo ▶
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-badge">
+            <span class="emoji">⚡</span>
+            <strong>15,000+</strong> Abogados
+          </div>
+          <div class="stat-badge gold-border">
+            <span class="emoji">🎯</span>
+            <strong>94%</strong> Precisión
+          </div>
+          <div class="stat-badge">
+            <span class="emoji">🛠</span>
+            <strong>13</strong> Herramientas IA
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual derecho -->
+      <div class="hero-visual">
+        <div class="hero-phone-wrap">
+          <div class="hero-phone-glow-t"></div>
+          <div class="hero-phone-glow-b"></div>
+          <div class="hero-phone">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="ps-topbar">
+                <span class="ps-logo">Lex.ia</span>
+                <div style="display:flex;gap:5px;align-items:center;">
+                  <div style="font-size:11px;">🔔</div>
+                  <div class="ps-avatar"></div>
+                </div>
+              </div>
+              <div class="ps-card">
+                <div class="ps-card-label">Expedientes Activos</div>
+                <div class="ps-card-value">24</div>
+                <div class="ps-bars">
+                  <div class="ps-bar" style="height:55%;"></div>
+                  <div class="ps-bar" style="height:80%;"></div>
+                  <div class="ps-bar" style="height:40%;"></div>
+                  <div class="ps-bar" style="height:95%;background:linear-gradient(180deg,var(--gold),rgba(201,168,76,0.2));"></div>
+                  <div class="ps-bar" style="height:65%;"></div>
+                  <div class="ps-bar" style="height:75%;"></div>
+                </div>
+              </div>
+              <div class="ps-progress-row">
+                <div class="ps-progress-label">● Análisis IA en progreso...</div>
+                <div class="ps-progress-track">
+                  <div class="ps-progress-fill" style="animation:progress-anim 2s ease-in-out infinite;"></div>
+                </div>
+              </div>
+              <div class="ps-card" style="padding:8px;">
+                <div class="ps-card-label">Predicción Caso #2847</div>
+                <div style="font-size:12px;font-weight:800;color:#10B981;font-family:'Plus Jakarta Sans',sans-serif;">87% probabilidad de éxito</div>
+              </div>
+              <div class="ps-item"><div class="ps-dot"></div><div style="flex:1;"><div class="ps-line" style="width:75%;margin-bottom:3px;"></div><div class="ps-line" style="width:50%;"></div></div></div>
+              <div class="ps-item"><div class="ps-dot" style="background:var(--cyan);"></div><div style="flex:1;"><div class="ps-line" style="width:85%;margin-bottom:3px;"></div><div class="ps-line" style="width:60%;"></div></div></div>
+              <div class="ps-item"><div class="ps-dot" style="background:var(--gold);"></div><div style="flex:1;"><div class="ps-line" style="width:65%;margin-bottom:3px;"></div><div class="ps-line" style="width:45%;"></div></div></div>
+              <div class="ps-action">+ Analizar con IA →</div>
+            </div>
+          </div>
+          <div class="float-badge float-badge-green">
+            <div class="fb-label">Precisión IA</div>
+            <div class="fb-value">94%</div>
+          </div>
+          <div class="float-badge float-badge-gold">
+            <div class="fb-label">Herramientas</div>
+            <div class="fb-value">13 activas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       INSTITUTIONS STRIP
+  ══════════════════════════════════════════════════ -->
+  <div class="institutions-strip">
+    <div class="institutions-label">Confiado por equipos legales de todo el Perú</div>
+    <div style="overflow:hidden;">
+      <div class="inst-track">
+        <div class="inst-item">Corte Superior Lima<span class="inst-sep"> | </span>Ministerio Público<span class="inst-sep"> | </span>INDECOPI<span class="inst-sep"> | </span>SUNARP<span class="inst-sep"> | </span>Poder Judicial<span class="inst-sep"> | </span>García Torres &amp; Ríos<span class="inst-sep"> | </span>Consorcio Legal Norte</div>
+        <div class="inst-item">Corte Superior Lima<span class="inst-sep"> | </span>Ministerio Público<span class="inst-sep"> | </span>INDECOPI<span class="inst-sep"> | </span>SUNARP<span class="inst-sep"> | </span>Poder Judicial<span class="inst-sep"> | </span>García Torres &amp; Ríos<span class="inst-sep"> | </span>Consorcio Legal Norte</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       CINEMATIC CHAPTERS
+  ══════════════════════════════════════════════════ -->
+  <section class="chapters-section" id="funciones" data-video-section style="position:relative;overflow:hidden;">
+    <!-- Video background capítulos -->
+    <div class="video-bg-wrap" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;">
+      <video id="video-chapter-bg" autoplay muted loop playsinline
+        poster="assets/img/chapter-poster.webp"
+        oncanplay="this.classList.add('loaded')">
+        <source src="assets/videos/chapter-bg.webm" type="video/webm" />
+        <source src="assets/videos/chapter-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay video-overlay-chapter"></div>
+    </div>
+    <div class="chapters-header reveal">
+      <div class="section-tag">CAPÍTULOS CINEMATOGRÁFICOS</div>
+      <h2 class="section-title">Las 4 herramientas <span class="gradient-text-cyan">más poderosas</span></h2>
+      <p class="section-subtitle">Cada herramienta diseñada para el sistema legal peruano</p>
+    </div>
+
+    <!-- Ch01 Análisis IA -->
+    <div class="chapter-block reveal">
+      <div class="chapter-content">
+        <div class="chapter-number">01</div>
+        <div class="chapter-title">ANÁLISIS IA</div>
+        <p class="chapter-desc">Carga cualquier expediente en PDF y recibe en segundos un análisis completo: fortalezas, debilidades, jurisprudencia aplicable y estrategia recomendada. Potenciado por Gemini AI.</p>
+        <a href="#" class="chapter-link">Explorar función →</a>
+      </div>
+      <div class="chapter-visual">
+        <div class="chapter-device">
+          <div class="device-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="device-url">lex.ia / análisis</div>
+          </div>
+          <div class="device-body">
+            <div class="device-tag">🔍 ANÁLISIS EN CURSO</div>
+            <div class="device-row">
+              <div class="device-card-sm">
+                <div class="device-card-label">Fortalezas</div>
+                <div class="device-card-val">8</div>
+                <div class="device-bar-row">
+                  <div class="device-bar" style="height:70%;"></div>
+                  <div class="device-bar" style="height:90%;"></div>
+                  <div class="device-bar" style="height:55%;"></div>
+                  <div class="device-bar" style="height:80%;"></div>
+                </div>
+              </div>
+              <div class="device-card-sm">
+                <div class="device-card-label">Riesgos</div>
+                <div class="device-card-val gold">3</div>
+                <div class="device-bar-row">
+                  <div class="device-bar" style="height:40%;background:linear-gradient(180deg,#C9A84C,rgba(201,168,76,0.2));"></div>
+                  <div class="device-bar" style="height:25%;background:linear-gradient(180deg,#C9A84C,rgba(201,168,76,0.2));"></div>
+                  <div class="device-bar" style="height:60%;background:linear-gradient(180deg,#C9A84C,rgba(201,168,76,0.2));"></div>
+                </div>
+              </div>
+            </div>
+            <div class="device-ai-row">
+              <div class="device-ai-icon">🤖</div>
+              <div class="device-ai-text"><strong>Gemini AI:</strong> Identifico el Art. 259 NCPP como precedente clave. Probabilidad alta de acogida.</div>
+            </div>
+            <div class="device-text-lines">
+              <div class="device-line" style="width:90%;"></div>
+              <div class="device-line" style="width:70%;"></div>
+              <div class="device-line" style="width:80%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ch02 Predictor Judicial -->
+    <div class="chapter-block reveal">
+      <div class="chapter-content">
+        <div class="chapter-number">02</div>
+        <div class="chapter-title chapter-title--gold">PREDICTOR JUDICIAL</div>
+        <p class="chapter-desc">Predice el resultado probable de tu caso basado en miles de sentencias reales del Poder Judicial Peruano. Con precedentes vinculantes y análisis comparativo.</p>
+        <a href="#" class="chapter-link chapter-link--gold">Explorar función →</a>
+      </div>
+      <div class="chapter-visual">
+        <div class="chapter-device">
+          <div class="device-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="device-url">lex.ia / predictor</div>
+          </div>
+          <div class="device-body">
+            <div class="device-tag gold-tag">⚖️ PREDICCIÓN ACTIVA</div>
+            <div class="device-card-sm" style="border-color:rgba(201,168,76,0.2);">
+              <div class="device-card-label">Probabilidad de éxito</div>
+              <div class="device-card-val gold" style="font-size:28px;">87%</div>
+            </div>
+            <div class="device-list">
+              <div class="device-list-item"><div class="device-list-dot"></div>Precedente favorable: STC 2005-2009-PHC</div>
+              <div class="device-list-item"><div class="device-list-dot" style="background:var(--gold);"></div>Tendencia reciente: +12% casos similares</div>
+              <div class="device-list-item"><div class="device-list-dot"></div>Jueces del distrito: 3/4 con jurisprudencia afín</div>
+            </div>
+            <div class="device-ai-row" style="border-color:rgba(201,168,76,0.15);">
+              <div class="device-ai-icon">📊</div>
+              <div class="device-ai-text" style="color:var(--gold-bright);">Basado en 1,847 sentencias similares del PJ Lima 2020-2026.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ch03 Redactor -->
+    <div class="chapter-block reveal">
+      <div class="chapter-content">
+        <div class="chapter-number">03</div>
+        <div class="chapter-title">REDACTOR DE ESCRITOS</div>
+        <p class="chapter-desc">Genera demandas, apelaciones y recursos con IA. Formato NCPP/CPC correcto desde el primer borrador. Ahorra horas de redacción con estructura legal impecable.</p>
+        <a href="#" class="chapter-link">Explorar función →</a>
+      </div>
+      <div class="chapter-visual">
+        <div class="chapter-device">
+          <div class="device-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="device-url">lex.ia / redactor</div>
+          </div>
+          <div class="device-body">
+            <div class="device-tag">✍️ REDACTANDO...</div>
+            <div class="device-text-lines">
+              <div class="device-line" style="width:95%;height:7px;background:rgba(248,250,252,0.12);"></div>
+              <div class="device-line" style="width:85%;"></div>
+              <div class="device-line" style="width:90%;"></div>
+              <div class="device-line" style="width:70%;"></div>
+              <div class="device-line" style="width:88%;"></div>
+              <div class="device-line" style="width:60%;"></div>
+            </div>
+            <div class="device-ai-row">
+              <div class="device-ai-icon">✅</div>
+              <div class="device-ai-text"><strong>Escrito generado:</strong> Demanda por alimentos — Formato CPC Art. 481. 3 páginas. Sin errores.</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <div class="device-tag" style="flex:1;justify-content:center;">📥 Descargar PDF</div>
+              <div class="device-tag gold-tag" style="flex:1;justify-content:center;">✏️ Editar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ch04 Simulador -->
+    <div class="chapter-block reveal">
+      <div class="chapter-content">
+        <div class="chapter-number">04</div>
+        <div class="chapter-title chapter-title--gold">SIMULADOR DE JUICIOS</div>
+        <p class="chapter-desc">Practica tu defensa en juicio oral simulado. La IA actúa como juez, fiscal y abogado contrario simultáneamente. Basado en el NCPP peruano.</p>
+        <a href="#" class="chapter-link chapter-link--gold">Explorar función →</a>
+      </div>
+      <div class="chapter-visual">
+        <div class="chapter-device">
+          <div class="device-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="device-url">lex.ia / simulador</div>
+          </div>
+          <div class="device-body">
+            <div class="device-tag gold-tag">⚖️ JUICIO EN CURSO</div>
+            <div class="device-list">
+              <div class="device-list-item" style="background:rgba(6,182,212,0.05);border:1px solid rgba(6,182,212,0.1);">
+                <div style="font-size:14px;">👨‍⚖️</div>
+                <div style="font-size:10px;color:var(--cyan-bright);">Juez IA: "Tiene la palabra la defensa..."</div>
+              </div>
+              <div class="device-list-item" style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);">
+                <div style="font-size:14px;">👮</div>
+                <div style="font-size:10px;color:var(--gold);">Fiscal IA: "Objeto, señoría. Irrelevante."</div>
+              </div>
+              <div class="device-list-item">
+                <div style="font-size:14px;">👤</div>
+                <div style="font-size:10px;color:var(--text-body);">Abogado (Tú): [Responde aquí...]</div>
+              </div>
+            </div>
+            <div class="device-card-sm" style="border-color:rgba(201,168,76,0.15);">
+              <div class="device-card-label">Puntuación de defensa</div>
+              <div class="device-card-val gold">7.8 / 10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       PRODUCT DEMO
+  ══════════════════════════════════════════════════ -->
+  <section class="demo-section" id="nosotros" data-video-section style="position:relative;overflow:hidden;">
+    <!-- Video background neural globe -->
+    <div class="video-bg-wrap" aria-hidden="true">
+      <video id="video-neural" autoplay muted loop playsinline
+        poster="assets/img/neural-poster.webp"
+        oncanplay="this.classList.add('loaded')">
+        <source src="assets/videos/neural-globe.webm" type="video/webm" />
+        <source src="assets/videos/neural-globe.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay video-overlay-neural"></div>
+    </div>
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">PRODUCTO</div>
+        <h2 class="section-title reveal">Lex.ia <span class="gradient-text-cyan">en acción</span></h2>
+        <p class="section-subtitle reveal reveal-delay-1">El dashboard más completo para la gestión legal peruana</p>
+      </div>
+      <div class="demo-browser reveal reveal-delay-2">
+        <div class="browser-bar">
+          <div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+          <div class="browser-url">app.lex.ia / dashboard</div>
+        </div>
+        <div class="browser-body">
+          <div class="browser-sidebar">
+            <div class="bs-logo">Lex.ia</div>
+            <div class="bs-item active"><div class="bs-icon">📊</div> Dashboard</div>
+            <div class="bs-item"><div class="bs-icon">📁</div> Expedientes</div>
+            <div class="bs-item"><div class="bs-icon">🔍</div> Análisis IA</div>
+            <div class="bs-item"><div class="bs-icon">⚖️</div> Predictor</div>
+            <div class="bs-item"><div class="bs-icon">✍️</div> Redactor</div>
+            <div class="bs-item"><div class="bs-icon">🎭</div> Simulador</div>
+            <div class="bs-item"><div class="bs-icon">📚</div> Jurisprudencia</div>
+            <div class="bs-item"><div class="bs-icon">🔔</div> SINOE</div>
+          </div>
+          <div class="browser-main">
+            <div class="bm-header">
+              <div class="bm-title">Panel Principal</div>
+              <div class="device-tag">● Lima, 16 Mar 2026</div>
+            </div>
+            <div class="bm-grid">
+              <div class="bm-card"><div class="bm-card-label">Expedientes activos</div><div class="bm-card-val cyan">24</div></div>
+              <div class="bm-card"><div class="bm-card-label">Análisis completados</div><div class="bm-card-val gold">147</div></div>
+              <div class="bm-card"><div class="bm-card-label">Predicciones correctas</div><div class="bm-card-val green">94%</div></div>
+            </div>
+            <div class="bm-ai-block">
+              <div class="bm-ai-ava">🤖</div>
+              <div class="bm-ai-text"><strong>Lex.ia IA:</strong> He detectado 3 vencimientos de plazo esta semana. El expediente #2847 tiene alta probabilidad de éxito. ¿Deseas que prepare el escrito de apelación?</div>
+            </div>
+            <div class="bm-rows">
+              <div class="bm-row"><span>Exp. #2847 — García vs. Estado</span><span class="bm-status open">Activo</span></div>
+              <div class="bm-row"><span>Exp. #2831 — Caso Laboral Lima</span><span class="bm-status won">Ganado</span></div>
+              <div class="bm-row"><span>Exp. #2819 — Apelación Civil</span><span class="bm-status review">Revisión</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       ALL 13 FEATURES
+  ══════════════════════════════════════════════════ -->
+  <section class="features-section" id="herramientas">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">HERRAMIENTAS IA</div>
+        <h2 class="section-title reveal">Las <span class="gradient-text-gold">13 herramientas</span> de Lex.ia</h2>
+        <p class="section-subtitle reveal reveal-delay-1">Todo lo que necesitas para ejercer el derecho peruano con IA</p>
+      </div>
+      <div class="features-grid-13">
+        <div class="feat-card reveal"><div class="feat-icon">🔍</div><div class="feat-name">Análisis IA de Expedientes</div><div class="feat-desc">Analiza documentos PDF en segundos con Gemini AI</div></div>
+        <div class="feat-card reveal reveal-delay-1"><div class="feat-icon">⚖️</div><div class="feat-name">Predictor Judicial</div><div class="feat-desc">Predice resultados con jurisprudencia del PJ</div></div>
+        <div class="feat-card reveal reveal-delay-2 gold-accent"><div class="feat-icon gold">✍️</div><div class="feat-name">Redactor de Escritos</div><div class="feat-desc">Genera escritos NCPP/CPC con IA avanzada</div></div>
+        <div class="feat-card reveal reveal-delay-3"><div class="feat-icon">🎭</div><div class="feat-name">Simulador de Juicios</div><div class="feat-desc">Juicio oral simulado con IA como juez y fiscal</div></div>
+        <div class="feat-card reveal"><div class="feat-icon">💬</div><div class="feat-name">Chat Lex.ia</div><div class="feat-desc">Asistente legal IA conversacional 24/7</div></div>
+        <div class="feat-card reveal reveal-delay-1 gold-accent"><div class="feat-icon gold">📚</div><div class="feat-name">Buscador de Jurisprudencia</div><div class="feat-desc">Búsqueda en tiempo real en bases del PJ</div></div>
+        <div class="feat-card reveal reveal-delay-2"><div class="feat-icon">🔔</div><div class="feat-name">Monitor SINOE</div><div class="feat-desc">Notificaciones electrónicas del Poder Judicial</div></div>
+        <div class="feat-card reveal reveal-delay-3"><div class="feat-icon">📅</div><div class="feat-name">Plazos Procesales</div><div class="feat-desc">Cálculo automático de plazos y vencimientos</div></div>
+        <div class="feat-card reveal"><div class="feat-icon">🗣️</div><div class="feat-name">Generador de Alegatos</div><div class="feat-desc">Alegatos de clausura con IA contextual</div></div>
+        <div class="feat-card reveal reveal-delay-1"><div class="feat-icon">👥</div><div class="feat-name">Estrategia de Interrogatorio</div><div class="feat-desc">Preguntas NCPP optimizadas con IA</div></div>
+        <div class="feat-card reveal reveal-delay-2 gold-accent"><div class="feat-icon gold">✋</div><div class="feat-name">Asistente de Objeciones</div><div class="feat-desc">Objeciones en tiempo real durante juicio</div></div>
+        <div class="feat-card reveal reveal-delay-3"><div class="feat-icon">📋</div><div class="feat-name">Resumen Ejecutivo de Caso</div><div class="feat-desc">Resumen IA de cualquier expediente complejo</div></div>
+        <div class="feat-card reveal feat-13"><div class="feat-icon">🧮</div><div class="feat-name">Peritos Contables</div><div class="feat-desc">Liquidaciones laborales e informes periciales</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       ROLES SECTION
+  ══════════════════════════════════════════════════ -->
+  <section class="roles-section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag-gold section-tag">ROLES LEGALES</div>
+        <h2 class="section-title reveal">Diseñado para <span class="gradient-text-gold">cada rol</span> jurídico</h2>
+        <p class="section-subtitle reveal reveal-delay-1">Herramientas especializadas para los 4 roles del sistema legal peruano</p>
+      </div>
+      <div class="roles-grid">
+        <div class="role-card reveal">
+          <div class="role-badge">01</div>
+          <div class="role-emoji">⚖️</div>
+          <div class="role-title">ABOGADO</div>
+          <div class="role-subtitle">Abogado Litigante</div>
+          <ul class="role-features">
+            <li>Gestión de expedientes CRUD</li>
+            <li>Redacción de escritos con IA</li>
+            <li>Predictor de resultados judiciales</li>
+            <li>Simulador de juicios orales</li>
+            <li>Bóveda de evidencia digital</li>
+          </ul>
+        </div>
+        <div class="role-card reveal reveal-delay-1">
+          <div class="role-badge">02</div>
+          <div class="role-emoji">📋</div>
+          <div class="role-title">FISCAL</div>
+          <div class="role-subtitle">Ministerio Público</div>
+          <ul class="role-features">
+            <li>Dashboard de fiscalía con métricas</li>
+            <li>Requerimientos fiscales con IA</li>
+            <li>Análisis de expedientes penales</li>
+            <li>Generador de acusación fiscal</li>
+            <li>Predictor de sentencias penales</li>
+          </ul>
+        </div>
+        <div class="role-card reveal reveal-delay-2">
+          <div class="role-badge">03</div>
+          <div class="role-emoji">👨‍⚖️</div>
+          <div class="role-title">JUEZ</div>
+          <div class="role-subtitle">Magistrado Judicial</div>
+          <ul class="role-features">
+            <li>Análisis de expedientes para resolución</li>
+            <li>Comparador de precedentes vinculantes</li>
+            <li>Asistente para redacción de sentencias</li>
+            <li>Predictor de tendencias judiciales</li>
+            <li>Cálculo de plazos y prescripción</li>
+          </ul>
+        </div>
+        <div class="role-card reveal reveal-delay-3">
+          <div class="role-badge">04</div>
+          <div class="role-emoji">🧮</div>
+          <div class="role-title">CONTADOR</div>
+          <div class="role-subtitle">Perito Contable</div>
+          <ul class="role-features">
+            <li>Cálculo de liquidaciones laborales</li>
+            <li>Generación de informes periciales</li>
+            <li>Análisis de estados financieros</li>
+            <li>Cálculo de intereses legales</li>
+            <li>Herramientas multidisciplinarias</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       STATS ROW
+  ══════════════════════════════════════════════════ -->
+  <section class="stats-row">
+    <div class="container">
+      <div class="stats-grid-4">
+        <div class="reveal">
+          <div class="stat-num cyan" id="cnt-15k">15K+</div>
+          <div class="stat-lbl">Abogados activos</div>
+        </div>
+        <div class="reveal reveal-delay-1">
+          <div class="stat-num gold" id="cnt-94">94%</div>
+          <div class="stat-lbl">Precisión del análisis</div>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <div class="stat-num cyan" id="cnt-13">13</div>
+          <div class="stat-lbl">Herramientas de IA</div>
+        </div>
+        <div class="reveal reveal-delay-3">
+          <div class="stat-num gold" id="cnt-4">4</div>
+          <div class="stat-lbl">Roles jurídicos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       PRICING
+  ══════════════════════════════════════════════════ -->
+  <section class="pricing-section" id="precios">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">PRECIOS</div>
+        <h2 class="section-title reveal">Planes para <span class="gradient-text-cyan">cada despacho</span></h2>
+        <p class="section-subtitle reveal reveal-delay-1">Desde abogados independientes hasta grandes estudios jurídicos</p>
+      </div>
+      <div class="pricing-grid">
+
+        <!-- Gratis -->
+        <div class="price-card reveal">
+          <div class="price-plan-name">BÁSICO</div>
+          <div class="price-tagline">Para empezar a explorar</div>
+          <div class="price-amount"><span class="price-currency">S/</span>0</div>
+          <div class="price-period">para siempre gratis</div>
+          <div class="price-divider"></div>
+          <ul class="price-features">
+            <li><span class="price-check">✓</span> 3 expedientes activos</li>
+            <li><span class="price-check">✓</span> Análisis IA básico (5/mes)</li>
+            <li><span class="price-check">✓</span> Chat Lex.ia (10 consultas/día)</li>
+            <li><span class="price-check">✓</span> Búsqueda jurisprudencia</li>
+            <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Predictor judicial</li>
+            <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Simulador de juicios</li>
+            <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Integración SINOE</li>
+          </ul>
+          <a href="/login" class="btn btn-ghost" style="width:100%;justify-content:center;">Comenzar Gratis</a>
+        </div>
+
+        <!-- PRO -->
+        <div class="price-card featured reveal reveal-delay-1">
+          <div class="popular-badge">MÁS POPULAR</div>
+          <div class="price-plan-name">PRO</div>
+          <div class="price-tagline">Para abogados que quieren ganar</div>
+          <div class="price-amount"><span class="price-currency">S/</span>99</div>
+          <div class="price-period">por mes · facturación mensual</div>
+          <div class="price-divider"></div>
+          <ul class="price-features">
+            <li><span class="price-check">✓</span> Expedientes ilimitados</li>
+            <li><span class="price-check">✓</span> Análisis IA ilimitado</li>
+            <li><span class="price-check">✓</span> Predictor judicial completo</li>
+            <li><span class="price-check">✓</span> Redactor de escritos IA</li>
+            <li><span class="price-check">✓</span> Simulador de juicios</li>
+            <li><span class="price-check">✓</span> Monitor SINOE integrado</li>
+            <li><span class="price-check">✓</span> Soporte prioritario</li>
+          </ul>
+          <a href="/login" class="btn btn-primary" style="width:100%;justify-content:center;">Empezar 14 días gratis</a>
+        </div>
+
+        <!-- Estudio -->
+        <div class="price-card enterprise reveal reveal-delay-2">
+          <div class="price-plan-name">ESTUDIO</div>
+          <div class="price-tagline">Para estudios jurídicos</div>
+          <div class="price-amount"><span class="price-currency">S/</span>299</div>
+          <div class="price-period">por mes · hasta 10 usuarios</div>
+          <div class="price-divider"></div>
+          <ul class="price-features">
+            <li><span class="price-check">✓</span> Todo de PRO ilimitado</li>
+            <li><span class="price-check">✓</span> Hasta 10 usuarios del estudio</li>
+            <li><span class="price-check">✓</span> Gestión de equipos</li>
+            <li><span class="price-check">✓</span> API access completo</li>
+            <li><span class="price-check">✓</span> Reportes avanzados</li>
+            <li><span class="price-check">✓</span> Gerente de cuenta dedicado</li>
+            <li><span class="price-check">✓</span> SLA 99.9% uptime</li>
+          </ul>
+          <a href="/login" class="btn btn-gold" style="width:100%;justify-content:center;">Contactar Ventas</a>
+        </div>
+
+      </div>
+      <div class="price-security reveal">
+        <span>🔒 Pago seguro SSL</span>
+        <span>✓ Sin contrato mínimo</span>
+        <span>↩ Reembolso 30 días</span>
+        <span>🇵🇪 Facturación en soles</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       TESTIMONIALS
+  ══════════════════════════════════════════════════ -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag-gold section-tag">TESTIMONIOS</div>
+        <h2 class="section-title reveal">Lo que <span class="gradient-text-gold">dicen</span> nuestros usuarios</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testi-card reveal">
+          <div class="testi-quote">"</div>
+          <p class="testi-text">El análisis de expedientes con IA me ahorró 3 horas en el caso más complejo del año. La precisión de Lex.ia para el contexto legal peruano es impresionante. Ahora gano más casos.</p>
+          <div class="testi-author">
+            <div class="testi-ava">CG</div>
+            <div>
+              <div class="testi-name">Carlos García López</div>
+              <div class="testi-role">Abogado Penalista · Corte Superior Lima</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card reveal reveal-delay-1">
+          <div class="testi-quote">"</div>
+          <p class="testi-text">Como fiscal, el predictor judicial me permite preparar mejor mis acusaciones. Los precedentes que sugiere son exactos y ahorran horas de investigación. Herramienta indispensable.</p>
+          <div class="testi-author">
+            <div class="testi-ava" style="background:linear-gradient(135deg,var(--gold),rgba(201,168,76,0.5));">MR</div>
+            <div>
+              <div class="testi-name">María Ríos Vargas</div>
+              <div class="testi-role">Fiscal Provincial · Ministerio Público Arequipa</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card reveal reveal-delay-2">
+          <div class="testi-quote">"</div>
+          <p class="testi-text">El simulador de juicios es extraordinario. Mis practicantes se preparan dos veces mejor antes de entrar a sala. La IA del juez virtual es increíblemente realista. Lo recomienzo a todos.</p>
+          <div class="testi-author">
+            <div class="testi-ava" style="background:linear-gradient(135deg,rgba(16,185,129,0.8),rgba(6,182,212,0.5));">JT</div>
+            <div>
+              <div class="testi-name">Jorge Torres Medina</div>
+              <div class="testi-role">Socio Principal · García Torres &amp; Ríos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       FINAL CTA
+  ══════════════════════════════════════════════════ -->
+  <section class="cta-final" id="cta-section" data-video-section style="position:relative;overflow:hidden;">
+    <!-- Video justice reveal — controlado por scroll -->
+    <div class="video-bg-wrap" aria-hidden="true">
+      <video id="video-justice" muted playsinline preload="auto"
+        poster="assets/img/justice-poster.webp"
+        oncanplay="this.classList.add('loaded')">
+        <source src="assets/videos/justice-reveal.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay video-overlay-cta"></div>
+    </div>
+    <div class="cta-inner" style="position:relative;z-index:2;">
+      <div style="display:flex;justify-content:center;"><div class="section-tag">COMIENZA HOY</div></div>
+      <h2 class="cta-title reveal">
+        Únete a <span class="gradient-text-cyan">15,000+</span><br>
+        abogados peruanos
+      </h2>
+      <p class="cta-subtitle reveal reveal-delay-1">
+        La plataforma legal más avanzada del Perú, potenciada por <strong style="color:var(--cyan)">Gemini AI</strong>. Sin tarjeta requerida.
+      </p>
+      <div class="cta-buttons reveal reveal-delay-2">
+        <a href="/login" class="btn btn-primary" style="font-size:16px;padding:15px 32px;">
+          Comienza Gratis →
+        </a>
+        <a href="/descargar" class="btn btn-ghost" style="font-size:16px;padding:15px 32px;">
+          Ver Demo ▶
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════ -->
+  <footer class="footer" id="contacto">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand -->
+        <div>
+          <a href="#" class="footer-brand-logo">
+            <svg width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+              <ellipse cx="15" cy="15" rx="12" ry="4.5" stroke="#06B6D4" stroke-width="1.5" fill="none" opacity="0.9"/>
+              <ellipse cx="15" cy="15" rx="12" ry="4.5" stroke="#06B6D4" stroke-width="1.5" fill="none" opacity="0.5" transform="rotate(60 15 15)"/>
+              <ellipse cx="15" cy="15" rx="12" ry="4.5" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.4" transform="rotate(120 15 15)"/>
+              <circle cx="15" cy="15" r="2.5" fill="#C9A84C"/>
+            </svg>
+            <span class="footer-logo-text">Lex<span class="ia-grad">.ia</span></span>
+          </a>
+          <p class="footer-tagline">Inteligencia Artificial al servicio de la Justicia Peruana. Potenciado por Google Gemini.</p>
+          <div class="footer-social">
+            <a href="#" class="social-btn" aria-label="LinkedIn">in</a>
+            <a href="#" class="social-btn" aria-label="Twitter">𝕏</a>
+            <a href="#" class="social-btn" aria-label="YouTube">▶</a>
+            <a href="#" class="social-btn" aria-label="Instagram">◉</a>
+          </div>
+        </div>
+
+        <!-- Producto -->
+        <div>
+          <div class="footer-col-title">Producto</div>
+          <ul class="footer-links">
+            <li><a href="#">Funciones</a></li>
+            <li><a href="#">Precios</a></li>
+            <li><a href="#">Demo interactivo</a></li>
+            <li><a href="#">Descargar App</a></li>
+            <li><a href="#">Novedades</a></li>
+          </ul>
+        </div>
+
+        <!-- Legal -->
+        <div>
+          <div class="footer-col-title">Legal</div>
+          <ul class="footer-links">
+            <li><a href="#">Términos de uso</a></li>
+            <li><a href="#">Política de privacidad</a></li>
+            <li><a href="#">Política de cookies</a></li>
+            <li><a href="#">Seguridad</a></li>
+            <li><a href="#">Cumplimiento</a></li>
+          </ul>
+        </div>
+
+        <!-- Empresa -->
+        <div>
+          <div class="footer-col-title">Empresa</div>
+          <ul class="footer-links">
+            <li><a href="#">Sobre nosotros</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Contacto</a></li>
+            <li><a href="#">Soporte</a></li>
+            <li><a href="#">Afiliados</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>Lima, Perú 2026 · © Lex.ia — Todos los derechos reservados</span>
+        <div class="footer-powered">
+          <div class="powered-dot"></div>
+          Powered by <strong style="color:var(--cyan);margin-left:4px;">Gemini AI</strong>
+        </div>
+        <div class="footer-legal">
+          <a href="#">Términos</a>
+          <a href="#">Privacidad</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+/* ─── Navbar scroll ─────────────────────────────────────── */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+/* ─── Hamburger ─────────────────────────────────────────── */
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  const isOpen = mobileMenu.classList.toggle('open');
+  hamburger.setAttribute('aria-expanded', String(isOpen));
+});
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+  });
+});
+
+/* ─── Reveal on scroll ──────────────────────────────────── */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ─── Active nav link ───────────────────────────────────── */
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.navbar-links a');
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const link = document.querySelector(`.navbar-links a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.4 });
+sections.forEach(s => navObserver.observe(s));
+
+/* ─── Neural Canvas 06-J (Cyan + Gold) ─────────────────── */
+const canvas = document.getElementById('neural-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initParticles() {
+  const count = Math.min(Math.floor(W * H / 14000), 80);
+  particles = Array.from({ length: count }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 1.5 + 0.5,
+    gold: Math.random() < 0.18,
+    opacity: Math.random() * 0.4 + 0.15
+  }));
+}
+
+function drawCanvas() {
+  ctx.clearRect(0, 0, W, H);
+  const maxDist = 130;
+
+  // Draw connections
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < maxDist) {
+        const alpha = (1 - dist / maxDist) * 0.12;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(6,182,212,${alpha})`;
+        ctx.lineWidth = 0.8;
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Draw particles
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    if (p.gold) {
+      ctx.fillStyle = `rgba(201,168,76,${p.opacity})`;
+      ctx.shadowColor = 'rgba(201,168,76,0.4)';
+    } else {
+      ctx.fillStyle = `rgba(6,182,212,${p.opacity})`;
+      ctx.shadowColor = 'rgba(6,182,212,0.4)';
+    }
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Move
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0) p.x = W;
+    if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H;
+    if (p.y > H) p.y = 0;
+  });
+
+  rafId = requestAnimationFrame(drawCanvas);
+}
+
+window.addEventListener('resize', () => { resize(); initParticles(); });
+resize();
+initParticles();
+let rafId = requestAnimationFrame(drawCanvas);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { cancelAnimationFrame(rafId); }
+  else { rafId = requestAnimationFrame(drawCanvas); }
+});
+
+/* ─── Mouse interaction with canvas ────────────────────── */
+let mouse = { x: -999, y: -999 };
+window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+</script>
+
+<!-- Motor de scroll interactivo + video parallax -->
+<script src="scroll-engine.js" type="module"></script>
+
+</body>
+</html>
+
