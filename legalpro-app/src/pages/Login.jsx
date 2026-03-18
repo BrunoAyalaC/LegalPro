@@ -10,7 +10,7 @@ const SLIDES = [
     icon: 'psychology',
     tag: 'INTELIGENCIA ARTIFICIAL',
     headline: 'Análisis de Expedientes',
-    sub: 'Sube cualquier PDF y Gemini AI extrae hechos, argumentos y puntos débiles en segundos. Lo que antes tomaba horas, ahora toma 30 segundos.',
+    sub: 'Sube cualquier PDF y Lex.ia extrae hechos, argumentos y puntos débiles en segundos. Lo que antes tomaba horas, ahora toma 30 segundos.',
     stat: '30s', statLabel: 'tiempo de análisis',
     accent: 'cyan',
   },
@@ -174,98 +174,106 @@ export default function Login() {
       minHeight: '100dvh', display: 'flex',
       background: '#050508', fontFamily: "'Inter',sans-serif",
     }}>
-      {/* ── LEFT PANEL: Onboarding slides (oculto en mobile) ── */}
-      <div style={{
-        flex: '0 0 58%', position: 'relative',
-        overflow: 'hidden', display: 'none',
-      }}
+      {/* ── LEFT PANEL: Hero image split ── */}
+      <div
         className="login-left-panel"
+        style={{
+          flex: '0 0 58%', position: 'relative',
+          overflow: 'hidden',
+          backgroundImage: "url('/landing/assets/img/logo-og.jpeg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
       >
-        {/* Video-like gradient background */}
+        {/* Dark overlay */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, #050508 0%, #0a1220 40%, #050508 100%)',
+          background: 'linear-gradient(160deg, rgba(5,5,8,0.78) 0%, rgba(5,5,8,0.50) 50%, rgba(5,5,8,0.82) 100%)',
         }} />
-        {/* Blobs decorativos */}
-        <div style={{
-          position: 'absolute', width: 500, height: 500,
-          borderRadius: '50%', top: -120, left: -120,
-          background: 'radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', width: 400, height: 400,
-          borderRadius: '50%', bottom: -60, right: -60,
-          background: 'radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-        {/* Mesh lines */}
-        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.04 }}
-          xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#06B6D4" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
 
-        {/* Logo + brand */}
+        {/* Logo + brand — esquina superior izquierda */}
         <div style={{
-          position: 'absolute', top: 36, left: 52,
+          position: 'absolute', top: 40, left: 48, zIndex: 2,
           display: 'flex', alignItems: 'center', gap: 12,
         }}>
           <img src={logoImg} alt="Lex.ia" style={{
-            width: 40, height: 40, borderRadius: 10,
+            width: 44, height: 44, borderRadius: 11,
             objectFit: 'contain',
-            boxShadow: '0 0 20px rgba(6,182,212,0.3)',
+            boxShadow: '0 0 24px rgba(6,182,212,0.45)',
           }} />
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', fontFamily: "'Plus Jakarta Sans',sans-serif", letterSpacing: '-0.5px' }}>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', fontFamily: "'Plus Jakarta Sans',sans-serif", letterSpacing: '-0.5px' }}>
               Lex.<span style={{ color: '#06B6D4' }}>ia</span>
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
               Legal AI Platform
             </div>
           </div>
         </div>
 
-        {/* Slides container */}
-        <div style={{ position: 'absolute', inset: 0, paddingTop: 100 }}>
-          {SLIDES.map((slide, i) => (
-            <OnboardingSlide key={i} slide={slide} active={i === activeSlide} />
-          ))}
+        {/* Contenido central */}
+        <div style={{
+          position: 'absolute', zIndex: 2,
+          top: '50%', left: 48, right: 48,
+          transform: 'translateY(-50%)',
+        }}>
+          <div style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: '2.5px',
+            color: '#06B6D4', textTransform: 'uppercase', marginBottom: 16,
+          }}>
+            Plataforma Legal IA · Perú
+          </div>
+          <h2 style={{
+            fontSize: 'clamp(26px, 2.8vw, 42px)', fontWeight: 900,
+            color: '#fff', lineHeight: 1.2, marginBottom: 16,
+            fontFamily: "'Plus Jakarta Sans',sans-serif",
+          }}>
+            La justicia,<br />
+            <span style={{ color: '#06B6D4' }}>potenciada por IA</span>
+          </h2>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.62)', lineHeight: 1.7, marginBottom: 40, maxWidth: 380 }}>
+            Predicción judicial, análisis de expedientes y redacción legal automatizada para el sistema jurídico peruano.
+          </p>
+
+          {/* Stats */}
+          <div style={{ display: 'flex', gap: 28 }}>
+            {[
+              { val: '94%',  label: 'Precisión predictiva' },
+              { val: '50K+', label: 'Sentencias analizadas' },
+              { val: '13',   label: 'Herramientas IA' },
+            ].map(s => (
+              <div key={s.val} style={{
+                background: 'rgba(6,182,212,0.08)',
+                border: '1px solid rgba(6,182,212,0.18)',
+                borderRadius: 12, padding: '12px 16px', textAlign: 'center',
+              }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: '#06B6D4', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{s.val}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 3 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Dot indicators */}
+        {/* Roles badge — parte inferior */}
         <div style={{
-          position: 'absolute', bottom: 40, left: 52,
-          display: 'flex', gap: 8, alignItems: 'center',
+          position: 'absolute', bottom: 40, left: 48, zIndex: 2,
+          display: 'flex', gap: 8,
         }}>
-          {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveSlide(i)}
-              aria-label={`Slide ${i + 1}`}
-              style={{
-                width: i === activeSlide ? 24 : 6,
-                height: 6, borderRadius: 3,
-                background: i === activeSlide ? '#06B6D4' : 'rgba(255,255,255,0.35)',
-                border: 'none', cursor: 'pointer', padding: 0,
-                transition: 'all 0.3s ease',
-                boxShadow: i === activeSlide ? '0 0 8px #06B6D4' : 'none',
-              }}
-            />
+          {['Abogado', 'Fiscal', 'Juez', 'Contador'].map(r => (
+            <span key={r} style={{
+              fontSize: 10, fontWeight: 600, letterSpacing: '0.5px',
+              padding: '5px 10px', borderRadius: 20,
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              color: 'rgba(255,255,255,0.6)',
+            }}>{r}</span>
           ))}
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginLeft: 8 }}>
-            {activeSlide + 1} / {SLIDES.length}
-          </span>
         </div>
 
         {/* Divider vertical */}
         <div style={{
           position: 'absolute', top: 0, right: 0, bottom: 0, width: 1,
-          background: 'linear-gradient(to bottom, transparent, rgba(6,182,212,0.15) 30%, rgba(6,182,212,0.15) 70%, transparent)',
+          background: 'linear-gradient(to bottom, transparent, rgba(6,182,212,0.22) 30%, rgba(6,182,212,0.22) 70%, transparent)',
         }} />
       </div>
 
@@ -502,7 +510,7 @@ export default function Login() {
           </div>
 
           <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 24 }}>
-            Impulsado por Gemini AI &copy; 2026 · Lex.ia Legal Platform
+            &copy; 2026 · Lex.ia Legal Platform · Impulsado por IA
           </p>
         </div>
       </div>

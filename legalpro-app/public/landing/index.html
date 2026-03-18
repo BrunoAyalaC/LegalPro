@@ -135,15 +135,15 @@
       opacity: 0.5;
     }
     .blob {
-      position: fixed;
+      position: absolute;
       border-radius: 50%;
       filter: blur(130px);
       pointer-events: none;
       z-index: 0;
     }
     .blob-1 { width: 700px; height: 700px; background: rgba(6,182,212,0.07); top: -200px; left: -200px; }
-    .blob-2 { width: 500px; height: 500px; background: rgba(201,168,76,0.05); top: 50%; right: -150px; }
-    .blob-3 { width: 450px; height: 450px; background: rgba(6,182,212,0.05); bottom: 0; left: 30%; }
+    .blob-2 { width: 500px; height: 500px; background: rgba(201,168,76,0.05); top: 20%; right: -150px; }
+    .blob-3 { width: 450px; height: 450px; background: rgba(6,182,212,0.05); bottom: 10%; left: 30%; }
     .page { position: relative; z-index: 2; }
 
     /* ─── UTILITIES ──────────────────────────────────────────────── */
@@ -1055,7 +1055,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
-          POWERED BY GEMINI AI ⚡
+          POWERED BY LEX.IA ⚡
         </div>
 
         <h1 class="hero-title">
@@ -1181,7 +1181,7 @@
   ══════════════════════════════════════════════════ -->
   <section class="chapters-section" id="funciones" data-video-section style="position:relative;overflow:hidden;">
     <!-- Video background capítulos -->
-    <div class="video-bg-wrap" aria-hidden="true" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;">
+    <div class="video-bg-wrap" aria-hidden="true" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;">
       <video id="video-chapter-bg" autoplay muted loop playsinline
         poster="assets/img/chapter-poster.webp"
         oncanplay="this.classList.add('loaded')">
@@ -1191,9 +1191,9 @@
       <div class="video-overlay video-overlay-chapter"></div>
     </div>
     <div class="chapters-header reveal">
-      <div class="section-tag">CAPÍTULOS CINEMATOGRÁFICOS</div>
+      <div class="section-tag">MÓDULOS PRINCIPALES</div>
       <h2 class="section-title">Las 4 herramientas <span class="gradient-text-cyan">más poderosas</span></h2>
-      <p class="section-subtitle">Cada herramienta diseñada para el sistema legal peruano</p>
+      <p class="section-subtitle">Cada módulo diseñado para el sistema legal peruano</p>
     </div>
 
     <!-- Ch01 Análisis IA -->
@@ -1235,7 +1235,7 @@
             </div>
             <div class="device-ai-row">
               <div class="device-ai-icon">🤖</div>
-              <div class="device-ai-text"><strong>Gemini AI:</strong> Identifico el Art. 259 NCPP como precedente clave. Probabilidad alta de acogida.</div>
+              <div class="device-ai-text"><strong>Lex.ia:</strong> Identifico el Art. 259 NCPP como precedente clave. Probabilidad alta de acogida.</div>
             </div>
             <div class="device-text-lines">
               <div class="device-line" style="width:90%;"></div>
@@ -1431,7 +1431,7 @@
         <p class="section-subtitle reveal reveal-delay-1">Todo lo que necesitas para ejercer el derecho peruano con IA</p>
       </div>
       <div class="features-grid-13">
-        <div class="feat-card reveal"><div class="feat-icon"><span class="si si-analisis"></span></div><div class="feat-name">Análisis IA de Expedientes</div><div class="feat-desc">Analiza documentos PDF en segundos con Gemini AI</div></div>
+        <div class="feat-card reveal"><div class="feat-icon"><span class="si si-analisis"></span></div><div class="feat-name">Análisis IA de Expedientes</div><div class="feat-desc">Analiza documentos PDF en segundos con Lex.ia</div></div>
         <div class="feat-card reveal reveal-delay-1"><div class="feat-icon"><span class="si si-predictor"></span></div><div class="feat-name">Predictor Judicial</div><div class="feat-desc">Predice resultados con jurisprudencia del PJ</div></div>
         <div class="feat-card reveal reveal-delay-2 gold-accent"><div class="feat-icon gold"><span class="si si-escritos gold"></span></div><div class="feat-name">Redactor de Escritos</div><div class="feat-desc">Genera escritos NCPP/CPC con IA avanzada</div></div>
         <div class="feat-card reveal reveal-delay-3"><div class="feat-icon"><span class="si si-simulador"></span></div><div class="feat-name">Simulador de Juicios</div><div class="feat-desc">Juicio oral simulado con IA como juez y fiscal</div></div>
@@ -1688,7 +1688,7 @@
         abogados peruanos
       </h2>
       <p class="cta-subtitle reveal reveal-delay-1">
-        La plataforma legal más avanzada del Perú, potenciada por <strong style="color:var(--cyan)">Gemini AI</strong>. Sin tarjeta requerida.
+        La plataforma legal más avanzada del Perú, potenciada por <strong style="color:var(--cyan)">Lex.ia</strong>. Sin tarjeta requerida.
       </p>
       <div class="cta-buttons reveal reveal-delay-2">
         <a href="/login" class="btn btn-primary" style="font-size:16px;padding:15px 32px;">
@@ -1768,7 +1768,7 @@
         <span>Lima, Perú 2026 · © Lex.ia — Todos los derechos reservados</span>
         <div class="footer-powered">
           <div class="powered-dot"></div>
-          Powered by <strong style="color:var(--cyan);margin-left:4px;">Gemini AI</strong>
+          Powered by <strong style="color:var(--cyan);margin-left:4px;">Lex.ia AI</strong>
         </div>
         <div class="footer-legal">
           <a href="#">Términos</a>
@@ -1912,7 +1912,7 @@ window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.cli
 <!-- Motor de scroll interactivo + video parallax -->
 <script src="scroll-engine.js" type="module"></script>
 
-<!-- GSAP + ScrollTrigger CDN — animaciones cinematográficas avanzadas -->
+<!-- GSAP + ScrollTrigger CDN — animaciones avanzadas avanzadas -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
