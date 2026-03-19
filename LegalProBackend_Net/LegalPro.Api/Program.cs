@@ -15,21 +15,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add support for Railway environment variables
 builder.Configuration.AddEnvironmentVariables();
 
-    // ── Serilog full configuration ────────────────────────────────────────────
-    builder.Host.UseSerilog((ctx, cfg) =>
-    {
-        cfg.ReadFrom.Configuration(ctx.Configuration)
-           .Enrich.FromLogContext()
-       .Enrich.WithProperty("Application", "LegalPro.Api")
-       .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
-       .WriteTo.Console(outputTemplate:
-           "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
-       .WriteTo.File(
-           path: "logs/legalpro-.log",
-           rollingInterval: RollingInterval.Day,
-           retainedFileCountLimit: 7,
-           outputTemplate:
-               "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+// ── Serilog full configuration ────────────────────────────────────────────
+builder.Host.UseSerilog((ctx, cfg) =>
+{
+    cfg.ReadFrom.Configuration(ctx.Configuration)
+       .Enrich.FromLogContext()
+   .Enrich.WithProperty("Application", "LegalPro.Api")
+   .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+   .WriteTo.Console(outputTemplate:
+       "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
+   .WriteTo.File(
+       path: "logs/legalpro-.log",
+       rollingInterval: RollingInterval.Day,
+       retainedFileCountLimit: 7,
+       outputTemplate:
+           "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
 });
 
 
@@ -39,21 +39,21 @@ builder.Services.AddRateLimiter(o =>
     // Regla general: 60 req/min por IP (ventana deslizante)
     o.AddSlidingWindowLimiter("general", opts =>
     {
-        opts.PermitLimit          = 60;
-        opts.Window               = TimeSpan.FromMinutes(1);
-        opts.SegmentsPerWindow    = 6;  // ventanas de 10s
+        opts.PermitLimit = 60;
+        opts.Window = TimeSpan.FromMinutes(1);
+        opts.SegmentsPerWindow = 6;  // ventanas de 10s
         opts.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opts.QueueLimit           = 0;
+        opts.QueueLimit = 0;
     });
 
     // Regla Gemini estricta: 10 req/min por IP (costoso en tokens)
     o.AddSlidingWindowLimiter("gemini", opts =>
     {
-        opts.PermitLimit          = 10;
-        opts.Window               = TimeSpan.FromMinutes(1);
-        opts.SegmentsPerWindow    = 6;
+        opts.PermitLimit = 10;
+        opts.Window = TimeSpan.FromMinutes(1);
+        opts.SegmentsPerWindow = 6;
         opts.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opts.QueueLimit           = 0;
+        opts.QueueLimit = 0;
     });
 
     o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -82,7 +82,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        Title   = "LegalPro API",
+        Title = "LegalPro API",
         Version = "v1",
         Description = "API backend de LegalPro — plataforma legal IA para abogados, fiscales y jueces peruanos."
     });
@@ -90,12 +90,12 @@ builder.Services.AddSwaggerGen(c =>
     // Configuración de seguridad JWT Bearer para Swagger UI
     var jwtScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Name         = "Authorization",
-        Type         = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme       = "bearer",
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
         BearerFormat = "JWT",
-        In           = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description  = "Ingresa el token JWT. Ejemplo: eyJhbGci..."
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Ingresa el token JWT. Ejemplo: eyJhbGci..."
     };
     c.AddSecurityDefinition("Bearer", jwtScheme);
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
