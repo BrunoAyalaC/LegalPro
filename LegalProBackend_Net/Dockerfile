@@ -24,5 +24,8 @@ WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
 
+# Parchear CVE-2026-22184 (zlib HIGH) y cualquier otro paquete Alpine pendiente
+RUN apk upgrade --no-cache
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "LegalPro.Api.dll"]
