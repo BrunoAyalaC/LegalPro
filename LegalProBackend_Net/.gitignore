@@ -1,0 +1,27 @@
+# Build
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Logs
+logs/
+*.log
+
+# Secrets (NUNCA subir al repo)
+appsettings.Development.json
+appsettings.Testing.json
+appsettings.Production.json
+*.env.test
+.env.test
+.env
+secrets.json
+
+# NuGet
+*.nupkg
+.nuget/
+
+# OS
+.DS_Store
+Thumbs.db
