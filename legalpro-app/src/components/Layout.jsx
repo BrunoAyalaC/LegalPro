@@ -6,6 +6,7 @@ export default function Layout() {
   const location = useLocation();
 
   return (
+    <div className="app-shell">
     <div className="flex flex-col min-h-screen relative">
       {/* ─── GLOBAL FULL SCREEN BACKGROUND ─── */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
@@ -17,6 +18,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <BottomNav />
+    </div>
     </div>
   );
 }
