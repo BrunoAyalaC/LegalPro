@@ -105,11 +105,18 @@ small, .text-sm {
 }
 
 #root {
+  min-height: 100dvh;
+  position: relative;
+}
+
+/* Constrains the in-app mobile shell pages (Dashboard, Expedientes, etc.).
+   Login/Descargar/Landing remain full-width. */
+.app-shell {
   max-width: 430px;
   margin: 0 auto;
   min-height: 100dvh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* ══════════════════════════════════════════ */

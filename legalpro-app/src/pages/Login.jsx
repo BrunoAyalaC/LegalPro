@@ -92,7 +92,7 @@ function OnboardingSlide({ slide, active }) {
         marginBottom: 28,
         boxShadow: `0 0 30px ${accentHex}20`,
       }}>
-        <span className="material-icons" style={{ fontSize: 34, color: accentHex }}>
+        <span className="material-symbols-outlined" style={{ fontSize: 34, color: accentHex }}>
           {slide.icon}
         </span>
       </div>
@@ -179,7 +179,7 @@ export default function Login() {
         className="login-left-panel"
         style={{
           flex: '0 0 58%', position: 'relative',
-          overflow: 'hidden',
+          overflow: 'hidden', display: 'none',
           backgroundImage: "url('/landing/assets/img/logo-og.jpeg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -341,7 +341,7 @@ export default function Login() {
                 borderRadius: 10, fontSize: 13,
                 color: '#f87171', display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                <span className="material-icons" style={{ fontSize: 16 }}>error_outline</span>
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>error</span>
                 {error}
               </div>
             )}
@@ -353,10 +353,10 @@ export default function Login() {
                   Correo electrónico
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <span className="material-icons" style={{
+                  <span className="material-symbols-outlined" style={{
                     position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
                     fontSize: 18, color: 'rgba(255,255,255,0.3)', pointerEvents: 'none',
-                  }}>mail_outline</span>
+                  }}>mail</span>
                   <input
                     type="email"
                     value={email}
@@ -383,10 +383,10 @@ export default function Login() {
                   Contraseña
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <span className="material-icons" style={{
+                  <span className="material-symbols-outlined" style={{
                     position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
                     fontSize: 18, color: 'rgba(255,255,255,0.3)', pointerEvents: 'none',
-                  }}>lock_outline</span>
+                  }}>lock</span>
                   <input
                     type={showPass ? 'text' : 'password'}
                     value={password}
@@ -413,7 +413,7 @@ export default function Login() {
                       color: 'rgba(255,255,255,0.35)',
                     }}
                   >
-                    <span className="material-icons" style={{ fontSize: 18 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                       {showPass ? 'visibility_off' : 'visibility'}
                     </span>
                   </button>
@@ -458,7 +458,7 @@ export default function Login() {
                   }} />
                 ) : (
                   <>
-                    <span className="material-icons" style={{ fontSize: 18 }}>login</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>
                     Iniciar Sesión
                   </>
                 )}
@@ -517,7 +517,6 @@ export default function Login() {
 
       {/* CSS inline para responsive + spinner */}
       <style>{`
-        @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (min-width: 900px) {
@@ -525,6 +524,7 @@ export default function Login() {
           .login-mobile-logo { display: none !important; }
         }
         @media (max-width: 899px) {
+          .login-left-panel { display: none !important; }
           .login-mobile-slides { display: block !important; }
         }
         input::placeholder { color: rgba(255,255,255,0.22) !important; }
