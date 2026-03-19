@@ -155,12 +155,13 @@ describe('PROD .NET: POST /api/expedientes — creación real', () => {
 
   it('crea expediente real y retorna 200/201 con ID asignado (403 si usuario sin org)', async () => {
     expect(tokens.abogado).toBeTruthy();
-    // numero <= 20 chars (validación FluentValidation), tipo = TipoRamaProcesal enum
+    // numero <= 20 chars (validación FluentValidation), tipo = TipoRamaProcesal enum (int)
+    // TipoRamaProcesal: Penal=0, Civil=1, Laboral=2, Constitucional=3, ContenciosoAdministrativo=4, Familia=5
     const numero = `TP-${Date.now().toString().slice(-10)}`; // max ~13 chars
     const res = await api('POST', '/api/expedientes', {
       numero,
       titulo: 'Expediente de prueba automatizada — puede eliminarse',
-      tipo: 'Civil',
+      tipo: 1, // Civil (integer — .NET no tiene JsonStringEnumConverter)
       esUrgente: false,
     }, tokens.abogado);
     // 200/201: creado | 403: usuario sin org en .NET DB
