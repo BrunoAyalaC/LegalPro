@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Enums;
+using LegalPro.Domain.Exceptions;
 
 namespace LegalPro.Application.Expedientes.Queries;
 
@@ -72,7 +73,7 @@ public class GetExpedientesQueryHandler : IRequestHandler<GetExpedientesQuery, G
     public async Task<GetExpedientesResult> Handle(GetExpedientesQuery request, CancellationToken cancellationToken)
     {
         var orgId = _currentUser.OrganizationId
-            ?? throw new UnauthorizedAccessException("No perteneces a ninguna organización.");
+            ?? throw new ForbiddenAccessException("No perteneces a ninguna organización. Crea o únete a una organización primero.");
 
         var query = _context.Expedientes
             .Where(e => e.OrganizationId == orgId)

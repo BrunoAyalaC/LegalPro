@@ -59,6 +59,36 @@ public class ExceptionHandlingMiddleware
                     Detail = domainEx.Message
                 }
             ),
+            AuthenticationFailedException authEx => (
+                HttpStatusCode.Unauthorized,
+                new ErrorResponse
+                {
+                    Type = "AuthenticationError",
+                    Title = "No Autorizado",
+                    Status = (int)HttpStatusCode.Unauthorized,
+                    Detail = authEx.Message
+                }
+            ),
+            UnauthorizedAccessException unauthorizedEx => (
+                HttpStatusCode.Forbidden,
+                new ErrorResponse
+                {
+                    Type = "Forbidden",
+                    Title = "Acceso Denegado",
+                    Status = (int)HttpStatusCode.Forbidden,
+                    Detail = unauthorizedEx.Message
+                }
+            ),
+            ConflictException conflictEx => (
+                HttpStatusCode.Conflict,
+                new ErrorResponse
+                {
+                    Type = "Conflict",
+                    Title = "Conflicto",
+                    Status = (int)HttpStatusCode.Conflict,
+                    Detail = conflictEx.Message
+                }
+            ),
             NotFoundException notFoundEx => (
                 HttpStatusCode.NotFound,
                 new ErrorResponse

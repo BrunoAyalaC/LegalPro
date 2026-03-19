@@ -36,7 +36,7 @@ public class GetExpedienteByIdQueryHandler : IRequestHandler<GetExpedienteByIdQu
     public async Task<ExpedienteDto> Handle(GetExpedienteByIdQuery request, CancellationToken cancellationToken)
     {
         var orgId = _currentUser.OrganizationId
-            ?? throw new UnauthorizedAccessException("No perteneces a ninguna organización.");
+            ?? throw new ForbiddenAccessException("No perteneces a ninguna organización. Crea o únete a una organización primero.");
 
         // Filtra por Id Y OrganizationId en una sola consulta:
         // — si el recurso existe pero es de otro tenant, devuelve NotFoundException (no 403)
