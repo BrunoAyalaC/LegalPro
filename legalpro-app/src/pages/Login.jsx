@@ -514,22 +514,6 @@ export default function Login() {
           </p>
         </div>
       </div>
-
-      {/* CSS inline para responsive + spinner */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (min-width: 900px) {
-          .login-left-panel { display: flex !important; }
-          .login-mobile-logo { display: none !important; }
-        }
-        @media (max-width: 899px) {
-          .login-left-panel { display: none !important; }
-          .login-mobile-slides { display: block !important; }
-        }
-        input::placeholder { color: rgba(255,255,255,0.22) !important; }
-        input:-webkit-autofill { -webkit-box-shadow: 0 0 0 50px #0a0f1a inset !important; -webkit-text-fill-color: #fff !important; }
-      `}</style>
     </div>
   );
 }
