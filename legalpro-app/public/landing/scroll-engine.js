@@ -29,6 +29,7 @@ class VideoBackgroundManager {
     this.section = options.sectionId ? document.getElementById(options.sectionId) : null;
     this.parallaxFactor = options.parallaxFactor || 0.3;
     this.initialized = false;
+    this._sectionTop = null;  // cached absolute position (no forced reflow en update)
 
     if (!this.video) return;
     this._init();
@@ -41,9 +42,13 @@ class VideoBackgroundManager {
       return;
     }
 
+    // will-change para promover al GPU compositor
+    this.video.style.willChange = 'transform';
+
     this.video.addEventListener('canplay', () => {
       this.video.parentElement.style.opacity = '1';
       this.initialized = true;
+      this._cachePosition();  // cache posición cuando el video esté listo
     }, { once: true });
 
     // Observer para pausar video fuera de viewport (save GPU)
@@ -58,17 +63,32 @@ class VideoBackgroundManager {
     }, { threshold: 0.1 });
 
     observer.observe(this.video);
+
+    // Recachear posición en resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => this._cachePosition(), 150);
+    }, { passive: true });
   }
 
-  /** Llamar en cada frame del scroll loop */
+  /** Cachea la posición ABSOLUTA (sin transforms) — una sola vez o en resize */
+  _cachePosition() {
+    if (!this.section) return;
+    // Quitar transform temporalmente para leer posición natural
+    const prevTransform = this.video.style.transform;
+    this.video.style.transform = '';
+    const rect = this.section.getBoundingClientRect();
+    this._sectionTop = rect.top + window.scrollY;
+    this.video.style.transform = prevTransform;
+  }
+
+  /** Llamar en cada frame del scroll loop — NO lee layout, solo escribe */
   applyParallax(scrollY) {
     if (!this.initialized || REDUCED_MOTION || IS_MOBILE) return;
-    if (!this.section) return;
+    if (this._sectionTop === null) return;
 
-    const rect = this.section.getBoundingClientRect();
-    const sectionTop = rect.top + scrollY;
-    const offset = (scrollY - sectionTop) * this.parallaxFactor;
-
+    const offset = (scrollY - this._sectionTop) * this.parallaxFactor;
     this.video.style.transform = `translateY(${offset}px) scale(1.2)`;
   }
 }
@@ -76,7 +96,7 @@ class VideoBackgroundManager {
 /* ─── 2. SCROLL-DRIVEN VIDEO SEEK ──────────────────────── */
 /**
  * Controla la reproducción de un video según el scroll
- * Ideal para el justice-reveal.mp4 en el CTA final
+ * Usa rAF para debounce — evita jank por currentTime en cada evento
  *
  * @param {string} videoId
  * @param {string} sectionId — sección que triggeriza el seek
@@ -91,8 +111,15 @@ function setupScrollVideoSeek(videoId, sectionId) {
   // Cargar pero no reproducir automáticamente
   video.pause();
   video.currentTime = 0;
+  video.style.willChange = 'transform';
 
   let hasStarted = false;
+  // Cache posición absoluta de la sección
+  let sectionAbsTop = section.getBoundingClientRect().top + window.scrollY;
+  window.addEventListener('resize', () => {
+    section.style.transform = '';
+    sectionAbsTop = section.getBoundingClientRect().top + window.scrollY;
+  }, { passive: true });
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -105,20 +132,27 @@ function setupScrollVideoSeek(videoId, sectionId) {
 
   observer.observe(section);
 
-  // Scroll seek refinado
+  // Scroll seek con rAF debounce — no bloquea el main thread
+  let rafPending = false;
   window.addEventListener('scroll', () => {
-    const rect = section.getBoundingClientRect();
-    const viewH = window.innerHeight;
+    if (rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(() => {
+      rafPending = false;
+      const viewH = window.innerHeight;
+      const scrollY = window.scrollY;
+      const sectionHeight = section.offsetHeight;
+      const relTop = sectionAbsTop - scrollY;
 
-    if (rect.top < viewH && rect.bottom > 0) {
-      const progress = Math.max(0, Math.min(1,
-        (viewH - rect.top) / (viewH + rect.height)
-      ));
-      // Solo seek si el video está pausado (no interferir con autoplay)
-      if (video.paused && video.duration) {
-        video.currentTime = progress * video.duration;
+      if (relTop < viewH && relTop + sectionHeight > 0) {
+        const progress = Math.max(0, Math.min(1,
+          (viewH - relTop) / (viewH + sectionHeight)
+        ));
+        if (video.paused && video.duration) {
+          video.currentTime = progress * video.duration;
+        }
       }
-    }
+    });
   }, { passive: true });
 }
 
@@ -128,24 +162,65 @@ class ParallaxLayer {
    * @param {string} selector — CSS selector del elemento
    * @param {number} speed    — velocidad (0.1 lento - 0.8 rápido)
    * @param {string} axis     — 'Y' (default) | 'X'
+   *
+   * IMPORTANTE: Cachea posiciones absolutas en init para evitar
+   * forced reflow en cada frame del RAF loop.
    */
   constructor(selector, speed = 0.2, axis = 'Y') {
-    this.elements = document.querySelectorAll(selector);
     this.speed = speed;
     this.axis = axis;
+    this._cache = [];
+
+    const elements = [...document.querySelectorAll(selector)];
+    if (!elements.length) return;
+
+    // Asignar will-change antes de cachear
+    elements.forEach(el => {
+      el.style.willChange = 'transform';
+      el.style.transform = '';  // reset por si acaso
+    });
+
+    // Forzar un único reflow para leer posiciones naturales
+    this._cache = elements.map(el => {
+      const rect = el.getBoundingClientRect();
+      return {
+        el,
+        // Posición ABSOLUTA en el documento (invariante ante scroll)
+        absTop: rect.top + window.scrollY,
+        height: rect.height,
+      };
+    });
+
+    // Re-cachear solo en resize (no en scroll)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => this._recache(), 150);
+    }, { passive: true });
   }
 
+  _recache() {
+    this._cache.forEach(item => {
+      item.el.style.transform = '';
+    });
+    // Un único reflow aquí
+    this._cache.forEach(item => {
+      const rect = item.el.getBoundingClientRect();
+      item.absTop = rect.top + window.scrollY;
+      item.height = rect.height;
+    });
+  }
+
+  /** Solo escribe transforms — nunca lee layout */
   update(scrollY) {
-    if (REDUCED_MOTION) return;
-    this.elements.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      const centerY = rect.top + rect.height / 2 - window.innerHeight / 2;
-      const offset = centerY * this.speed;
-      if (this.axis === 'Y') {
-        el.style.transform = `translateY(${offset}px)`;
-      } else {
-        el.style.transform = `translateX(${offset}px)`;
-      }
+    if (REDUCED_MOTION || !this._cache.length) return;
+    const viewCenterY = scrollY + window.innerHeight * 0.5;
+    this._cache.forEach(({ el, absTop, height }) => {
+      const elCenterY = absTop + height * 0.5;
+      const offset = (viewCenterY - elCenterY) * this.speed;
+      el.style.transform = this.axis === 'Y'
+        ? `translateY(${offset}px)`
+        : `translateX(${offset}px)`;
     });
   }
 }
@@ -333,7 +408,7 @@ function initScrollEngine() {
   chapterBgManager  = new VideoBackgroundManager('video-chapter-bg', { sectionId: 'funciones', parallaxFactor: 0.2 });
   neuralGlobeManager = new VideoBackgroundManager('video-neural',    { sectionId: 'nosotros', parallaxFactor: 0.15 });
 
-  // Parallax layers
+  // Parallax layers — cachean posiciones en constructor (un solo reflow)
   heroParallax = new ParallaxLayer('.hero-content', 0.12);
   blobParallax = new ParallaxLayer('.blob', 0.08);
 
@@ -351,22 +426,35 @@ function initScrollEngine() {
   if (!IS_MOBILE) new CursorTrail();
 
   // Main RAF loop para parallax
+  // Patrón correcto: scrollY se lee ONCE por frame, luego solo WRITES
   if (!REDUCED_MOTION) {
+    let lastScrollY = -1;
     let rafId;
+
     function update() {
       const scrollY = window.scrollY;
-      heroBgManager.applyParallax(scrollY);
-      chapterBgManager.applyParallax(scrollY);
-      neuralGlobeManager.applyParallax(scrollY);
-      heroParallax.update(scrollY);
-      blobParallax.update(scrollY);
+
+      // Solo actualizar si el scroll cambió (evita work innecesario en frames sin scroll)
+      if (scrollY !== lastScrollY) {
+        lastScrollY = scrollY;
+        // Todos los WRITES en bloque — posiciones ya están cacheadas, no hay LEEDAs de layout aquí
+        heroBgManager.applyParallax(scrollY);
+        chapterBgManager.applyParallax(scrollY);
+        neuralGlobeManager.applyParallax(scrollY);
+        heroParallax.update(scrollY);
+        blobParallax.update(scrollY);
+      }
+
       rafId = requestAnimationFrame(update);
     }
     rafId = requestAnimationFrame(update);
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) cancelAnimationFrame(rafId);
-      else rafId = requestAnimationFrame(update);
+      else {
+        lastScrollY = -1;  // forzar update al volver
+        rafId = requestAnimationFrame(update);
+      }
     });
   }
 }

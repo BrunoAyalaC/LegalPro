@@ -763,3 +763,39 @@ textarea.input {
   height: 100%;
   object-fit: cover;
 }
+
+/* ══════════════════════════════════════════ */
+/*  LOGIN — Split layout responsive           */
+/* ══════════════════════════════════════════ */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Desktop ≥ 900px: mostrar panel izquierdo */
+@media (min-width: 900px) {
+  .login-left-panel {
+    display: flex !important;
+  }
+  .login-mobile-logo {
+    display: none !important;
+  }
+}
+
+/* Mobile < 900px: ocultar panel izq, mostrar slides mini */
+@media (max-width: 899px) {
+  .login-left-panel {
+    display: none !important;
+  }
+  .login-mobile-slides {
+    display: block !important;
+  }
+}
+
+/* Autofill styling */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 50px #0a0f1a inset !important;
+  -webkit-text-fill-color: #fff !important;
+}
+input::placeholder {
+  color: rgba(255, 255, 255, 0.22) !important;
+}
