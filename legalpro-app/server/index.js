@@ -158,12 +158,10 @@ app.use('/api/gemini', geminiLimiter, geminiRoutes);
 // ── ERROR HANDLER GLOBAL ──────────────────────────────────────────────────────
 app.use((err, _req, res, _next) => {
   const status = err.status ?? err.statusCode ?? 500;
-  // No exponer stack traces en producción (information disclosure — OWASP A05)
-  const message = isProd && status >= 500
-    ? 'Error interno del servidor'
-    : (err.message ?? 'Error interno del servidor');
-  if (status >= 500) console.error('[ERROR]', err);
-  res.status(status).json({ error: message });
+  // DEBUG TEMPORAL: exponer error real para diagnóstico — revertir tras fix
+  const message = err.message ?? 'Error interno del servidor';
+  if (status >= 500) console.error('[ERROR]', err.name, err.message, err.code, err.detail, err.stack?.split('\n')[1]);
+  res.status(status).json({ error: message, _debug_name: err.name, _debug_code: err.code });
 });
 
 app.listen(PORT, async () => {

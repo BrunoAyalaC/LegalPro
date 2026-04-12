@@ -107,6 +107,7 @@ router.post('/register', async (req, res, next) => {
       mensaje: 'Usuario registrado. Crea o únete a una organización para continuar.',
     });
   } catch (err) {
+    console.error('[register CATCH]', err?.name, err?.message, err?.code, err?.detail);
     next(err);
   }
 });
