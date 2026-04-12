@@ -236,25 +236,21 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 // ── EF Core Migrations en startup ──────────────────────────────────────────
-// NOTA: Las migraciones se aplican vía background task para no bloquear healthcheck.
-// Se ejecutan 3s después del inicio del servidor.
+// Solo en Production para evitar fallo en Development/Testing sin DB real.
 if (app.Environment.IsProduction())
 {
-    _ = Task.Run(async () =>
+    try
     {
-        try
-        {
-            await Task.Delay(3000);
-            using var scope = app.Services.CreateScope();
-            var dbCtx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            await dbCtx.Database.MigrateAsync();
-            Log.Information("EF Core migrations aplicadas correctamente.");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error en background migration. El servicio continúa.");
-        }
-    });
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await db.Database.MigrateAsync();
+        Log.Information("EF Core migrations aplicadas correctamente.");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Error aplicando EF Core migrations al iniciar. El servicio continúa.");
+        Log.Warning("Si las migraciones no están aplicadas, ejecuta: dotnet ef database update");
+    }
 }
 
 app.Run();
