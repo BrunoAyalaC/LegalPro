@@ -7,6 +7,8 @@ import { test, expect } from '@playwright/test';
 test.describe('Accesibilidad — Login', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/login');
+    // Esperar a que el lazy chunk de Login cargue (Suspense)
+    await page.waitForSelector('input[type="email"]', { timeout: 10000 });
   });
 
   test('todos los inputs tienen label asociado', async ({ page }) => {
@@ -25,7 +27,8 @@ test.describe('Accesibilidad — Login', () => {
   });
 
   test('el botón toggle de contraseña tiene aria-label o es accesible', async ({ page }) => {
-    const toggleBtn = page.locator('button:has(span.material-icons)').first();
+    // Componente usa material-symbols-outlined (no material-icons)
+    const toggleBtn = page.getByRole('button', { name: /mostrar|ocultar contrase/i });
     await expect(toggleBtn).toBeVisible();
     // Debe ser clickeable sin mouse trap
     await toggleBtn.click();

@@ -21,7 +21,7 @@ export default function BovedaEvidencia() {
             <div key={i} className="card anim-fade-in-up" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><AppIcon name={iconMap[e.tipo]} size={20} /></div>
-                <div className="flex-1"><p className="font-semibold text-sm">{e.name}</p><p className="text-[10px] text-slate-500">{e.size} • {e.fecha}</p><p className="text-[9px] text-slate-600 font-mono mt-1">{e.hash}</p></div>
+                <div className="flex-1"><p className="font-semibold text-sm">{e.name}</p><p className="text-xs text-slate-400">{e.size} • {e.fecha}</p><p className="text-xs text-slate-500 font-mono mt-1">{e.hash}</p></div>
                 <AppIcon name={e.verificado ? 'check_circle' : 'pending'} size={20} />
               </div>
             </div>

@@ -179,7 +179,7 @@ export default function Login() {
         className="login-left-panel"
         style={{
           flex: '0 0 58%', position: 'relative',
-          overflow: 'hidden', display: 'none',
+          overflow: 'hidden',
           backgroundImage: "url('/landing/assets/img/logo-og.jpeg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -406,6 +406,7 @@ export default function Login() {
                   />
                   <button
                     type="button"
+                    aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                     onClick={() => setShowPass(p => !p)}
                     style={{
                       position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',

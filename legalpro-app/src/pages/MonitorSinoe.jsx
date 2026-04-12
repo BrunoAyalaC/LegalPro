@@ -28,8 +28,8 @@ export default function MonitorSinoe() {
           {notificaciones.map((n, i) => (
             <div key={i} className={`card ${n.urgente ? 'border-l-4 border-red-500' : ''} anim-fade-in-up`} style={{ animationDelay: `${i * 0.08}s`, opacity: 0 }}>
               <div className="flex items-center justify-between mb-1">
-                <span className="badge badge-primary text-[9px]">{n.tipo}</span>
-                <span className="text-[10px] text-slate-500">{n.fecha}</span>
+                <span className="badge badge-primary text-xs">{n.tipo}</span>
+                <span className="text-xs text-slate-400">{n.fecha}</span>
               </div>
               <p className="font-semibold text-sm">{n.titulo}</p>
               <p className="text-xs text-slate-500 mt-1">Exp. {n.exp}</p>

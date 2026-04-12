@@ -16,7 +16,7 @@ export default function PredictorJudicial() {
     try {
       const data = await api.consulta(hechos, 'predictor');
       setResultado(data.resultado);
-    } catch (e) {
+    } catch {
       setError('Error al conectar con el servidor');
     } finally {
       setLoading(false);

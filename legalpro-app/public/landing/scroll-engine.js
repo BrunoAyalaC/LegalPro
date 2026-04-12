@@ -400,17 +400,15 @@ function setupCounters() {
 
 /* ─── 10. MAIN SCROLL LOOP ──────────────────────────────── */
 let heroBgManager, chapterBgManager, neuralGlobeManager;
-let heroParallax, blobParallax;
 
 function initScrollEngine() {
-  // Video managers
-  heroBgManager     = new VideoBackgroundManager('video-hero-bg',    { sectionId: 'inicio', parallaxFactor: 0.25 });
-  chapterBgManager  = new VideoBackgroundManager('video-chapter-bg', { sectionId: 'funciones', parallaxFactor: 0.2 });
-  neuralGlobeManager = new VideoBackgroundManager('video-neural',    { sectionId: 'nosotros', parallaxFactor: 0.15 });
+  // Video managers — parallax solo en videos (GPU-composited, no afectan layout)
+  heroBgManager     = new VideoBackgroundManager('video-hero-bg',    { sectionId: 'inicio', parallaxFactor: 0.15 });
+  chapterBgManager  = new VideoBackgroundManager('video-chapter-bg', { sectionId: 'funciones', parallaxFactor: 0.12 });
+  neuralGlobeManager = new VideoBackgroundManager('video-neural',    { sectionId: 'nosotros', parallaxFactor: 0.10 });
 
-  // Parallax layers — cachean posiciones en constructor (un solo reflow)
-  heroParallax = new ParallaxLayer('.hero-content', 0.12);
-  blobParallax = new ParallaxLayer('.blob', 0.08);
+  // NOTA: blob parallax gestionado por GSAP ScrollTrigger (inline en index.html, sección 4).
+  // El RAF loop aquí solo mueve los videos (GPU-composited, nativo). No mezclar con blobs.
 
   // Scroll seek para CTA final
   setupScrollVideoSeek('video-justice', 'cta-section');
@@ -422,11 +420,10 @@ function initScrollEngine() {
   setupIconStagger();
   setupCounters();
 
-  // Cursor trail (solo desktop)
-  if (!IS_MOBILE) new CursorTrail();
+  // Cursor trail desactivado — causaba un segundo loop RAF concurrente que generaba jank
+  // Si se quiere reactivar, usar una versión throttled con IntersectionObserver
 
-  // Main RAF loop para parallax
-  // Patrón correcto: scrollY se lee ONCE por frame, luego solo WRITES
+  // Main RAF loop — solo video parallax (sin blobs ni hero-content)
   if (!REDUCED_MOTION) {
     let lastScrollY = -1;
     let rafId;
@@ -434,15 +431,12 @@ function initScrollEngine() {
     function update() {
       const scrollY = window.scrollY;
 
-      // Solo actualizar si el scroll cambió (evita work innecesario en frames sin scroll)
       if (scrollY !== lastScrollY) {
         lastScrollY = scrollY;
-        // Todos los WRITES en bloque — posiciones ya están cacheadas, no hay LEEDAs de layout aquí
+        // Solo parallax de videos — son elementos separados en stacking context GPU
         heroBgManager.applyParallax(scrollY);
         chapterBgManager.applyParallax(scrollY);
         neuralGlobeManager.applyParallax(scrollY);
-        heroParallax.update(scrollY);
-        blobParallax.update(scrollY);
       }
 
       rafId = requestAnimationFrame(update);
@@ -452,7 +446,7 @@ function initScrollEngine() {
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) cancelAnimationFrame(rafId);
       else {
-        lastScrollY = -1;  // forzar update al volver
+        lastScrollY = -1;
         rafId = requestAnimationFrame(update);
       }
     });

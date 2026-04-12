@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { GoogleGenAI, FunctionCallingConfigMode, Type } from '@google/genai';
-import supabase from '../supabase.js';
+import db from '../db.js';
 import { authMiddleware, tenantMiddleware } from '../middleware/authMiddleware.js';
 import { sanitizarPrompt, validarPermisoIA, envolverContenidoUsuario } from '../middleware/promptSanitizer.js';
 
@@ -133,12 +133,10 @@ router.post('/chat', async (req, res, next) => {
     // Contexto adicional del expediente si se provee
     let contextoExpediente = '';
     if (expediente_id) {
-      const { data: exp } = await supabase
-        .from('expedientes')
-        .select('numero, titulo, tipo, estado')
-        .eq('id', expediente_id)
-        .eq('organization_id', orgId)
-        .maybeSingle();
+      const { rows: [exp] } = await db.query(
+        'SELECT numero, titulo, tipo, estado FROM expedientes WHERE id=$1 AND organization_id=$2',
+        [expediente_id, orgId]
+      );
 
       if (exp) {
         contextoExpediente = `\n\nExpediente en contexto: ${exp.numero} — ${exp.titulo} (${exp.tipo}, ${exp.estado})`;
@@ -172,13 +170,11 @@ router.post('/chat', async (req, res, next) => {
     const respuesta = response.text ?? 'No se pudo obtener respuesta.';
 
     // Guardar en historial de chat (fire & forget — no bloquea la respuesta)
-    supabase.from('historial_chat').insert({
-      usuario_id: req.user.sub,
-      organization_id: orgId,
-      expediente_id: expediente_id ?? null,
-      mensaje_usuario: mensaje,
-      respuesta_ia: respuesta,
-    }).then(() => {}).catch(() => {});
+    db.query(
+      `INSERT INTO mensajes_chat (usuario_id, organization_id, expediente_id, contenido, rol)
+       VALUES ($1,$2,$3,$4,'user'),($1,$2,$3,$5,'assistant')`,
+      [req.user.sub, orgId, expediente_id ?? null, mensaje, respuesta]
+    ).catch(() => {});
 
     return res.json({ respuesta, tokens: response.usageMetadata?.totalTokenCount ?? null });
   } catch (err) {
@@ -302,20 +298,20 @@ router.get('/historial', async (req, res, next) => {
     const usuarioId = req.user.sub;
     const { limit = 50, expediente_id } = req.query;
 
-    let query = supabase
-      .from('historial_chat')
-      .select('id, mensaje_usuario, respuesta_ia, created_at, expediente_id')
-      .eq('usuario_id', usuarioId)
-      .eq('organization_id', orgId)
-      .order('created_at', { ascending: false })
-      .limit(Math.min(200, parseInt(limit)));
+    const params = [usuarioId, orgId];
+    let sql = `SELECT id, contenido AS mensaje_usuario, rol, created_at, expediente_id
+               FROM mensajes_chat
+               WHERE usuario_id=$1 AND organization_id=$2`;
+    if (expediente_id) {
+      sql += ` AND expediente_id=$${params.length + 1}`;
+      params.push(expediente_id);
+    }
+    sql += ` ORDER BY created_at DESC LIMIT $${params.length + 1}`;
+    params.push(Math.min(200, parseInt(limit)));
 
-    if (expediente_id) query = query.eq('expediente_id', expediente_id);
+    const { rows: historial } = await db.query(sql, params);
 
-    const { data: historial, error } = await query;
-    if (error) throw error;
-
-    return res.json({ historial: historial ?? [] });
+    return res.json({ historial });
   } catch (err) {
     next(err);
   }
@@ -329,13 +325,12 @@ router.get('/notificaciones', async (req, res, next) => {
     // Por ahora retorna datos estructurados del tenant
     const orgId = req.organizationId;
 
-    const { data: urgentes } = await supabase
-      .from('expedientes')
-      .select('id, numero, titulo, tipo')
-      .eq('organization_id', orgId)
-      .eq('es_urgente', true)
-      .eq('estado', 'ACTIVO')
-      .limit(5);
+    const { rows: urgentes } = await db.query(
+      `SELECT id, numero, titulo, tipo FROM expedientes
+       WHERE organization_id=$1 AND es_urgente=TRUE AND estado='activo'
+       LIMIT 5`,
+      [orgId]
+    );
 
     const notificaciones = (urgentes ?? []).map(exp => ({
       id: exp.id,

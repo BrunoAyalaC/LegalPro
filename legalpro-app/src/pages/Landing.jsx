@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Landing() {
@@ -15,10 +15,11 @@ export default function Landing() {
           return;
         }
       } catch {
-        // Token inválido — redirigir a landing
+        // Token inválido — redirigir a login
       }
     }
-    window.location.replace('/landing/');
+    // Redirigir directamente a login — la landing obsoleta fue eliminada
+    navigate('/login', { replace: true });
   }, [navigate]);
 
   return (

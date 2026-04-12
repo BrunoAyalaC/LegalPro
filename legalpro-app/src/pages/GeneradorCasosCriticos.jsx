@@ -16,7 +16,7 @@ export default function GeneradorCasosCriticos() {
       <div className="px-4 py-6 space-y-6">
         {/* Intro */}
         <div className="text-center px-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-[0_8px_32px_rgba(249,115,22,0.4)] mx-auto mb-4 border border-white/20">
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-[0_8px_32px_rgba(249,115,22,0.4)] mx-auto mb-4 border border-white/20">
             <AppIcon name="dangerous" size={32} className="icon-raw" style={{ filter: 'brightness(0) invert(1)' }} />
           </div>
           <h2 className="text-xl font-bold text-white mb-2">Escenarios Críticos</h2>

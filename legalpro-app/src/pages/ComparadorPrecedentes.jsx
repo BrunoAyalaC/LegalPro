@@ -6,7 +6,7 @@ export default function ComparadorPrecedentes() {
     <div className="page-enter">
       <Header title="Comparador Precedentes" showBack rightAction={<span className="badge badge-primary">INDECOPI/TC</span>} />
       <div className="px-4 py-6 space-y-6">
-        <div className="input flex items-center gap-2"><AppIcon name="search" size={20} /><input className="bg-transparent border-none outline-none text-sm flex-1 placeholder:text-slate-500" placeholder="Buscar precedente..." /></div>
+        <div className="input flex items-center gap-2"><AppIcon name="search" size={20} /><input className="bg-transparent border-none outline-none text-sm flex-1 placeholder:text-slate-500" placeholder="Buscar precedente..." aria-label="Buscar precedente" /></div>
         <div className="grid grid-cols-2 gap-3">
           <div className="card border-primary/30 p-3"><h4 className="text-xs font-bold text-primary mb-2">Precedente A</h4><p className="text-[11px] text-slate-400">Casación 0432-2023 - Delitos contra el patrimonio</p><span className="badge badge-success mt-2">Favorable</span></div>
           <div className="card border-amber-500/30 p-3"><h4 className="text-xs font-bold text-amber-400 mb-2">Precedente B</h4><p className="text-[11px] text-slate-400">Casación 2933-2023 - Responsabilidad civil</p><span className="badge badge-warning mt-2">Neutral</span></div>

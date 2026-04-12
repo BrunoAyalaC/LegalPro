@@ -45,8 +45,8 @@ test.describe('Login Page', () => {
     const passwordInput = page.locator('input[type="password"]');
     await passwordInput.fill('MiPassword123');
 
-    // Click toggle button
-    await page.locator('button:has(span.material-icons:text("visibility"))').click();
+    // Click toggle button — identificado por aria-label
+    await page.getByRole('button', { name: 'Mostrar contraseña' }).click();
 
     // Now should be text type
     const visibleInput = page.locator('input[value="MiPassword123"]');

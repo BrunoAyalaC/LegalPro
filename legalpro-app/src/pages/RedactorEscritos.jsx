@@ -19,7 +19,7 @@ export default function RedactorEscritos() {
       const prompt = `Redacta un escrito legal de tipo "${tipoEscrito}" para la "${distritoJudicial}". Hechos del caso: ${hechos}`;
       const data = await api.consulta(prompt, 'redaccion');
       setResultado(typeof data.resultado === 'string' ? data.resultado : JSON.stringify(data.resultado, null, 2));
-    } catch (e) {
+    } catch {
       setError('Error al conectar con el servidor');
     } finally {
       setLoading(false);

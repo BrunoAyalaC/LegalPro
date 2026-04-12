@@ -1,37 +1,43 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { TenantProvider } from './context/TenantContext';
+import { UIProvider } from './context/UIContext';
 import Layout from './components/Layout';
 import AuthGuard from './components/AuthGuard';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import ChatIA from './pages/ChatIA';
-import Expedientes from './pages/Expedientes';
-import AnalistaExpedientes from './pages/AnalistaExpedientes';
-import SimuladorJuicios from './pages/SimuladorJuicios';
-import BuscadorJurisprudencia from './pages/BuscadorJurisprudencia';
-import RedactorEscritos from './pages/RedactorEscritos';
-import PredictorJudicial from './pages/PredictorJudicial';
-import Herramientas from './pages/Herramientas';
-import Perfil from './pages/Perfil';
-import GeneradorAlegatos from './pages/GeneradorAlegatos';
-import EstrategiaInterrogatorio from './pages/EstrategiaInterrogatorio';
-import AsistenteObjeciones from './pages/AsistenteObjeciones';
-import MonitorSinoe from './pages/MonitorSinoe';
-import ComparadorPrecedentes from './pages/ComparadorPrecedentes';
-import BovedaEvidencia from './pages/BovedaEvidencia';
-import GestionMultidoc from './pages/GestionMultidoc';
-import GeneradorCasosCriticos from './pages/GeneradorCasosCriticos';
-import ResumenEjecutivo from './pages/ResumenEjecutivo';
-import ReporteRetroalimentacion from './pages/ReporteRetroalimentacion';
-import ConfigEspecialidad from './pages/ConfigEspecialidad';
-import SetupOrganizacion from './pages/SetupOrganizacion';
-import Descargar from './pages/Descargar';
-import Landing from './pages/Landing';
+
+// Rutas con lazy loading — cada página se carga solo cuando se navega a ella
+const Login                   = lazy(() => import('./pages/Login'));
+const Dashboard               = lazy(() => import('./pages/Dashboard'));
+const ChatIA                  = lazy(() => import('./pages/ChatIA'));
+const Expedientes             = lazy(() => import('./pages/Expedientes'));
+const AnalistaExpedientes     = lazy(() => import('./pages/AnalistaExpedientes'));
+const SimuladorJuicios        = lazy(() => import('./pages/SimuladorJuicios'));
+const BuscadorJurisprudencia  = lazy(() => import('./pages/BuscadorJurisprudencia'));
+const RedactorEscritos        = lazy(() => import('./pages/RedactorEscritos'));
+const PredictorJudicial       = lazy(() => import('./pages/PredictorJudicial'));
+const Herramientas            = lazy(() => import('./pages/Herramientas'));
+const Perfil                  = lazy(() => import('./pages/Perfil'));
+const GeneradorAlegatos       = lazy(() => import('./pages/GeneradorAlegatos'));
+const EstrategiaInterrogatorio= lazy(() => import('./pages/EstrategiaInterrogatorio'));
+const AsistenteObjeciones     = lazy(() => import('./pages/AsistenteObjeciones'));
+const MonitorSinoe            = lazy(() => import('./pages/MonitorSinoe'));
+const ComparadorPrecedentes   = lazy(() => import('./pages/ComparadorPrecedentes'));
+const BovedaEvidencia         = lazy(() => import('./pages/BovedaEvidencia'));
+const GestionMultidoc         = lazy(() => import('./pages/GestionMultidoc'));
+const GeneradorCasosCriticos  = lazy(() => import('./pages/GeneradorCasosCriticos'));
+const ResumenEjecutivo        = lazy(() => import('./pages/ResumenEjecutivo'));
+const ReporteRetroalimentacion= lazy(() => import('./pages/ReporteRetroalimentacion'));
+const ConfigEspecialidad      = lazy(() => import('./pages/ConfigEspecialidad'));
+const SetupOrganizacion       = lazy(() => import('./pages/SetupOrganizacion'));
+const Descargar               = lazy(() => import('./pages/Descargar'));
+const Landing                 = lazy(() => import('./pages/Landing'));
 
 export default function App() {
   return (
-    <TenantProvider>
-      <BrowserRouter>
+    <UIProvider>
+      <TenantProvider>
+        <BrowserRouter>
+        <Suspense fallback={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0a0a0f', color: '#06B6D4', fontFamily: 'sans-serif' }}>Cargando...</div>}>
         <Routes>
           {/* Rutas públicas */}
           <Route path="/" element={<Landing />} />
@@ -59,16 +65,17 @@ export default function App() {
           <Route path="/resumen-ejecutivo" element={<ResumenEjecutivo />} />
           <Route path="/retroalimentacion" element={<ReporteRetroalimentacion />} />
           <Route path="/config-especialidad" element={<ConfigEspecialidad />} />
+          {/* Chat IA y detalle: dentro del Layout para tener sidebar en desktop */}
+          <Route path="/chat-ia" element={<ChatIA />} />
+          <Route path="/expediente/:id" element={<AnalistaExpedientes />} />
           </Route>
-
-          {/* Full-screen pages without bottom nav */}
-          <Route path="/chat-ia" element={<AuthGuard><ChatIA /></AuthGuard>} />
-          <Route path="/expediente/:id" element={<AuthGuard><AnalistaExpedientes /></AuthGuard>} />
 
           {/* Ruta publica - sin autenticacion */}
           <Route path="/descargar" element={<Descargar />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
-    </TenantProvider>
+      </TenantProvider>
+    </UIProvider>
   );
 }

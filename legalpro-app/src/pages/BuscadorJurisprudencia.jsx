@@ -18,7 +18,7 @@ export default function BuscadorJurisprudencia() {
     try {
       const data = await api.consulta(buscar, 'jurisprudencia');
       setResultados(data.resultado);
-    } catch (e) {
+    } catch {
       setError('Error al conectar con el servidor');
       setResultados(null);
     } finally {
