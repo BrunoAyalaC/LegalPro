@@ -130,11 +130,13 @@ builder.Services.AddHealthChecks();
 
 // CORS: orígenes permitidos configurables desde variable de entorno ALLOWED_ORIGINS
 // En Railway: ALLOWED_ORIGINS=https://mi-frontend.railway.app,https://legalpro.app
+// NOTA: también acepta sin protocolo (ej. "mi-frontend.railway.app") → se normaliza a https://
 builder.Services.AddCors(options =>
 {
-    var allowedOrigins = builder.Configuration["ALLOWED_ORIGINS"]
-        ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        ?? [];
+    var allowedOrigins = (builder.Configuration["ALLOWED_ORIGINS"] ?? "")
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(o => o.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? o : $"https://{o}")
+        .ToArray();
 
     options.AddPolicy("DefaultCors", policy =>
     {
@@ -207,6 +209,12 @@ if (app.Environment.IsDevelopment())
 
 // Global Exception Handling (replaces try/catch in every controller)
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+// Security Headers — CSP, HSTS, X-Frame-Options, etc. (OWASP A05)
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
+// Brute Force Protection — login lockout progresivo (OWASP A07)
+app.UseMiddleware<BruteForceProtectionMiddleware>();
 
 // Rate limiting (antes de routing para cortar temprano)
 app.UseRateLimiter();

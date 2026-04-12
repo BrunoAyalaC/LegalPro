@@ -30,7 +30,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginQuery query)
     {
         var token = await _mediator.Send(query);
-        return Ok(new { Token = token });
+        return Ok(new { token, mensaje = "Login exitoso." });
     }
 
     /// <summary>
@@ -44,9 +44,9 @@ public class AuthController : ControllerBase
         var result = await _mediator.Send(command);
         return Ok(new
         {
-            accessToken     = result.AccessToken,
-            refreshToken    = result.NewRefreshToken,
-            expiresAt       = result.ExpiresAt,
+            accessToken = result.AccessToken,
+            refreshToken = result.NewRefreshToken,
+            expiresAt = result.ExpiresAt,
         });
     }
 }

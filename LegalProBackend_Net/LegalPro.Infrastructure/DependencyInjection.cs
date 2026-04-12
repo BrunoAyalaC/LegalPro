@@ -55,6 +55,9 @@ public static class DependencyInjection
         services.AddScoped<ISimulationService, SimulationService>();
         services.AddScoped<IJwtService, JwtService>();
 
+        // Audit log de seguridad — persistencia de eventos de autenticación y acceso
+        services.AddScoped<IAuditLogger, AuditLoggerService>();
+
         // Resiliencia de IA: Polly v8 Pipeline para Gemini
         services.AddResiliencePipeline("gemini-pipeline", builder =>
         {
