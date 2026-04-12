@@ -79,6 +79,18 @@ async function applySchema() {
 
   const client = await db.connect();
   try {
+    await client.query('BEGIN');
+    await client.query(sql);
+    await client.query('COMMIT');
+    console.log('[initDb] ✅ Schema aplicado correctamente (init.sql ejecutado).');
+  } catch (schemaErr) {
+    await client.query('ROLLBACK');
+    console.error('[initDb] ❌ Error aplicando schema:', schemaErr.message);
+  } finally {
+    client.release();
+  }
+}
+  try {
     await client.query(sql);
     console.log('[initDb] ✅ Schema aplicado correctamente.');
   } catch (schemaErr) {
