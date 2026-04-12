@@ -7,6 +7,7 @@ import { rateLimit } from 'express-rate-limit';
 import authRoutes from './routes/auth.js';
 import organizacionesRoutes from './routes/organizaciones.js';
 import geminiRoutes from './routes/gemini.js';
+import { initDb } from './initDb.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -165,8 +166,10 @@ app.use((err, _req, res, _next) => {
   res.status(status).json({ error: message });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`[LegalPro API] escuchando en puerto ${PORT} (${process.env.NODE_ENV ?? 'development'})`);
+  // Inicializar schema de DB si las tablas no existen (Railway fresh deploy)
+  await initDb();
 });
 
 export default app;
