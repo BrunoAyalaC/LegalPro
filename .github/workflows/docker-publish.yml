@@ -61,8 +61,6 @@ jobs:
             VITE_APK_URL=${{ secrets.VITE_APK_URL }}
             VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}
             VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # ──────────────────────────────────────────────────────────────
   # 2. BACKEND NODE API (node:20-alpine)
@@ -97,8 +95,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   # ──────────────────────────────────────────────────────────────
   # 3. BACKEND .NET API (aspnet:9.0-alpine)
@@ -133,5 +129,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
