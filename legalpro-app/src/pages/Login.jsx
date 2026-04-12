@@ -278,7 +278,7 @@ export default function Login() {
       </div>
 
       {/* ── RIGHT PANEL: Formulario de login ──────────────────── */}
-      <div style={{
+      <main role="main" style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         padding: '40px 24px', position: 'relative', overflowY: 'auto',
@@ -334,14 +334,17 @@ export default function Login() {
 
             {/* Error */}
             {error && (
-              <div style={{
+              <div
+                role="alert"
+                aria-live="assertive"
+                style={{
                 marginBottom: 16, padding: '12px 14px',
                 background: 'rgba(239,68,68,0.1)',
                 border: '1px solid rgba(239,68,68,0.25)',
                 borderRadius: 10, fontSize: 13,
                 color: '#f87171', display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>error</span>
+                <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 16 }}>error</span>
                 {error}
               </div>
             )}
@@ -349,15 +352,16 @@ export default function Login() {
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {/* Email */}
               <div>
-                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+                <label htmlFor="login-email" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
                   Correo electrónico
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <span className="material-symbols-outlined" style={{
+                  <span className="material-symbols-outlined" aria-hidden="true" style={{
                     position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
                     fontSize: 18, color: 'rgba(255,255,255,0.3)', pointerEvents: 'none',
                   }}>mail</span>
                   <input
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -379,15 +383,16 @@ export default function Login() {
 
               {/* Password */}
               <div>
-                <label style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+                <label htmlFor="login-password" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
                   Contraseña
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <span className="material-symbols-outlined" style={{
+                  <span className="material-symbols-outlined" aria-hidden="true" style={{
                     position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
                     fontSize: 18, color: 'rgba(255,255,255,0.3)', pointerEvents: 'none',
                   }}>lock</span>
                   <input
+                    id="login-password"
                     type={showPass ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -514,7 +519,7 @@ export default function Login() {
             &copy; 2026 · Lex.ia Legal Platform · Impulsado por IA
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
