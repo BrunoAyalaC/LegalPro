@@ -244,26 +244,29 @@ if (app.Environment.IsProduction())
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    // Convertir postgresql:// URI a formato ADO.NET que NpgsqlConnectionStringBuilder acepta.
-    // Railway provee DATABASE_URL como URI, pero Npgsql SetConnectionString requiere key=value.
-    static string ConvertPostgresUri(string uriOrConnStr)
-    {
-        if (string.IsNullOrEmpty(uriOrConnStr)) return uriOrConnStr;
-        if (!uriOrConnStr.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase)
-            && !uriOrConnStr.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
-            return uriOrConnStr.Replace(":6543/", ":5432/");
-
-        var uri = new Uri(uriOrConnStr);
-        var userInfo = uri.UserInfo.Split(':', 2);
-        var user = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : "";
-        var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
-        var db2 = uri.AbsolutePath.TrimStart('/');
-        return $"Host={uri.Host};Port={uri.Port};Database={db2};Username={user};Password={pass};SSL Mode=Prefer;Trust Server Certificate=true";
-    }
-
+    // Convertir postgresql:// URI a formato ADO.NET key=value que Npgsql acepta.
+    // Railway provee DATABASE_URL como URI — NpgsqlConnectionStringBuilder solo acepta key=value.
     var rawConn = app.Configuration["MIGRATION_DB_URL"]
         ?? db.Database.GetConnectionString()!;
-    var migrationConn = ConvertPostgresUri(rawConn);
+
+    string migrationConn;
+    if (rawConn.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase)
+        || rawConn.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+    {
+        var pgUri = new Uri(rawConn);
+        var parts = pgUri.UserInfo.Split(':', 2);
+        var pgUser = parts.Length > 0 ? Uri.UnescapeDataString(parts[0]) : "";
+        var pgPass = parts.Length > 1 ? Uri.UnescapeDataString(parts[1]) : "";
+        var pgDb   = pgUri.AbsolutePath.TrimStart('/');
+        migrationConn = $"Host={pgUri.Host};Port={pgUri.Port};Database={pgDb};" +
+                        $"Username={pgUser};Password={pgPass};" +
+                        "SSL Mode=Prefer;Trust Server Certificate=true";
+    }
+    else
+    {
+        migrationConn = rawConn.Replace(":6543/", ":5432/");
+    }
+
     db.Database.SetConnectionString(migrationConn);
 
     try
