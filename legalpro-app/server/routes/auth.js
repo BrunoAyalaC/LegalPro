@@ -72,20 +72,28 @@ router.post('/register', async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const { rows: inserted } = await db.query(
-      `INSERT INTO usuarios (nombre_completo, email, password_hash, rol, especialidad, esta_activo, created_at)
-       VALUES ($1, $2, $3, $4, $5, TRUE, NOW())
-       RETURNING *`,
-      [
-        nombreCompleto.trim(),
-        email.toLowerCase().trim(),
-        passwordHash,
-        rol.toUpperCase(),
-        especialidad.toUpperCase(),
-      ]
-    );
+    let inserted;
+    try {
+      const result = await db.query(
+        `INSERT INTO usuarios (nombre_completo, email, password_hash, rol, especialidad, esta_activo, created_at)
+         VALUES ($1, $2, $3, $4, $5, TRUE, NOW())
+         RETURNING *`,
+        [
+          nombreCompleto.trim(),
+          email.toLowerCase().trim(),
+          passwordHash,
+          rol.toUpperCase(),
+          especialidad.toUpperCase(),
+        ]
+      );
+      inserted = result.rows;
+    } catch (insertErr) {
+      console.error('[register INSERT ERROR]', insertErr.message, '| detail:', insertErr.detail, '| code:', insertErr.code);
+      throw insertErr;
+    }
     const usuario = inserted[0];
     if (!usuario) return res.status(500).json({ error: 'Error al crear usuario. Inténtelo de nuevo.' });
+    console.log('[register] Usuario creado:', usuario.id, usuario.email);
 
     const token = generateToken(usuario, null);
     return res.status(201).json({
