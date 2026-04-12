@@ -236,52 +236,54 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 
 // ── EF Core Migrations en startup (Railway + Supabase) ──────────────────────────
-// Solo en Production — evita fallo en Development y Testing (sin DB real).
-// Usamos conexión directa (migrationConnectionString, puerto 5432) para DDL,
-// porque Supabase PgBouncer en transaction mode (6543) bloquea CREATE TABLE.
+// Se lanza en background para que app.Run() no sea bloqueado y el healthcheck pase.
+// Railway healthcheckTimeout = 30s — el migration puede tardar más.
 if (app.Environment.IsProduction())
 {
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-    // Convertir postgresql:// URI a formato ADO.NET key=value que Npgsql acepta.
-    // Railway provee DATABASE_URL como URI — NpgsqlConnectionStringBuilder solo acepta key=value.
-    var rawConn = app.Configuration["MIGRATION_DB_URL"]
-        ?? db.Database.GetConnectionString()!;
-
-    string migrationConn;
-    if (rawConn.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase)
-        || rawConn.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+    _ = Task.Run(async () =>
     {
-        var pgUri = new Uri(rawConn);
-        var parts = pgUri.UserInfo.Split(':', 2);
-        var pgUser = parts.Length > 0 ? Uri.UnescapeDataString(parts[0]) : "";
-        var pgPass = parts.Length > 1 ? Uri.UnescapeDataString(parts[1]) : "";
-        var pgDb   = pgUri.AbsolutePath.TrimStart('/');
-        migrationConn = $"Host={pgUri.Host};Port={pgUri.Port};Database={pgDb};" +
-                        $"Username={pgUser};Password={pgPass};" +
-                        "SSL Mode=Prefer;Trust Server Certificate=true";
-    }
-    else
-    {
-        migrationConn = rawConn.Replace(":6543/", ":5432/");
-    }
+        await Task.Delay(2000); // Esperar que el server levante antes de migrar
 
-    db.Database.SetConnectionString(migrationConn);
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    try
-    {
-        await db.Database.MigrateAsync();
-        Log.Information("EF Core migrations aplicadas correctamente.");
-    }
-    catch (Exception ex)
-    {
-        // No hacer crash-loop: si la BD ya está migrada, el servicio puede arrancar.
-        // Supabase PgBouncer puede rechazar DDL; las migraciones manuales siguen válidas.
-        Log.Error(ex, "Error aplicando EF Core migrations al iniciar. El servicio continúa.");
-        Log.Warning("Si las migraciones no están aplicadas, ejecuta: dotnet ef database update");
-        Log.Warning("Para DDL en Supabase usa conexión directa (puerto 5432) en MIGRATION_DB_URL");
-    }
+        var rawConn = app.Configuration["MIGRATION_DB_URL"]
+            ?? db.Database.GetConnectionString()!;
+
+        string migrationConn;
+        if (rawConn.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase)
+            || rawConn.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+        {
+            var pgUri = new Uri(rawConn);
+            var parts = pgUri.UserInfo.Split(':', 2);
+            var pgUser = parts.Length > 0 ? Uri.UnescapeDataString(parts[0]) : "";
+            var pgPass = parts.Length > 1 ? Uri.UnescapeDataString(parts[1]) : "";
+            var pgDb   = pgUri.AbsolutePath.TrimStart('/');
+            migrationConn = $"Host={pgUri.Host};Port={pgUri.Port};Database={pgDb};" +
+                            $"Username={pgUser};Password={pgPass};" +
+                            "SSL Mode=Prefer;Trust Server Certificate=true;" +
+                            "Connection Timeout=5;Command Timeout=15";
+        }
+        else
+        {
+            migrationConn = rawConn.Replace(":6543/", ":5432/");
+            if (!migrationConn.Contains("Connection Timeout"))
+                migrationConn += ";Connection Timeout=5;Command Timeout=15";
+        }
+
+        db.Database.SetConnectionString(migrationConn);
+
+        try
+        {
+            await db.Database.MigrateAsync();
+            Log.Information("EF Core migrations aplicadas correctamente.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error aplicando EF Core migrations (background). El servicio continúa.");
+        }
+    });
 }
 
 app.Run();
