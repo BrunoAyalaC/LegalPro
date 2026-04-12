@@ -104,7 +104,7 @@ export default function SimuladorJuicios() {
       <div className="px-4 pb-28">
         <div className="flex gap-2 items-center glass rounded-full pl-4 pr-1 py-1 shadow-[0_8px_24px_rgba(0,0,0,0.5)] border border-white/10">
           <input className="flex-1 bg-transparent border-none outline-none text-sm py-2 placeholder:text-slate-500" placeholder="Escribe tu argumento legal..." />
-          <button className="bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-full p-2.5 flex items-center justify-center hover:scale-105 transition-transform shadow-lg">
+          <button className="bg-linear-to-br from-indigo-500 to-violet-600 text-white rounded-full p-2.5 flex items-center justify-center hover:scale-105 transition-transform shadow-lg">
             <AppIcon name="send" size={20} className="icon-raw" style={{ filter: 'brightness(0) invert(1)' }} />
           </button>
         </div>

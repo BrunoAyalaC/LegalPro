@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e6]:
+      - img "Lex.ia" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e9]: Lex.ia
+        - generic [ref=e10]: Legal AI Platform
+    - generic [ref=e11]:
+      - generic [ref=e12]: Plataforma Legal IA · Perú
+      - heading "La justicia, potenciada por IA" [level=2] [ref=e13]:
+        - text: La justicia,
+        - text: potenciada por IA
+      - paragraph [ref=e14]: Predicción judicial, análisis de expedientes y redacción legal automatizada para el sistema jurídico peruano.
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: 94%
+          - generic [ref=e18]: Precisión predictiva
+        - generic [ref=e19]:
+          - generic [ref=e20]: 50K+
+          - generic [ref=e21]: Sentencias analizadas
+        - generic [ref=e22]:
+          - generic [ref=e23]: "13"
+          - generic [ref=e24]: Herramientas IA
+    - generic [ref=e25]:
+      - generic [ref=e26]: Abogado
+      - generic [ref=e27]: Fiscal
+      - generic [ref=e28]: Juez
+      - generic [ref=e29]: Contador
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - heading "Iniciar Sesión" [level=1] [ref=e35]
+      - paragraph [ref=e36]: Ingresa tus credenciales para continuar
+      - generic [ref=e37]:
+        - generic [ref=e38]: error
+        - text: Credenciales incorrectas. Verifica tu email y contraseña.
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: Correo electrónico
+          - generic [ref=e42]:
+            - generic: mail
+            - textbox "tu@correo.com" [ref=e43]: demo@legalpro.pe
+        - generic [ref=e44]:
+          - generic [ref=e45]: Contraseña
+          - generic [ref=e46]:
+            - generic: lock
+            - textbox "••••••••" [ref=e47]: Demo2026!
+            - button "visibility" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]: visibility
+        - generic [ref=e50]:
+          - generic [ref=e51] [cursor=pointer]:
+            - checkbox "Recordarme" [checked] [ref=e52]
+            - text: Recordarme
+          - link "¿Olvidó su contraseña?" [ref=e53] [cursor=pointer]:
+            - /url: "#"
+        - button "login Iniciar Sesión" [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]: login
+          - text: Iniciar Sesión
+    - paragraph [ref=e56]: © 2026 · Lex.ia Legal Platform · Impulsado por IA
+```

@@ -140,9 +140,8 @@
       filter: blur(130px);
       pointer-events: none;
       z-index: 0;
-      /* GPU compositing — evita repaint en cada frame de parallax */
+      /* GSAP ScrollTrigger gestiona el transform — no usar CSS animation aquí (conflicto) */
       will-change: transform;
-      transform: translateZ(0);
     }
     .blob-1 { width: 700px; height: 700px; background: rgba(6,182,212,0.07); top: -200px; left: -200px; }
     .blob-2 { width: 500px; height: 500px; background: rgba(201,168,76,0.05); top: 20%; right: -150px; }
@@ -323,6 +322,19 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.06'/%3E%3C/svg%3E");
       opacity: 0.6;
     }
+    /* ─── HERO SECTION full-bleed + fade inferior suave ──────── */
+    section#inicio {
+      position: relative;
+      background: linear-gradient(135deg, #080C14 0%, #0D1520 30%, #0A1018 60%, #050508 100%);
+    }
+    section#inicio::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, transparent 0%, #050508 100%);
+      z-index: 10;
+      pointer-events: none;
+    }
     .hero-content { position: relative; z-index: 1; }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
@@ -379,7 +391,23 @@
       backdrop-filter: blur(10px);
     }
     .stat-badge.gold-border { border-color: rgba(201,168,76,0.3); }
-    .stat-badge span.emoji { font-size: 14px; }
+    .sim-role-tag {
+      display: inline-block; font-size: 9px; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+      background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.25);
+      color: var(--cyan-bright); border-radius: 4px; padding: 2px 7px;
+      flex-shrink: 0;
+    }
+    .sim-role-tag.gold { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.25); color: var(--gold); }
+    .sim-role-tag.muted { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); color: var(--text-muted); }
+    .device-ai-tag {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+      background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3);
+      font-size: 9px; font-weight: 900; color: var(--cyan-bright);
+      font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0;
+    }
+    .device-ai-tag.gold { background: rgba(201,168,76,0.12); border-color: rgba(201,168,76,0.3); color: var(--gold); }
     .hero-visual {
       display: flex; align-items: center; justify-content: center;
       position: relative;
@@ -468,8 +496,7 @@
     .institutions-strip {
       padding: 22px 24px;
       background: rgba(255,255,255,0.015);
-      border-top: 1px solid var(--border-base);
-      border-bottom: 1px solid var(--border-base);
+      border: none; /* sin cortes duros — transición suave */
       overflow: hidden;
     }
     .institutions-label {
@@ -717,6 +744,34 @@
     .feat-name { font-family: 'Plus Jakarta Sans',sans-serif; font-size: 14px; font-weight: 700; color: var(--text-white); margin-bottom: 6px; line-height: 1.3; }
     .feat-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 
+    /* ─── FEATURE TABS ──────────────────────────────────────────── */
+    .feature-tabs {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      justify-content: center; margin-bottom: 40px;
+    }
+    .feat-tab-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 20px; border-radius: 10px;
+      font-size: 13px; font-weight: 700;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      cursor: pointer; transition: all 0.22s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .feat-tab-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-white); }
+    .feat-tab-btn.active {
+      background: rgba(6,182,212,0.12);
+      border-color: rgba(6,182,212,0.35);
+      color: var(--cyan-bright);
+    }
+    .feat-tab-btn.gold-tab.active {
+      background: rgba(201,168,76,0.12);
+      border-color: rgba(201,168,76,0.35);
+      color: var(--gold-bright);
+    }
+    .feat-card.feat-hidden { display: none !important; }
+
     /* ─── Sprite.png icon system — sprite 1355×758px ──────────────
        Cada .si-* usa background-size+position calculados para
        mostrar el ícono a exactamente 28px de alto.                  */
@@ -756,38 +811,16 @@
     .si.gold { filter: drop-shadow(0 0 4px rgba(201,168,76,0.45)); }
 
     /* ═══════════════════════════════════════════════════════════════
-       ROLES SECTION
-    ═══════════════════════════════════════════════════════════════ */
-    .roles-section { padding: 100px 24px; background: rgba(255,255,255,0.01); }
-    .roles-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
-    .role-card {
-      background: var(--bg-card); border: 1px solid var(--border-base);
-      border-radius: 20px; padding: 28px;
-      transition: all 0.3s ease; position: relative;
-    }
-    .role-card:hover { border-color: var(--border-cyan); transform: translateY(-4px); box-shadow: 0 0 40px rgba(6,182,212,0.07); }
-    .role-badge {
-      width: 34px; height: 34px; border-radius: 8px;
-      background: var(--gold-ghost); border: 1px solid var(--border-gold);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 900; color: var(--gold);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      margin-bottom: 16px;
-    }
-    .role-emoji { font-size: 28px; margin-bottom: 4px; }
-    .role-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 17px; font-weight: 800; color: var(--text-white); margin-bottom: 4px; }
-    .role-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-    .role-features { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .role-features li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-body); }
-    .role-features li::before { content: '›'; color: var(--cyan); font-weight: 700; font-size: 14px; flex-shrink: 0; margin-top: -1px; }
-
-    /* ═══════════════════════════════════════════════════════════════
        STATS ROW
     ═══════════════════════════════════════════════════════════════ */
     .stats-row {
       padding: 80px 24px;
-      background: linear-gradient(135deg, rgba(6,182,212,0.04) 0%, rgba(201,168,76,0.02) 100%);
-      border-top: 1px solid var(--border-base); border-bottom: 1px solid var(--border-base);
+      background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(6,182,212,0.05) 15%,
+        rgba(201,168,76,0.03) 85%,
+        transparent 100%);
+      border: none; /* transición fluida entre secciones */
     }
     .stats-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 40px; text-align: center; }
     .stat-num {
@@ -872,7 +905,7 @@
     .cta-final {
       padding: 100px 24px;
       background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(6,182,212,0.07) 0%, var(--bg-deep) 70%);
-      border-top: 1px solid rgba(6,182,212,0.12);
+      border-top: none; /* sin corte — fondo radial ya delimita la sección */
       text-align: center;
     }
     .cta-inner { max-width: 720px; margin: 0 auto; }
@@ -947,7 +980,6 @@
       .hero { grid-template-columns: 1fr; padding-top: 110px; }
       .hero-visual { display: none; }
       .features-grid-13 { grid-template-columns: repeat(3,1fr); }
-      .roles-grid { grid-template-columns: repeat(2,1fr); }
       .chapter-block { grid-template-columns: 1fr; min-height: auto; }
       .chapter-block:nth-child(even) .chapter-content { order: 1; }
       .chapter-block:nth-child(even) .chapter-visual { order: 2; }
@@ -965,7 +997,6 @@
       .navbar-actions .btn-ghost { display: none; }
       .hamburger { display: flex; }
       .features-grid-13 { grid-template-columns: repeat(2,1fr); }
-      .roles-grid { grid-template-columns: 1fr; }
       .stats-grid-4 { grid-template-columns: repeat(2,1fr); gap: 32px; }
       .bm-grid { grid-template-columns: repeat(2,1fr); }
       .footer-grid { grid-template-columns: 1fr; }
@@ -1039,26 +1070,26 @@
   <!-- ══════════════════════════════════════════════════
        HERO
   ══════════════════════════════════════════════════ -->
-  <section id="inicio" data-video-section>
-    <div class="hero" style="position:relative;">
-      <!-- Video background hero -->
-      <div class="video-bg-wrap" aria-hidden="true">
-        <video id="video-hero-bg" autoplay muted loop playsinline
-          poster="assets/img/hero-poster.webp"
-          oncanplay="this.classList.add('loaded')">
-          <source src="assets/videos/hero-bg.webm" type="video/webm" />
-          <source src="assets/videos/hero-bg.mp4" type="video/mp4" />
-        </video>
-        <div class="video-overlay video-overlay-hero"></div>
-      </div>
+  <section id="inicio" data-video-section style="position:relative;">
+    <!-- Video background hero — full-bleed a nivel de sección -->
+    <div class="video-bg-wrap" aria-hidden="true">
+      <video id="video-hero-bg" autoplay muted loop playsinline
+        poster="assets/img/hero-poster.webp"
+        oncanplay="this.classList.add('loaded')">
+        <source src="assets/videos/hero-bg.webm" type="video/webm" />
+        <source src="assets/videos/hero-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay video-overlay-hero"></div>
+    </div>
 
+    <div class="hero" style="position:relative; z-index:1;">
       <!-- Contenido izquierdo -->
       <div class="hero-content">
         <div class="hero-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
-          POWERED BY LEX.IA ⚡
+          POWERED BY LEX.IA
         </div>
 
         <h1 class="hero-title">
@@ -1084,16 +1115,13 @@
 
         <div class="hero-stats">
           <div class="stat-badge">
-            <span class="emoji">⚡</span>
-            <strong>15,000+</strong> Abogados
+            <strong>15,000+</strong> Abogados activos
           </div>
           <div class="stat-badge gold-border">
-            <span class="emoji">🎯</span>
-            <strong>94%</strong> Precisión
+            <strong>94%</strong> Precisión IA
           </div>
           <div class="stat-badge">
-            <span class="emoji">🛠</span>
-            <strong>13</strong> Herramientas IA
+            <strong>13</strong> Herramientas
           </div>
         </div>
       </div>
@@ -1109,7 +1137,6 @@
               <div class="ps-topbar">
                 <span class="ps-logo">Lex.ia</span>
                 <div style="display:flex;gap:5px;align-items:center;">
-                  <div style="font-size:11px;">🔔</div>
                   <div class="ps-avatar"></div>
                 </div>
               </div>
@@ -1214,7 +1241,7 @@
             <div class="device-url">lex.ia / análisis</div>
           </div>
           <div class="device-body">
-            <div class="device-tag">🔍 ANÁLISIS EN CURSO</div>
+            <div class="device-tag">ANÁLISIS EN CURSO</div>
             <div class="device-row">
               <div class="device-card-sm">
                 <div class="device-card-label">Fortalezas</div>
@@ -1237,7 +1264,7 @@
               </div>
             </div>
             <div class="device-ai-row">
-              <div class="device-ai-icon">🤖</div>
+              <div class="device-ai-tag">IA</div>
               <div class="device-ai-text"><strong>Lex.ia:</strong> Identifico el Art. 259 NCPP como precedente clave. Probabilidad alta de acogida.</div>
             </div>
             <div class="device-text-lines">
@@ -1265,7 +1292,7 @@
             <div class="device-url">lex.ia / predictor</div>
           </div>
           <div class="device-body">
-            <div class="device-tag gold-tag">⚖️ PREDICCIÓN ACTIVA</div>
+            <div class="device-tag gold-tag">PREDICCIÓN ACTIVA</div>
             <div class="device-card-sm" style="border-color:rgba(201,168,76,0.2);">
               <div class="device-card-label">Probabilidad de éxito</div>
               <div class="device-card-val gold" style="font-size:28px;">87%</div>
@@ -1276,7 +1303,7 @@
               <div class="device-list-item"><div class="device-list-dot"></div>Jueces del distrito: 3/4 con jurisprudencia afín</div>
             </div>
             <div class="device-ai-row" style="border-color:rgba(201,168,76,0.15);">
-              <div class="device-ai-icon">📊</div>
+              <div class="device-ai-tag gold">PJ</div>
               <div class="device-ai-text" style="color:var(--gold-bright);">Basado en 1,847 sentencias similares del PJ Lima 2020-2026.</div>
             </div>
           </div>
@@ -1299,7 +1326,7 @@
             <div class="device-url">lex.ia / redactor</div>
           </div>
           <div class="device-body">
-            <div class="device-tag">✍️ REDACTANDO...</div>
+            <div class="device-tag">REDACTANDO...</div>
             <div class="device-text-lines">
               <div class="device-line" style="width:95%;height:7px;background:rgba(248,250,252,0.12);"></div>
               <div class="device-line" style="width:85%;"></div>
@@ -1309,12 +1336,12 @@
               <div class="device-line" style="width:60%;"></div>
             </div>
             <div class="device-ai-row">
-              <div class="device-ai-icon">✅</div>
+              <div class="device-ai-tag">IA</div>
               <div class="device-ai-text"><strong>Escrito generado:</strong> Demanda por alimentos — Formato CPC Art. 481. 3 páginas. Sin errores.</div>
             </div>
             <div style="display:flex;gap:6px;">
-              <div class="device-tag" style="flex:1;justify-content:center;">📥 Descargar PDF</div>
-              <div class="device-tag gold-tag" style="flex:1;justify-content:center;">✏️ Editar</div>
+              <div class="device-tag" style="flex:1;justify-content:center;">Descargar PDF</div>
+              <div class="device-tag gold-tag" style="flex:1;justify-content:center;">Editar</div>
             </div>
           </div>
         </div>
@@ -1336,18 +1363,18 @@
             <div class="device-url">lex.ia / simulador</div>
           </div>
           <div class="device-body">
-            <div class="device-tag gold-tag">⚖️ JUICIO EN CURSO</div>
+            <div class="device-tag gold-tag">JUICIO EN CURSO</div>
             <div class="device-list">
               <div class="device-list-item" style="background:rgba(6,182,212,0.05);border:1px solid rgba(6,182,212,0.1);">
-                <div style="font-size:14px;">👨‍⚖️</div>
+                <div class="sim-role-tag">Juez</div>
                 <div style="font-size:10px;color:var(--cyan-bright);">Juez IA: "Tiene la palabra la defensa..."</div>
               </div>
               <div class="device-list-item" style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);">
-                <div style="font-size:14px;">👮</div>
+                <div class="sim-role-tag gold">Fiscal</div>
                 <div style="font-size:10px;color:var(--gold);">Fiscal IA: "Objeto, señoría. Irrelevante."</div>
               </div>
               <div class="device-list-item">
-                <div style="font-size:14px;">👤</div>
+                <div class="sim-role-tag muted">Defensa</div>
                 <div style="font-size:10px;color:var(--text-body);">Abogado (Tú): [Responde aquí...]</div>
               </div>
             </div>
@@ -1389,14 +1416,14 @@
         <div class="browser-body">
           <div class="browser-sidebar">
             <div class="bs-logo">Lex.ia</div>
-            <div class="bs-item active"><div class="bs-icon">📊</div> Dashboard</div>
-            <div class="bs-item"><div class="bs-icon">📁</div> Expedientes</div>
-            <div class="bs-item"><div class="bs-icon">🔍</div> Análisis IA</div>
-            <div class="bs-item"><div class="bs-icon">⚖️</div> Predictor</div>
-            <div class="bs-item"><div class="bs-icon">✍️</div> Redactor</div>
-            <div class="bs-item"><div class="bs-icon">🎭</div> Simulador</div>
-            <div class="bs-item"><div class="bs-icon">📚</div> Jurisprudencia</div>
-            <div class="bs-item"><div class="bs-icon">🔔</div> SINOE</div>
+            <div class="bs-item active"><div class="bs-icon">DB</div> Dashboard</div>
+            <div class="bs-item"><div class="bs-icon">EX</div> Expedientes</div>
+            <div class="bs-item"><div class="bs-icon">IA</div> Análisis IA</div>
+            <div class="bs-item"><div class="bs-icon">PJ</div> Predictor</div>
+            <div class="bs-item"><div class="bs-icon">RD</div> Redactor</div>
+            <div class="bs-item"><div class="bs-icon">SJ</div> Simulador</div>
+            <div class="bs-item"><div class="bs-icon">JR</div> Jurisprudencia</div>
+            <div class="bs-item"><div class="bs-icon">SN</div> SINOE</div>
           </div>
           <div class="browser-main">
             <div class="bm-header">
@@ -1409,7 +1436,7 @@
               <div class="bm-card"><div class="bm-card-label">Predicciones correctas</div><div class="bm-card-val green">94%</div></div>
             </div>
             <div class="bm-ai-block">
-              <div class="bm-ai-ava">🤖</div>
+              <div class="bm-ai-ava">IA</div>
               <div class="bm-ai-text"><strong>Lex.ia IA:</strong> He detectado 3 vencimientos de plazo esta semana. El expediente #2847 tiene alta probabilidad de éxito. ¿Deseas que prepare el escrito de apelación?</div>
             </div>
             <div class="bm-rows">
@@ -1431,89 +1458,30 @@
       <div class="section-header">
         <div class="section-tag">HERRAMIENTAS IA</div>
         <h2 class="section-title reveal">Las <span class="gradient-text-gold">13 herramientas</span> de Lex.ia</h2>
-        <p class="section-subtitle reveal reveal-delay-1">Todo lo que necesitas para ejercer el derecho peruano con IA</p>
+        <p class="section-subtitle reveal reveal-delay-1">Filtra por tu rol jurídico para ver las herramientas que necesitas</p>
       </div>
-      <div class="features-grid-13">
-        <div class="feat-card reveal"><div class="feat-icon"><span class="si si-analisis"></span></div><div class="feat-name">Análisis IA de Expedientes</div><div class="feat-desc">Analiza documentos PDF en segundos con Lex.ia</div></div>
-        <div class="feat-card reveal reveal-delay-1"><div class="feat-icon"><span class="si si-predictor"></span></div><div class="feat-name">Predictor Judicial</div><div class="feat-desc">Predice resultados con jurisprudencia del PJ</div></div>
-        <div class="feat-card reveal reveal-delay-2 gold-accent"><div class="feat-icon gold"><span class="si si-escritos gold"></span></div><div class="feat-name">Redactor de Escritos</div><div class="feat-desc">Genera escritos NCPP/CPC con IA avanzada</div></div>
-        <div class="feat-card reveal reveal-delay-3"><div class="feat-icon"><span class="si si-simulador"></span></div><div class="feat-name">Simulador de Juicios</div><div class="feat-desc">Juicio oral simulado con IA como juez y fiscal</div></div>
-        <div class="feat-card reveal"><div class="feat-icon"><span class="si si-chat"></span></div><div class="feat-name">Chat Lex.ia</div><div class="feat-desc">Asistente legal IA conversacional 24/7</div></div>
-        <div class="feat-card reveal reveal-delay-1 gold-accent"><div class="feat-icon gold"><span class="si si-juris gold"></span></div><div class="feat-name">Buscador de Jurisprudencia</div><div class="feat-desc">Búsqueda en tiempo real en bases del PJ</div></div>
-        <div class="feat-card reveal reveal-delay-2"><div class="feat-icon"><span class="si si-sinoe"></span></div><div class="feat-name">Monitor SINOE</div><div class="feat-desc">Notificaciones electrónicas del Poder Judicial</div></div>
-        <div class="feat-card reveal reveal-delay-3"><div class="feat-icon"><span class="si si-plazos"></span></div><div class="feat-name">Plazos Procesales</div><div class="feat-desc">Cálculo automático de plazos y vencimientos</div></div>
-        <div class="feat-card reveal"><div class="feat-icon"><span class="si si-alegatos"></span></div><div class="feat-name">Generador de Alegatos</div><div class="feat-desc">Alegatos de clausura con IA contextual</div></div>
-        <div class="feat-card reveal reveal-delay-1"><div class="feat-icon"><span class="si si-interroga"></span></div><div class="feat-name">Estrategia de Interrogatorio</div><div class="feat-desc">Preguntas NCPP optimizadas con IA</div></div>
-        <div class="feat-card reveal reveal-delay-2 gold-accent"><div class="feat-icon gold"><span class="si si-objeciones gold"></span></div><div class="feat-name">Asistente de Objeciones</div><div class="feat-desc">Objeciones en tiempo real durante juicio</div></div>
-        <div class="feat-card reveal reveal-delay-3"><div class="feat-icon"><span class="si si-resumen"></span></div><div class="feat-name">Resumen Ejecutivo de Caso</div><div class="feat-desc">Resumen IA de cualquier expediente complejo</div></div>
-        <div class="feat-card reveal feat-13"><div class="feat-icon gold"><span class="si si-peritos gold"></span></div><div class="feat-name">Peritos Contables</div><div class="feat-desc">Liquidaciones laborales e informes periciales</div></div>
+      <!-- Tabs filtro por rol -->
+      <div class="feature-tabs reveal reveal-delay-2" id="feat-tabs">
+        <button class="feat-tab-btn active" data-filter="all">Todas (13)</button>
+        <button class="feat-tab-btn" data-filter="abogado">Abogado</button>
+        <button class="feat-tab-btn" data-filter="fiscal">Fiscal</button>
+        <button class="feat-tab-btn" data-filter="juez">Juez</button>
+        <button class="feat-tab-btn gold-tab" data-filter="contador">Contador</button>
       </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════
-       ROLES SECTION
-  ══════════════════════════════════════════════════ -->
-  <section class="roles-section">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag-gold section-tag">ROLES LEGALES</div>
-        <h2 class="section-title reveal">Diseñado para <span class="gradient-text-gold">cada rol</span> jurídico</h2>
-        <p class="section-subtitle reveal reveal-delay-1">Herramientas especializadas para los 4 roles del sistema legal peruano</p>
-      </div>
-      <div class="roles-grid">
-        <div class="role-card reveal">
-          <div class="role-badge">01</div>
-          <div class="role-emoji">⚖️</div>
-          <div class="role-title">ABOGADO</div>
-          <div class="role-subtitle">Abogado Litigante</div>
-          <ul class="role-features">
-            <li>Gestión de expedientes CRUD</li>
-            <li>Redacción de escritos con IA</li>
-            <li>Predictor de resultados judiciales</li>
-            <li>Simulador de juicios orales</li>
-            <li>Bóveda de evidencia digital</li>
-          </ul>
-        </div>
-        <div class="role-card reveal reveal-delay-1">
-          <div class="role-badge">02</div>
-          <div class="role-emoji">📋</div>
-          <div class="role-title">FISCAL</div>
-          <div class="role-subtitle">Ministerio Público</div>
-          <ul class="role-features">
-            <li>Dashboard de fiscalía con métricas</li>
-            <li>Requerimientos fiscales con IA</li>
-            <li>Análisis de expedientes penales</li>
-            <li>Generador de acusación fiscal</li>
-            <li>Predictor de sentencias penales</li>
-          </ul>
-        </div>
-        <div class="role-card reveal reveal-delay-2">
-          <div class="role-badge">03</div>
-          <div class="role-emoji">👨‍⚖️</div>
-          <div class="role-title">JUEZ</div>
-          <div class="role-subtitle">Magistrado Judicial</div>
-          <ul class="role-features">
-            <li>Análisis de expedientes para resolución</li>
-            <li>Comparador de precedentes vinculantes</li>
-            <li>Asistente para redacción de sentencias</li>
-            <li>Predictor de tendencias judiciales</li>
-            <li>Cálculo de plazos y prescripción</li>
-          </ul>
-        </div>
-        <div class="role-card reveal reveal-delay-3">
-          <div class="role-badge">04</div>
-          <div class="role-emoji">🧮</div>
-          <div class="role-title">CONTADOR</div>
-          <div class="role-subtitle">Perito Contable</div>
-          <ul class="role-features">
-            <li>Cálculo de liquidaciones laborales</li>
-            <li>Generación de informes periciales</li>
-            <li>Análisis de estados financieros</li>
-            <li>Cálculo de intereses legales</li>
-            <li>Herramientas multidisciplinarias</li>
-          </ul>
-        </div>
+      <div class="features-grid-13" id="features-grid">
+        <div class="feat-card reveal" data-roles="all abogado fiscal juez"><div class="feat-icon"><span class="si si-analisis"></span></div><div class="feat-name">Análisis IA de Expedientes</div><div class="feat-desc">Analiza documentos PDF en segundos con Lex.ia</div></div>
+        <div class="feat-card reveal reveal-delay-1" data-roles="all abogado fiscal juez"><div class="feat-icon"><span class="si si-predictor"></span></div><div class="feat-name">Predictor Judicial</div><div class="feat-desc">Predice resultados con jurisprudencia del PJ</div></div>
+        <div class="feat-card reveal reveal-delay-2 gold-accent" data-roles="all abogado fiscal"><div class="feat-icon gold"><span class="si si-escritos gold"></span></div><div class="feat-name">Redactor de Escritos</div><div class="feat-desc">Genera escritos NCPP/CPC con IA avanzada</div></div>
+        <div class="feat-card reveal reveal-delay-3" data-roles="all abogado fiscal"><div class="feat-icon"><span class="si si-simulador"></span></div><div class="feat-name">Simulador de Juicios</div><div class="feat-desc">Juicio oral simulado con IA como juez y fiscal</div></div>
+        <div class="feat-card reveal" data-roles="all abogado fiscal juez contador"><div class="feat-icon"><span class="si si-chat"></span></div><div class="feat-name">Chat Lex.ia</div><div class="feat-desc">Asistente legal IA conversacional 24/7</div></div>
+        <div class="feat-card reveal reveal-delay-1 gold-accent" data-roles="all abogado fiscal juez"><div class="feat-icon gold"><span class="si si-juris gold"></span></div><div class="feat-name">Buscador de Jurisprudencia</div><div class="feat-desc">Búsqueda en tiempo real en bases del PJ</div></div>
+        <div class="feat-card reveal reveal-delay-2" data-roles="all abogado fiscal"><div class="feat-icon"><span class="si si-sinoe"></span></div><div class="feat-name">Monitor SINOE</div><div class="feat-desc">Notificaciones electrónicas del Poder Judicial</div></div>
+        <div class="feat-card reveal reveal-delay-3" data-roles="all abogado juez"><div class="feat-icon"><span class="si si-plazos"></span></div><div class="feat-name">Plazos Procesales</div><div class="feat-desc">Cálculo automático de plazos y vencimientos</div></div>
+        <div class="feat-card reveal" data-roles="all abogado"><div class="feat-icon"><span class="si si-alegatos"></span></div><div class="feat-name">Generador de Alegatos</div><div class="feat-desc">Alegatos de clausura con IA contextual</div></div>
+        <div class="feat-card reveal reveal-delay-1" data-roles="all abogado fiscal"><div class="feat-icon"><span class="si si-interroga"></span></div><div class="feat-name">Estrategia de Interrogatorio</div><div class="feat-desc">Preguntas NCPP optimizadas con IA</div></div>
+        <div class="feat-card reveal reveal-delay-2 gold-accent" data-roles="all abogado"><div class="feat-icon gold"><span class="si si-objeciones gold"></span></div><div class="feat-name">Asistente de Objeciones</div><div class="feat-desc">Objeciones en tiempo real durante juicio</div></div>
+        <div class="feat-card reveal reveal-delay-3" data-roles="all abogado juez contador"><div class="feat-icon"><span class="si si-resumen"></span></div><div class="feat-name">Resumen Ejecutivo de Caso</div><div class="feat-desc">Resumen IA de cualquier expediente complejo</div></div>
+        <div class="feat-card feat-13" data-roles="all contador"><div class="feat-icon gold"><span class="si si-peritos gold"></span></div><div class="feat-name">Peritos Contables</div><div class="feat-desc">Liquidaciones laborales e informes periciales</div></div>
       </div>
     </div>
   </section>
@@ -1616,10 +1584,10 @@
 
       </div>
       <div class="price-security reveal">
-        <span>🔒 Pago seguro SSL</span>
-        <span>✓ Sin contrato mínimo</span>
-        <span>↩ Reembolso 30 días</span>
-        <span>🇵🇪 Facturación en soles</span>
+        <span>Pago seguro SSL</span>
+        <span>Sin contrato mínimo</span>
+        <span>Reembolso 30 días</span>
+        <span>Facturación en soles</span>
       </div>
     </div>
   </section>
@@ -1907,6 +1875,30 @@ document.addEventListener('visibilitychange', () => {
   else { rafId = requestAnimationFrame(drawCanvas); }
 });
 
+/* ─── Feature Tabs ─── filtro por rol ─── */
+(function initFeatureTabs() {
+  const tabBtns = document.querySelectorAll('#feat-tabs .feat-tab-btn');
+  const cards   = document.querySelectorAll('#features-grid .feat-card');
+  function applyFilter(filter) {
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+    cards.forEach(card => {
+      const roles = (card.dataset.roles || 'all').split(' ');
+      const show  = roles.includes(filter);
+      card.classList.toggle('feat-hidden', !show);
+      if (show) card.style.animation = 'fadeInUp 0.3s ease both';
+    });
+    const feat13 = document.querySelector('.feat-13');
+    if (feat13) {
+      const vis = [...cards].filter(c => !c.classList.contains('feat-hidden'));
+      const alone = vis.length % 4 === 1 && vis[vis.length - 1] === feat13;
+      feat13.style.gridColumn  = alone ? '1 / -1' : '';
+      feat13.style.justifySelf = alone ? 'center'  : '';
+      feat13.style.width       = alone ? 'calc((100% - 3 * 16px) / 4)' : '';
+    }
+  }
+  tabBtns.forEach(btn => btn.addEventListener('click', () => applyFilter(btn.dataset.filter)));
+})();
+
 /* ─── Mouse interaction with canvas ────────────────────── */
 let mouse = { x: -999, y: -999 };
 window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
@@ -1932,29 +1924,65 @@ window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.cli
   const IS_MOB  = window.innerWidth < 768;
   if (REDUCED) return;
 
-  /* ── 1. HERO PIN — texto queda fijo mientras el video avanza ── */
-  if (!IS_MOB) {
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: '#inicio',
-        start: 'top top',
-        end: '+=600',
-        pin: true,
-        scrub: 1.2,
-        anticipatePin: 1,
-      }
-    })
-    .to('.hero-content', { y: -60, opacity: 0.4, scale: 0.97, ease: 'power1.in' }, 0)
-    .to('#video-hero-bg', { scale: 1.08, ease: 'none' }, 0);
-  }
+  /* ── 1. HERO PARALLAX — sin pin, sin freeze de scroll ── */
+  gsap.to('.hero-content', {
+    yPercent: IS_MOB ? -12 : -22,
+    opacity: 0.6,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '#inicio',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 0.4,
+    }
+  });
+  gsap.to('#video-hero-bg', {
+    scale: 1.06,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '#inicio',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 0.3,
+    }
+  });
 
-  /* ── 2. SECTION TITLE CHAR ANIMATION ─────────────────────── */
+  /* ── 2. SECTION TITLE WORD ANIMATION (DOM-safe) ─────────── */
   document.querySelectorAll('.section-title').forEach(el => {
-    // Envuelve cada palabra en un span animable
-    const words = el.innerHTML.split(/(\s+)/);
-    el.innerHTML = words.map(w =>
-      w.trim() ? `<span class="gsap-word" style="display:inline-block;overflow:hidden"><span style="display:inline-block">${w}</span></span>` : w
-    ).join('');
+    // Recorre childNodes para preservar etiquetas HTML internas (spans con gradiente)
+    const originalNodes = Array.from(el.childNodes);
+    el.innerHTML = '';
+
+    originalNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        // Solo texto plano: partir por palabras preservando espacios
+        node.textContent.split(/( +)/).forEach(chunk => {
+          if (!chunk) return;
+          if (!chunk.trim()) {
+            el.appendChild(document.createTextNode(chunk));
+          } else {
+            const outer = document.createElement('span');
+            outer.className = 'gsap-word';
+            outer.style.cssText = 'display:inline-block;overflow:hidden';
+            const inner = document.createElement('span');
+            inner.style.display = 'inline-block';
+            inner.textContent = chunk;
+            outer.appendChild(inner);
+            el.appendChild(outer);
+          }
+        });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        // Elemento HTML (ej. <span class="gradient-text-gold">): envolver intacto
+        const outer = document.createElement('span');
+        outer.className = 'gsap-word';
+        outer.style.cssText = 'display:inline-block;overflow:hidden';
+        const inner = document.createElement('span');
+        inner.style.display = 'inline-block';
+        inner.appendChild(node.cloneNode(true));
+        outer.appendChild(inner);
+        el.appendChild(outer);
+      }
+    });
 
     const spans = el.querySelectorAll('.gsap-word > span');
     gsap.fromTo(spans,
@@ -2043,18 +2071,6 @@ window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.cli
   });
 
   /* ── 6. ROLE CARDS — stagger scale-in ─────────────────────── */
-  const roleCards = gsap.utils.toArray('.role-card');
-  if (roleCards.length) {
-    gsap.fromTo(roleCards,
-      { opacity: 0, scale: 0.85, y: 30 },
-      {
-        opacity: 1, scale: 1, y: 0,
-        duration: 0.6, stagger: 0.1, ease: 'back.out(1.2)',
-        scrollTrigger: { trigger: '.roles-grid', start: 'top 80%', toggleActions: 'play none none none' }
-      }
-    );
-  }
-
   /* ── 7. CTA FINAL — escala + glow reveal ─────────────────── */
   gsap.fromTo('.cta-final .cta-headline',
     { opacity: 0, y: 50, scale: 0.95 },

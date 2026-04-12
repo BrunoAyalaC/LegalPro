@@ -18,7 +18,7 @@ export default function GeneradorAlegatos() {
       const prompt = `Genera un ${tipoAlegato} para el siguiente caso:\n\nTeoría del caso: ${teoriaDelCaso}`;
       const data = await api.consulta(prompt, 'alegatos');
       setResultado(typeof data.resultado === 'string' ? data.resultado : JSON.stringify(data.resultado, null, 2));
-    } catch (e) {
+    } catch {
       setError('Error al conectar con el servidor');
     } finally {
       setLoading(false);

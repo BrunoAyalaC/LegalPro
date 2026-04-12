@@ -27,7 +27,7 @@ export default function ChatIA() {
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [funcUsadas, setFuncUsadas] = useState([]);
+  const [_funcUsadas, setFuncUsadas] = useState([]);
   const messagesEnd = useRef(null);
 
   // Persistir mensajes en localStorage en cada cambio
@@ -79,7 +79,7 @@ export default function ChatIA() {
         funciones: result.funciones_usadas,
         modo: result.modo
       }]);
-    } catch (err) {
+    } catch {
       setMessages(prev => [...prev, { role: 'ai', text: 'Error al conectar con el servidor. Verifica que el backend esté corriendo en el puerto 3001.', time: 'Error' }]);
     }
     setLoading(false);
@@ -147,9 +147,9 @@ export default function ChatIA() {
                     <div className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(formatMessage(msg.text), { ALLOWED_TAGS: ['strong', 'br', 'span'], ALLOWED_ATTR: ['class'] }) }}></div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-slate-500">{msg.time}</span>
+                    <span className="text-xs text-slate-400">{msg.time}</span>
                     {msg.funciones?.length > 0 && (
-                      <span className="text-[9px] text-primary flex items-center gap-1">
+                      <span className="text-xs text-primary flex items-center gap-1">
                         <AppIcon name="functions" size={20} />
                         {msg.funciones.map(f => f.nombre).join(', ')}
                       </span>
@@ -182,6 +182,7 @@ export default function ChatIA() {
             <input value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               disabled={loading}
+              aria-label="Mensaje al asistente legal"
               className="bg-transparent border-none outline-none text-sm w-full placeholder:text-slate-500 disabled:opacity-60"
               placeholder="Consulta legal..." />
             <button className="text-slate-400 hover:text-primary transition-colors">

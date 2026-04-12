@@ -2,6 +2,8 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
+  // produccion.spec.js requiere playwright.config.prod.js con credenciales Railway
+  testIgnore: ['**/produccion.spec.js'],
   timeout: 30000,
   retries: 0,
   use: {

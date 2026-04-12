@@ -1,0 +1,542 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - link "Lex.ia" [ref=e5] [cursor=pointer]:
+        - /url: "#"
+        - img [ref=e7]
+        - generic [ref=e12]: Lex.ia
+      - list [ref=e13]:
+        - listitem [ref=e14]:
+          - link "Inicio" [ref=e15] [cursor=pointer]:
+            - /url: "#inicio"
+        - listitem [ref=e16]:
+          - link "Funciones" [ref=e17] [cursor=pointer]:
+            - /url: "#funciones"
+        - listitem [ref=e18]:
+          - link "Precios" [ref=e19] [cursor=pointer]:
+            - /url: "#precios"
+        - listitem [ref=e20]:
+          - link "Sobre nosotros" [ref=e21] [cursor=pointer]:
+            - /url: "#nosotros"
+        - listitem [ref=e22]:
+          - link "Blog" [ref=e23] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e24]:
+        - link "Iniciar Sesión" [ref=e25] [cursor=pointer]:
+          - /url: /login
+        - link "Descargar App" [ref=e26] [cursor=pointer]:
+          - /url: /descargar
+  - generic [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - img [ref=e34]
+        - text: POWERED BY LEX.IA
+      - heading "La Inteligencia Artificial al servicio de la Justicia Peruana" [level=1] [ref=e36]:
+        - text: La Inteligencia
+        - text: Artificial al servicio
+        - text: de la Justicia Peruana
+      - paragraph [ref=e38]: Gestiona expedientes, predice resultados y redacta escritos legales con IA avanzada. La plataforma legal más moderna del Perú.
+      - generic [ref=e39]:
+        - link "Comienza Gratis →" [ref=e40] [cursor=pointer]:
+          - /url: /login
+        - link "Ver Demo ▶" [ref=e41] [cursor=pointer]:
+          - /url: /descargar
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - strong [ref=e44]: 15,000+
+          - text: Abogados activos
+        - generic [ref=e45]:
+          - strong [ref=e46]: 94%
+          - text: Precisión IA
+        - generic [ref=e47]:
+          - strong [ref=e48]: "13"
+          - text: Herramientas
+    - generic [ref=e50]:
+      - generic [ref=e53]:
+        - generic [ref=e55]: Lex.ia
+        - generic [ref=e58]:
+          - generic [ref=e59]: Expedientes Activos
+          - generic [ref=e60]: "24"
+        - generic [ref=e69]: ● Análisis IA en progreso...
+        - generic [ref=e72]:
+          - generic [ref=e73]: "Predicción Caso #2847"
+          - generic [ref=e74]: 87% probabilidad de éxito
+        - generic [ref=e90]: + Analizar con IA →
+      - generic [ref=e91]:
+        - generic [ref=e92]: Precisión IA
+        - generic [ref=e93]: 94%
+      - generic [ref=e94]:
+        - generic [ref=e95]: Herramientas
+        - generic [ref=e96]: 13 activas
+  - generic [ref=e98]: Confiado por equipos legales de todo el Perú
+  - generic [ref=e125]:
+    - generic [ref=e126]:
+      - generic [ref=e127]: MÓDULOS PRINCIPALES
+      - heading "Las 4 herramientas más poderosas" [level=2] [ref=e128]:
+        - generic [ref=e130]: Las
+        - generic [ref=e132]: "4"
+        - generic [ref=e134]: herramientas
+        - generic [ref=e136]: más poderosas
+      - paragraph [ref=e137]: Cada módulo diseñado para el sistema legal peruano
+    - generic [ref=e138]:
+      - generic [ref=e139]:
+        - generic [ref=e140]: "01"
+        - generic [ref=e141]: ANÁLISIS IA
+        - paragraph [ref=e142]: "Carga cualquier expediente en PDF y recibe en segundos un análisis completo: fortalezas, debilidades, jurisprudencia aplicable y estrategia recomendada. Potenciado por Gemini AI."
+        - link "Explorar función →" [ref=e143] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e145]:
+        - generic [ref=e150]: lex.ia / análisis
+        - generic [ref=e151]:
+          - generic [ref=e152]: ANÁLISIS EN CURSO
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - generic [ref=e155]: Fortalezas
+              - generic [ref=e156]: "8"
+            - generic [ref=e162]:
+              - generic [ref=e163]: Riesgos
+              - generic [ref=e164]: "3"
+          - generic [ref=e169]:
+            - generic [ref=e170]: IA
+            - generic [ref=e171]:
+              - strong [ref=e172]: "Lex.ia:"
+              - text: Identifico el Art. 259 NCPP como precedente clave. Probabilidad alta de acogida.
+    - generic [ref=e177]:
+      - generic [ref=e178]:
+        - generic [ref=e179]: "02"
+        - generic [ref=e180]: PREDICTOR JUDICIAL
+        - paragraph [ref=e181]: Predice el resultado probable de tu caso basado en miles de sentencias reales del Poder Judicial Peruano. Con precedentes vinculantes y análisis comparativo.
+        - link "Explorar función →" [ref=e182] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e184]:
+        - generic [ref=e189]: lex.ia / predictor
+        - generic [ref=e190]:
+          - generic [ref=e191]: PREDICCIÓN ACTIVA
+          - generic [ref=e192]:
+            - generic [ref=e193]: Probabilidad de éxito
+            - generic [ref=e194]: 87%
+          - generic [ref=e195]:
+            - generic [ref=e196]: "Precedente favorable: STC 2005-2009-PHC"
+            - generic [ref=e198]: "Tendencia reciente: +12% casos similares"
+            - generic [ref=e200]: "Jueces del distrito: 3/4 con jurisprudencia afín"
+          - generic [ref=e202]:
+            - generic [ref=e203]: PJ
+            - generic [ref=e204]: Basado en 1,847 sentencias similares del PJ Lima 2020-2026.
+    - generic [ref=e205]:
+      - generic [ref=e206]:
+        - generic [ref=e207]: "03"
+        - generic [ref=e208]: REDACTOR DE ESCRITOS
+        - paragraph [ref=e209]: Genera demandas, apelaciones y recursos con IA. Formato NCPP/CPC correcto desde el primer borrador. Ahorra horas de redacción con estructura legal impecable.
+        - link "Explorar función →" [ref=e210] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e212]:
+        - generic [ref=e217]: lex.ia / redactor
+        - generic [ref=e218]:
+          - generic [ref=e219]: REDACTANDO...
+          - generic [ref=e227]:
+            - generic [ref=e228]: IA
+            - generic [ref=e229]:
+              - strong [ref=e230]: "Escrito generado:"
+              - text: Demanda por alimentos — Formato CPC Art. 481. 3 páginas. Sin errores.
+          - generic [ref=e231]:
+            - generic [ref=e232]: Descargar PDF
+            - generic [ref=e233]: Editar
+    - generic [ref=e234]:
+      - generic [ref=e235]:
+        - generic [ref=e236]: "04"
+        - generic [ref=e237]: SIMULADOR DE JUICIOS
+        - paragraph [ref=e238]: Practica tu defensa en juicio oral simulado. La IA actúa como juez, fiscal y abogado contrario simultáneamente. Basado en el NCPP peruano.
+        - link "Explorar función →" [ref=e239] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e241]:
+        - generic [ref=e246]: lex.ia / simulador
+        - generic [ref=e247]:
+          - generic [ref=e248]: JUICIO EN CURSO
+          - generic [ref=e249]:
+            - generic [ref=e250]:
+              - generic [ref=e251]: Juez
+              - generic [ref=e252]: "Juez IA: \"Tiene la palabra la defensa...\""
+            - generic [ref=e253]:
+              - generic [ref=e254]: Fiscal
+              - generic [ref=e255]: "Fiscal IA: \"Objeto, señoría. Irrelevante.\""
+            - generic [ref=e256]:
+              - generic [ref=e257]: Defensa
+              - generic [ref=e258]: "Abogado (Tú): [Responde aquí...]"
+          - generic [ref=e259]:
+            - generic [ref=e260]: Puntuación de defensa
+            - generic [ref=e261]: 7.8 / 10
+  - generic [ref=e266]:
+    - generic [ref=e267]:
+      - generic [ref=e268]: PRODUCTO
+      - heading "Lex.ia en acción" [level=2] [ref=e269]:
+        - generic [ref=e271]: Lex.ia
+        - generic [ref=e273]: en acción
+      - paragraph [ref=e274]: El dashboard más completo para la gestión legal peruana
+    - generic [ref=e275]:
+      - generic [ref=e281]: app.lex.ia / dashboard
+      - generic [ref=e282]:
+        - generic [ref=e283]:
+          - generic [ref=e284]: Lex.ia
+          - generic [ref=e285] [cursor=pointer]:
+            - generic [ref=e286]: DB
+            - text: Dashboard
+          - generic [ref=e287] [cursor=pointer]:
+            - generic [ref=e288]: EX
+            - text: Expedientes
+          - generic [ref=e289] [cursor=pointer]:
+            - generic [ref=e290]: IA
+            - text: Análisis IA
+          - generic [ref=e291] [cursor=pointer]:
+            - generic [ref=e292]: PJ
+            - text: Predictor
+          - generic [ref=e293] [cursor=pointer]:
+            - generic [ref=e294]: RD
+            - text: Redactor
+          - generic [ref=e295] [cursor=pointer]:
+            - generic [ref=e296]: SJ
+            - text: Simulador
+          - generic [ref=e297] [cursor=pointer]:
+            - generic [ref=e298]: JR
+            - text: Jurisprudencia
+          - generic [ref=e299] [cursor=pointer]:
+            - generic [ref=e300]: SN
+            - text: SINOE
+        - generic [ref=e301]:
+          - generic [ref=e302]:
+            - generic [ref=e303]: Panel Principal
+            - generic [ref=e304]: ● Lima, 16 Mar 2026
+          - generic [ref=e305]:
+            - generic [ref=e306]:
+              - generic [ref=e307]: Expedientes activos
+              - generic [ref=e308]: "24"
+            - generic [ref=e309]:
+              - generic [ref=e310]: Análisis completados
+              - generic [ref=e311]: "147"
+            - generic [ref=e312]:
+              - generic [ref=e313]: Predicciones correctas
+              - generic [ref=e314]: 94%
+          - generic [ref=e315]:
+            - generic [ref=e316]: IA
+            - generic [ref=e317]:
+              - strong [ref=e318]: "Lex.ia IA:"
+              - text: "He detectado 3 vencimientos de plazo esta semana. El expediente #2847 tiene alta probabilidad de éxito. ¿Deseas que prepare el escrito de apelación?"
+          - generic [ref=e319]:
+            - generic [ref=e320]:
+              - generic [ref=e321]: "Exp. #2847 — García vs. Estado"
+              - generic [ref=e322]: Activo
+            - generic [ref=e323]:
+              - generic [ref=e324]: "Exp. #2831 — Caso Laboral Lima"
+              - generic [ref=e325]: Ganado
+            - generic [ref=e326]:
+              - generic [ref=e327]: "Exp. #2819 — Apelación Civil"
+              - generic [ref=e328]: Revisión
+  - generic [ref=e330]:
+    - generic [ref=e331]:
+      - generic [ref=e332]: HERRAMIENTAS IA
+      - heading "Las 13 herramientas de Lex.ia" [level=2] [ref=e333]:
+        - generic [ref=e335]: Las
+        - generic [ref=e337]: 13 herramientas
+        - generic [ref=e339]: de
+        - generic [ref=e341]: Lex.ia
+      - paragraph [ref=e342]: Filtra por tu rol jurídico para ver las herramientas que necesitas
+    - generic [ref=e343]:
+      - button "Todas (13)" [ref=e344] [cursor=pointer]
+      - button "Abogado" [ref=e345] [cursor=pointer]
+      - button "Fiscal" [ref=e346] [cursor=pointer]
+      - button "Juez" [ref=e347] [cursor=pointer]
+      - button "Contador" [ref=e348] [cursor=pointer]
+    - generic [ref=e349]:
+      - generic [ref=e350] [cursor=pointer]:
+        - generic [ref=e353]: Análisis IA de Expedientes
+        - generic [ref=e354]: Analiza documentos PDF en segundos con Lex.ia
+      - generic [ref=e355] [cursor=pointer]:
+        - generic [ref=e358]: Predictor Judicial
+        - generic [ref=e359]: Predice resultados con jurisprudencia del PJ
+      - generic [ref=e360] [cursor=pointer]:
+        - generic [ref=e363]: Redactor de Escritos
+        - generic [ref=e364]: Genera escritos NCPP/CPC con IA avanzada
+      - generic [ref=e365] [cursor=pointer]:
+        - generic [ref=e368]: Simulador de Juicios
+        - generic [ref=e369]: Juicio oral simulado con IA como juez y fiscal
+      - generic [ref=e370] [cursor=pointer]:
+        - generic [ref=e373]: Chat Lex.ia
+        - generic [ref=e374]: Asistente legal IA conversacional 24/7
+      - generic [ref=e375] [cursor=pointer]:
+        - generic [ref=e378]: Buscador de Jurisprudencia
+        - generic [ref=e379]: Búsqueda en tiempo real en bases del PJ
+      - generic [ref=e380] [cursor=pointer]:
+        - generic [ref=e383]: Monitor SINOE
+        - generic [ref=e384]: Notificaciones electrónicas del Poder Judicial
+      - generic [ref=e385] [cursor=pointer]:
+        - generic [ref=e388]: Plazos Procesales
+        - generic [ref=e389]: Cálculo automático de plazos y vencimientos
+      - generic [ref=e390] [cursor=pointer]:
+        - generic [ref=e393]: Generador de Alegatos
+        - generic [ref=e394]: Alegatos de clausura con IA contextual
+      - generic [ref=e395] [cursor=pointer]:
+        - generic [ref=e398]: Estrategia de Interrogatorio
+        - generic [ref=e399]: Preguntas NCPP optimizadas con IA
+      - generic [ref=e400] [cursor=pointer]:
+        - generic [ref=e403]: Asistente de Objeciones
+        - generic [ref=e404]: Objeciones en tiempo real durante juicio
+      - generic [ref=e405] [cursor=pointer]:
+        - generic [ref=e408]: Resumen Ejecutivo de Caso
+        - generic [ref=e409]: Resumen IA de cualquier expediente complejo
+      - generic [ref=e410] [cursor=pointer]:
+        - generic [ref=e413]: Peritos Contables
+        - generic [ref=e414]: Liquidaciones laborales e informes periciales
+  - generic [ref=e417]:
+    - generic [ref=e418]:
+      - generic [ref=e419]: 15K+
+      - generic [ref=e420]: Abogados activos
+    - generic [ref=e421]:
+      - generic [ref=e422]: 94%
+      - generic [ref=e423]: Precisión del análisis
+    - generic [ref=e424]:
+      - generic [ref=e425]: "13"
+      - generic [ref=e426]: Herramientas de IA
+    - generic [ref=e427]:
+      - generic [ref=e428]: "4"
+      - generic [ref=e429]: Roles jurídicos
+  - generic [ref=e431]:
+    - generic [ref=e432]:
+      - generic [ref=e433]: PRECIOS
+      - heading "Planes para cada despacho" [level=2] [ref=e434]:
+        - generic [ref=e436]: Planes
+        - generic [ref=e438]: para
+        - generic [ref=e440]: cada despacho
+      - paragraph [ref=e441]: Desde abogados independientes hasta grandes estudios jurídicos
+    - generic [ref=e442]:
+      - generic [ref=e443]:
+        - generic [ref=e444]: BÁSICO
+        - generic [ref=e445]: Para empezar a explorar
+        - generic [ref=e446]: S/0
+        - generic [ref=e447]: para siempre gratis
+        - list [ref=e449]:
+          - listitem [ref=e450]:
+            - generic [ref=e451]: ✓
+            - text: 3 expedientes activos
+          - listitem [ref=e452]:
+            - generic [ref=e453]: ✓
+            - text: Análisis IA básico (5/mes)
+          - listitem [ref=e454]:
+            - generic [ref=e455]: ✓
+            - text: Chat Lex.ia (10 consultas/día)
+          - listitem [ref=e456]:
+            - generic [ref=e457]: ✓
+            - text: Búsqueda jurisprudencia
+          - listitem [ref=e458]:
+            - generic [ref=e459]: ✕
+            - text: Predictor judicial
+          - listitem [ref=e460]:
+            - generic [ref=e461]: ✕
+            - text: Simulador de juicios
+          - listitem [ref=e462]:
+            - generic [ref=e463]: ✕
+            - text: Integración SINOE
+        - link "Comenzar Gratis" [ref=e464] [cursor=pointer]:
+          - /url: /login
+      - generic [ref=e465]:
+        - generic [ref=e466]: MÁS POPULAR
+        - generic [ref=e467]: PRO
+        - generic [ref=e468]: Para abogados que quieren ganar
+        - generic [ref=e469]: S/99
+        - generic [ref=e470]: por mes · facturación mensual
+        - list [ref=e472]:
+          - listitem [ref=e473]:
+            - generic [ref=e474]: ✓
+            - text: Expedientes ilimitados
+          - listitem [ref=e475]:
+            - generic [ref=e476]: ✓
+            - text: Análisis IA ilimitado
+          - listitem [ref=e477]:
+            - generic [ref=e478]: ✓
+            - text: Predictor judicial completo
+          - listitem [ref=e479]:
+            - generic [ref=e480]: ✓
+            - text: Redactor de escritos IA
+          - listitem [ref=e481]:
+            - generic [ref=e482]: ✓
+            - text: Simulador de juicios
+          - listitem [ref=e483]:
+            - generic [ref=e484]: ✓
+            - text: Monitor SINOE integrado
+          - listitem [ref=e485]:
+            - generic [ref=e486]: ✓
+            - text: Soporte prioritario
+        - link "Empezar 14 días gratis" [ref=e487] [cursor=pointer]:
+          - /url: /login
+      - generic [ref=e488]:
+        - generic [ref=e489]: ESTUDIO
+        - generic [ref=e490]: Para estudios jurídicos
+        - generic [ref=e491]: S/299
+        - generic [ref=e492]: por mes · hasta 10 usuarios
+        - list [ref=e494]:
+          - listitem [ref=e495]:
+            - generic [ref=e496]: ✓
+            - text: Todo de PRO ilimitado
+          - listitem [ref=e497]:
+            - generic [ref=e498]: ✓
+            - text: Hasta 10 usuarios del estudio
+          - listitem [ref=e499]:
+            - generic [ref=e500]: ✓
+            - text: Gestión de equipos
+          - listitem [ref=e501]:
+            - generic [ref=e502]: ✓
+            - text: API access completo
+          - listitem [ref=e503]:
+            - generic [ref=e504]: ✓
+            - text: Reportes avanzados
+          - listitem [ref=e505]:
+            - generic [ref=e506]: ✓
+            - text: Gerente de cuenta dedicado
+          - listitem [ref=e507]:
+            - generic [ref=e508]: ✓
+            - text: SLA 99.9% uptime
+        - link "Contactar Ventas" [ref=e509] [cursor=pointer]:
+          - /url: /login
+    - generic [ref=e510]:
+      - generic [ref=e511]: Pago seguro SSL
+      - generic [ref=e512]: Sin contrato mínimo
+      - generic [ref=e513]: Reembolso 30 días
+      - generic [ref=e514]: Facturación en soles
+  - generic [ref=e516]:
+    - generic [ref=e517]:
+      - generic [ref=e518]: TESTIMONIOS
+      - heading "Lo que dicen nuestros usuarios" [level=2] [ref=e519]:
+        - generic [ref=e521]: Lo
+        - generic [ref=e523]: que
+        - generic [ref=e525]: dicen
+        - generic [ref=e527]: nuestros
+        - generic [ref=e529]: usuarios
+    - generic [ref=e530]:
+      - generic [ref=e531]:
+        - generic [ref=e532]: "\""
+        - paragraph [ref=e533]: El análisis de expedientes con IA me ahorró 3 horas en el caso más complejo del año. La precisión de Lex.ia para el contexto legal peruano es impresionante. Ahora gano más casos.
+        - generic [ref=e534]:
+          - generic [ref=e535]: CG
+          - generic [ref=e536]:
+            - generic [ref=e537]: Carlos García López
+            - generic [ref=e538]: Abogado Penalista · Corte Superior Lima
+      - generic [ref=e539]:
+        - generic [ref=e540]: "\""
+        - paragraph [ref=e541]: Como fiscal, el predictor judicial me permite preparar mejor mis acusaciones. Los precedentes que sugiere son exactos y ahorran horas de investigación. Herramienta indispensable.
+        - generic [ref=e542]:
+          - generic [ref=e543]: MR
+          - generic [ref=e544]:
+            - generic [ref=e545]: María Ríos Vargas
+            - generic [ref=e546]: Fiscal Provincial · Ministerio Público Arequipa
+      - generic [ref=e547]:
+        - generic [ref=e548]: "\""
+        - paragraph [ref=e549]: El simulador de juicios es extraordinario. Mis practicantes se preparan dos veces mejor antes de entrar a sala. La IA del juez virtual es increíblemente realista. Lo recomienzo a todos.
+        - generic [ref=e550]:
+          - generic [ref=e551]: JT
+          - generic [ref=e552]:
+            - generic [ref=e553]: Jorge Torres Medina
+            - generic [ref=e554]: Socio Principal · García Torres & Ríos
+  - generic [ref=e559]:
+    - generic [ref=e561]: COMIENZA HOY
+    - heading "Únete a 15,000+ abogados peruanos" [level=2] [ref=e562]:
+      - text: Únete a 15,000+
+      - text: abogados peruanos
+    - paragraph [ref=e563]:
+      - text: La plataforma legal más avanzada del Perú, potenciada por
+      - strong [ref=e564]: Lex.ia
+      - text: . Sin tarjeta requerida.
+    - generic [ref=e565]:
+      - link "Comienza Gratis →" [ref=e566] [cursor=pointer]:
+        - /url: /login
+      - link "Ver Demo ▶" [ref=e567] [cursor=pointer]:
+        - /url: /descargar
+  - contentinfo [ref=e568]:
+    - generic [ref=e569]:
+      - generic [ref=e570]:
+        - generic [ref=e571]:
+          - link "Lex.ia" [ref=e572] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e573]
+            - generic [ref=e578]: Lex.ia
+          - paragraph [ref=e579]: Inteligencia Artificial al servicio de la Justicia Peruana. Potenciado por Google Gemini.
+          - generic [ref=e580]:
+            - link "LinkedIn" [ref=e581] [cursor=pointer]:
+              - /url: "#"
+              - text: in
+            - link "Twitter" [ref=e582] [cursor=pointer]:
+              - /url: "#"
+              - text: 𝕏
+            - link "YouTube" [ref=e583] [cursor=pointer]:
+              - /url: "#"
+              - text: ▶
+            - link "Instagram" [ref=e584] [cursor=pointer]:
+              - /url: "#"
+              - text: ◉
+        - generic [ref=e585]:
+          - generic [ref=e586]: Producto
+          - list [ref=e587]:
+            - listitem [ref=e588]:
+              - link "Funciones" [ref=e589] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e590]:
+              - link "Precios" [ref=e591] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e592]:
+              - link "Demo interactivo" [ref=e593] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e594]:
+              - link "Descargar App" [ref=e595] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e596]:
+              - link "Novedades" [ref=e597] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e598]:
+          - generic [ref=e599]: Legal
+          - list [ref=e600]:
+            - listitem [ref=e601]:
+              - link "Términos de uso" [ref=e602] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e603]:
+              - link "Política de privacidad" [ref=e604] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e605]:
+              - link "Política de cookies" [ref=e606] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e607]:
+              - link "Seguridad" [ref=e608] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e609]:
+              - link "Cumplimiento" [ref=e610] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e611]:
+          - generic [ref=e612]: Empresa
+          - list [ref=e613]:
+            - listitem [ref=e614]:
+              - link "Sobre nosotros" [ref=e615] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e616]:
+              - link "Blog" [ref=e617] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e618]:
+              - link "Contacto" [ref=e619] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e620]:
+              - link "Soporte" [ref=e621] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e622]:
+              - link "Afiliados" [ref=e623] [cursor=pointer]:
+                - /url: "#"
+      - generic [ref=e624]:
+        - generic [ref=e625]: Lima, Perú 2026 · © Lex.ia — Todos los derechos reservados
+        - generic [ref=e626]:
+          - text: Powered by
+          - strong [ref=e628]: Lex.ia AI
+        - generic [ref=e629]:
+          - link "Términos" [ref=e630] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacidad" [ref=e631] [cursor=pointer]:
+            - /url: "#"
+          - link "Cookies" [ref=e632] [cursor=pointer]:
+            - /url: "#"
+```

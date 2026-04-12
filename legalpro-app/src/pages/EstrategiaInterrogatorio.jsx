@@ -18,7 +18,7 @@ export default function EstrategiaInterrogatorio() {
       const prompt = `Genera una estrategia de interrogatorio NCPP para un ${tipoTestigo}${nombreTestigo ? ` llamado ${nombreTestigo}` : ''}. Puntos a probar: ${puntosProbar || 'General'}`;
       const data = await api.consulta(prompt, 'interrogatorio');
       setResultado(typeof data.resultado === 'string' ? data.resultado : JSON.stringify(data.resultado, null, 2));
-    } catch (e) {
+    } catch {
       setError('Error al conectar con el servidor');
     } finally {
       setLoading(false);
@@ -85,7 +85,7 @@ export default function EstrategiaInterrogatorio() {
               <div key={i} className="card anim-fade-in-up" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
                 <div className="flex items-center gap-2 mb-2">
                   <AppIcon name={p.icon} size={20} />
-                  <span className="badge badge-primary text-[9px]">{p.tipo}</span>
+                  <span className="badge badge-primary text-xs">{p.tipo}</span>
                 </div>
                 <p className="text-sm leading-relaxed">{p.q}</p>
               </div>

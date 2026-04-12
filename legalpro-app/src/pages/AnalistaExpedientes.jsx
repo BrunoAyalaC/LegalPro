@@ -4,7 +4,6 @@ import Header from '../components/Header';
 import { api } from '../api/client';
 
 export default function AnalistaExpedientes() {
-  const [activeTab, setActiveTab] = useState('documento');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
@@ -33,7 +32,7 @@ export default function AnalistaExpedientes() {
         content = typeof resp === 'string' ? resp : JSON.stringify(resp);
       }
       setMessages(prev => [...prev, { role: 'ai', content }]);
-    } catch (e) {
+    } catch {
       setMessages(prev => [...prev, { role: 'ai', content: 'Error al conectar con el servidor.' }]);
     } finally {
       setLoading(false);
@@ -64,7 +63,7 @@ export default function AnalistaExpedientes() {
               
               <div className="relative bg-red-500/10 border-l-2 border-red-500 px-3 my-3 py-2">
                 <p>Sin embargo, en la declaración preventiva (Folio 45) se indica una ubicación contradictoria cercana a la Av. Abancay...</p>
-                <div className="absolute -right-2 top-0 translate-x-full bg-red-500 text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold flex items-center gap-1 z-10">
+                <div className="absolute -right-2 top-0 translate-x-full bg-red-500 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold flex items-center gap-1 z-10">
                   <AppIcon name="warning" size={20} />Contradicción detectada
                 </div>
               </div>
@@ -73,7 +72,7 @@ export default function AnalistaExpedientes() {
               
               <div className="relative bg-primary/10 border-l-2 border-primary px-3 my-3 py-2">
                 <p>...según lo tipificado en el Código Penal referente al delito contra la vida, el cuerpo y la salud...</p>
-                <div className="absolute -right-2 top-0 translate-x-full bg-primary text-white text-[9px] px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold flex items-center gap-1 z-10">
+                <div className="absolute -right-2 top-0 translate-x-full bg-primary text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold flex items-center gap-1 z-10">
                   <AppIcon name="gavel" size={20} />Artículo 106 CP
                 </div>
               </div>
@@ -103,12 +102,12 @@ export default function AnalistaExpedientes() {
             {messages.map((msg, i) => (
               msg.role === 'ai' ? (
                 <div key={i} className="flex gap-3 max-w-[85%]">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shrink-0 shadow-lg">
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-indigo-600 flex items-center justify-center shrink-0 shadow-lg">
                     <AppIcon name="smart_toy" size={20} />
                   </div>
                   <div className="chat-ai p-3">
                     <p className="text-xs leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                    <span className="text-[9px] text-slate-500 mt-2 block">{new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span className="text-xs text-slate-400 mt-2 block">{new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 </div>
               ) : (
@@ -124,7 +123,7 @@ export default function AnalistaExpedientes() {
             ))}
             {loading && (
               <div className="flex gap-3 max-w-[85%]">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shrink-0 shadow-lg">
+                <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-indigo-600 flex items-center justify-center shrink-0 shadow-lg">
                   <AppIcon name="smart_toy" size={20} />
                 </div>
                 <div className="chat-ai p-3">
@@ -142,6 +141,7 @@ export default function AnalistaExpedientes() {
             <div className="flex items-center gap-2">
               <div className="flex-1 bg-surface-dark rounded-2xl border border-border-dark px-4 py-2.5 flex items-center">
                 <input
+                  aria-label="Consulta al analista"
                   className="bg-transparent border-none outline-none text-sm w-full placeholder:text-slate-500"
                   placeholder="¿Hay nulidades en esta notificación?"
                   value={input}

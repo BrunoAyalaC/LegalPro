@@ -121,6 +121,7 @@ export function TenantProvider({ children }) {
   return <TenantContext.Provider value={value}>{children}</TenantContext.Provider>;
 }
 
+/* eslint-disable-next-line react-refresh/only-export-components */
 export function useTenant() {
   const ctx = useContext(TenantContext);
   if (ctx === null) throw new Error('useTenant debe usarse dentro de TenantProvider');

@@ -17,7 +17,7 @@ export default function AsistenteObjeciones() {
       const prompt = `Como asistente de objeciones NCPP, analiza la siguiente declaración o pregunta del oponente y sugiere el tipo de objeción aplicable con el artículo del NCPP correspondiente: ${situacion}`;
       const data = await api.consulta(prompt, 'general');
       setResultado(typeof data.resultado === 'string' ? data.resultado : JSON.stringify(data.resultado, null, 2));
-    } catch (e) {
+    } catch {
       setError('Error al conectar con el servidor');
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export default function AsistenteObjeciones() {
               style={{ animationDelay: `${i * 0.08}s`, opacity: 0 }}>
               <div className="flex items-center justify-between mb-1">
                 <span className="font-bold text-sm">{o.tipo}</span>
-                <span className="badge badge-primary text-[9px]">{o.art}</span>
+                <span className="badge badge-primary text-xs">{o.art}</span>
               </div>
               <p className="text-xs text-slate-400">{o.desc}</p>
             </button>
