@@ -258,4 +258,49 @@ router.get('/me', authMiddleware, async (req, res, next) => {
   }
 });
 
+/**
+ * GET /api/auth/diag — Diagnóstico TEMPORAL del registro (eliminar tras fix)
+ * Ejecuta cada paso de register y retorna dónde falla sin autenticación.
+ */
+router.get('/diag', async (req, res) => {
+  const steps = {};
+  try {
+    // 1. DB conecta
+    const r1 = await db.query('SELECT 1 as ok');
+    steps.db_ping = r1.rows[0].ok === 1 ? 'OK' : 'FAIL';
+  } catch (e) { steps.db_ping = `ERROR: ${e.message}`; }
+
+  try {
+    // 2. INSERT de prueba
+    const ts = Date.now();
+    const r2 = await db.query(
+      `INSERT INTO usuarios (nombre_completo, email, password_hash, rol, especialidad, esta_activo, created_at)
+       VALUES ($1,$2,$3,$4,$5,TRUE,NOW()) RETURNING id, email`,
+      ['_diag_', `_diag_${ts}@diag.pe`, '$2b$12$fakehashfordiagnosis1234', 'ABOGADO', 'GENERAL']
+    );
+    steps.insert = `OK - id: ${r2.rows[0]?.id}`;
+    await db.query('DELETE FROM usuarios WHERE email=$1', [`_diag_${ts}@diag.pe`]);
+    steps.delete = 'OK';
+  } catch (e) { steps.insert = `ERROR: ${e.message} | code: ${e.code} | detail: ${e.detail}`; }
+
+  try {
+    // 3. bcrypt
+    await bcrypt.hash('TestDiag123!', 12);
+    steps.bcrypt = 'OK';
+  } catch (e) { steps.bcrypt = `ERROR: ${e.message}`; }
+
+  try {
+    // 4. jwt.sign
+    const token = jwt.sign({ sub: 'test', email: 'test@test.com', rol: 'ABOGADO' }, JWT_SECRET, {
+      issuer: JWT_ISSUER, audience: JWT_AUDIENCE, expiresIn: JWT_EXPIRY,
+    });
+    steps.jwt = `OK - token length: ${token.length}`;
+  } catch (e) { steps.jwt = `ERROR: ${e.message}`; }
+
+  steps.JWT_SECRET_set = !!JWT_SECRET;
+  steps.JWT_EXPIRY = JWT_EXPIRY;
+
+  res.json(steps);
+});
+
 export default router;
