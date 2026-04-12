@@ -235,53 +235,24 @@ app.MapControllers();
 // Health Check endpoint for Docker/Kubernetes
 app.MapHealthChecks("/health");
 
-// ── EF Core Migrations en startup (Railway + Supabase) ──────────────────────────
-// Se lanza en background para que app.Run() no sea bloqueado y el healthcheck pase.
-// Railway healthcheckTimeout = 30s — el migration puede tardar más.
+// ── EF Core Migrations en startup ──────────────────────────────────────────
+// NOTA: Las migraciones se aplican vía background task para no bloquear healthcheck.
+// Se ejecutan 3s después del inicio del servidor.
 if (app.Environment.IsProduction())
 {
     _ = Task.Run(async () =>
     {
-        await Task.Delay(2000); // Esperar que el server levante antes de migrar
-
-        using var scope = app.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-
-        var rawConn = app.Configuration["MIGRATION_DB_URL"]
-            ?? db.Database.GetConnectionString()!;
-
-        string migrationConn;
-        if (rawConn.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase)
-            || rawConn.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
-        {
-            var pgUri = new Uri(rawConn);
-            var parts = pgUri.UserInfo.Split(':', 2);
-            var pgUser = parts.Length > 0 ? Uri.UnescapeDataString(parts[0]) : "";
-            var pgPass = parts.Length > 1 ? Uri.UnescapeDataString(parts[1]) : "";
-            var pgDb   = pgUri.AbsolutePath.TrimStart('/');
-            migrationConn = $"Host={pgUri.Host};Port={pgUri.Port};Database={pgDb};" +
-                            $"Username={pgUser};Password={pgPass};" +
-                            "SSL Mode=Prefer;Trust Server Certificate=true;" +
-                            "Connection Timeout=5;Command Timeout=15";
-        }
-        else
-        {
-            migrationConn = rawConn.Replace(":6543/", ":5432/");
-            if (!migrationConn.Contains("Connection Timeout"))
-                migrationConn += ";Connection Timeout=5;Command Timeout=15";
-        }
-
-        db.Database.SetConnectionString(migrationConn);
-
         try
         {
-            await db.Database.MigrateAsync();
+            await Task.Delay(3000);
+            using var scope = app.Services.CreateScope();
+            var dbCtx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            await dbCtx.Database.MigrateAsync();
             Log.Information("EF Core migrations aplicadas correctamente.");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error aplicando EF Core migrations (background). El servicio continúa.");
+            Log.Error(ex, "Error en background migration. El servicio continúa.");
         }
     });
 }
