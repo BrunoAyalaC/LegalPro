@@ -15,5 +15,6 @@ public interface IApplicationDbContext
     DbSet<InvitacionOrganizacion> InvitacionesOrganizacion { get; }
     DbSet<MensajeChat> MensajesChat { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
+    DbSet<AuditLog> AuditLogs { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

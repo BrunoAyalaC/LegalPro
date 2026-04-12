@@ -20,6 +20,25 @@ public class NotFoundException : Exception
 }
 
 /// <summary>
+/// Thrown when authentication fails (wrong credentials, expired token, etc.).
+/// Maps to HTTP 401 Unauthorized.
+/// </summary>
+public class AuthenticationFailedException : Exception
+{
+    public AuthenticationFailedException() : base("Credenciales incorrectas.") { }
+    public AuthenticationFailedException(string message) : base(message) { }
+}
+
+/// <summary>
+/// Thrown when a resource already exists (duplicate email, etc.).
+/// Maps to HTTP 409 Conflict.
+/// </summary>
+public class ConflictException : Exception
+{
+    public ConflictException(string message) : base(message) { }
+}
+
+/// <summary>
 /// Thrown when a business rule forbids the operation.
 /// </summary>
 public class ForbiddenAccessException : Exception

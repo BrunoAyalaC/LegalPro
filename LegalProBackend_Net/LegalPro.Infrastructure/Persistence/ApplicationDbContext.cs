@@ -29,6 +29,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<MensajeChat> MensajesChat => Set<MensajeChat>();
     // Auth: refresh tokens
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    // Audit trail de seguridad
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
