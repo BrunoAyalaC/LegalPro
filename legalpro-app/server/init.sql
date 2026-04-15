@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS expedientes (
     materia           TEXT,
     tipo_proceso      TEXT,
     numero_expediente TEXT,
+    es_urgente        BOOLEAN     NOT NULL DEFAULT FALSE,
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at        TIMESTAMPTZ
 );

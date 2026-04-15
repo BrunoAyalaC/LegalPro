@@ -17,7 +17,7 @@ public class Expediente : BaseEntity
     public EstadoExpediente Estado { get; private set; } = EstadoExpediente.Activo;
     public bool EsUrgente { get; private set; }
 
-    public int UsuarioId { get; private set; }
+    public Guid UsuarioId { get; private set; }
     public Usuario? Usuario { get; private set; }
 
     public Guid OrganizationId { get; private set; }
@@ -25,7 +25,7 @@ public class Expediente : BaseEntity
 
     private Expediente() { }
 
-    public static Expediente Crear(string numero, string titulo, TipoRamaProcesal tipo, int usuarioId, Guid organizationId, bool esUrgente = false)
+    public static Expediente Crear(string numero, string titulo, TipoRamaProcesal tipo, Guid usuarioId, Guid organizationId, bool esUrgente = false)
     {
         if (string.IsNullOrWhiteSpace(numero))
             throw new DomainException("El número de expediente es obligatorio.");

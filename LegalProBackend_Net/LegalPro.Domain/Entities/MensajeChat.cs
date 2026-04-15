@@ -10,7 +10,7 @@ namespace LegalPro.Domain.Entities;
 /// </summary>
 public class MensajeChat : BaseEntity
 {
-    public int UsuarioId { get; private set; }
+    public Guid UsuarioId { get; private set; }
     public Guid? OrganizationId { get; private set; }
 
     /// <summary>"user" o "assistant"</summary>
@@ -25,7 +25,7 @@ public class MensajeChat : BaseEntity
 
     private MensajeChat() { }
 
-    public static MensajeChat Crear(int usuarioId, Guid? organizationId, string rol, string contenido, Guid sesionId)
+    public static MensajeChat Crear(Guid usuarioId, Guid? organizationId, string rol, string contenido, Guid sesionId)
     {
         if (string.IsNullOrWhiteSpace(contenido))
             throw new DomainException("El contenido del mensaje no puede estar vacío.");

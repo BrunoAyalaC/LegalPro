@@ -11,7 +11,7 @@ namespace LegalPro.Domain.Entities;
 /// </summary>
 public class Simulacion : BaseEntity
 {
-    public int UsuarioId { get; private set; }
+    public Guid UsuarioId { get; private set; }
     public Usuario? Usuario { get; private set; }
 
     public Guid? OrganizationId { get; private set; }
@@ -29,7 +29,7 @@ public class Simulacion : BaseEntity
 
     private Simulacion() { }
 
-    public static Simulacion Crear(int usuarioId, TipoRamaProcesal rama, string rolUsuario, string dificultad, string contextoIA)
+    public static Simulacion Crear(Guid usuarioId, TipoRamaProcesal rama, string rolUsuario, string dificultad, string contextoIA)
     {
         if (string.IsNullOrWhiteSpace(rolUsuario))
             throw new DomainException("El rol del usuario en la simulación es obligatorio.");

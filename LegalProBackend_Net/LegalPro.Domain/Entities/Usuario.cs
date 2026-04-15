@@ -9,7 +9,7 @@ namespace LegalPro.Domain.Entities;
 /// Aggregate Root: Usuario
 /// Contains business logic for user registration, role validation, and password management.
 /// </summary>
-public class Usuario : BaseEntity
+public class Usuario : BaseGuidEntity
 {
     public string NombreCompleto { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;

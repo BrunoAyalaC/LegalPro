@@ -112,7 +112,7 @@ export function validarPermisoIA(userRol, feature) {
   const PERMISOS = {
     ABOGADO: new Set([
       'predictor', 'redactor', 'jurisprudencia', 'simulacion',
-      'alegato', 'interrogatorio', 'objeciones', 'resumen', 'chat',
+      'alegato', 'interrogatorio', 'objeciones', 'resumen', 'analisis', 'chat',
     ]),
     FISCAL: new Set([
       'predictor', 'redactor', 'jurisprudencia', 'simulacion',

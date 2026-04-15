@@ -243,6 +243,63 @@ if (app.Environment.IsProduction())
     {
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        // Workaround: Si la DB fue creada fuera de EF (por Node.js initDb.js),
+        // __EFMigrationsHistory puede estar vacío/ausente aunque las tablas existan.
+        // Sembramos el historial para que MigrateAsync solo aplique migraciones nuevas.
+        var conn = db.Database.GetDbConnection();
+        if (conn.State != System.Data.ConnectionState.Open)
+            await conn.OpenAsync();
+
+        await using var checkCmd = conn.CreateCommand();
+        checkCmd.CommandText = @"
+            SELECT
+                EXISTS(SELECT 1 FROM information_schema.tables
+                       WHERE table_schema='public' AND table_name='usuarios')
+                AND (
+                    NOT EXISTS(SELECT 1 FROM information_schema.tables
+                               WHERE table_schema='public' AND table_name='__EFMigrationsHistory')
+                    OR (SELECT COUNT(*) FROM ""__EFMigrationsHistory"") = 0
+                )";
+        var needsSeed = (bool)(await checkCmd.ExecuteScalarAsync() ?? false);
+
+        if (needsSeed)
+        {
+            Log.Information("Schema legacy detectado. Sembrando historial de migraciones EF Core...");
+            await using var seedCmd = conn.CreateCommand();
+            seedCmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
+                    migration_id character varying(150) NOT NULL,
+                    product_version character varying(32) NOT NULL,
+                    CONSTRAINT pk___ef_migrations_history PRIMARY KEY (migration_id)
+                );
+                INSERT INTO ""__EFMigrationsHistory"" (migration_id, product_version) VALUES
+                    ('20260305222244_InitialCreate',             '9.0.1'),
+                    ('20260312184741_UpdateSchema',              '9.0.1'),
+                    ('20260316191058_AddMensajeChatRefreshToken','9.0.1'),
+                    ('20260319011004_SnakeCaseColumns',          '9.0.1')
+                ON CONFLICT (migration_id) DO NOTHING";
+            await seedCmd.ExecuteNonQueryAsync();
+            Log.Information("Historial de migraciones sembrado para schema existente.");
+
+            // Agregar columnas que EF Core espera pero que el schema legacy de Node.js no tiene
+            await using var patchCmd = conn.CreateCommand();
+            patchCmd.CommandText = @"
+                ALTER TABLE usuarios
+                    ADD COLUMN IF NOT EXISTS es_admin_organizacion BOOLEAN NOT NULL DEFAULT FALSE";
+            await patchCmd.ExecuteNonQueryAsync();
+            Log.Information("Schema legacy parchado: columna es_admin_organizacion agregada (IF NOT EXISTS).");
+        }
+
+        // Patch incondicional: columnas que deben existir siempre (idempotente con IF NOT EXISTS)
+        // Cubre el caso donde el deploy anterior ya sembró el historial pero no ejecutó el patch.
+        await using var alwaysPatchCmd = conn.CreateCommand();
+        alwaysPatchCmd.CommandText = @"
+            ALTER TABLE IF EXISTS usuarios
+                ADD COLUMN IF NOT EXISTS es_admin_organizacion BOOLEAN NOT NULL DEFAULT FALSE;";
+        await alwaysPatchCmd.ExecuteNonQueryAsync();
+        Log.Information("Patch incondicional aplicado (es_admin_organizacion).");
+
         await db.Database.MigrateAsync();
         Log.Information("EF Core migrations aplicadas correctamente.");
     }
@@ -250,6 +307,7 @@ if (app.Environment.IsProduction())
     {
         Log.Error(ex, "Error aplicando EF Core migrations al iniciar. El servicio continúa.");
         Log.Warning("Si las migraciones no están aplicadas, ejecuta: dotnet ef database update");
+        Log.Warning("Para DDL en Supabase usa conexión directa (puerto 5432) en MIGRATION_DB_URL");
     }
 }
 

@@ -87,8 +87,8 @@ public class OrganizacionesController : ControllerBase
     // ── DELETE /api/organizaciones/members/{usuarioId} ───────────────────
     // Owner/Admin remueve un miembro de la organización.
     // ─────────────────────────────────────────────────────────────────────
-    [HttpDelete("members/{usuarioId:int}")]
-    public async Task<IActionResult> RemoverMiembro(int usuarioId, CancellationToken ct)
+    [HttpDelete("members/{usuarioId:guid}")]
+    public async Task<IActionResult> RemoverMiembro(Guid usuarioId, CancellationToken ct)
     {
         await _mediator.Send(new RemoverMiembroCommand { UsuarioId = usuarioId }, ct);
         return NoContent();

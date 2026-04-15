@@ -9,7 +9,7 @@ namespace LegalPro.Application.OrganizacionesModule.Commands;
 
 public class RemoverMiembroCommand : IRequest<Unit>
 {
-    public int UsuarioId { get; set; }
+    public Guid UsuarioId { get; set; }
 }
 
 public class RemoverMiembroCommandHandler : IRequestHandler<RemoverMiembroCommand, Unit>

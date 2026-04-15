@@ -9,7 +9,7 @@ namespace LegalPro.Application.Common.Interfaces;
 public interface ICurrentUserService
 {
     /// <summary>ID del usuario autenticado (claim "sub").</summary>
-    int? UserId { get; }
+    Guid? UserId { get; }
 
     /// <summary>ID de la organización (claim "organization_id").</summary>
     Guid? OrganizationId { get; }

@@ -67,7 +67,7 @@ public class Organizacion : BaseGuidEntity
     }
 
     /// <summary>Agrega un miembro a la organización verificando el límite del plan.</summary>
-    public MiembroOrganizacion AgregarMiembro(int usuarioId, RolMiembro rol, int? invitadoPorId = null)
+    public MiembroOrganizacion AgregarMiembro(Guid usuarioId, RolMiembro rol, Guid? invitadoPorId = null)
     {
         if (!Activo)
             throw new DomainException("La organización está desactivada.");
@@ -86,7 +86,7 @@ public class Organizacion : BaseGuidEntity
     }
 
     /// <summary>Remueve un miembro de la organización. No permite remover al único Owner.</summary>
-    public void RemoverMiembro(int usuarioId)
+    public void RemoverMiembro(Guid usuarioId)
     {
         var miembro = MembresiaDetallada.FirstOrDefault(m => m.UsuarioId == usuarioId && m.Activo)
             ?? throw new DomainException("El usuario no es miembro activo de esta organización.");
