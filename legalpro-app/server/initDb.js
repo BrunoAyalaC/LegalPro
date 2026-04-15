@@ -44,8 +44,11 @@ export async function initDb() {
           ALTER TABLE miembros_organizacion DROP CONSTRAINT IF EXISTS miembros_organizacion_rol_check;
           ALTER TABLE miembros_organizacion ADD CONSTRAINT miembros_organizacion_rol_check
             CHECK (UPPER(rol) IN ('OWNER', 'ADMIN', 'MEMBER', 'VIEWER'));
+          ALTER TABLE organizaciones DROP CONSTRAINT IF EXISTS organizaciones_plan_check;
+          ALTER TABLE organizaciones ADD CONSTRAINT organizaciones_plan_check
+            CHECK (LOWER(plan) IN ('free', 'pro', 'enterprise'));
         `);
-        console.log('[initDb] Constraints de rol actualizadas a case-insensitive.');
+        console.log('[initDb] Constraints de rol y plan actualizadas a case-insensitive.');
       } catch (constraintErr) {
         console.error('[initDb] Patch constraints ERROR:', constraintErr.message);
       }

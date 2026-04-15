@@ -49,6 +49,7 @@ public class Organizacion : BaseGuidEntity
             MaxExpedientes = maxExpedientes,
             StorageGbLimit = storageGb,
             Activo = true,
+            Config = "{}",
             CreatedAt = DateTime.UtcNow
         };
 
