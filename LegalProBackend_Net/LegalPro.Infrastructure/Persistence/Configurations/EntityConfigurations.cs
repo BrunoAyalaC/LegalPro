@@ -31,7 +31,9 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .IsRequired();
 
         builder.Property(u => u.Rol)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<RolUsuario>(v, true))
             .HasMaxLength(50)
             .IsRequired();
 
