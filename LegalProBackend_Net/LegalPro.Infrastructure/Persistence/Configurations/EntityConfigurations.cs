@@ -173,7 +173,7 @@ public class OrganizacionConfiguration : IEntityTypeConfiguration<Organizacion>
 
         builder.Property(o => o.Plan)
             .HasConversion(
-                v => v.ToString().ToUpperInvariant(),
+                v => v.ToString().ToLowerInvariant(),
                 v => Enum.Parse<PlanTipo>(v, true))
             .HasMaxLength(20)
             .IsRequired();
