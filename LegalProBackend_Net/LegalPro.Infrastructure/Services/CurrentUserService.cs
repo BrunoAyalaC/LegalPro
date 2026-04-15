@@ -26,7 +26,7 @@ public class CurrentUserService : ICurrentUserService
     /// Busca primero el claim "sub" (JwtRegisteredClaimNames.Sub) y también
     /// ClaimTypes.NameIdentifier por compatibilidad con el mapper de ASP.NET Core.
     /// </remarks>
-    public int? UserId
+    public Guid? UserId
     {
         get
         {
@@ -34,7 +34,7 @@ public class CurrentUserService : ICurrentUserService
             // o mapearse a NameIdentifier (si MapInboundClaims=true, default)
             var value = User?.FindFirstValue("sub")
                         ?? User?.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.TryParse(value, out var id) ? id : null;
+            return Guid.TryParse(value, out var id) ? id : null;
         }
     }
 

@@ -327,7 +327,8 @@ router.get('/notificaciones', async (req, res, next) => {
 
     const { rows: urgentes } = await db.query(
       `SELECT id, numero, titulo, tipo FROM expedientes
-       WHERE organization_id=$1 AND es_urgente=TRUE AND estado='activo'
+       WHERE organization_id=$1 AND estado='activo'
+       ORDER BY created_at DESC
        LIMIT 5`,
       [orgId]
     );

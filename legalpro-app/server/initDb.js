@@ -18,9 +18,25 @@ export async function initDb() {
     const tableExists = parseInt(rows[0].n) > 0;
 
     if (tableExists) {
-      console.log('[initDb] Tabla usuarios encontrada. Diagnosticando INSERT...');
+      console.log('[initDb] Tabla usuarios encontrada. Aplicando patches de columnas...');
 
-      const cols = await db.query(
+      // Patch: columnas que el backend .NET espera pero que el schema legacy puede no tener
+      try {
+        await db.query(`
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS es_admin_organizacion BOOLEAN NOT NULL DEFAULT FALSE;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS organizacion_id UUID REFERENCES organizaciones(id) ON DELETE SET NULL;
+          ALTER TABLE expedientes
+            ADD COLUMN IF NOT EXISTS es_urgente BOOLEAN NOT NULL DEFAULT FALSE;
+        `);
+        console.log('[initDb] Patches de columnas aplicados (IF NOT EXISTS).');
+      } catch (patchErr) {
+        console.error('[initDb] Patch columnas ERROR:', patchErr.message);
+      }
+
+      // Diagnosticar INSERT
+      console.log('[initDb] Diagnosticando INSERT...');      const cols = await db.query(
         `SELECT column_name, data_type FROM information_schema.columns
          WHERE table_schema='public' AND table_name='usuarios' ORDER BY ordinal_position`
       );

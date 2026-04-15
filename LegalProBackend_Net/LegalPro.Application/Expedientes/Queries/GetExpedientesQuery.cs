@@ -29,7 +29,7 @@ public record ExpedienteDto(
     string Tipo,
     string Estado,
     bool EsUrgente,
-    int UsuarioId,
+    Guid UsuarioId,
     Guid OrganizationId,
     DateTime CreatedAt,
     DateTime? UpdatedAt

@@ -23,7 +23,7 @@ public class SimulationService : ISimulationService
         _simulationAI = simulationAI;
     }
 
-    public async Task<Simulacion> IniciarSimulacionAsync(int usuarioId, string ramaDerecho, string rolUsuario, string dificultadModificador)
+    public async Task<Simulacion> IniciarSimulacionAsync(Guid usuarioId, string ramaDerecho, string rolUsuario, string dificultadModificador)
     {
         // Finalizar simulaciones previas
         var previas = await _context.Simulaciones
@@ -72,7 +72,7 @@ public class SimulationService : ISimulationService
         return eventoIA;
     }
 
-    public async Task<Simulacion?> ObtenerSimulacionActivaObtenerAsync(int usuarioId)
+    public async Task<Simulacion?> ObtenerSimulacionActivaObtenerAsync(Guid usuarioId)
     {
         return await _context.Simulaciones
             .Include(s => s.Eventos)

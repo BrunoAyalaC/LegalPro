@@ -5,11 +5,11 @@ namespace LegalPro.Domain.Events;
 /// <summary>Raised when a new user is registered.</summary>
 public class UsuarioRegistradoEvent : DomainEvent
 {
-    public int UsuarioId { get; }
+    public Guid UsuarioId { get; }
     public string Email { get; }
     public string Rol { get; }
 
-    public UsuarioRegistradoEvent(int usuarioId, string email, string rol)
+    public UsuarioRegistradoEvent(Guid usuarioId, string email, string rol)
     {
         UsuarioId = usuarioId;
         Email = email;
@@ -22,9 +22,9 @@ public class ExpedienteCreadoEvent : DomainEvent
 {
     public int ExpedienteId { get; }
     public string Numero { get; }
-    public int UsuarioId { get; }
+    public Guid UsuarioId { get; }
 
-    public ExpedienteCreadoEvent(int expedienteId, string numero, int usuarioId)
+    public ExpedienteCreadoEvent(int expedienteId, string numero, Guid usuarioId)
     {
         ExpedienteId = expedienteId;
         Numero = numero;
@@ -37,9 +37,9 @@ public class SimulacionFinalizadaEvent : DomainEvent
 {
     public int SimulacionId { get; }
     public int PuntajeFinal { get; }
-    public int UsuarioId { get; }
+    public Guid UsuarioId { get; }
 
-    public SimulacionFinalizadaEvent(int simulacionId, int puntajeFinal, int usuarioId)
+    public SimulacionFinalizadaEvent(int simulacionId, int puntajeFinal, Guid usuarioId)
     {
         SimulacionId = simulacionId;
         PuntajeFinal = puntajeFinal;
@@ -95,10 +95,10 @@ public class InvitacionEnviadaEvent : DomainEvent
 /// <summary>Raised when a user joins an organization.</summary>
 public class UsuarioUnidoAOrganizacionEvent : DomainEvent
 {
-    public int UsuarioId { get; }
+    public Guid UsuarioId { get; }
     public Guid OrgId { get; }
 
-    public UsuarioUnidoAOrganizacionEvent(int usuarioId, Guid orgId)
+    public UsuarioUnidoAOrganizacionEvent(Guid usuarioId, Guid orgId)
     {
         UsuarioId = usuarioId;
         OrgId = orgId;
@@ -110,10 +110,10 @@ public class MiembroAgregadoEvent : DomainEvent
 {
     public Guid MiembroId { get; }
     public Guid OrgId { get; }
-    public int UsuarioId { get; }
+    public Guid UsuarioId { get; }
     public string Rol { get; }
 
-    public MiembroAgregadoEvent(Guid miembroId, Guid orgId, int usuarioId, string rol)
+    public MiembroAgregadoEvent(Guid miembroId, Guid orgId, Guid usuarioId, string rol)
     {
         MiembroId = miembroId;
         OrgId = orgId;
@@ -126,9 +126,9 @@ public class MiembroAgregadoEvent : DomainEvent
 public class MiembroRemovidoEvent : DomainEvent
 {
     public Guid OrgId { get; }
-    public int UsuarioId { get; }
+    public Guid UsuarioId { get; }
 
-    public MiembroRemovidoEvent(Guid orgId, int usuarioId)
+    public MiembroRemovidoEvent(Guid orgId, Guid usuarioId)
     {
         OrgId = orgId;
         UsuarioId = usuarioId;

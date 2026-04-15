@@ -4,7 +4,7 @@ namespace LegalPro.Domain.Entities;
 
 public class RefreshToken : BaseEntity
 {
-    public int UsuarioId { get; private set; }
+    public Guid UsuarioId { get; private set; }
     public string Token { get; private set; } = string.Empty;
     public DateTime ExpiresAt { get; private set; }
     public bool IsRevoked { get; private set; }
@@ -16,7 +16,7 @@ public class RefreshToken : BaseEntity
 
     private RefreshToken() { }
 
-    public static RefreshToken Crear(int usuarioId, string token, DateTime expiresAt)
+    public static RefreshToken Crear(Guid usuarioId, string token, DateTime expiresAt)
     {
         if (string.IsNullOrWhiteSpace(token)) throw new ArgumentException("Token requerido.", nameof(token));
         if (expiresAt <= DateTime.UtcNow) throw new ArgumentException("Expiry debe ser futura.", nameof(expiresAt));

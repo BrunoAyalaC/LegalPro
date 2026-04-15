@@ -3,10 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import db from './db.js';
-
 import authRoutes from './routes/auth.js';
 import organizacionesRoutes from './routes/organizaciones.js';
 import geminiRoutes from './routes/gemini.js';
@@ -15,7 +11,6 @@ import { initDb } from './initDb.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
-const JWT_SECRET = process.env.JWT_SECRET;
 
 // ── LOGGING DE AUDITORÍA HTTP ────────────────────────────────────────────────
 app.use((req, res, next) => {
@@ -153,26 +148,6 @@ app.use(express.json({ limit: '1mb' }));
 // Excluido de rate limiting global
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
 
-// ── DIAGNÓSTICO TEMPORAL — verificar register paso a paso (eliminar tras fix) ──
-app.get('/diag-register', async (req, res) => {
-  const steps = {};
-  try { await db.query('SELECT 1'); steps.db_ping = 'OK'; } catch (e) { steps.db_ping = `ERROR: ${e.message}`; }
-  try {
-    const ts = Date.now();
-    const r = await db.query(`INSERT INTO usuarios (nombre_completo, email, password_hash, rol, especialidad, esta_activo, created_at) VALUES ($1,$2,$3,$4,$5,TRUE,NOW()) RETURNING id`,
-      ['_d_', `_d_${ts}@d.pe`, '$2b$12$test12345678901234567a', 'ABOGADO', 'GENERAL']);
-    steps.insert = `OK:${r.rows[0]?.id}`;
-    await db.query('DELETE FROM usuarios WHERE email=$1', [`_d_${ts}@d.pe`]);
-  } catch (e) { steps.insert = `ERR:${e.message}|code:${e.code}|detail:${e.detail}`; }
-  try { await bcrypt.hash('Test123!', 12); steps.bcrypt = 'OK'; } catch (e) { steps.bcrypt = `ERR:${e.message}`; }
-  try {
-    const t = jwt.sign({ sub: 'x', email: 'x@x.com', rol: 'ABOGADO' }, JWT_SECRET, { issuer: 'LegalProAPI', audience: 'LegalProClients', expiresIn: 3600 });
-    steps.jwt = `OK:${t.length}chars`;
-  } catch (e) { steps.jwt = `ERR:${e.message}`; }
-  steps.JWT_SECRET_ok = !!JWT_SECRET;
-  res.json(steps);
-});
-
 // ── RUTAS ─────────────────────────────────────────────────────────────────────
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/organizaciones', organizacionesRoutes);
@@ -182,10 +157,9 @@ app.use('/api/gemini', geminiLimiter, geminiRoutes);
 // ── ERROR HANDLER GLOBAL ──────────────────────────────────────────────────────
 app.use((err, _req, res, _next) => {
   const status = err.status ?? err.statusCode ?? 500;
-  // DEBUG TEMPORAL: exponer error real para diagnóstico — revertir tras fix
-  const message = err.message ?? 'Error interno del servidor';
-  if (status >= 500) console.error('[ERROR]', err.name, err.message, err.code, err.detail, err.stack?.split('\n')[1]);
-  res.status(status).json({ error: message, _debug_name: err.name, _debug_code: err.code });
+  const message = isProd ? (status >= 500 ? 'Error interno del servidor' : err.message) : err.message;
+  if (status >= 500) console.error('[ERROR]', err.name, err.message, err.stack?.split('\n')[1]);
+  res.status(status).json({ error: message });
 });
 
 app.listen(PORT, async () => {

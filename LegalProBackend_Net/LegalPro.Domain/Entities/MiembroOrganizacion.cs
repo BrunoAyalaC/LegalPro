@@ -15,12 +15,12 @@ public class MiembroOrganizacion : BaseGuidEntity
     public Guid OrganizacionId { get; private set; }
     public Organizacion? Organizacion { get; private set; }
 
-    public int UsuarioId { get; private set; }
+    public Guid UsuarioId { get; private set; }
     public Usuario? Usuario { get; private set; }
 
     public RolMiembro Rol { get; private set; } = RolMiembro.Member;
 
-    public int? InvitadoPorId { get; private set; }
+    public Guid? InvitadoPorId { get; private set; }
     public DateTime? InvitadoEn { get; private set; }
     public DateTime UnidoEn { get; private set; } = DateTime.UtcNow;
     public bool Activo { get; private set; } = true;
@@ -28,12 +28,12 @@ public class MiembroOrganizacion : BaseGuidEntity
     private MiembroOrganizacion() { }
 
     /// <summary>Factory: única forma de crear una membresía.</summary>
-    public static MiembroOrganizacion Crear(Guid orgId, int usuarioId, RolMiembro rol, int? invitadoPorId = null)
+    public static MiembroOrganizacion Crear(Guid orgId, Guid usuarioId, RolMiembro rol, Guid? invitadoPorId = null)
     {
         if (orgId == Guid.Empty)
             throw new DomainException("El ID de la organización es obligatorio.");
 
-        if (usuarioId <= 0)
+        if (usuarioId == Guid.Empty)
             throw new DomainException("El ID del usuario es obligatorio.");
 
         var miembro = new MiembroOrganizacion

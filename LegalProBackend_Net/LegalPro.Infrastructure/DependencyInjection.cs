@@ -16,9 +16,12 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         // DATABASE_URL (Railway) o ConnectionStrings:DefaultConnection (appsettings)
-        var connectionString = configuration["DATABASE_URL"]
+        var rawConnectionString = configuration["DATABASE_URL"]
                                ?? configuration.GetConnectionString("DefaultConnection")
                                ?? throw new InvalidOperationException("ConnectionString no configurada.");
+
+        // Convertir postgresql:// URI a formato ADO.NET que Npgsql acepta
+        var connectionString = ConvertPostgresUri(rawConnectionString);
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString)
@@ -72,5 +75,28 @@ public static class DependencyInjection
         });
 
         return services;
+    }
+
+    /// <summary>
+    /// Convierte una URI postgresql:// o postgres:// al formato ADO.NET que Npgsql acepta.
+    /// Si ya es formato ADO.NET (Host=...) devuelve sin cambios.
+    /// </summary>
+    private static string ConvertPostgresUri(string uriOrConnStr)
+    {
+        if (string.IsNullOrWhiteSpace(uriOrConnStr))
+            return uriOrConnStr;
+
+        if (!uriOrConnStr.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase)
+            && !uriOrConnStr.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase))
+            return uriOrConnStr;
+
+        var uri = new Uri(uriOrConnStr);
+        var userInfo = uri.UserInfo.Split(':', 2);
+        var user = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : string.Empty;
+        var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
+        var db   = uri.AbsolutePath.TrimStart('/');
+        var port = uri.Port > 0 ? uri.Port : 5432;
+
+        return $"Host={uri.Host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Prefer;Trust Server Certificate=true";
     }
 }
