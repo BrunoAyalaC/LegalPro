@@ -2,7 +2,7 @@ using LegalPro.Domain.Common;
 
 namespace LegalPro.Domain.Entities;
 
-public class RefreshToken : BaseEntity
+public class RefreshToken : BaseGuidEntity
 {
     public Guid UsuarioId { get; private set; }
     public string Token { get; private set; } = string.Empty;
@@ -23,6 +23,7 @@ public class RefreshToken : BaseEntity
 
         return new RefreshToken
         {
+            Id = Guid.NewGuid(),
             UsuarioId = usuarioId,
             Token = token,
             ExpiresAt = expiresAt,

@@ -9,7 +9,7 @@ namespace LegalPro.Domain.Entities;
 /// Aggregate Root: Expediente (Case File)
 /// Contains business rules for state transitions and urgency management.
 /// </summary>
-public class Expediente : BaseEntity
+public class Expediente : BaseGuidEntity
 {
     public string Numero { get; private set; } = string.Empty;
     public string Titulo { get; private set; } = string.Empty;
@@ -35,6 +35,7 @@ public class Expediente : BaseEntity
 
         var expediente = new Expediente
         {
+            Id = Guid.NewGuid(),
             Numero = numero.Trim(),
             Titulo = titulo.Trim(),
             Tipo = tipo,

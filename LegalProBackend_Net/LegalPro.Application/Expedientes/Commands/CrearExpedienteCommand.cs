@@ -27,7 +27,7 @@ public class CrearExpedienteCommand : IRequest<CrearExpedienteResult>, IPlanLimi
 }
 
 public record CrearExpedienteResult(
-    int Id,
+    Guid Id,
     string Numero,
     string Titulo,
     string Tipo,

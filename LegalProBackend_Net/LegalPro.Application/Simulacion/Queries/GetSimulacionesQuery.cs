@@ -16,7 +16,7 @@ public class GetSimulacionesQuery : IRequest<GetSimulacionesResult>
 }
 
 public record SimulacionResumenDto(
-    int Id,
+    Guid Id,
     string RamaDerecho,
     string RolUsuario,
     string Dificultad,

@@ -14,7 +14,7 @@ namespace LegalPro.Application.Simulacion.Queries;
 
 public class GetSimulacionBoardQuery : IRequest<SimulacionBoardDto>
 {
-    public int SimulacionId { get; set; }
+    public Guid SimulacionId { get; set; }
 }
 
 public record EventoDto(
@@ -25,7 +25,7 @@ public record EventoDto(
     DateTime CreadoEn);
 
 public record SimulacionBoardDto(
-    int Id,
+    Guid Id,
     string Rama,
     string RolUsuario,
     string DificultadModificador,
@@ -39,7 +39,7 @@ public class GetSimulacionBoardValidator : AbstractValidator<GetSimulacionBoardQ
 {
     public GetSimulacionBoardValidator()
     {
-        RuleFor(x => x.SimulacionId).GreaterThan(0).WithMessage("SimulacionId debe ser mayor que 0.");
+        RuleFor(x => x.SimulacionId).NotEmpty().WithMessage("SimulacionId es requerido.");
     }
 }
 

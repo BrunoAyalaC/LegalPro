@@ -23,7 +23,7 @@ public class GetExpedientesQuery : IRequest<GetExpedientesResult>
 }
 
 public record ExpedienteDto(
-    int Id,
+    Guid Id,
     string Numero,
     string Titulo,
     string Tipo,

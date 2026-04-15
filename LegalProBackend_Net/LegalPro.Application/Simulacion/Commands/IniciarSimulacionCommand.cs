@@ -23,7 +23,7 @@ public class IniciarSimulacionCommand : IRequest<IniciarSimulacionResult>
 }
 
 public record IniciarSimulacionResult(
-    int SimulacionId,
+    Guid SimulacionId,
     string ContextoSintetico,
     string MensajeJuez,
     string MensajeAdversarial,

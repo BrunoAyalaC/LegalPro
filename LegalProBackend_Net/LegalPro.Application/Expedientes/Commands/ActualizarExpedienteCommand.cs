@@ -16,14 +16,14 @@ namespace LegalPro.Application.Expedientes.Commands;
 
 public class ActualizarExpedienteCommand : IRequest<ActualizarExpedienteResult>
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string? Titulo { get; set; }
     public string? Estado { get; set; }
     public bool? EsUrgente { get; set; }
 }
 
 public record ActualizarExpedienteResult(
-    int Id,
+    Guid Id,
     string Numero,
     string Titulo,
     string Tipo,
@@ -37,7 +37,7 @@ public class ActualizarExpedienteCommandValidator : AbstractValidator<Actualizar
     public ActualizarExpedienteCommandValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0).WithMessage("El Id del expediente debe ser mayor a 0.");
+            .NotEmpty().WithMessage("El Id del expediente debe ser mayor a 0.");
 
         RuleFor(x => x.Titulo)
             .MaximumLength(500).WithMessage("El título no puede superar 500 caracteres.")
@@ -107,3 +107,4 @@ public class ActualizarExpedienteCommandHandler : IRequestHandler<ActualizarExpe
             expediente.UpdatedAt);
     }
 }
+

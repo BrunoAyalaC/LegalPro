@@ -54,8 +54,8 @@ public class SimulacionController : ControllerBase
     // ── POST /api/simulacion/{id}/finalizar ───────────────────────────────
     // Cierra la sesión. Persiste puntaje final y total de turnos.
     // ─────────────────────────────────────────────────────────────
-    [HttpPost("{id:int}/finalizar")]
-    public async Task<IActionResult> Finalizar(int id, CancellationToken ct)
+    [HttpPost("{id:guid}/finalizar")]
+    public async Task<IActionResult> Finalizar(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new FinalizarSimulacionCommand { SimulacionId = id }, ct);
         return Ok(result);
@@ -64,8 +64,8 @@ public class SimulacionController : ControllerBase
     // ── GET /api/simulacion/{id}/board ────────────────────────────────────
     // Estado completo: contexto + eventos ordenados por turno.
     // ─────────────────────────────────────────────────────────────
-    [HttpGet("{id:int}/board")]
-    public async Task<IActionResult> GetBoard(int id, CancellationToken ct)
+    [HttpGet("{id:guid}/board")]
+    public async Task<IActionResult> GetBoard(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GetSimulacionBoardQuery { SimulacionId = id }, ct);
         return Ok(result);
@@ -83,3 +83,5 @@ public class SimulacionController : ControllerBase
         return Ok(result);
     }
 }
+
+
