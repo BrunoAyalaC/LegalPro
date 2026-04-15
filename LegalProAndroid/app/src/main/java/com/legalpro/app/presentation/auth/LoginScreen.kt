@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.legalpro.app.R
+import com.legalpro.app.presentation.theme.ResponsiveValues
 import kotlinx.coroutines.delay
 
 /* ═══ Paleta Design System 06-J ════════════════════════════════ */
@@ -279,7 +280,7 @@ fun LoginScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(52.dp))
+            Spacer(Modifier.height(ResponsiveValues.getPaddingMedium()))
 
             /* ── Logo ─────────────────────────────────────────── */
             Box(

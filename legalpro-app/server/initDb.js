@@ -71,27 +71,6 @@ export async function initDb() {
         console.error('[initDb] Patch constraints ERROR:', constraintErr.message);
       }
 
-      // Diagnosticar INSERT
-      console.log('[initDb] Diagnosticando INSERT...');      const cols = await db.query(
-        `SELECT column_name, data_type FROM information_schema.columns
-         WHERE table_schema='public' AND table_name='usuarios' ORDER BY ordinal_position`
-      );
-      console.log('[initDb] Columnas:', cols.rows.map(c => `${c.column_name}(${c.data_type})`).join(', '));
-
-      try {
-        const test = await db.query(
-          `INSERT INTO usuarios (nombre_completo, email, password_hash, rol, especialidad, esta_activo, created_at)
-           VALUES ($1,$2,$3,$4,$5,TRUE,NOW()) RETURNING id`,
-          ['_init_test_', '_init_test_@diagpro.pe', '$2b$12$test_hash', 'ABOGADO', 'GENERAL']
-        );
-        console.log('[initDb] Test INSERT OK - id:', test.rows[0]?.id);
-        await db.query('DELETE FROM usuarios WHERE email=$1', ['_init_test_@diagpro.pe']);
-        console.log('[initDb] DB operacional - INSERT/DELETE funciona correctamente.');
-      } catch (insertErr) {
-        console.error('[initDb] TEST INSERT FALLO:', insertErr.message);
-        console.error('[initDb]    Detail:', insertErr.detail);
-        console.error('[initDb]    Code:', insertErr.code);
-      }
       return;
     }
 
