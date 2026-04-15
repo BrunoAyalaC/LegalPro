@@ -16,9 +16,9 @@
 // Lee URLs desde env vars → permite sobreescribir sin editar el archivo
 // Uso: FRONTEND_URL=https://... NODE_API_URL=https://... node smoke-production.mjs
 const FRONTEND  = process.env.FRONTEND_URL  ?? 'https://legalpro-frontend-production.up.railway.app';
-const NODE_API  = process.env.NODE_API_URL  ?? 'https://legalpro-node-production.up.railway.app';
-const DOTNET_API = process.env.DOTNET_API_URL ?? 'https://legalpro-dotnet-production.up.railway.app';
-const APK_URL   = process.env.APK_URL       ?? 'https://github.com/BrunoAyalaC/Abogacia/releases/download/v1.0.0/LegalPro-debug.apk';
+const NODE_API  = process.env.NODE_API_URL  ?? 'https://legalpro-node-production-34ac.up.railway.app';
+const DOTNET_API = process.env.DOTNET_API_URL ?? 'https://legalpro-dotnet-production-5a39.up.railway.app';
+const APK_URL   = process.env.APK_URL       ?? 'https://github.com/BrunoAyalaC/Abogacia/releases/download/v1.1.0/LegalPro-v1.1.0.apk';
 
 // ── Credenciales de prueba (se crean contra Supabase REAL) ──────────────
 const TS = Date.now();
@@ -186,6 +186,34 @@ await test('Node LOGIN usuario real → 200 + JWT', async () => {
 });
 
 // ═════════════════════════════════════════════════════════════════════════
+// 3b. NODE — CREAR ORGANIZACIÓN + RE-LOGIN (necesario para tests de tenant)
+// ═════════════════════════════════════════════════════════════════════════
+console.log('\n── 3b. Node: Crear organización y re-login con org ───');
+
+await test('Node CREAR organización para usuario de prueba → 201', async () => {
+  if (!nodeToken) { console.log('       ⚠️  Skip (sin token)'); return; }
+  const { status, body } = await fetchJson(`${NODE_API}/api/organizaciones`, {
+    method: 'POST',
+    headers: authHeader(nodeToken),
+    body: JSON.stringify({ nombre: `SmokeCorp ${TS}`, plan: 'FREE' }),
+  });
+  assert(status === 201, `Expected 201, got ${status}. Body: ${JSON.stringify(body).substring(0, 120)}`);
+  console.log(`       → Org creada: ${JSON.stringify(body).substring(0, 80)}`);
+});
+
+await test('Node RE-LOGIN → JWT con organization_id (para tenant middleware)', async () => {
+  const { status, body } = await fetchJson(`${NODE_API}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: TEST_USER.email, password: TEST_USER.password }),
+  });
+  assert(status === 200, `Expected 200, got ${status}`);
+  assert(body?.token, 'No token en re-login');
+  nodeToken = body.token; // JWT ahora incluye organization_id
+  console.log(`       → Re-login OK, token con org (${nodeToken.substring(0, 20)}...)`);
+});
+
+// ═════════════════════════════════════════════════════════════════════════
 // 4. NODE — RUTAS PROTEGIDAS (con JWT real)
 // ═════════════════════════════════════════════════════════════════════════
 console.log('\n── 4. Node: Rutas protegidas con JWT real ────────────');
@@ -231,8 +259,8 @@ await test('Node GET /api/organizaciones/me CON token → respuesta válida', as
   const { status, body } = await fetchJson(`${NODE_API}/api/organizaciones/me`, {
     headers: authHeader(nodeToken),
   });
-  // Puede ser 200 (sin org) o 404 — pero NO 401/403
-  assert(status !== 401 && status !== 403, `Auth falló: ${status}`);
+  // Con JWT que contiene organization_id → espera 200
+  assert(status !== 401 && status !== 403, `Auth/tenant falló: ${status}. Body: ${JSON.stringify(body).substring(0, 80)}`);
   console.log(`       → Org response: ${status} ${typeof body === 'string' ? body.substring(0, 50) : JSON.stringify(body).substring(0, 80)}`);
 });
 
