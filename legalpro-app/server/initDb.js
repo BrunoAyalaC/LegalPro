@@ -29,6 +29,24 @@ export async function initDb() {
             ADD COLUMN IF NOT EXISTS organizacion_id UUID REFERENCES organizaciones(id) ON DELETE SET NULL;
           ALTER TABLE expedientes
             ADD COLUMN IF NOT EXISTS es_urgente BOOLEAN NOT NULL DEFAULT FALSE;
+          ALTER TABLE miembros_organizacion
+            ADD COLUMN IF NOT EXISTS invitado_por_id UUID REFERENCES usuarios(id) ON DELETE SET NULL;
+          ALTER TABLE miembros_organizacion
+            ADD COLUMN IF NOT EXISTS invitado_en TIMESTAMPTZ;
+          ALTER TABLE miembros_organizacion
+            ADD COLUMN IF NOT EXISTS unido_en TIMESTAMPTZ NOT NULL DEFAULT now();
+          ALTER TABLE miembros_organizacion
+            ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+          ALTER TABLE refresh_tokens
+            ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+          ALTER TABLE eventos_simulacion
+            ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+          ALTER TABLE mensajes_chat
+            ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+          ALTER TABLE base_legal_vectorial
+            ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+          ALTER TABLE invitaciones_organizacion
+            ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
         `);
         console.log('[initDb] Patches de columnas aplicados (IF NOT EXISTS).');
       } catch (patchErr) {
