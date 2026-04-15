@@ -12,13 +12,13 @@ namespace LegalPro.Application.Expedientes.Queries;
 // evita leakage de información cross-tenant.
 // ═══════════════════════════════════════════════════════
 
-public record GetExpedienteByIdQuery(int Id) : IRequest<ExpedienteDto>;
+public record GetExpedienteByIdQuery(Guid Id) : IRequest<ExpedienteDto>;
 
 public class GetExpedienteByIdQueryValidator : AbstractValidator<GetExpedienteByIdQuery>
 {
     public GetExpedienteByIdQueryValidator()
     {
-        RuleFor(x => x.Id).GreaterThan(0).WithMessage("El Id del expediente debe ser mayor a 0.");
+        RuleFor(x => x.Id).NotEmpty().WithMessage("El Id del expediente debe ser mayor a 0.");
     }
 }
 
@@ -59,3 +59,4 @@ public class GetExpedienteByIdQueryHandler : IRequestHandler<GetExpedienteByIdQu
             expediente.UpdatedAt);
     }
 }
+

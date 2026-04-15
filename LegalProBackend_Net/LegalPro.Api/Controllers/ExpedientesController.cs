@@ -62,8 +62,8 @@ public class ExpedientesController : ControllerBase
     // Obtiene un expediente por Id. Devuelve 404 si no existe o si es de
     // otro tenant (evita information disclosure cross-tenant — OWASP A01).
     // ─────────────────────────────────────────────────────────────────────
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetExpedienteById(int id, CancellationToken ct)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetExpedienteById(Guid id, CancellationToken ct)
     {
         var dto = await _mediator.Send(new GetExpedienteByIdQuery(id), ct);
         return Ok(dto);
@@ -99,9 +99,9 @@ public class ExpedientesController : ControllerBase
     // Actualización parcial: titulo, estado y/o esUrgente.
     // Al menos un campo debe estar presente (validado en FluentValidation).
     // ─────────────────────────────────────────────────────────────────────
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:guid}")]
     public async Task<IActionResult> ActualizarExpediente(
-        int id,
+        Guid id,
         [FromBody] ActualizarExpedienteCommand command,
         CancellationToken ct)
     {
@@ -124,8 +124,8 @@ public class ExpedientesController : ControllerBase
     // Soft-delete: archiva el expediente (EstadoExpediente.Archivado).
     // Preserva histórico forense requerido en procedimientos legales peruanos.
     // ─────────────────────────────────────────────────────────────────────
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> EliminarExpediente(int id, CancellationToken ct)
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> EliminarExpediente(Guid id, CancellationToken ct)
     {
         await _mediator.Send(new EliminarExpedienteCommand(id), ct);
         return NoContent();
@@ -135,11 +135,13 @@ public class ExpedientesController : ControllerBase
     // Genera resumen ejecutivo del caso con Gemini (FC forzado).
     // Incluye fortalezas, debilidades, acciones inmediatas y riesgo general.
     // ────────────────────────────────────────────────────────────────
-    [HttpGet("{id:int}/resumen-ia")]
+    [HttpGet("{id:guid}/resumen-ia")]
     [EnableRateLimiting("gemini")]
-    public async Task<IActionResult> ResumenIa(int id, CancellationToken ct)
+    public async Task<IActionResult> ResumenIa(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GenerarResumenCasoQuery(id), ct);
         return Ok(result);
     }
 }
+
+

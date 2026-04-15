@@ -14,14 +14,14 @@ namespace LegalPro.Application.Expedientes.Commands;
 // Tenant isolation: filtra por Id + OrganizationId (OWASP A01).
 // ═══════════════════════════════════════════════════════
 
-public record EliminarExpedienteCommand(int Id) : IRequest;
+public record EliminarExpedienteCommand(Guid Id) : IRequest;
 
 public class EliminarExpedienteCommandValidator : AbstractValidator<EliminarExpedienteCommand>
 {
     public EliminarExpedienteCommandValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0).WithMessage("El Id del expediente debe ser mayor a 0.");
+            .NotEmpty().WithMessage("El Id del expediente debe ser mayor a 0.");
     }
 }
 
@@ -53,3 +53,4 @@ public class EliminarExpedienteCommandHandler : IRequestHandler<EliminarExpedien
         await _context.SaveChangesAsync(cancellationToken);
     }
 }
+

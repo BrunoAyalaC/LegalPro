@@ -9,7 +9,7 @@ namespace LegalPro.Domain.Entities;
 /// Aggregate Root: Simulación de Juicio
 /// Manages the lifecycle of a trial simulation session.
 /// </summary>
-public class Simulacion : BaseEntity
+public class Simulacion : BaseGuidEntity
 {
     public Guid UsuarioId { get; private set; }
     public Usuario? Usuario { get; private set; }
@@ -36,6 +36,7 @@ public class Simulacion : BaseEntity
 
         return new Simulacion
         {
+            Id = Guid.NewGuid(),
             UsuarioId = usuarioId,
             RamaDerecho = rama,
             RolUsuario = rolUsuario,
@@ -87,9 +88,9 @@ public class Simulacion : BaseEntity
 /// <summary>
 /// Child entity within the Simulacion aggregate.
 /// </summary>
-public class EventoSimulacion : BaseEntity
+public class EventoSimulacion : BaseGuidEntity
 {
-    public int SimulacionId { get; private set; }
+    public Guid SimulacionId { get; private set; }
     public Simulacion? Simulacion { get; private set; }
 
     public int Turno { get; private set; }
@@ -99,10 +100,11 @@ public class EventoSimulacion : BaseEntity
 
     private EventoSimulacion() { }
 
-    public static EventoSimulacion Crear(int simulacionId, int turno, string emisor, string mensaje, string? leyesInvocadas = null)
+    public static EventoSimulacion Crear(Guid simulacionId, int turno, string emisor, string mensaje, string? leyesInvocadas = null)
     {
         return new EventoSimulacion
         {
+            Id = Guid.NewGuid(),
             SimulacionId = simulacionId,
             Turno = turno,
             Emisor = emisor,

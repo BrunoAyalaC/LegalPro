@@ -5,7 +5,7 @@ namespace LegalPro.Domain.Entities;
 /// <summary>
 /// Entity for vectorized legal bases (for RAG/pgvector search).
 /// </summary>
-public class BaseLegalVectorial : BaseEntity
+public class BaseLegalVectorial : BaseGuidEntity
 {
     public string CodigoNormativa { get; private set; } = string.Empty;
     public string Articulo { get; private set; } = string.Empty;
@@ -17,6 +17,7 @@ public class BaseLegalVectorial : BaseEntity
     {
         return new BaseLegalVectorial
         {
+            Id = Guid.NewGuid(),
             CodigoNormativa = codigoNormativa,
             Articulo = articulo,
             TextoLiteral = textoLiteral,

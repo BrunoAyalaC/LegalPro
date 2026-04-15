@@ -14,11 +14,11 @@ namespace LegalPro.Application.Simulacion.Commands;
 
 public class FinalizarSimulacionCommand : IRequest<FinalizarSimulacionResult>
 {
-    public int SimulacionId { get; set; }
+    public Guid SimulacionId { get; set; }
 }
 
 public record FinalizarSimulacionResult(
-    int SimulacionId,
+    Guid SimulacionId,
     int PuntajeFinal,
     int TotalTurnos,
     bool Finalizada);
@@ -27,7 +27,7 @@ public class FinalizarSimulacionCommandValidator : AbstractValidator<FinalizarSi
 {
     public FinalizarSimulacionCommandValidator()
     {
-        RuleFor(x => x.SimulacionId).GreaterThan(0);
+        RuleFor(x => x.SimulacionId).NotEmpty();
     }
 }
 
@@ -68,3 +68,4 @@ public class FinalizarSimulacionCommandHandler : IRequestHandler<FinalizarSimula
             Finalizada: simulacion.EstaFinalizada);
     }
 }
+

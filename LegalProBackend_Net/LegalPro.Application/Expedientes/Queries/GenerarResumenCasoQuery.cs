@@ -13,10 +13,10 @@ namespace LegalPro.Application.Expedientes.Queries;
 /// El abogado obtiene en segundos: hechos clave, fortalezas, debilidades, próximos pasos.
 /// Tenant-isolated: solo accede a expedientes de la organización del usuario autenticado.
 /// </summary>
-public record GenerarResumenCasoQuery(int ExpedienteId) : IRequest<ResumenCasoDto>;
+public record GenerarResumenCasoQuery(Guid ExpedienteId) : IRequest<ResumenCasoDto>;
 
 public record ResumenCasoDto(
-    int ExpedienteId,
+    Guid ExpedienteId,
     string Numero,
     string Titulo,
     string ResumenEjecutivo,
@@ -32,7 +32,7 @@ public class GenerarResumenCasoQueryValidator : AbstractValidator<GenerarResumen
 {
     public GenerarResumenCasoQueryValidator()
     {
-        RuleFor(x => x.ExpedienteId).GreaterThan(0);
+        RuleFor(x => x.ExpedienteId).NotEmpty();
     }
 }
 
@@ -101,3 +101,4 @@ public class GenerarResumenCasoQueryHandler : IRequestHandler<GenerarResumenCaso
             GeneradoEn:                DateTime.UtcNow);
     }
 }
+

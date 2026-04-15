@@ -20,11 +20,11 @@ public class UsuarioRegistradoEvent : DomainEvent
 /// <summary>Raised when a new expediente is created.</summary>
 public class ExpedienteCreadoEvent : DomainEvent
 {
-    public int ExpedienteId { get; }
+    public Guid ExpedienteId { get; }
     public string Numero { get; }
     public Guid UsuarioId { get; }
 
-    public ExpedienteCreadoEvent(int expedienteId, string numero, Guid usuarioId)
+    public ExpedienteCreadoEvent(Guid expedienteId, string numero, Guid usuarioId)
     {
         ExpedienteId = expedienteId;
         Numero = numero;
@@ -35,11 +35,11 @@ public class ExpedienteCreadoEvent : DomainEvent
 /// <summary>Raised when a simulation finishes.</summary>
 public class SimulacionFinalizadaEvent : DomainEvent
 {
-    public int SimulacionId { get; }
+    public Guid SimulacionId { get; }
     public int PuntajeFinal { get; }
     public Guid UsuarioId { get; }
 
-    public SimulacionFinalizadaEvent(int simulacionId, int puntajeFinal, Guid usuarioId)
+    public SimulacionFinalizadaEvent(Guid simulacionId, int puntajeFinal, Guid usuarioId)
     {
         SimulacionId = simulacionId;
         PuntajeFinal = puntajeFinal;
@@ -50,11 +50,11 @@ public class SimulacionFinalizadaEvent : DomainEvent
 /// <summary>Raised when an expediente changes state.</summary>
 public class ExpedienteEstadoCambiadoEvent : DomainEvent
 {
-    public int ExpedienteId { get; }
+    public Guid ExpedienteId { get; }
     public string EstadoAnterior { get; }
     public string EstadoNuevo { get; }
 
-    public ExpedienteEstadoCambiadoEvent(int expedienteId, string estadoAnterior, string estadoNuevo)
+    public ExpedienteEstadoCambiadoEvent(Guid expedienteId, string estadoAnterior, string estadoNuevo)
     {
         ExpedienteId = expedienteId;
         EstadoAnterior = estadoAnterior;

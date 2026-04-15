@@ -52,7 +52,7 @@ public class SimulationService : ISimulationService
         return nuevaSimulacion;
     }
 
-    public async Task<EventoSimulacion> ProcesarTurnoAsync(int simulacionId, string emisor, string mensaje)
+    public async Task<EventoSimulacion> ProcesarTurnoAsync(Guid simulacionId, string emisor, string mensaje)
     {
         var simulacion = await _context.Simulaciones
             .Include(s => s.Eventos)

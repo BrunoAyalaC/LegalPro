@@ -16,12 +16,12 @@ namespace LegalPro.Application.Simulacion.Commands;
 
 public class ProcesarTurnoCommand : IRequest<ProcesarTurnoResult>
 {
-    public int SimulacionId { get; set; }
+    public Guid SimulacionId { get; set; }
     public string MensajeUsuario { get; set; } = string.Empty;
 }
 
 public record ProcesarTurnoResult(
-    int SimulacionId,
+    Guid SimulacionId,
     string MensajeRespuesta,
     int PuntajeDelta,
     int PuntajeActual,
@@ -34,7 +34,7 @@ public class ProcesarTurnoCommandValidator : AbstractValidator<ProcesarTurnoComm
 {
     public ProcesarTurnoCommandValidator()
     {
-        RuleFor(x => x.SimulacionId).GreaterThan(0);
+        RuleFor(x => x.SimulacionId).NotEmpty();
         RuleFor(x => x.MensajeUsuario)
             .NotEmpty().WithMessage("El argumento del usuario no puede estar vacío.")
             .MaximumLength(2000);

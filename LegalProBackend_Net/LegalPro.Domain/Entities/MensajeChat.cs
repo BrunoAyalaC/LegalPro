@@ -8,7 +8,7 @@ namespace LegalPro.Domain.Entities;
 /// Persiste el historial de conversaciones legales por usuario y organización.
 /// Permite retomar conversaciones entre sesiones (multi-turn persistido).
 /// </summary>
-public class MensajeChat : BaseEntity
+public class MensajeChat : BaseGuidEntity
 {
     public Guid UsuarioId { get; private set; }
     public Guid? OrganizationId { get; private set; }
@@ -35,6 +35,7 @@ public class MensajeChat : BaseEntity
 
         return new MensajeChat
         {
+            Id = Guid.NewGuid(),
             UsuarioId = usuarioId,
             OrganizationId = organizationId,
             Rol = rol,
