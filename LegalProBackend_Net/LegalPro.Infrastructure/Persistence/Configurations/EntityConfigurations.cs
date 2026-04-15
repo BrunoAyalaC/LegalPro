@@ -172,7 +172,9 @@ public class OrganizacionConfiguration : IEntityTypeConfiguration<Organizacion>
         builder.Property(o => o.Slug).HasMaxLength(100).IsRequired();
 
         builder.Property(o => o.Plan)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<PlanTipo>(v, true))
             .HasMaxLength(20)
             .IsRequired();
 
@@ -211,7 +213,9 @@ public class MiembroOrganizacionConfiguration : IEntityTypeConfiguration<Miembro
         builder.HasIndex(m => new { m.OrganizacionId, m.UsuarioId }).IsUnique();
 
         builder.Property(m => m.Rol)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<RolMiembro>(v, true))
             .HasMaxLength(20)
             .IsRequired();
 
@@ -239,7 +243,9 @@ public class InvitacionOrganizacionConfiguration : IEntityTypeConfiguration<Invi
         builder.Property(i => i.Token).HasMaxLength(256).IsRequired();
 
         builder.Property(i => i.Rol)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<RolUsuario>(v, true))
             .HasMaxLength(50)
             .IsRequired();
 
