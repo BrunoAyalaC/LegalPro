@@ -160,9 +160,33 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 // Override connection string if DATABASE_URL is provided by Railway
-if (!string.IsNullOrEmpty(builder.Configuration["DATABASE_URL"]))
+// Railway injects DATABASE_URL in URI format (postgresql://user:pass@host:5432/db)
+// Npgsql requires key-value format — convert explicitly to avoid "initialization string" errors
+var rawDbUrl = builder.Configuration["DATABASE_URL"] ?? builder.Configuration["DATABASE_PUBLIC_URL"];
+if (!string.IsNullOrEmpty(rawDbUrl))
 {
-    connectionString = builder.Configuration["DATABASE_URL"];
+    if (rawDbUrl.StartsWith("postgresql://") || rawDbUrl.StartsWith("postgres://"))
+    {
+        try
+        {
+            var uri = new Uri(rawDbUrl);
+            var userParts = uri.UserInfo.Split(':', 2);
+            var dbName = uri.AbsolutePath.TrimStart('/');
+            if (string.IsNullOrEmpty(dbName)) dbName = "railway";
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={dbName};" +
+                               $"Username={userParts[0]};Password={Uri.UnescapeDataString(userParts.Length > 1 ? userParts[1] : string.Empty)};" +
+                               "SSL Mode=Prefer;Trust Server Certificate=true;";
+        }
+        catch
+        {
+            // Si el parse falla, usar la URL directamente (Npgsql 6+ la acepta en algunos contextos)
+            connectionString = rawDbUrl;
+        }
+    }
+    else
+    {
+        connectionString = rawDbUrl;
+    }
 }
 
 // Configuration values with Railway environment variable priority
