@@ -38,7 +38,9 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .IsRequired();
 
         builder.Property(u => u.Especialidad)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<EspecialidadDerecho>(v, true))
             .HasMaxLength(50);
 
         builder.Property(u => u.EstaActivo)
@@ -67,11 +69,15 @@ public class ExpedienteConfiguration : IEntityTypeConfiguration<Expediente>
             .IsRequired();
 
         builder.Property(e => e.Tipo)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<TipoRamaProcesal>(v, true))
             .HasMaxLength(50);
 
         builder.Property(e => e.Estado)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<EstadoExpediente>(v, true))
             .HasMaxLength(50);
 
         builder.HasOne(e => e.Usuario)
@@ -92,7 +98,9 @@ public class SimulacionConfiguration : IEntityTypeConfiguration<Simulacion>
         builder.HasKey(s => s.Id);
 
         builder.Property(s => s.RamaDerecho)
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString().ToUpperInvariant(),
+                v => Enum.Parse<TipoRamaProcesal>(v, true))
             .HasMaxLength(50);
 
         builder.Property(s => s.RolUsuario)
