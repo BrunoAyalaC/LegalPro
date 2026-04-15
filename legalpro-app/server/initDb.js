@@ -35,6 +35,21 @@ export async function initDb() {
         console.error('[initDb] Patch columnas ERROR:', patchErr.message);
       }
 
+      // Patch: hacer el check de rol case-insensitive para compatibilidad .NET (PascalCase) / Node (UPPERCASE)
+      try {
+        await db.query(`
+          ALTER TABLE usuarios DROP CONSTRAINT IF EXISTS usuarios_rol_check;
+          ALTER TABLE usuarios ADD CONSTRAINT usuarios_rol_check
+            CHECK (UPPER(rol) IN ('ABOGADO', 'JUEZ', 'FISCAL', 'CONTADOR', 'ADMIN'));
+          ALTER TABLE miembros_organizacion DROP CONSTRAINT IF EXISTS miembros_organizacion_rol_check;
+          ALTER TABLE miembros_organizacion ADD CONSTRAINT miembros_organizacion_rol_check
+            CHECK (UPPER(rol) IN ('OWNER', 'ADMIN', 'MEMBER', 'VIEWER'));
+        `);
+        console.log('[initDb] Constraints de rol actualizadas a case-insensitive.');
+      } catch (constraintErr) {
+        console.error('[initDb] Patch constraints ERROR:', constraintErr.message);
+      }
+
       // Diagnosticar INSERT
       console.log('[initDb] Diagnosticando INSERT...');      const cols = await db.query(
         `SELECT column_name, data_type FROM information_schema.columns
