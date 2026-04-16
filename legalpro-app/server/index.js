@@ -9,6 +9,9 @@ import geminiRoutes from './routes/gemini.js';
 import { initDb } from './initDb.js';
 
 const app = express();
+// Confiar en el reverse proxy de Railway para identificar IPs reales
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
 
