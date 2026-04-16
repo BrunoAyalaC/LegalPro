@@ -12,7 +12,8 @@ public enum RolUsuario
     Abogado,
     Fiscal,
     Juez,
-    Contador
+    Contador,
+    Admin
 }
 
 public enum EspecialidadDerecho
