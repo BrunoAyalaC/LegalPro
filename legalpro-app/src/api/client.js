@@ -1,10 +1,10 @@
 // En dev: usa proxy de Vite (/api → localhost)
 // En producción (Railway): VITE_NODE_API_URL apunta al backend Node, VITE_DOTNET_API_URL al backend .NET
-const NODE_API   = import.meta.env.VITE_NODE_API_URL   ?? '';
-const DOTNET_API = import.meta.env.VITE_DOTNET_API_URL ?? '';
+const NODE_API   = import.meta.env.VITE_NODE_API_URL   || 'https://legalpro-node-production-34ac.up.railway.app';
+const DOTNET_API = import.meta.env.VITE_DOTNET_API_URL || 'https://legalpro-dotnet-production-5a39.up.railway.app';
 
-// Rutas que maneja .NET (expedientes, documentos — business logic)
-const DOTNET_PREFIXES = ['/expedientes', '/documentos'];
+// Rutas que maneja .NET (auth, expedientes, documentos, organizaciones — business logic)
+const DOTNET_PREFIXES = ['/auth', '/expedientes', '/documentos', '/organizaciones'];
 
 function resolveBase(url) {
   return DOTNET_PREFIXES.some(p => url.startsWith(p)) ? `${DOTNET_API}/api` : `${NODE_API}/api`;
