@@ -27,6 +27,20 @@ export async function initDb() {
             ADD COLUMN IF NOT EXISTS es_admin_organizacion BOOLEAN NOT NULL DEFAULT FALSE;
           ALTER TABLE usuarios
             ADD COLUMN IF NOT EXISTS organizacion_id UUID REFERENCES organizaciones(id) ON DELETE SET NULL;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS email_hash TEXT;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS datos_anonimizados BOOLEAN NOT NULL DEFAULT FALSE;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS terminos_aceptados_en TIMESTAMPTZ;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS terminos_version TEXT DEFAULT '1.0';
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS privacidad_aceptada_en TIMESTAMPTZ;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS privacidad_version TEXT DEFAULT '1.0';
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS eliminado_en TIMESTAMPTZ;
           ALTER TABLE expedientes
             ADD COLUMN IF NOT EXISTS es_urgente BOOLEAN NOT NULL DEFAULT FALSE;
           ALTER TABLE miembros_organizacion
@@ -69,6 +83,27 @@ export async function initDb() {
         console.log('[initDb] Constraints de rol y plan actualizadas a case-insensitive.');
       } catch (constraintErr) {
         console.error('[initDb] Patch constraints ERROR:', constraintErr.message);
+      }
+
+      // Patch: tabla consentimientos para trazabilidad legal LPDP/GDPR
+      try {
+        await db.query(`
+          CREATE TABLE IF NOT EXISTS consentimientos (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            usuario_id UUID NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+            tipo TEXT NOT NULL CHECK (tipo IN ('terminos', 'privacidad', 'marketing', 'eliminacion')),
+            version TEXT NOT NULL DEFAULT '1.0',
+            aceptado BOOLEAN NOT NULL DEFAULT TRUE,
+            ip_address INET,
+            user_agent TEXT,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          );
+          CREATE INDEX IF NOT EXISTS idx_consentimientos_usuario ON consentimientos(usuario_id);
+          CREATE INDEX IF NOT EXISTS idx_consentimientos_tipo ON consentimientos(usuario_id, tipo);
+        `);
+        console.log('[initDb] Tabla consentimientos verificada/creada.');
+      } catch (consentErr) {
+        console.error('[initDb] Patch consentimientos ERROR:', consentErr.message);
       }
 
       return;

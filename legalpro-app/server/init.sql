@@ -60,22 +60,26 @@ CREATE INDEX IF NOT EXISTS idx_organizaciones_activo ON organizaciones(activo);
 -- TABLA: usuarios (Auth propio — reemplaza Supabase Auth)
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS usuarios (
-    id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    email             TEXT        NOT NULL UNIQUE,
-    nombre_completo   TEXT        NOT NULL,
-    password_hash     TEXT        NOT NULL,
-    rol               TEXT        NOT NULL DEFAULT 'ABOGADO'
-                                  CHECK (rol IN ('ABOGADO', 'JUEZ', 'FISCAL', 'CONTADOR', 'ADMIN')),
-    especialidad      TEXT        DEFAULT 'GENERAL',
-    esta_activo       BOOLEAN     NOT NULL DEFAULT TRUE,
-    organization_id   UUID        REFERENCES organizaciones(id) ON DELETE SET NULL,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at        TIMESTAMPTZ
+    id                                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    email                                   TEXT        NOT NULL UNIQUE,
+    nombre_completo                         TEXT        NOT NULL,
+    password_hash                           TEXT        NOT NULL,
+    rol                                     TEXT        NOT NULL DEFAULT 'ABOGADO'
+                                            CHECK (rol IN ('ABOGADO', 'JUEZ', 'FISCAL', 'CONTADOR', 'ADMIN')),
+    especialidad                            TEXT        DEFAULT 'GENERAL',
+    esta_activo                             BOOLEAN     NOT NULL DEFAULT TRUE,
+    organization_id                         UUID        REFERENCES organizaciones(id) ON DELETE SET NULL,
+    acepta_transferencia_internacional      BOOLEAN     NOT NULL DEFAULT FALSE,
+    transferencia_internacional_aceptada_en TIMESTAMPTZ,
+    created_at                              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                              TIMESTAMPTZ
 );
 
 COMMENT ON TABLE  usuarios              IS 'Usuarios del sistema con auth propio (JWT + bcrypt)';
 COMMENT ON COLUMN usuarios.password_hash IS 'Hash bcrypt de la contraseña (cost=12)';
 COMMENT ON COLUMN usuarios.rol          IS 'Rol principal: ABOGADO | JUEZ | FISCAL | CONTADOR | ADMIN';
+COMMENT ON COLUMN usuarios.acepta_transferencia_internacional IS 'Consentimiento expreso para transferencia de datos a proveedores cloud extranjeros (Art. 21 LPDP)';
+COMMENT ON COLUMN usuarios.transferencia_internacional_aceptada_en IS 'Timestamp de aceptación del consentimiento para transferencia internacional';
 
 CREATE TRIGGER trg_usuarios_updated_at
     BEFORE UPDATE ON usuarios
@@ -123,31 +127,54 @@ CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_revocado ON refresh_tokens(expires_at, revocado);
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- TABLA: consentimientos (trazabilidad legal LPDP/GDPR)
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS consentimientos (
+    id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    usuario_id        UUID        NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    tipo              TEXT        NOT NULL CHECK (tipo IN ('terminos', 'privacidad', 'marketing', 'eliminacion')),
+    version           TEXT        NOT NULL DEFAULT '1.0',
+    aceptado          BOOLEAN     NOT NULL DEFAULT TRUE,
+    ip_address        INET,
+    user_agent        TEXT,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_consentimientos_usuario ON consentimientos(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_consentimientos_tipo ON consentimientos(usuario_id, tipo);
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- TABLA: expedientes
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS expedientes (
-    id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    usuario_id        UUID        REFERENCES usuarios(id) ON DELETE RESTRICT,
-    organization_id   UUID        NOT NULL REFERENCES organizaciones(id) ON DELETE CASCADE,
-    numero            TEXT        NOT NULL UNIQUE,
-    titulo            TEXT        NOT NULL,
-    tipo              TEXT        DEFAULT 'civil'
+    id                          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    usuario_id                  UUID        REFERENCES usuarios(id) ON DELETE RESTRICT,
+    organization_id             UUID        NOT NULL REFERENCES organizaciones(id) ON DELETE CASCADE,
+    numero                      TEXT        NOT NULL UNIQUE,
+    titulo                      TEXT        NOT NULL,
+    tipo                        TEXT        DEFAULT 'civil'
                                   CHECK (tipo IN ('penal', 'civil', 'laboral', 'constitucional', 'familia', 'administrativo')),
-    estado            TEXT        DEFAULT 'activo'
+    estado                      TEXT        DEFAULT 'activo'
                                   CHECK (estado IN ('activo', 'archivado', 'cerrado', 'suspendido')),
-    juzgado           TEXT,
-    partes            JSONB       DEFAULT '{}',
-    hechos            TEXT,
-    teoria_caso       TEXT,
-    materia           TEXT,
-    tipo_proceso      TEXT,
-    numero_expediente TEXT,
-    es_urgente        BOOLEAN     NOT NULL DEFAULT FALSE,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at        TIMESTAMPTZ
+    juzgado                     TEXT,
+    partes                      JSONB       DEFAULT '{}',
+    hechos                      TEXT,
+    teoria_caso                 TEXT,
+    materia                     TEXT,
+    tipo_proceso                TEXT,
+    numero_expediente           TEXT,
+    es_urgente                  BOOLEAN     NOT NULL DEFAULT FALSE,
+    es_dato_sensible            BOOLEAN     NOT NULL DEFAULT FALSE,
+    contenido_sensible_detectado BOOLEAN    NOT NULL DEFAULT FALSE,
+    metadata_sensibilidad       JSONB       NOT NULL DEFAULT '{}',
+    created_at                  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                  TIMESTAMPTZ
 );
 
 COMMENT ON TABLE expedientes IS 'Expedientes judiciales — núcleo del sistema legal';
+COMMENT ON COLUMN expedientes.es_dato_sensible IS 'Flag: TRUE si el expediente contiene datos sensibles según LPDP (salud, ideología, origen racial, etc.)';
+COMMENT ON COLUMN expedientes.contenido_sensible_detectado IS 'TRUE si la detección automática identificó posibles datos sensibles en hechos/teoria_caso';
+COMMENT ON COLUMN expedientes.metadata_sensibilidad IS 'Metadata JSON con detalles de la detección de datos sensibles: {detectado_en, patrones, severidad}';
 
 CREATE TRIGGER trg_expedientes_updated_at
     BEFORE UPDATE ON expedientes
@@ -268,23 +295,26 @@ CREATE INDEX IF NOT EXISTS idx_invitaciones_org ON invitaciones_organizacion(org
 -- TABLA: documentos
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS documentos (
-    id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    expediente_id     UUID        REFERENCES expedientes(id) ON DELETE CASCADE,
-    usuario_id        UUID        REFERENCES usuarios(id),
-    organization_id   UUID        NOT NULL REFERENCES organizaciones(id) ON DELETE CASCADE,
-    nombre            TEXT        NOT NULL,
-    tipo_documento    TEXT        NOT NULL,
-    descripcion       TEXT,
-    archivo_url       TEXT,
-    archivo_nombre    TEXT,
-    archivo_tipo      TEXT,
-    archivo_tamano    BIGINT,
-    hash_sha256       TEXT,
-    etiquetas         TEXT[]      DEFAULT '{}',
-    relacionado_con   UUID        REFERENCES documentos(id),
-    fecha_documento   DATE,
-    creado_en         TIMESTAMPTZ DEFAULT now(),
-    actualizado_en    TIMESTAMPTZ DEFAULT now()
+    id                          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    expediente_id               UUID        REFERENCES expedientes(id) ON DELETE CASCADE,
+    usuario_id                  UUID        REFERENCES usuarios(id),
+    organization_id             UUID        NOT NULL REFERENCES organizaciones(id) ON DELETE CASCADE,
+    nombre                      TEXT        NOT NULL,
+    tipo_documento              TEXT        NOT NULL,
+    descripcion                 TEXT,
+    archivo_url                 TEXT,
+    archivo_nombre              TEXT,
+    archivo_tipo                TEXT,
+    archivo_tamano              BIGINT,
+    hash_sha256                 TEXT,
+    etiquetas                   TEXT[]      DEFAULT '{}',
+    relacionado_con             UUID        REFERENCES documentos(id),
+    fecha_documento             DATE,
+    es_dato_sensible            BOOLEAN     NOT NULL DEFAULT FALSE,
+    contenido_sensible_detectado BOOLEAN    NOT NULL DEFAULT FALSE,
+    metadata_sensibilidad       JSONB       NOT NULL DEFAULT '{}',
+    creado_en                   TIMESTAMPTZ DEFAULT now(),
+    actualizado_en              TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_documentos_expediente_id ON documentos(expediente_id);
@@ -507,7 +537,7 @@ VALUES (
 
 -- Usuario admin demo (password: Admin2024! → bcrypt cost=12)
 -- Hash pre-generado: para cambiar, generar con: node -e "require('bcryptjs').hash('Admin2024!',12).then(console.log)"
-INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, organization_id)
+INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, acepta_transferencia_internacional, transferencia_internacional_aceptada_en, organization_id)
 VALUES (
     '00000000-0000-0000-0000-000000000010',
     'admin@legalpro.pe',
@@ -516,11 +546,13 @@ VALUES (
     'ADMIN',
     'GENERAL',
     TRUE,
+    TRUE,
+    NOW(),
     '00000000-0000-0000-0000-000000000001'
 ) ON CONFLICT (email) DO NOTHING;
 
 -- Usuario abogado demo (password: Abogado2024!)
-INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, organization_id)
+INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, acepta_transferencia_internacional, transferencia_internacional_aceptada_en, organization_id)
 VALUES (
     '00000000-0000-0000-0000-000000000011',
     'abogado@legalpro.pe',
@@ -529,11 +561,13 @@ VALUES (
     'ABOGADO',
     'CIVIL',
     TRUE,
+    TRUE,
+    NOW(),
     '00000000-0000-0000-0000-000000000001'
 ) ON CONFLICT (email) DO NOTHING;
 
 -- Usuario fiscal demo (password: Fiscal2024!)
-INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, organization_id)
+INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, acepta_transferencia_internacional, transferencia_internacional_aceptada_en, organization_id)
 VALUES (
     '00000000-0000-0000-0000-000000000012',
     'fiscal@legalpro.pe',
@@ -542,11 +576,13 @@ VALUES (
     'FISCAL',
     'PENAL',
     TRUE,
+    TRUE,
+    NOW(),
     '00000000-0000-0000-0000-000000000001'
 ) ON CONFLICT (email) DO NOTHING;
 
 -- Usuario juez demo (password: Juez2024!)
-INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, organization_id)
+INSERT INTO usuarios (id, email, nombre_completo, password_hash, rol, especialidad, esta_activo, acepta_transferencia_internacional, transferencia_internacional_aceptada_en, organization_id)
 VALUES (
     '00000000-0000-0000-0000-000000000013',
     'juez@legalpro.pe',
@@ -555,6 +591,8 @@ VALUES (
     'JUEZ',
     'CONSTITUCIONAL',
     TRUE,
+    TRUE,
+    NOW(),
     '00000000-0000-0000-0000-000000000001'
 ) ON CONFLICT (email) DO NOTHING;
 
@@ -571,3 +609,85 @@ ON CONFLICT (organizacion_id, usuario_id) DO NOTHING;
 INSERT INTO suscripciones (organization_id, plan, estado, precio_mensual)
 VALUES ('00000000-0000-0000-0000-000000000001', 'pro', 'activa', 99.00)
 ON CONFLICT DO NOTHING;
+
+-- =============================================================================
+-- SECCIÓN 5: FUNCIÓN DE DETECCIÓN DE DATOS SENSIBLES (LPDP Perú)
+-- =============================================================================
+-- Detecta automáticamente si un texto contiene datos sensibles según
+-- Art. 4 inc. 7 LPDP: salud, ideología política, origen racial, filiación sindical,
+-- datos biométricos, orientación sexual, creencias religiosas.
+-- =============================================================================
+CREATE OR REPLACE FUNCTION detectar_datos_sensibles(p_texto TEXT)
+RETURNS JSONB AS $$
+DECLARE
+    v_resultado JSONB;
+    v_patrones_encontrados TEXT[] := ARRAY[]::TEXT[];
+    v_severidad TEXT := 'ninguna';
+    v_es_sensible BOOLEAN := FALSE;
+BEGIN
+    IF p_texto IS NULL OR p_texto = '' THEN
+        RETURN jsonb_build_object(
+            'es_sensible', FALSE,
+            'severidad', 'ninguna',
+            'patrones', ARRAY[]::TEXT[],
+            'recomendacion', 'Sin contenido para analizar'
+        );
+    END IF;
+
+    -- Patrones de datos sensibles (case-insensitive)
+    IF p_texto ~* '(salud|enfermedad|hospital|clínica|diagnóstico|tratamiento médico|discapacidad|psicólogo|psiquiatría|VIH|SIDA|cáncer|diabetes|hipertensión)' THEN
+        v_patrones_encontrados := array_append(v_patrones_encontrados, 'salud');
+    END IF;
+
+    IF p_texto ~* '(ideología política|partido político|militante|simpatizante|comunista|socialista|liberal|conservador|aprista|fujimorista|política partidaria)' THEN
+        v_patrones_encontrados := array_append(v_patrones_encontrados, 'ideología_politica');
+    END IF;
+
+    IF p_texto ~* '(origen racial|etnia|indígena|afroperuano|mestizo|raza|discriminación racial|comunidad nativa)' THEN
+        v_patrones_encontrados := array_append(v_patrones_encontrados, 'origen_racial');
+    END IF;
+
+    IF p_texto ~* '(sindicato|sindical|filiación sindical|grema|gremio|trabajadores sindicalizados|huelga|negociación colectiva)' THEN
+        v_patrones_encontrados := array_append(v_patrones_encontrados, 'filiacion_sindical');
+    END IF;
+
+    IF p_texto ~* '(biométrico|huella dactilar|reconocimiento facial|iris|ADN|genética|marcadores genéticos)' THEN
+        v_patrones_encontrados := array_append(v_patrones_encontrados, 'datos_biometricos');
+    END IF;
+
+    IF p_texto ~* '(orientación sexual|homosexual|gay|lesbiana|bisexual|transgénero|LGBT|identidad de género)' THEN
+        v_patrones_encontrados := array_append(v_patrones_encontrados, 'orientacion_sexual');
+    END IF;
+
+    IF p_texto ~* '(creencia religiosa|religión|católico|evangélico|protestante|judío|musulmán|ateo|agnóstico|iglesia|templo)' THEN
+        v_patrones_encontrados := array_append(v_patrones_encontrados, 'creencias_religiosas');
+    END IF;
+
+    -- Determinar severidad
+    v_es_sensible := array_length(v_patrones_encontrados, 1) > 0;
+    
+    IF array_length(v_patrones_encontrados, 1) >= 3 THEN
+        v_severidad := 'alta';
+    ELSIF array_length(v_patrones_encontrados, 1) >= 2 THEN
+        v_severidad := 'media';
+    ELSIF array_length(v_patrones_encontrados, 1) = 1 THEN
+        v_severidad := 'baja';
+    END IF;
+
+    v_resultado := jsonb_build_object(
+        'es_sensible', v_es_sensible,
+        'severidad', v_severidad,
+        'patrones', v_patrones_encontrados,
+        'recomendacion', CASE 
+            WHEN v_severidad = 'alta' THEN 'ALERTA: Se detectaron múltiples categorías de datos sensibles. Se requiere consentimiento expreso adicional y medidas de seguridad reforzadas (Art. 4 inc. 7 LPDP).'
+            WHEN v_severidad = 'media' THEN 'ATENCIÓN: Se detectaron datos sensibles. Se recomienda verificar consentimiento explícito del titular.'
+            WHEN v_severidad = 'baja' THEN 'Precaución: Posible dato sensible detectado. Revise el contenido antes de procesar.'
+            ELSE 'No se detectaron datos sensibles en el contenido analizado.'
+        END
+    );
+
+    RETURN v_resultado;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+COMMENT ON FUNCTION detectar_datos_sensibles IS 'Detecta datos sensibles según LPDP peruana (Art. 4 inc. 7) en texto plano. Retorna JSON con severidad y recomendación.';

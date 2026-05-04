@@ -29,7 +29,7 @@ function generateToken(usuario, organizacion) {
     payload.plan = organizacion.plan;
     payload.usuarios_max = organizacion.max_usuarios;
     payload.expedientes_max = organizacion.max_expedientes;
-    payload.rol_org = organizacion.rol_miembro; // OWNER | ADMIN | MEMBER | VIEWER
+    payload.rol_org = organizacion.rol_miembro;
     payload.is_org_admin = ['OWNER', 'ADMIN'].includes(organizacion.rol_miembro);
   }
 
@@ -43,11 +43,19 @@ function generateToken(usuario, organizacion) {
 /**
  * POST /api/auth/register
  * Registra un usuario nuevo (sin organización — debe crear/unirse después).
+ * REQUIERE consentimiento explícito de Términos y Privacidad (LPDP Perú).
  */
 router.post('/register', async (req, res, next) => {
   try {
-    // Guard: si req.body es undefined (Content-Type ausente o body vacío)
-    const { nombreCompleto, email, password, rol = 'ABOGADO', especialidad = 'GENERAL' } = req.body ?? {};
+    const {
+      nombreCompleto,
+      email,
+      password,
+      rol = 'ABOGADO',
+      especialidad = 'GENERAL',
+      aceptaTerminos,
+      aceptaPrivacidad,
+    } = req.body ?? {};
 
     if (!nombreCompleto || !email || !password) {
       return res.status(400).json({ error: 'nombreCompleto, email y password son obligatorios.' });
@@ -55,15 +63,18 @@ router.post('/register', async (req, res, next) => {
     if (password.length < 8) {
       return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' });
     }
+    if (aceptaTerminos !== true || aceptaPrivacidad !== true) {
+      return res.status(400).json({ error: 'Debe aceptar los Términos y Condiciones y la Política de Privacidad para registrarse.' });
+    }
 
     const rolesPermitidos = ['ABOGADO', 'JUEZ', 'FISCAL', 'CONTADOR'];
     if (!rolesPermitidos.includes(rol.toUpperCase())) {
       return res.status(400).json({ error: `Rol inválido. Valores permitidos: ${rolesPermitidos.join(', ')}.` });
     }
 
-    // Verificar email duplicado
+    // Verificar email duplicado (solo usuarios no eliminados)
     const { rows: existing } = await db.query(
-      'SELECT id FROM usuarios WHERE email = $1',
+      'SELECT id FROM usuarios WHERE email = $1 AND eliminado_en IS NULL',
       [email.toLowerCase().trim()]
     );
     if (existing.length > 0) {
@@ -71,27 +82,51 @@ router.post('/register', async (req, res, next) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
+    const ahora = new Date().toISOString();
+    const versionTerminos = '1.0';
+    const versionPrivacidad = '1.0';
 
-    let inserted;
+    const result = await db.query(
+      `INSERT INTO usuarios (
+         nombre_completo, email, password_hash, rol, especialidad, esta_activo,
+         terminos_aceptados_en, terminos_version,
+         privacidad_aceptada_en, privacidad_version,
+         created_at
+       )
+       VALUES ($1, $2, $3, $4, $5, TRUE, $6, $7, $8, $9, NOW())
+       RETURNING *`,
+      [
+        nombreCompleto.trim(),
+        email.toLowerCase().trim(),
+        passwordHash,
+        rol.toUpperCase(),
+        especialidad.toUpperCase(),
+        ahora,
+        versionTerminos,
+        ahora,
+        versionPrivacidad,
+      ]
+    );
+    const usuario = result.rows[0];
+    if (!usuario) return res.status(500).json({ error: 'Error al crear usuario. Inténtelo de nuevo.' });
+
+    // Registrar consentimientos en tabla de trazabilidad
     try {
-      const result = await db.query(
-        `INSERT INTO usuarios (nombre_completo, email, password_hash, rol, especialidad, esta_activo, created_at)
-         VALUES ($1, $2, $3, $4, $5, TRUE, NOW())
-         RETURNING *`,
+      await db.query(
+        `INSERT INTO consentimientos (usuario_id, tipo, version, aceptado, ip_address, user_agent, created_at)
+         VALUES ($1, 'terminos', $2, TRUE, $3, $4, NOW()),
+                ($1, 'privacidad', $5, TRUE, $3, $4, NOW())`,
         [
-          nombreCompleto.trim(),
-          email.toLowerCase().trim(),
-          passwordHash,
-          rol.toUpperCase(),
-          especialidad.toUpperCase(),
+          usuario.id,
+          versionTerminos,
+          req.ip ?? null,
+          req.headers['user-agent'] ?? null,
+          versionPrivacidad,
         ]
       );
-      inserted = result.rows;
-    } catch (insertErr) {
-      throw insertErr;
+    } catch (consentErr) {
+      console.warn('[auth] No se pudo registrar consentimiento:', consentErr.message);
     }
-    const usuario = inserted[0];
-    if (!usuario) return res.status(500).json({ error: 'Error al crear usuario. Inténtelo de nuevo.' });
 
     const token = generateToken(usuario, null);
     return res.status(201).json({
@@ -114,7 +149,6 @@ router.post('/register', async (req, res, next) => {
  */
 router.post('/login', async (req, res, next) => {
   try {
-    // Guard: si req.body es undefined (Content-Type ausente o body malformado)
     const { email, password } = req.body ?? {};
 
     if (!email || !password) {
@@ -134,7 +168,7 @@ router.post('/login', async (req, res, next) => {
        FROM usuarios u
        LEFT JOIN miembros_organizacion mo ON mo.usuario_id = u.id AND mo.activo = TRUE
        LEFT JOIN organizaciones o ON o.id = mo.organizacion_id
-       WHERE u.email = $1 AND u.esta_activo = TRUE
+       WHERE u.email = $1 AND u.esta_activo = TRUE AND u.eliminado_en IS NULL
        LIMIT 1`,
       [email.toLowerCase().trim()]
     );
@@ -149,7 +183,6 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ error: 'Credenciales incorrectas.' });
     }
 
-    // Construir org desde la fila JOIN
     const org = usuario.org_id
       ? {
           id: usuario.org_id,
@@ -188,9 +221,72 @@ router.post('/login', async (req, res, next) => {
 });
 
 /**
+ * DELETE /api/auth/cuenta
+ * Ejercicio del derecho al olvido (LPDP Perú / GDPR).
+ * Soft delete + anonimización + eliminación hard de chats y datos sensibles.
+ */
+router.delete('/cuenta', authMiddleware, async (req, res, next) => {
+  try {
+    const usuarioId = req.user.sub;
+    const ahora = new Date().toISOString();
+
+    const { rows: userRows } = await db.query(
+      'SELECT email FROM usuarios WHERE id = $1 AND eliminado_en IS NULL',
+      [usuarioId]
+    );
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado o ya eliminado.' });
+    }
+    const emailOriginal = userRows[0].email;
+
+    const crypto = await import('crypto');
+    const emailHash = crypto.createHash('sha256').update(emailOriginal + process.env.JWT_SECRET).digest('hex');
+
+    await db.query(
+      `UPDATE usuarios
+       SET nombre_completo = 'Usuario Eliminado',
+           email = $1,
+           email_hash = $2,
+           password_hash = '[REVOKED]',
+           esta_activo = FALSE,
+           datos_anonimizados = TRUE,
+           eliminado_en = NOW(),
+           updated_at = NOW()
+       WHERE id = $3`,
+      [`deleted-${emailHash.slice(0, 16)}@legalpro.pe`, emailHash, usuarioId]
+    );
+
+    await db.query('DELETE FROM mensajes_chat WHERE usuario_id = $1', [usuarioId]);
+
+    const { rows: simRows } = await db.query('SELECT id FROM simulaciones WHERE usuario_id = $1', [usuarioId]);
+    for (const sim of simRows) {
+      await db.query('DELETE FROM eventos_simulacion WHERE simulacion_id = $1', [sim.id]);
+    }
+    await db.query('DELETE FROM simulaciones WHERE usuario_id = $1', [usuarioId]);
+
+    await db.query('DELETE FROM refresh_tokens WHERE usuario_id = $1', [usuarioId]);
+
+    try {
+      await db.query(
+        `INSERT INTO consentimientos (usuario_id, tipo, version, aceptado, ip_address, user_agent, created_at)
+         VALUES ($1, 'eliminacion', '1.0', TRUE, $2, $3, NOW())`,
+        [usuarioId, req.ip ?? null, req.headers['user-agent'] ?? null]
+      );
+    } catch (consentErr) {
+      console.warn('[auth] No se pudo registrar consentimiento de eliminación:', consentErr.message);
+    }
+
+    return res.json({
+      mensaje: 'Cuenta eliminada exitosamente. Sus datos personales han sido anonimizados y sus conversaciones eliminadas.',
+      eliminadoEn: ahora,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
  * GET /api/auth/me — Retorna perfil del usuario autenticado + JWT refrescado con claims tenant.
- * NOTA: Regenera el token para que el frontend tenga claims actualizados
- * (p.ej. después de crear o unirse a una organización).
  */
 router.get('/me', authMiddleware, async (req, res, next) => {
   try {
@@ -206,7 +302,7 @@ router.get('/me', authMiddleware, async (req, res, next) => {
        FROM usuarios u
        LEFT JOIN miembros_organizacion mo ON mo.usuario_id = u.id AND mo.activo = TRUE
        LEFT JOIN organizaciones o ON o.id = mo.organizacion_id
-       WHERE u.id = $1
+       WHERE u.id = $1 AND u.eliminado_en IS NULL
        LIMIT 1`,
       [req.user.sub]
     );
@@ -228,7 +324,6 @@ router.get('/me', authMiddleware, async (req, res, next) => {
         }
       : null;
 
-    // Regenerar token con claims actualizados
     const token = generateToken(usuario, org);
 
     return res.json({

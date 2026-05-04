@@ -2,34 +2,43 @@ import { Router } from 'express';
 import crypto from 'crypto';
 import db from '../db.js';
 import { authMiddleware, tenantMiddleware, requireRole } from '../middleware/authMiddleware.js';
+import { validate } from '../middleware/validate.js';
+import { createOrganizacionSchema } from '../schemas/organizacionSchema.js';
+import { OrganizacionRepository } from '../repositories/OrganizacionRepository.js';
 
 const router = Router();
+const organizacionRepo = new OrganizacionRepository(db);
 
 // ─── PLAN LIMITS ─────────────────────────────────────────────────────────────
 const PLAN_LIMITS = {
-  FREE:       { max_usuarios: 3,   max_expedientes: 10  },
-  PRO:        { max_usuarios: 15,  max_expedientes: 200 },
-  ENTERPRISE: { max_usuarios: 100, max_expedientes: 5000 },
+  BASICO:       { dbValue: 'basico',       max_usuarios: 3,   max_expedientes: 10  },
+  PROFESIONAL:  { dbValue: 'profesional',  max_usuarios: 15,  max_expedientes: 200 },
+  EMPRESA:      { dbValue: 'empresa',      max_usuarios: 100, max_expedientes: 5000 },
 };
+
+const PLAN_ALIASES = {
+  FREE: 'BASICO',
+  PRO: 'PROFESIONAL',
+  ENTERPRISE: 'EMPRESA',
+};
+
+function normalizePlan(plan) {
+  const key = String(plan || 'BASICO').trim().toUpperCase();
+  return PLAN_ALIASES[key] || key;
+}
 
 // ─── POST /api/organizaciones ─────────────────────────────────────────────────
 // Crea una nueva organización y convierte al usuario en OWNER.
-router.post('/', authMiddleware, async (req, res, next) => {
+router.post('/', authMiddleware, validate(createOrganizacionSchema), async (req, res, next) => {
   try {
-    const { nombre, plan = 'FREE' } = req.body;
+    const { nombre, plan } = req.body;
     const usuarioId = req.user.sub;
 
-    if (!nombre?.trim()) {
-      return res.status(400).json({ error: 'El nombre de la organización es obligatorio.' });
-    }
-
-    const planesValidos = Object.keys(PLAN_LIMITS);
-    if (!planesValidos.includes(plan.toUpperCase())) {
-      return res.status(400).json({ error: `Plan inválido. Valores: ${planesValidos.join(', ')}.` });
-    }
-
-    const planKey = plan.toUpperCase();
+    const planKey = normalizePlan(plan);
     const limits = PLAN_LIMITS[planKey];
+    if (!limits) {
+      return res.status(400).json({ error: `Plan inválido. Valores: ${Object.keys(PLAN_LIMITS).join(', ')}.` });
+    }
 
     // Slug único a partir del nombre
     const slug = nombre.trim()
@@ -39,6 +48,8 @@ router.post('/', authMiddleware, async (req, res, next) => {
       .slice(0, 50) + '-' + crypto.randomBytes(3).toString('hex');
 
     // Verificar que el usuario no tenga ya una organización como OWNER
+    const ownerRol = await organizacionRepo.getMemberRole(null, usuarioId);
+    // getMemberRole requiere orgId; usamos query directa para este check global
     const { rows: ownerCheck } = await db.query(
       `SELECT mo.id FROM miembros_organizacion mo
        WHERE mo.usuario_id = $1 AND mo.rol = 'OWNER' AND mo.activo = TRUE
@@ -49,19 +60,9 @@ router.post('/', authMiddleware, async (req, res, next) => {
       return res.status(409).json({ error: 'Ya eres propietario de una organización.' });
     }
 
-    const { rows: orgRows } = await db.query(
-      `INSERT INTO organizaciones (nombre, slug, plan, max_usuarios, max_expedientes)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
-      [nombre.trim(), slug, planKey.toLowerCase(), limits.max_usuarios, limits.max_expedientes]
-    );
-    const org = orgRows[0];
-
-    // Crear membresía OWNER
-    await db.query(
-      `INSERT INTO miembros_organizacion (organizacion_id, usuario_id, rol, activo)
-       VALUES ($1, $2, 'OWNER', TRUE)`,
-      [org.id, usuarioId]
+    const org = await organizacionRepo.create(
+      { nombre, slug, plan: limits.dbValue, maxUsuarios: limits.max_usuarios, maxExpedientes: limits.max_expedientes },
+      usuarioId
     );
 
     return res.status(201).json({
@@ -79,15 +80,7 @@ router.get('/me', authMiddleware, tenantMiddleware, async (req, res, next) => {
   try {
     const orgId = req.organizationId;
 
-    const { rows } = await db.query(
-      `SELECT o.*,
-              (SELECT COUNT(*) FROM miembros_organizacion WHERE organizacion_id = o.id AND activo = TRUE) AS usuarios_usados,
-              (SELECT COUNT(*) FROM expedientes WHERE organization_id = o.id) AS expedientes_usados
-       FROM organizaciones o
-       WHERE o.id = $1`,
-      [orgId]
-    );
-    const org = rows[0] || null;
+    const org = await organizacionRepo.findById(orgId);
 
     if (!org) {
       return res.status(404).json({ error: 'Organización no encontrada.' });
@@ -113,15 +106,7 @@ router.get('/me/miembros', authMiddleware, tenantMiddleware, async (req, res, ne
   try {
     const orgId = req.organizationId;
 
-    const { rows: miembros } = await db.query(
-      `SELECT mo.id, mo.rol, mo.activo, mo.created_at,
-              u.id AS u_id, u.nombre_completo, u.email, u.rol AS u_rol, u.especialidad
-       FROM miembros_organizacion mo
-       JOIN usuarios u ON u.id = mo.usuario_id
-       WHERE mo.organizacion_id = $1 AND mo.activo = TRUE
-       ORDER BY mo.created_at ASC`,
-      [orgId]
-    );
+    const miembros = await organizacionRepo.findMembers(orgId);
 
     return res.json({
       miembros: miembros.map(m => ({
@@ -160,38 +145,21 @@ router.post('/invitar', authMiddleware, tenantMiddleware, requireRole(['OWNER', 
     }
 
     // Verificar límite de usuarios del plan
-    const { rows: orgRows } = await db.query(
-      'SELECT max_usuarios FROM organizaciones WHERE id = $1',
-      [orgId]
-    );
-    const { rows: countRows } = await db.query(
-      'SELECT COUNT(*) AS total FROM miembros_organizacion WHERE organizacion_id = $1 AND activo = TRUE',
-      [orgId]
-    );
-    if (parseInt(countRows[0].total, 10) >= (orgRows[0]?.max_usuarios ?? 3)) {
+    const maxUsuarios = await organizacionRepo.getMaxUsuarios(orgId);
+    const totalMiembros = await organizacionRepo.countActiveMembers(orgId);
+    if (totalMiembros >= maxUsuarios) {
       return res.status(402).json({ error: 'Límite de usuarios del plan alcanzado. Actualiza tu plan.' });
     }
 
     // Verificar invitación duplicada pendiente
-    const { rows: invExist } = await db.query(
-      `SELECT id FROM invitaciones_organizacion
-       WHERE organization_id = $1 AND email = $2 AND esta_aceptada = FALSE`,
-      [orgId, email.toLowerCase().trim()]
-    );
-    if (invExist.length > 0) {
+    const invExist = await organizacionRepo.findPendingInvitation(orgId, email);
+    if (invExist) {
       return res.status(409).json({ error: 'Ya existe una invitación pendiente para este email.' });
     }
 
     const token = crypto.randomBytes(32).toString('hex');
 
-    const { rows: invRows } = await db.query(
-      `INSERT INTO invitaciones_organizacion
-         (organization_id, email, rol, token, expira_at, invitado_por)
-       VALUES ($1, $2, $3, $4, NOW() + INTERVAL '7 days', $5)
-       RETURNING *`,
-      [orgId, email.toLowerCase().trim(), rolInvitado.toUpperCase(), token, req.user.sub]
-    );
-    const invitacion = invRows[0];
+    const invitacion = await organizacionRepo.createInvitation(orgId, email, rolInvitado, token, req.user.sub);
 
     return res.status(201).json({
       invitacion: {
@@ -218,16 +186,7 @@ router.post('/aceptar-invitacion', authMiddleware, async (req, res, next) => {
       return res.status(400).json({ error: 'El token de invitación es obligatorio.' });
     }
 
-    const { rows: invRows } = await db.query(
-      `SELECT inv.*, o.id AS o_id, o.nombre AS o_nombre, o.slug AS o_slug,
-              o.plan AS o_plan, o.max_usuarios, o.max_expedientes
-       FROM invitaciones_organizacion inv
-       JOIN organizaciones o ON o.id = inv.organization_id
-       WHERE inv.token = $1 AND inv.esta_aceptada = FALSE
-       LIMIT 1`,
-      [token]
-    );
-    const invitacion = invRows[0] || null;
+    const invitacion = await organizacionRepo.findInvitationByToken(token);
 
     if (!invitacion) {
       return res.status(404).json({ error: 'Invitación no encontrada o ya utilizada.' });
@@ -238,29 +197,16 @@ router.post('/aceptar-invitacion', authMiddleware, async (req, res, next) => {
     }
 
     // Verificar que no sea ya miembro
-    const { rows: memCheck } = await db.query(
-      `SELECT id FROM miembros_organizacion
-       WHERE organizacion_id = $1 AND usuario_id = $2
-       LIMIT 1`,
-      [invitacion.organization_id, usuarioId]
-    );
-    if (memCheck.length > 0) {
+    const yaMiembro = await organizacionRepo.isMember(invitacion.organization_id, usuarioId);
+    if (yaMiembro) {
       return res.status(409).json({ error: 'Ya eres miembro de esta organización.' });
     }
 
-    // Crear membresía (rol MEMBER por defecto; invitacion.rol es el rol legal del usuario)
-    await db.query(
-      `INSERT INTO miembros_organizacion (organizacion_id, usuario_id, rol, activo)
-       VALUES ($1, $2, 'MEMBER', TRUE)`,
-      [invitacion.organization_id, usuarioId]
-    );
-
-    // Marcar invitación como aceptada
-    await db.query(
-      `UPDATE invitaciones_organizacion
-       SET esta_aceptada = TRUE, aceptada_at = NOW()
-       WHERE id = $1`,
-      [invitacion.id]
+    await organizacionRepo.acceptInvitation(
+      invitacion.id,
+      usuarioId,
+      invitacion.organization_id,
+      invitacion.rol
     );
 
     const org = {
@@ -279,7 +225,7 @@ router.post('/aceptar-invitacion', authMiddleware, async (req, res, next) => {
   }
 });
 
-// ─── DELETE /api/organizaciones/me/miembros/:usuarioId ───────────────────────
+// ─── DELETE /api/organizaciones/me/miembros/:targetUserId ─────────────────────
 router.delete('/me/miembros/:targetUserId', authMiddleware, tenantMiddleware, requireRole(['OWNER', 'ADMIN']), async (req, res, next) => {
   try {
     const orgId = req.organizationId;
@@ -290,24 +236,15 @@ router.delete('/me/miembros/:targetUserId', authMiddleware, tenantMiddleware, re
     }
 
     // No se puede remover al OWNER
-    const { rows: targetRows } = await db.query(
-      `SELECT rol FROM miembros_organizacion
-       WHERE organizacion_id = $1 AND usuario_id = $2
-       LIMIT 1`,
-      [orgId, targetUserId]
-    );
-    if (targetRows.length === 0) {
+    const targetRol = await organizacionRepo.getMemberRole(orgId, targetUserId);
+    if (!targetRol) {
       return res.status(404).json({ error: 'Miembro no encontrado.' });
     }
-    if (targetRows[0].rol === 'OWNER') {
+    if (targetRol === 'OWNER') {
       return res.status(403).json({ error: 'No se puede remover al propietario de la organización.' });
     }
 
-    await db.query(
-      `UPDATE miembros_organizacion SET activo = FALSE
-       WHERE organizacion_id = $1 AND usuario_id = $2`,
-      [orgId, targetUserId]
-    );
+    await organizacionRepo.removeMember(orgId, targetUserId);
 
     return res.json({ mensaje: 'Miembro removido exitosamente.' });
   } catch (err) {

@@ -37,6 +37,7 @@ const INJECTION_PATTERNS = [
   /what\s+(are|were)\s+your\s+(system\s+)?instructions/i,
   /show\s+(me\s+)?your\s+(system\s+)?prompt/i,
   // Inyección indirecta vía caracteres especiales
+  // eslint-disable-next-line no-control-regex
   /\x00|\x08|\x0b|\x0c|\x0e|\x0f/,   // caracteres de control ASCII
 ];
 

@@ -28,7 +28,7 @@ async function api(method, path, body, token) {
     body: body ? JSON.stringify(body) : undefined,
   });
   let json = null;
-  try { json = await res.json(); } catch {}
+  try { json = await res.json(); } catch { /* expected */ }
   return { status: res.status, body: json, headers: res.headers };
 }
 
@@ -128,6 +128,9 @@ describe('PROD: POST /api/auth/login — credenciales reales', () => {
       email: USERS.abogado.email, // ya existe
       password: 'Test1234!',
       rol: 'ABOGADO',
+      aceptaTerminos: true,
+      aceptaPrivacidad: true,
+      aceptaTransferenciaInternacional: true,
     });
     // 409/400 = duplicado | 429 = rate limit activo | 500 = Supabase caído
     if (res.status === 429) {
@@ -310,6 +313,9 @@ describe('PROD: Seguridad — protección real en producción', () => {
       email: `xss-test-${Date.now()}@test.pe`,
       password: 'Test1234!',
       rol: 'ABOGADO',
+      aceptaTerminos: true,
+      aceptaPrivacidad: true,
+      aceptaTransferenciaInternacional: true,
     });
     // 429 = rate limit activo (aceptable), 500 solo si DB está caída (Supabase pausado)
     if (res.status === 429) {

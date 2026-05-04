@@ -5,7 +5,8 @@ import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import authRoutes from './routes/auth.js';
 import organizacionesRoutes from './routes/organizaciones.js';
-import geminiRoutes from './routes/gemini.js';
+import datosPersonalesRoutes from './routes/datos-personales.js';
+import aiRoutes from './routes/ai.js';
 import { initDb } from './initDb.js';
 
 const app = express();
@@ -154,8 +155,9 @@ app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOS
 // ── RUTAS ─────────────────────────────────────────────────────────────────────
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/organizaciones', organizacionesRoutes);
+app.use('/api/mis-datos', datosPersonalesRoutes);
 // /api/expedientes → BACKEND C# (LegalProBackend_Net) — no Node.js
-app.use('/api/gemini', geminiLimiter, geminiRoutes);
+app.use('/api/gemini', geminiLimiter, aiRoutes);
 
 // ── ERROR HANDLER GLOBAL ──────────────────────────────────────────────────────
 app.use((err, _req, res, _next) => {

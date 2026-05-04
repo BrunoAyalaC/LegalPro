@@ -58,7 +58,7 @@ describe('POST /api/auth/register', () => {
   it('should_return_400_when_password_too_short', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: '123' });
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: '123', aceptaTerminos: true, aceptaPrivacidad: true });
     expect(res.status).toBe(400);
     expect(res.body.error).toContain('8 caracteres');
   });
@@ -66,7 +66,15 @@ describe('POST /api/auth/register', () => {
   it('should_return_400_when_invalid_rol', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Secure123!', rol: 'HACKER' });
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Secure123!', rol: 'HACKER', aceptaTerminos: true, aceptaPrivacidad: true });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toContain('Rol inválido');
+  });
+
+  it('should_return_400_when_invalid_rol', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Secure123!', rol: 'HACKER', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect(res.status).toBe(400);
     expect(res.body.error).toContain('Rol inválido');
   });

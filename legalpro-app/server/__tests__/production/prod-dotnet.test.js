@@ -33,8 +33,8 @@ async function api(method, path, body, token) {
   try {
     const raw = await res.text();
     text = raw;
-    try { json = JSON.parse(raw); } catch {}
-  } catch {}
+    try { json = JSON.parse(raw); } catch { /* expected */ }
+  } catch { /* expected */ }
   return { status: res.status, body: json, text };
 }
 

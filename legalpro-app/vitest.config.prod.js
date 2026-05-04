@@ -10,7 +10,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     // Solo los archivos prod-*.test.js (sin mocks)
-    include: ['server/__tests__/prod-*.test.js'],
+    include: ['server/__tests__/production/**/*.test.js'],
     environment: 'node',
     // Sin setup files — no mockear nada
     setupFiles: [],

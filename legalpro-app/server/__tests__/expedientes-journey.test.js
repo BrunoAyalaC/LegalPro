@@ -105,6 +105,9 @@ describe('Journey Seguridad — Inyección', () => {
         email: 'xss@test.pe',
         password: 'Test1234!',
         rol: 'ABOGADO',
+        aceptaTerminos: true,
+        aceptaPrivacidad: true,
+        aceptaTransferenciaInternacional: true,
       });
     // El servidor no debe retornar el script sin sanitizar
     const bodyStr = JSON.stringify(res.body);

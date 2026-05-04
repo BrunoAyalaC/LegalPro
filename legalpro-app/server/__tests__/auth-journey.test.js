@@ -27,56 +27,64 @@ describe('Journey: POST /api/auth/register — Validaciones', () => {
   it('400 — falta nombreCompleto', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ email: 'test@legalpro.pe', password: 'Test1234!', rol: 'ABOGADO' });
+      .send({ email: 'test@legalpro.pe', password: 'Test1234!', rol: 'ABOGADO', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect(res.status).toBe(400);
   });
 
   it('400 — falta email', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test User', password: 'Test1234!', rol: 'ABOGADO' });
+      .send({ nombreCompleto: 'Test User', password: 'Test1234!', rol: 'ABOGADO', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect(res.status).toBe(400);
   });
 
   it('400 — falta password', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@legalpro.pe', rol: 'ABOGADO' });
+      .send({ nombreCompleto: 'Test', email: 'test@legalpro.pe', rol: 'ABOGADO', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect(res.status).toBe(400);
+  });
+
+  it('400 — no acepta términos ni privacidad', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ nombreCompleto: 'Test', email: 'test@legalpro.pe', password: 'Test1234!', rol: 'ABOGADO', aceptaTerminos: false, aceptaPrivacidad: false, aceptaTransferenciaInternacional: false });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/Términos|Privacidad/i);
   });
 
   it('400 — password con solo 7 caracteres', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: '1234567', rol: 'ABOGADO' });
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: '1234567', rol: 'ABOGADO', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect(res.status).toBe(400);
   });
 
   it('400 — password de exactamente 8 caracteres sin complejidad', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: '12345678', rol: 'ABOGADO' });
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: '12345678', rol: 'ABOGADO', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect([400, 201, 409, 500]).toContain(res.status); // depende del validator de complejidad
   });
 
   it('400 — rol inválido SUPERADMIN', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Test1234!', rol: 'SUPERADMIN' });
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Test1234!', rol: 'SUPERADMIN', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect(res.status).toBe(400);
   });
 
   it('400 — rol inválido HACKER', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Test1234!', rol: 'HACKER' });
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Test1234!', rol: 'HACKER', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect(res.status).toBe(400);
   });
 
   it('400 — rol case-sensitive minúscula rechazado', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Test1234!', rol: 'abogado' });
+      .send({ nombreCompleto: 'Test', email: 'test@test.pe', password: 'Test1234!', rol: 'abogado', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     // El backend .NET es case-insensitive, pero Node puede ser estricto
     expect([400, 201, 409, 500]).toContain(res.status);
   });
@@ -90,7 +98,7 @@ describe('Journey: POST /api/auth/register — Validaciones', () => {
   it('400 — email sin formato válido', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ nombreCompleto: 'Test', email: 'noesunemail', password: 'Test1234!', rol: 'ABOGADO' });
+      .send({ nombreCompleto: 'Test', email: 'noesunemail', password: 'Test1234!', rol: 'ABOGADO', aceptaTerminos: true, aceptaPrivacidad: true, aceptaTransferenciaInternacional: true });
     expect([400, 201, 500]).toContain(res.status);
   });
 });
