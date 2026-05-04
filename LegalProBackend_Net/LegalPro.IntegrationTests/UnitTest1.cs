@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using LegalPro.Infrastructure.Persistence;
+using Microsoft.Extensions.DependencyInjection;
 
 // Forzar ejecución secuencial de test classes — múltiples WebApplicationFactory
 // simultáneas conflictúan con el estado global de Serilog y ASP.NET Core.
@@ -9,13 +11,12 @@ using FluentAssertions;
 namespace LegalPro.IntegrationTests;
 
 // ═══════════════════════════════════════════════════════════════════════
-// TESTS DE INTEGRACIÓN REALES — Sin mocks.
-// Levantan la app ASP.NET Core completa con WebApplicationFactory<Program>.
-// Requieren credenciales reales en env vars o archivo .env.test
-// Docs: https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests
+// TESTS DE INTEGRACIÓN — Sin dependencias externas (PostgreSQL / Gemini real).
+// Levantan la app ASP.NET Core completa con WebApplicationFactory<Program>
+// usando EF Core InMemory, autenticación fake y Gemini fake.
 // ═══════════════════════════════════════════════════════════════════════
 
-/// <summary>Tests del Health Check — siempre corren, no requieren credenciales.</summary>
+/// <summary>Tests del Health Check — siempre corren.</summary>
 public class HealthCheckTests : IClassFixture<LegalProWebApplicationFactory>
 {
     private readonly HttpClient _client;
@@ -42,18 +43,15 @@ public class HealthCheckTests : IClassFixture<LegalProWebApplicationFactory>
     }
 }
 
-/// <summary>Tests reales del Auth endpoint contra Supabase PostgreSQL.</summary>
+/// <summary>Tests del Auth endpoint contra EF Core InMemory.</summary>
 public class AuthControllerTests : IClassFixture<LegalProWebApplicationFactory>
 {
     private readonly HttpClient _client;
-
-    // Solo corre si DATABASE_URL es una cadena real de PostgreSQL
-    private static bool TieneCredencialesDB =>
-        Environment.GetEnvironmentVariable("DATABASE_URL") is { Length: > 20 } url
-        && url.StartsWith("postgresql://");
+    private readonly LegalProWebApplicationFactory _factory;
 
     public AuthControllerTests(LegalProWebApplicationFactory factory)
     {
+        _factory = factory;
         _client = factory.CreateClient();
     }
 
@@ -69,23 +67,19 @@ public class AuthControllerTests : IClassFixture<LegalProWebApplicationFactory>
     [Fact]
     public async Task Login_Credenciales_Invalidas_Retorna_Error()
     {
-        if (!TieneCredencialesDB) return; // Salta si no hay DB configurada
-
         var response = await _client.PostAsJsonAsync("/api/auth/login", new
         {
             email = "noexiste@test.com",
             password = "wrongpassword"
         });
 
-        // Credenciales inválidas → error (422 DomainError o 500)
+        // Credenciales inválidas → error (401, 404 o 422)
         ((int)response.StatusCode).Should().BeGreaterThanOrEqualTo(400);
     }
 
     [Fact]
     public async Task Register_Y_Login_Flujo_Completo()
     {
-        if (!TieneCredencialesDB) return; // Salta si no hay DB configurada
-
         // Email único por ejecución de test para evitar conflictos
         var email = $"test.integration.{Guid.NewGuid():N}@legalpro.test";
         var password = "TestPass123!";
@@ -121,24 +115,34 @@ public class AuthControllerTests : IClassFixture<LegalProWebApplicationFactory>
     }
 }
 
-/// <summary>Tests reales de los endpoints Gemini (Chat, Analista, Predictor, Redactor).</summary>
+/// <summary>
+/// Tests de los endpoints Gemini usando FakeGeminiService — corren SIEMPRE
+/// en CI/CD sin depender de la API real ni de PostgreSQL.
+/// </summary>
 public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
 {
     private readonly HttpClient _client;
-
-    // Solo corre si GEMINI_API_KEY es una clave real (comienza con AIzaSy y tiene >30 chars)
-    private static bool TieneGeminiKey =>
-        Environment.GetEnvironmentVariable("GEMINI_API_KEY") is { Length: > 30 } key
-        && key.StartsWith("AIzaSy");
+    private readonly LegalProWebApplicationFactory _factory;
 
     public GeminiEndpointsTests(LegalProWebApplicationFactory factory)
     {
+        _factory = factory;
         _client = factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
         {
-            // Gemini puede tardar hasta 30s en responder
             HandleCookies = false
         });
-        _client.Timeout = TimeSpan.FromSeconds(90);
+        _client.Timeout = TimeSpan.FromSeconds(30);
+    }
+
+    /// <summary>
+    /// Seedea datos mínimos (org + usuario) antes de cada test que interactúa
+    /// con la base de datos (ej. chat que persiste mensajes).
+    /// </summary>
+    private async Task EnsureTestDataAsync()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await TestDataSeeder.SeedAsync(db);
     }
 
     [Fact]
@@ -147,11 +151,10 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/chat/enviar", new
         {
             history = "",
-            userInput = "" // Vacío → FluentValidation lanza 400 o 401 si no autenticado
+            userInput = "" // Vacío → FluentValidation lanza 400
         });
 
-        // Sin autenticación retorna 401; con JWT y cuerpo vacío retorna 400.
-        // Ambos son respuestas correctas de error — no hay acceso no autorizado.
+        // Con auth fake y cuerpo vacío retorna 400.
         ((int)response.StatusCode).Should().BeGreaterThanOrEqualTo(400);
     }
 
@@ -163,14 +166,14 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
             textoExpediente = "" // Vacío → validación falla
         });
 
-        // Sin autenticación retorna 401; con JWT y cuerpo vacío retorna 400.
+        // Con auth fake y cuerpo vacío retorna 400.
         ((int)response.StatusCode).Should().BeGreaterThanOrEqualTo(400);
     }
 
     [Fact]
-    public async Task Chat_Con_Gemini_Real_Retorna_Respuesta_Legal()
+    public async Task Chat_Con_FakeGemini_Retorna_Respuesta()
     {
-        if (!TieneGeminiKey) return; // Salta si no hay API key configurada
+        await EnsureTestDataAsync();
 
         var response = await _client.PostAsJsonAsync("/api/chat/enviar", new
         {
@@ -186,6 +189,86 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
     }
 
     [Fact]
+    public async Task Analista_Con_FakeGemini_Analiza_Expediente()
+    {
+        var response = await _client.PostAsJsonAsync("/api/analista/analizar", new
+        {
+            textoExpediente = "EXPEDIENTE Nº 00123-2024-0-1801-JR-PE-01. " +
+                              "IMPUTADO: Juan Pérez. DELITO: Robo agravado NCPP art. 189. " +
+                              "HECHOS: El imputado fue intervenido el 10/01/2024 a las 22:00 hrs " +
+                              "en Av. Arequipa 1234, Lima, con víctima presente. " +
+                              "EVIDENCIA: 1 arma de fuego incautada, 3 testigos presenciales. " +
+                              "El folio 5 indica arresto el 10/01 pero el folio 12 indica el 11/01."
+        });
+
+        response.IsSuccessStatusCode.Should().BeTrue(
+            $"Analista falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+
+        var body = await response.Content.ReadAsStringAsync();
+        body.Should().Contain("resumenGeneral", "FakeGemini debe devolver JSON con resumenGeneral");
+    }
+
+    [Fact]
+    public async Task Predictor_Con_FakeGemini_Predice_Resultado()
+    {
+        var response = await _client.PostAsJsonAsync("/api/predictor/predecir", new
+        {
+            hechosCausa = "Acusado detenido con 50g de PBC en flagrancia, sin antecedentes previos",
+            materia = "Penal",
+            juzgadoSala = "3er Juzgado Penal Especializado Lima",
+            juezAsignado = "Dr. Carlos Mendoza"
+        });
+
+        response.IsSuccessStatusCode.Should().BeTrue(
+            $"Predictor falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+
+        var body = await response.Content.ReadAsStringAsync();
+        body.Should().Contain("probabilidadExito");
+    }
+
+    [Fact]
+    public async Task Redactor_Con_FakeGemini_Genera_Borrador()
+    {
+        var response = await _client.PostAsJsonAsync("/api/redactor/generar", new
+        {
+            tipoEscrito = "Recurso de Apelación",
+            distritoJudicial = "Lima",
+            hechosCausa = "El juzgado negó la demanda sin motivación suficiente, " +
+                          "vulnerando el derecho al debido proceso art. 139 Constitución Peruana"
+        });
+
+        response.IsSuccessStatusCode.Should().BeTrue(
+            $"Redactor falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+
+        var body = await response.Content.ReadAsStringAsync();
+        body.Should().NotBeNullOrEmpty();
+    }
+
+    // ── Tests opcionales con Gemini REAL (se saltan si no hay API key) ──
+
+    private static bool TieneGeminiKey =>
+        Environment.GetEnvironmentVariable("GEMINI_API_KEY") is { Length: > 30 } key
+        && key.StartsWith("AIzaSy");
+
+    [Fact(Skip = "Requiere GEMINI_API_KEY real; usar Chat_Con_FakeGemini_Retorna_Respuesta para CI/CD")]
+    public async Task Chat_Con_Gemini_Real_Retorna_Respuesta_Legal()
+    {
+        if (!TieneGeminiKey) return;
+
+        var response = await _client.PostAsJsonAsync("/api/chat/enviar", new
+        {
+            history = "",
+            userInput = "¿Cuál es el plazo para interponer apelación en proceso civil peruano?"
+        });
+
+        response.IsSuccessStatusCode.Should().BeTrue(
+            $"Gemini Chat falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+
+        var body = await response.Content.ReadAsStringAsync();
+        body.Should().NotBeNullOrEmpty();
+    }
+
+    [Fact(Skip = "Requiere GEMINI_API_KEY real")]
     public async Task Analista_Con_Gemini_Real_Analiza_Expediente()
     {
         if (!TieneGeminiKey) return;
@@ -207,7 +290,7 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
         body.Should().Contain("resumenGeneral", "Gemini debe devolver JSON con resumenGeneral");
     }
 
-    [Fact]
+    [Fact(Skip = "Requiere GEMINI_API_KEY real")]
     public async Task Predictor_Con_Gemini_Real_Predice_Resultado()
     {
         if (!TieneGeminiKey) return;
@@ -227,7 +310,7 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
         body.Should().Contain("probabilidadExito");
     }
 
-    [Fact]
+    [Fact(Skip = "Requiere GEMINI_API_KEY real")]
     public async Task Redactor_Con_Gemini_Real_Genera_Borrador()
     {
         if (!TieneGeminiKey) return;
@@ -250,4 +333,3 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
 
 // DTO auxiliar para deserializar respuestas de Auth
 internal record TokenResponse(string Token);
-
