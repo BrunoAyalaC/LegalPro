@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import DOMPurify from 'dompurify';
 
 import AppIcon from '../components/AppIcon';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import { useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import api from '../api/client';
@@ -133,6 +134,7 @@ export default function ChatIA() {
           </div>
         ) : (
           <>
+            <IADisclaimerBanner compact className="mb-2" />
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse max-w-[85%] ml-auto' : 'max-w-[90%]'} anim-fade-in-up`}>
                 {msg.role === 'ai' ? (

@@ -1,10 +1,13 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Sliders, Bell, Shield, Sparkles, Download,
-  HelpCircle, ChevronRight, LogOut, Building2
+  HelpCircle, ChevronRight, LogOut, Building2,
+  Trash2, FileText, Edit3, Save, X, AlertTriangle
 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
+import { api } from '../api/client';
 
 const APK_URL = import.meta.env.VITE_APK_URL ?? null;
 
@@ -15,16 +18,6 @@ const item = {
   initial: { opacity: 0, y: 16, scale: 0.97 },
   animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35 } },
 };
-
-const MENU_ITEMS = [
-  { icon: User,      label: 'Datos Personales',   desc: 'Nombre, colegiatura, especialidad', color: 'bg-blue-500/15 text-blue-400' },
-  { icon: Sliders,   label: 'Especialidad Legal',  desc: 'Configura tu área de práctica',     color: 'bg-violet-500/15 text-violet-400' },
-  { icon: Bell,      label: 'Notificaciones',      desc: 'Alertas y recordatorios',           color: 'bg-amber-500/15 text-amber-400' },
-  { icon: Shield,    label: 'Seguridad',            desc: 'Contraseña y 2FA',                  color: 'bg-emerald-500/15 text-emerald-400' },
-  { icon: Sparkles,  label: 'Configuración IA',     desc: 'Modelo Gemini y preferencias',      color: 'bg-indigo-500/15 text-indigo-400' },
-  { icon: Download,  label: 'Exportar Datos',       desc: 'Backup de expedientes',             color: 'bg-cyan-500/15 text-cyan-400' },
-  { icon: HelpCircle,label: 'Soporte',              desc: 'Ayuda y documentación',             color: 'bg-slate-500/15 text-slate-400' },
-];
 
 function DescargarAPK() {
   if (!APK_URL) return null;
@@ -55,12 +48,97 @@ function DescargarAPK() {
 
 export default function Perfil() {
   const navigate = useNavigate();
-  const { usuario, organizacion, logout } = useTenant();
+  const { usuario, organizacion, logout, refreshToken } = useTenant();
+
+  const [misDatos, setMisDatos] = useState(null);
+  const [loadingDatos, setLoadingDatos] = useState(false);
+  const [datosError, setDatosError] = useState('');
+
+  const [editMode, setEditMode] = useState(false);
+  const [nombreEdit, setNombreEdit] = useState('');
+  const [especialidadEdit, setEspecialidadEdit] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [confirmDeleteText, setConfirmDeleteText] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const nombreCompleto = usuario?.nombreCompleto || usuario?.nombre || 'Usuario';
   const iniciales = nombreCompleto.split(' ').map(n => n.charAt(0)).join('').slice(0, 2).toUpperCase();
   const rol = usuario?.rol?.toLowerCase() || 'abogado';
   const especialidad = usuario?.especialidad || 'General';
+
+  const cargarMisDatos = useCallback(async () => {
+    setLoadingDatos(true);
+    setDatosError('');
+    try {
+      const data = await api.getMisDatos();
+      setMisDatos(data);
+      setNombreEdit(data.usuario.nombreCompleto);
+      setEspecialidadEdit(data.usuario.especialidad || '');
+    } catch {
+      setDatosError('No se pudieron cargar tus datos personales.');
+    } finally {
+      setLoadingDatos(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    cargarMisDatos();
+  }, [cargarMisDatos]);
+
+  const handleUpdate = async () => {
+    if (!nombreEdit.trim()) return;
+    setSaving(true);
+    try {
+      await api.updateMisDatos({
+        nombreCompleto: nombreEdit.trim(),
+        especialidad: especialidadEdit.trim(),
+      });
+      await refreshToken();
+      await cargarMisDatos();
+      setEditMode(false);
+    } catch {
+      setDatosError('Error al guardar los cambios.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const res = await api.exportMisDatos();
+      if (!res.ok) throw new Error('Error al exportar');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const disposition = res.headers.get('content-disposition');
+      a.download = disposition?.match(/filename="(.+)"/)?.[1] || 'mis-datos.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setDatosError('Error al descargar la exportación.');
+    }
+  };
+
+  const handleDeleteCuenta = async () => {
+    if (confirmDeleteText.trim().toLowerCase() !== 'eliminar') {
+      setDatosError('Debe escribir "eliminar" para confirmar.');
+      return;
+    }
+    setDeleting(true);
+    try {
+      await api.deleteCuenta();
+      logout();
+      navigate('/login');
+    } catch {
+      setDatosError('Error al eliminar la cuenta. Intenta nuevamente.');
+      setDeleting(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -120,7 +198,7 @@ export default function Perfil() {
               <p className="text-[10px] text-slate-400 uppercase font-semibold">Casos</p>
             </div>
             <div>
-              <p className="text-lg font-bold text-white">—</p>
+              <p className="text-lg font-bold text-white">{misDatos?.estadisticasUso?.total_mensajes_chat ?? '—'}</p>
               <p className="text-[10px] text-slate-400 uppercase font-semibold">Consultas IA</p>
             </div>
             <div>
@@ -134,9 +212,134 @@ export default function Perfil() {
       {/* Descarga APK Android */}
       <DescargarAPK />
 
-      {/* Menu */}
+      {/* Mis Datos Personales — Sección destacada */}
+      <motion.div variants={item} className="mb-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Shield size={16} className="text-emerald-400" />
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Mis Datos Personales</h3>
+        </div>
+
+        <div className="rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-5 shadow-lg">
+          {datosError && (
+            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+              {datosError}
+            </div>
+          )}
+
+          {loadingDatos && !misDatos ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-6 h-6 rounded-full border-2 border-cyan-500/30 border-t-cyan-400 animate-spin" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Datos */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Nombre completo</span>
+                  {editMode ? (
+                    <input
+                      value={nombreEdit}
+                      onChange={e => setNombreEdit(e.target.value)}
+                      className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-cyan-500/50 w-48"
+                    />
+                  ) : (
+                    <span className="text-sm text-white font-medium">{misDatos?.usuario?.nombreCompleto || nombreCompleto}</span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Email</span>
+                  <span className="text-sm text-white font-medium">{misDatos?.usuario?.email || usuario?.email}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Especialidad</span>
+                  {editMode ? (
+                    <input
+                      value={especialidadEdit}
+                      onChange={e => setEspecialidadEdit(e.target.value)}
+                      className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-cyan-500/50 w-48"
+                    />
+                  ) : (
+                    <span className="text-sm text-white font-medium">{misDatos?.usuario?.especialidad || especialidad}</span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Rol</span>
+                  <span className="text-sm text-white font-medium capitalize">{misDatos?.usuario?.rol?.toLowerCase() || rol}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Miembro desde</span>
+                  <span className="text-sm text-white font-medium">
+                    {misDatos?.usuario?.creadoEn ? new Date(misDatos.usuario.creadoEn).toLocaleDateString('es-PE') : '—'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Términos aceptados</span>
+                  <span className="text-sm text-emerald-400 font-medium">
+                    {misDatos?.usuario?.terminosAceptadosEn ? new Date(misDatos.usuario.terminosAceptadosEn).toLocaleDateString('es-PE') : '—'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">Privacidad aceptada</span>
+                  <span className="text-sm text-emerald-400 font-medium">
+                    {misDatos?.usuario?.privacidadAceptadaEn ? new Date(misDatos.usuario.privacidadAceptadaEn).toLocaleDateString('es-PE') : '—'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Acciones */}
+              <div className="flex flex-wrap gap-2 pt-4 border-t border-white/8">
+                {editMode ? (
+                  <>
+                    <button
+                      onClick={handleUpdate}
+                      disabled={saving}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 text-xs font-bold hover:bg-emerald-500/25 transition-colors disabled:opacity-50"
+                    >
+                      <Save size={14} />
+                      {saving ? 'Guardando...' : 'Guardar'}
+                    </button>
+                    <button
+                      onClick={() => { setEditMode(false); setNombreEdit(misDatos?.usuario?.nombreCompleto || ''); setEspecialidadEdit(misDatos?.usuario?.especialidad || ''); }}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-slate-300 border border-white/10 text-xs font-bold hover:bg-white/10 transition-colors"
+                    >
+                      <X size={14} />
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setEditMode(true)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-bold hover:bg-cyan-500/20 transition-colors"
+                    >
+                      <Edit3 size={14} />
+                      Editar datos
+                    </button>
+                    <button
+                      onClick={handleExport}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 text-slate-300 border border-white/10 text-xs font-bold hover:bg-white/10 transition-colors"
+                    >
+                      <FileText size={14} />
+                      Descargar mis datos
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Menú clásico */}
       <div className="space-y-2">
-        {MENU_ITEMS.map((menuItem, i) => {
+        {[
+          { icon: Sliders, label: 'Especialidad Legal', desc: 'Configura tu área de práctica', color: 'bg-violet-500/15 text-violet-400' },
+          { icon: Bell, label: 'Notificaciones', desc: 'Alertas y recordatorios', color: 'bg-amber-500/15 text-amber-400' },
+          { icon: Shield, label: 'Seguridad', desc: 'Contraseña y 2FA', color: 'bg-emerald-500/15 text-emerald-400' },
+          { icon: Sparkles, label: 'Configuración IA', desc: 'Modelo Gemini y preferencias', color: 'bg-indigo-500/15 text-indigo-400' },
+          { icon: Download, label: 'Exportar Datos', desc: 'Backup de expedientes', color: 'bg-cyan-500/15 text-cyan-400' },
+          { icon: HelpCircle, label: 'Soporte', desc: 'Ayuda y documentación', color: 'bg-slate-500/15 text-slate-400' },
+        ].map((menuItem, i) => {
           const Icon = menuItem.icon;
           return (
             <motion.button
@@ -164,6 +367,28 @@ export default function Perfil() {
         })}
       </div>
 
+      {/* Eliminar cuenta */}
+      <motion.div variants={item} className="mt-4">
+        <button
+          onClick={() => setShowDeleteModal(true)}
+          className="w-full flex items-center gap-3 text-left p-3.5 group
+            backdrop-blur-xl bg-red-500/5 border border-red-500/15
+            hover:bg-red-500/10 hover:border-red-500/25
+            rounded-2xl transition-all duration-300 shadow-lg"
+        >
+          <div className="w-10 h-10 rounded-xl bg-red-500/15 text-red-400 flex items-center justify-center
+            shadow-lg border border-white/10 transition-transform duration-300
+            group-hover:scale-110">
+            <Trash2 size={20} className="text-current" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-red-400">Eliminar mi cuenta</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Derecho al olvido (LPDP)</p>
+          </div>
+          <ChevronRight size={16} className="text-slate-500 group-hover:text-slate-300 group-hover:translate-x-1 transition-all duration-300 shrink-0" />
+        </button>
+      </motion.div>
+
       {/* Cerrar Sesión */}
       <motion.button
         variants={item}
@@ -178,6 +403,77 @@ export default function Perfil() {
         <LogOut size={16} />
         Cerrar Sesión
       </motion.button>
+
+      {/* Modal de eliminación */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowDeleteModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-md rounded-2xl bg-[#0b0b12] border border-red-500/20 p-6 shadow-2xl"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center">
+                  <AlertTriangle size={20} className="text-red-400" />
+                </div>
+                <div>
+                  <h4 className="text-white font-bold text-sm">Eliminar cuenta permanentemente</h4>
+                  <p className="text-slate-400 text-[11px]">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-5">
+                <p className="text-slate-300 text-xs leading-relaxed">
+                  Al eliminar tu cuenta:
+                </p>
+                <ul className="text-slate-400 text-[11px] list-disc pl-4 space-y-1">
+                  <li>Tus datos personales serán anonimizados.</li>
+                  <li>Tus mensajes de chat y simulaciones serán eliminados.</li>
+                  <li>Perderás acceso a todos los expedientes y organizaciones.</li>
+                  <li>Esta acción se realiza bajo tu derecho al olvido (Ley N.º 29733).</li>
+                </ul>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-xs text-slate-400 mb-2">
+                  Escribe <strong className="text-white">eliminar</strong> para confirmar:
+                </label>
+                <input
+                  value={confirmDeleteText}
+                  onChange={e => setConfirmDeleteText(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-red-500/50"
+                  placeholder="eliminar"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setShowDeleteModal(false); setConfirmDeleteText(''); setDatosError(''); }}
+                  className="flex-1 py-2.5 rounded-xl bg-white/5 text-slate-300 text-xs font-bold border border-white/10 hover:bg-white/10 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteCuenta}
+                  disabled={deleting || confirmDeleteText.trim().toLowerCase() !== 'eliminar'}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500/15 text-red-400 text-xs font-bold border border-red-500/25 hover:bg-red-500/25 transition-colors disabled:opacity-40"
+                >
+                  {deleting ? 'Eliminando...' : 'Sí, eliminar cuenta'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

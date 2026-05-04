@@ -1,14 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import AppIcon from '../components/AppIcon';
 import Header from '../components/Header';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import { api } from '../api/client';
 
 export default function AnalistaExpedientes() {
+  const { id } = useParams();
+  const [expediente, setExpediente] = useState(null);
+  const [loadingExp, setLoadingExp] = useState(true);
+  const [errorExp, setErrorExp] = useState('');
+
+  const [documentos, setDocumentos] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(true);
+
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: 'ai', content: 'He analizado el expediente. He detectado una contradicción relevante entre los folios 12 y 45, y una posible nulidad por falta de notificación según el CPC. ¿En qué puedo ayudarte?' }
-  ]);
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingExp(true);
+    setErrorExp('');
+    api.getExpediente(id)
+      .then(data => { if (!cancelled) { setExpediente(data); setLoadingExp(false); } })
+      .catch(() => { if (!cancelled) { setErrorExp('Expediente no encontrado'); setLoadingExp(false); } });
+
+    setLoadingDocs(true);
+    api.getDocumentos(id)
+      .then(data => { if (!cancelled) { setDocumentos(Array.isArray(data) ? data : []); setLoadingDocs(false); } })
+      .catch(() => { if (!cancelled) { setDocumentos([]); setLoadingDocs(false); } });
+
+    return () => { cancelled = true; };
+  }, [id]);
 
   const sendMessage = async (promptText) => {
     const text = (promptText || input).trim();
@@ -17,23 +41,15 @@ export default function AnalistaExpedientes() {
     setInput('');
     setLoading(true);
     try {
-      const data = await api.consulta(text, 'analisis');
-      const resp = data.resultado;
-      let content;
-      if (resp && typeof resp === 'object') {
-        content = [
-          resp.resumenGeneral && `Resumen: ${resp.resumenGeneral}`,
-          resp.hechosClave && `Hechos clave: ${Array.isArray(resp.hechosClave) ? resp.hechosClave.join('; ') : resp.hechosClave}`,
-          resp.inconsistencias && `Inconsistencias: ${Array.isArray(resp.inconsistencias) ? resp.inconsistencias.join('; ') : resp.inconsistencias}`,
-          resp.riesgosProcesales && `Riesgos procesales: ${Array.isArray(resp.riesgosProcesales) ? resp.riesgosProcesales.join('; ') : resp.riesgosProcesales}`,
-          resp.estrategiaRecomendada && `Estrategia recomendada: ${resp.estrategiaRecomendada}`,
-        ].filter(Boolean).join('\n\n');
-      } else {
-        content = typeof resp === 'string' ? resp : JSON.stringify(resp);
-      }
-      setMessages(prev => [...prev, { role: 'ai', content }]);
+      const historial = messages.map(m => ({
+        role: m.role === 'ai' ? 'model' : 'user',
+        text: m.content,
+      }));
+      const data = await api.chat(text, historial, id);
+      const resp = data?.respuesta ?? data?.texto ?? data?.resultado ?? (typeof data === 'string' ? data : JSON.stringify(data));
+      setMessages(prev => [...prev, { role: 'ai', content: resp }]);
     } catch {
-      setMessages(prev => [...prev, { role: 'ai', content: 'Error al conectar con el servidor.' }]);
+      setMessages(prev => [...prev, { role: 'ai', content: 'No se pudo obtener respuesta. Intenta de nuevo.' }]);
     } finally {
       setLoading(false);
     }
@@ -46,41 +62,60 @@ export default function AnalistaExpedientes() {
     { icon: 'warning', label: 'Detectar nulidades', prompt: 'Detecta posibles nulidades procesales en este expediente' },
   ];
 
+  if (loadingExp) {
+    return (
+      <div className="page-enter flex flex-col h-screen items-center justify-center text-slate-400">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-sm">Cargando expediente...</p>
+      </div>
+    );
+  }
+
+  if (errorExp) {
+    return (
+      <div className="page-enter flex flex-col h-screen items-center justify-center px-6 text-center">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+          <AppIcon name="error_outline" size={32} />
+        </div>
+        <h2 className="text-lg font-bold text-white mb-2">{errorExp}</h2>
+        <p className="text-sm text-slate-400 mb-6">El expediente que buscas no existe o no tienes acceso.</p>
+        <Link to="/expedientes" className="btn btn-primary">
+          <AppIcon name="arrow_back" size={20} /> Volver a Expedientes
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="page-enter flex flex-col h-screen">
-      <Header title="Expediente N° 042-2023" showBack
+      <Header title={expediente ? `Expediente N° ${expediente.numero || expediente.id}` : 'Expediente'} showBack
         rightAction={<span className="badge badge-primary"><AppIcon name="auto_awesome" size={20} /> Gemini 2.0</span>}
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Document Viewer */}
         <div className="relative h-[45%] bg-surface-dark overflow-y-auto border-b border-border-dark shadow-inner">
-          <div className="p-6 max-w-lg mx-auto">
-            <div className="bg-white/5 shadow-xl rounded p-8 min-h-[400px] relative text-[11px] leading-relaxed text-slate-300 font-serif">
-              <p className="font-bold mb-4 text-center text-sm text-slate-100">CORTE SUPERIOR DE JUSTICIA DE LIMA</p>
-              <p className="mb-4 text-slate-400">EXPEDIENTE: 0042-2023-0-1801-JR-PE-01</p>
-              <p className="mb-4">...que habiendo analizado los hechos expuestos por el recurrente en el folio 12, se determina que el imputado no se encontraba en el lugar de los hechos al momento de la intervención policial...</p>
-              
-              <div className="relative bg-red-500/10 border-l-2 border-red-500 px-3 my-3 py-2">
-                <p>Sin embargo, en la declaración preventiva (Folio 45) se indica una ubicación contradictoria cercana a la Av. Abancay...</p>
-                <div className="absolute -right-2 top-0 translate-x-full bg-red-500 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold flex items-center gap-1 z-10">
-                  <AppIcon name="warning" size={20} />Contradicción detectada
-                </div>
-              </div>
-              
-              <p className="mb-4">Por lo tanto, se solicita la aplicación de los beneficios procesales correspondientes...</p>
-              
-              <div className="relative bg-primary/10 border-l-2 border-primary px-3 my-3 py-2">
-                <p>...según lo tipificado en el Código Penal referente al delito contra la vida, el cuerpo y la salud...</p>
-                <div className="absolute -right-2 top-0 translate-x-full bg-primary text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap font-sans font-bold flex items-center gap-1 z-10">
-                  <AppIcon name="gavel" size={20} />Artículo 106 CP
-                </div>
-              </div>
+          {loadingDocs ? (
+            <div className="flex items-center justify-center h-full text-slate-400 text-sm">
+              Cargando documentos...
             </div>
-          </div>
-          <div className="absolute top-4 right-4 glass text-[10px] px-3 py-1.5 rounded-full flex items-center gap-2">
-            <AppIcon name="description" size={20} />Pág. 1 / 15
-          </div>
+          ) : documentos.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center px-6">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                <AppIcon name="description" size={24} />
+              </div>
+              <p className="text-sm text-slate-400">No hay documentos asociados a este expediente.</p>
+            </div>
+          ) : (
+            <div className="p-6 max-w-lg mx-auto space-y-4">
+              {documentos.map((doc, i) => (
+                <div key={doc.id ?? i} className="bg-white/5 border border-border-dark rounded-xl p-5">
+                  <p className="text-sm font-bold text-white mb-2">{doc.titulo || 'Documento sin título'}</p>
+                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-6">{doc.contenido || 'Sin contenido'}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Chat Panel */}
@@ -99,6 +134,12 @@ export default function AnalistaExpedientes() {
           </div>
           
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.some(m => m.role === 'ai') && <IADisclaimerBanner compact className="mb-2" />}
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center text-slate-500 text-sm">
+                <p>¿En qué puedo ayudarte con este expediente?</p>
+              </div>
+            )}
             {messages.map((msg, i) => (
               msg.role === 'ai' ? (
                 <div key={i} className="flex gap-3 max-w-[85%]">
@@ -127,6 +168,7 @@ export default function AnalistaExpedientes() {
                   <AppIcon name="smart_toy" size={20} />
                 </div>
                 <div className="chat-ai p-3">
+                  <p className="text-xs text-slate-400 mb-2">Consultando...</p>
                   <div className="flex gap-1 items-center">
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />

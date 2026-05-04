@@ -1,8 +1,34 @@
+import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
 import casosCriticosFondo from '../assets/backgrounds/casos_criticos_fondo.jpeg';
+import { api } from '../api/client';
 
 export default function GeneradorCasosCriticos() {
+  const [situacion, setSituacion] = useState('');
+  const [escenarios, setEscenarios] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleGenerar = async () => {
+    if (!situacion.trim()) return;
+    setLoading(true);
+    setError('');
+    try {
+      const data = await api.consulta?.(situacion, 'casos-criticos');
+      const res = data?.resultado;
+      if (Array.isArray(res)) {
+        setEscenarios(res);
+      } else if (res) {
+        setEscenarios([{ titulo: 'Escenario crítico', riesgo: 'Alto', desc: typeof res === 'string' ? res : JSON.stringify(res), icon: 'dangerous', color: 'badge-danger' }]);
+      }
+    } catch {
+      setError('Error al conectar con el servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="page-enter">
       {/* ─── FULL SCREEN BACKGROUND ─── */}
@@ -23,43 +49,65 @@ export default function GeneradorCasosCriticos() {
           <p className="text-sm text-slate-400 leading-relaxed">Anticipa los peores escenarios posibles en tus expedientes y prepara planes de contingencia estratégicos apoyados por IA.</p>
         </div>
 
-        {/* Scenarios List */}
-        <div className="space-y-3 pt-2">
-          {[
-            { titulo: 'Rechazo de Prueba Clave', riesgo: 'Alto', desc: 'El juez declara inadmisible la prueba pericial informando defecto en la cadena de custodia', icon: 'error', color: 'badge-danger' },
-            { titulo: 'Testigo Hostil', riesgo: 'Medio', desc: 'El testigo principal cambia su declaración durante el interrogatorio en juicio oral', icon: 'warning', color: 'badge-warning' },
-            { titulo: 'Nulidad Procesal', riesgo: 'Alto', desc: 'Se detecta defecto formal en la notificación que podría llevar a la nulidad de lo actuado', icon: 'dangerous', color: 'badge-danger' },
-          ].map((c, i) => (
-            <div key={i} className="glass p-4 rounded-xl border border-white/5 shadow-lg relative overflow-hidden anim-fade-in-up group" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
-              {c.riesgo === 'Alto' && <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl -z-10 group-hover:bg-red-500/20 transition-colors"></div>}
-              
-              <div className="flex items-start gap-3 mb-3">
-                <div className={`mt-0.5 ${c.riesgo === 'Alto' ? 'text-red-400' : 'text-amber-400'}`}>
-                   <AppIcon name={c.icon} size={22} className="icon-raw" style={{ filter: 'brightness(0) saturate(100%) invert(56%) sepia(97%) saturate(2000%) hue-rotate(220deg) brightness(100%)' }} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-sm">{c.titulo}</span>
-                    <span className={`badge ${c.color}`}>{c.riesgo}</span>
-                  </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">{c.desc}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-white/5 flex gap-2">
-                <button className="flex-1 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
-                  <AppIcon name="auto_awesome" size={16} className="icon-indigo" /> 
-                  Plan Contingencia
-                </button>
-              </div>
-            </div>
-          ))}
+        {/* Input */}
+        <div className="space-y-3">
+          <label className="block">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 block">Situación Procesal</span>
+            <textarea
+              className="input min-h-[80px] resize-none"
+              placeholder="Describe la situación procesal para identificar escenarios críticos..."
+              value={situacion}
+              onChange={e => setSituacion(e.target.value)}
+            />
+          </label>
+          {error && <p className="text-red-400 text-xs">{error}</p>}
+          <button
+            className="btn btn-primary w-full"
+            onClick={handleGenerar}
+            disabled={loading || !situacion.trim()}
+          >
+            <AppIcon name="auto_awesome" size={20} />
+            {loading ? ' Analizando...' : ' Generar Escenarios'}
+          </button>
         </div>
-        
-        <button className="w-full py-4 rounded-xl border border-dashed border-slate-600 text-slate-400 font-semibold hover:border-indigo-500 hover:text-indigo-400 transition-colors flex justify-center items-center gap-2">
-          <AppIcon name="add" size={20} className="icon-muted" /> 
-          Evaluación de Nuevo Escenario
-        </button>
+
+        {/* Scenarios List */}
+        {escenarios.length > 0 && (
+          <div className="space-y-3 pt-2">
+            {escenarios.map((c, i) => (
+              <div key={i} className="glass p-4 rounded-xl border border-white/5 shadow-lg relative overflow-hidden anim-fade-in-up group" style={{ animationDelay: `${i * 0.1}s`, opacity: 0 }}>
+                {c.riesgo === 'Alto' && <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full blur-2xl -z-10 group-hover:bg-red-500/20 transition-colors"></div>}
+                
+                <div className="flex items-start gap-3 mb-3">
+                  <div className={`mt-0.5 ${c.riesgo === 'Alto' ? 'text-red-400' : 'text-amber-400'}`}>
+                     <AppIcon name={c.icon || 'warning'} size={22} className="icon-raw" style={{ filter: 'brightness(0) saturate(100%) invert(56%) sepia(97%) saturate(2000%) hue-rotate(220deg) brightness(100%)' }} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-bold text-sm">{c.titulo}</span>
+                      <span className={`badge ${c.color || 'badge-warning'}`}>{c.riesgo}</span>
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">{c.desc}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-white/5 flex gap-2">
+                  <button className="flex-1 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5">
+                    <AppIcon name="auto_awesome" size={16} className="icon-indigo" /> 
+                    Plan Contingencia
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {escenarios.length === 0 && !loading && (
+          <div className="text-center py-8 text-slate-400">
+            <AppIcon name="dangerous" size={32} className="mx-auto mb-3 opacity-40" />
+            <p className="text-sm">Describe la situación procesal para identificar escenarios críticos.</p>
+          </div>
+        )}
       </div>
     </div>
   );

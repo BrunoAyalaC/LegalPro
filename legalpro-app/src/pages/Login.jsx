@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppIcon from '../components/AppIcon';
 const logoImg = '/landing/assets/img/logo-icon.jpeg';
 import { useTenant } from '../context/TenantContext';
+import { api } from '../api/client';
 
 /* ═══ Datos de los slides de onboarding ════════════════════════ */
 const SLIDES = [
@@ -138,12 +139,18 @@ export default function Login() {
   const navigate = useNavigate();
   const { login, isLoading: contextLoading } = useTenant();
 
+  const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [nombreCompleto, setNombreCompleto] = useState('');
+  const [aceptaTransferencia, setAceptaTransferencia] = useState(false);
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [aceptaPrivacidad, setAceptaPrivacidad] = useState(false);
 
   /* Auto-advance slides each 4s */
   useEffect(() => {
@@ -152,6 +159,14 @@ export default function Login() {
     }, 4000);
     return () => clearInterval(t);
   }, []);
+
+  const resetForm = () => {
+    setError('');
+    setPassword('');
+    setConfirmPassword('');
+    setAceptaTerminos(false);
+    setAceptaPrivacidad(false);
+  };
 
   const handleLogin = useCallback(async (e) => {
     e.preventDefault();
@@ -166,6 +181,52 @@ export default function Login() {
       setLoading(false);
     }
   }, [email, password, login, navigate]);
+
+  const handleRegister = useCallback(async (e) => {
+    e.preventDefault();
+    setError('');
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
+    if (!aceptaTerminos || !aceptaPrivacidad) {
+      setError('Debe aceptar los Términos y Condiciones y la Política de Privacidad.');
+      return;
+    }
+    if (!aceptaTransferencia) {
+      setError('Debe aceptar la transferencia internacional de datos para el procesamiento de IA conforme a la Política de Privacidad.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.register({
+        email,
+        password,
+        nombreCompleto: nombreCompleto.trim(),
+        rol: 'ABOGADO',
+        especialidad: 'GENERAL',
+        aceptaTransferenciaInternacional: true,
+      });
+      // Auto-login después de registro
+      const { organizacion } = await login(email, password);
+      navigate(organizacion ? '/dashboard' : '/setup-organizacion');
+    } catch (err) {
+      const msg = err?.message ?? '';
+      if (msg.includes('409') || msg.includes('ya está registrado')) {
+        setError('El email ya está registrado.');
+      } else if (msg.includes('TRANSFERENCIA_REQUIRED')) {
+        setError('Debe aceptar la transferencia internacional de datos.');
+      } else {
+        setError('Error al registrar. Verifica tus datos e intenta nuevamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [email, password, confirmPassword, nombreCompleto, aceptaTerminos, aceptaPrivacidad, aceptaTransferencia, login, navigate]);
 
   const isSubmitting = loading || contextLoading;
 
@@ -327,9 +388,9 @@ export default function Login() {
             <h1 style={{
               fontSize: 20, fontWeight: 700, color: '#fff', marginBottom: 6,
               fontFamily: "'Plus Jakarta Sans',sans-serif",
-            }}>Iniciar Sesión</h1>
+            }}>{isRegister ? 'Crear Cuenta' : 'Iniciar Sesión'}</h1>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 24 }}>
-              Ingresa tus credenciales para continuar
+              {isRegister ? 'Regístrate para comenzar a usar LegalPro' : 'Ingresa tus credenciales para continuar'}
             </p>
 
             {/* Error */}
@@ -349,7 +410,40 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <form onSubmit={isRegister ? handleRegister : handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Nombre completo (solo registro) */}
+              {isRegister && (
+                <div>
+                  <label htmlFor="reg-nombre" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+                    Nombre completo
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <span className="material-symbols-outlined" aria-hidden="true" style={{
+                      position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                      fontSize: 18, color: 'rgba(255,255,255,0.3)', pointerEvents: 'none',
+                    }}>person</span>
+                    <input
+                      id="reg-nombre"
+                      type="text"
+                      value={nombreCompleto}
+                      onChange={e => setNombreCompleto(e.target.value)}
+                      required={isRegister}
+                      placeholder="Dr. Juan Pérez"
+                      style={{
+                        width: '100%', boxSizing: 'border-box',
+                        padding: '12px 14px 12px 40px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                        borderRadius: 12, fontSize: 14, color: '#fff',
+                        outline: 'none', transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => e.target.style.borderColor = 'rgba(6,182,212,0.5)'}
+                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.10)'}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Email */}
               <div>
                 <label htmlFor="login-email" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
@@ -426,30 +520,107 @@ export default function Login() {
                 </div>
               </div>
 
+              {/* Confirmar password (solo registro) */}
+              {isRegister && (
+                <div>
+                  <label htmlFor="reg-confirm" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+                    Confirmar contraseña
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <span className="material-symbols-outlined" aria-hidden="true" style={{
+                      position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                      fontSize: 18, color: 'rgba(255,255,255,0.3)', pointerEvents: 'none',
+                    }}>lock_reset</span>
+                    <input
+                      id="reg-confirm"
+                      type={showPass ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      required={isRegister}
+                      placeholder="••••••••"
+                      style={{
+                        width: '100%', boxSizing: 'border-box',
+                        padding: '12px 14px 12px 40px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                        borderRadius: 12, fontSize: 14, color: '#fff',
+                        outline: 'none', transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => e.target.style.borderColor = 'rgba(6,182,212,0.5)'}
+                      onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.10)'}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Extras row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'rgba(255,255,255,0.45)', cursor: 'pointer' }}>
-                  <input type="checkbox" defaultChecked style={{ accentColor: '#06B6D4' }} />
-                  Recordarme
-                </label>
-                <a href="#" style={{ fontSize: 12, color: '#06B6D4', textDecoration: 'none' }}>
-                  ¿Olvidó su contraseña?
-                </a>
-              </div>
+              {!isRegister && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'rgba(255,255,255,0.45)', cursor: 'pointer' }}>
+                    <input type="checkbox" defaultChecked style={{ accentColor: '#06B6D4' }} />
+                    Recordarme
+                  </label>
+                  <a href="#" style={{ fontSize: 12, color: '#06B6D4', textDecoration: 'none' }}>
+                    ¿Olvidó su contraseña?
+                  </a>
+                </div>
+              )}
+
+              {/* Consentimientos (solo registro) */}
+              {isRegister && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', lineHeight: 1.5 }}>
+                    <input
+                      type="checkbox"
+                      checked={aceptaTerminos}
+                      onChange={e => setAceptaTerminos(e.target.checked)}
+                      style={{ accentColor: '#06B6D4', marginTop: 2 }}
+                    />
+                    <span>
+                      Acepto los{' '}
+                      <a href="/terminos.html" target="_blank" rel="noopener noreferrer" style={{ color: '#06B6D4', textDecoration: 'underline' }}>Términos y Condiciones</a>
+                    </span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', lineHeight: 1.5 }}>
+                    <input
+                      type="checkbox"
+                      checked={aceptaPrivacidad}
+                      onChange={e => setAceptaPrivacidad(e.target.checked)}
+                      style={{ accentColor: '#06B6D4', marginTop: 2 }}
+                    />
+                    <span>
+                      Acepto la{' '}
+                      <a href="/privacidad.html" target="_blank" rel="noopener noreferrer" style={{ color: '#06B6D4', textDecoration: 'underline' }}>Política de Privacidad</a>
+                    </span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', lineHeight: 1.5 }}>
+                    <input
+                      type="checkbox"
+                      checked={aceptaTransferencia}
+                      onChange={e => setAceptaTransferencia(e.target.checked)}
+                      style={{ accentColor: '#06B6D4', marginTop: 2 }}
+                    />
+                    <span>
+                      Acepto que mis datos puedan ser transferidos a proveedores de servicios cloud ubicados en el extranjero (Estados Unidos) para el procesamiento de IA, conforme a la{' '}
+                      <a href="/privacidad.html" target="_blank" rel="noopener noreferrer" style={{ color: '#06B6D4', textDecoration: 'underline' }}>Política de Privacidad</a>
+                    </span>
+                  </label>
+                </div>
+              )}
 
               {/* Submit */}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || (isRegister && (!aceptaTerminos || !aceptaPrivacidad || !aceptaTransferencia))}
                 style={{
                   width: '100%', padding: '14px',
-                  borderRadius: 12, border: 'none', cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                  background: isSubmitting
+                  borderRadius: 12, border: 'none', cursor: (isSubmitting || (isRegister && (!aceptaTerminos || !aceptaPrivacidad || !aceptaTransferencia))) ? 'not-allowed' : 'pointer',
+                  background: (isSubmitting || (isRegister && (!aceptaTerminos || !aceptaPrivacidad || !aceptaTransferencia)))
                     ? 'rgba(6,182,212,0.4)'
                     : 'linear-gradient(135deg, #06B6D4 0%, #0891b2 100%)',
                   color: '#fff', fontSize: 15, fontWeight: 700,
                   fontFamily: "'Plus Jakarta Sans',sans-serif",
-                  boxShadow: isSubmitting ? 'none' : '0 4px 20px rgba(6,182,212,0.35)',
+                  boxShadow: (isSubmitting || (isRegister && (!aceptaTerminos || !aceptaPrivacidad || !aceptaTransferencia))) ? 'none' : '0 4px 20px rgba(6,182,212,0.35)',
                   transition: 'all 0.2s ease',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   marginTop: 4,
@@ -464,12 +635,29 @@ export default function Login() {
                   }} />
                 ) : (
                   <>
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>
-                    Iniciar Sesión
+                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                      {isRegister ? 'person_add' : 'login'}
+                    </span>
+                    {isRegister ? 'Crear Cuenta' : 'Iniciar Sesión'}
                   </>
                 )}
               </button>
             </form>
+
+            {/* Toggle login/registro */}
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <button
+                type="button"
+                onClick={() => { setIsRegister(r => !r); resetForm(); }}
+                style={{
+                  background: 'none', border: 'none', color: '#06B6D4',
+                  fontSize: 13, cursor: 'pointer', textDecoration: 'underline',
+                  textUnderlineOffset: '3px',
+                }}
+              >
+                {isRegister ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
+              </button>
+            </div>
           </div>
 
           {/* Mini slides carousel (solo mobile) */}

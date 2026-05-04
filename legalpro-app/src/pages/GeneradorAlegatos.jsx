@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
+import IADisclaimerModal from '../components/IADisclaimerModal';
 import { api } from '../api/client';
 
 export default function GeneradorAlegatos() {
@@ -9,6 +11,7 @@ export default function GeneradorAlegatos() {
   const [resultado, setResultado] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
 
   const handleGenerar = async () => {
     if (!teoriaDelCaso.trim()) return;
@@ -29,13 +32,6 @@ export default function GeneradorAlegatos() {
     <div className="page-enter">
       <Header title="Alegatos de Clausura IA" showBack rightAction={<span className="badge badge-primary">IA Gemini</span>} />
       <div className="px-4 py-6 space-y-6">
-        <div className="card">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center"><AppIcon name="record_voice_over" size={20} /></div>
-            <div><p className="font-bold text-sm">Caso de Colusión Agravada</p><p className="text-xs text-slate-400">Exp. 04532-2023-JR-PE</p></div>
-          </div>
-          <div className="flex gap-2"><span className="badge badge-warning">Penal</span><span className="badge badge-danger">Juicio Oral</span></div>
-        </div>
         <div className="space-y-3">
           <label className="block"><span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 block">Tipo de Alegato</span>
             <div className="relative">
@@ -67,15 +63,33 @@ export default function GeneradorAlegatos() {
         </button>
         <div className="card bg-primary/5 border-primary/20 min-h-[200px] p-5">
           <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3">Borrador del Alegato</h3>
+          {resultado && <IADisclaimerBanner className="mb-3" compact />}
           {resultado ? (
             <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{resultado}</p>
           ) : (
-            <>
-              <p className="text-sm text-slate-300 leading-relaxed">Señor Juez, con el respeto que usted merece, quiero destacar que a lo largo de este juicio oral se ha demostrado fehacientemente que mi patrocinado...</p>
-              <p className="text-sm text-slate-400 leading-relaxed mt-2">La prueba actuada demuestra que no existió un acuerdo previo entre los acusados. Los testimonios de los peritos confirman que las reuniones fueron de naturaleza técnica...</p>
-            </>
+            <p className="text-sm text-slate-500 leading-relaxed">El borrador del alegato aparecerá aquí después de generarlo.</p>
+          )}
+          {resultado && (
+            <div className="pt-4 flex justify-end gap-2 border-t border-border-dark mt-4">
+              <button 
+                className="btn btn-primary text-xs py-2 px-3"
+                onClick={() => setShowDisclaimerModal(true)}
+              >
+                <AppIcon name="picture_as_pdf" size={20} /> Descargar PDF
+              </button>
+            </div>
           )}
         </div>
+
+        <IADisclaimerModal
+          isOpen={showDisclaimerModal}
+          actionLabel="Descargar PDF"
+          onConfirm={() => {
+            setShowDisclaimerModal(false);
+            alert('Descarga iniciada: recuerde revisar este documento antes de su uso profesional.');
+          }}
+          onCancel={() => setShowDisclaimerModal(false)}
+        />
       </div>
     </div>
   );

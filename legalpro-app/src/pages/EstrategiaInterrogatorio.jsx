@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
+import IADisclaimerModal from '../components/IADisclaimerModal';
 import { api } from '../api/client';
 
 export default function EstrategiaInterrogatorio() {
@@ -10,6 +12,7 @@ export default function EstrategiaInterrogatorio() {
   const [resultado, setResultado] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
 
   const handleGenerar = async () => {
     setLoading(true);
@@ -77,8 +80,17 @@ export default function EstrategiaInterrogatorio() {
         <div className="space-y-3">
           <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Preguntas Sugeridas</h3>
           {resultado ? (
-            <div className="card">
+            <div className="card space-y-3">
+              <IADisclaimerBanner compact />
               <p className="text-sm leading-relaxed text-slate-300 whitespace-pre-wrap">{resultado}</p>
+              <div className="pt-3 flex justify-end gap-2 border-t border-border-dark">
+                <button 
+                  className="btn btn-primary text-xs py-2 px-3"
+                  onClick={() => setShowDisclaimerModal(true)}
+                >
+                  <AppIcon name="content_copy" size={20} /> Copiar al portapapeles
+                </button>
+              </div>
             </div>
           ) : (
             preguntasDefault.map((p, i) => (
@@ -92,6 +104,17 @@ export default function EstrategiaInterrogatorio() {
             ))
           )}
         </div>
+
+        <IADisclaimerModal
+          isOpen={showDisclaimerModal}
+          actionLabel="Copiar"
+          onConfirm={() => {
+            setShowDisclaimerModal(false);
+            navigator.clipboard?.writeText(resultado);
+            alert('Contenido copiado: recuerde revisar este documento antes de su uso profesional.');
+          }}
+          onCancel={() => setShowDisclaimerModal(false)}
+        />
       </div>
     </div>
   );

@@ -1,11 +1,33 @@
 import { useState } from 'react';
 import AppIcon from '../components/AppIcon';
 import Header from '../components/Header';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import simuladorFondo from '../assets/backgrounds/simulador_fondo.jpeg';
+import { api } from '../api/client';
 
 export default function SimuladorJuicios() {
   const [rol, setRol] = useState('abogado');
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
   const roles = ['Juez', 'Fiscal', 'Abogado'];
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+    const userMsg = input.trim();
+    setMessages(prev => [...prev, { from: 'user', text: userMsg }]);
+    setInput('');
+    setLoading(true);
+    try {
+      const data = await api.consulta?.(userMsg, 'simulador');
+      const reply = data?.resultado ?? 'Respuesta del simulador no disponible.';
+      setMessages(prev => [...prev, { from: 'ia', text: reply }]);
+    } catch {
+      setMessages(prev => [...prev, { from: 'ia', text: 'Error al conectar con el simulador.' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="page-enter">
@@ -21,7 +43,7 @@ export default function SimuladorJuicios() {
           <button className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"><AppIcon name="settings" size={20} /></button>
         </div>
       } />
-      
+
       {/* Role Selection */}
       <div className="px-4 py-6">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Tu Rol en la Audiencia</h2>
@@ -35,31 +57,19 @@ export default function SimuladorJuicios() {
         </div>
       </div>
 
-      {/* Case Summary Card */}
+      {/* Intro */}
       <div className="px-4 mb-6">
-        <div className="glass card p-4 border border-indigo-500/20 shadow-[0_8px_32px_rgba(99,102,241,0.15)] relative overflow-hidden">
+        <div className="glass card p-4 border border-indigo-500/20 shadow-[0_8px_32px_rgba(99,102,241,0.15)] relative overflow-hidden text-center">
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -z-10"></div>
-          
-          <div className="flex items-center gap-2 mb-2">
-            <span className="badge badge-primary">Penal</span>
-            <span className="text-xs text-slate-400 font-medium tracking-wide">Exp. 00123-2023-JR-PE</span>
-          </div>
-          
-          <h3 className="text-white font-bold text-base mb-2 leading-tight">Analizando Tipicidad: Caso Colusión Agravada</h3>
-          
-          <p className="text-sm text-slate-300 leading-relaxed mb-4">
-            Acusación por colusión agravada en la licitación del Puente Tarata III. Análisis de tipicidad según el Código Procesal Penal peruano.
-          </p>
-          
-          <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400 bg-indigo-500/10 px-3 py-2 rounded-lg w-fit">
-            <AppIcon name="menu_book" size={18} className="icon-indigo" />
-            <span>Jurisprudencia: R.N. 123-2022 Lima</span>
-          </div>
+          <AppIcon name="psychology" size={28} className="icon-indigo mx-auto mb-2" />
+          <h3 className="text-white font-bold text-base mb-2 leading-tight">Simulador de Audiencias con IA</h3>
+          <p className="text-sm text-slate-300 leading-relaxed">Selecciona tu rol para comenzar la simulación.</p>
         </div>
       </div>
 
       {/* Gemini Feedback */}
       <div className="px-4 mb-6">
+        <IADisclaimerBanner compact className="mb-3" />
         <div className="glass border border-primary/20 rounded-xl p-4 shadow-lg shadow-indigo-500/5">
           <div className="flex items-center gap-2 mb-3">
             <AppIcon name="psychology" size={20} className="icon-indigo" />
@@ -67,17 +77,10 @@ export default function SimuladorJuicios() {
           </div>
           <div className="space-y-3">
             <div className="flex gap-3">
-              <AppIcon name="check_circle" size={20} className="icon-indigo" />
+              <AppIcon name="info" size={20} className="icon-muted" />
               <div>
-                <p className="text-sm font-semibold">Fortaleza Legal</p>
-                <p className="text-xs text-slate-400">Correcta citación del Art. 384 del CP. El argumento sobre el perjuicio patrimonial es sólido.</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <AppIcon name="warning" size={20} className="icon-muted" />
-              <div>
-                <p className="text-sm font-semibold text-amber-500">Sugerencia Estratégica</p>
-                <p className="text-xs text-slate-400">Refuerce la conexión entre la conducta del imputado y el acuerdo colusorio detectado en los chats.</p>
+                <p className="text-sm font-semibold">Simulación activa</p>
+                <p className="text-xs text-slate-400">Los argumentos se generarán en tiempo real según tu rol seleccionado.</p>
               </div>
             </div>
           </div>
@@ -86,25 +89,47 @@ export default function SimuladorJuicios() {
 
       {/* Chat Simulation */}
       <div className="px-4 space-y-4 pb-4">
-        <div className="flex justify-start">
-          <div className="max-w-[85%] chat-ai p-3 shadow-sm border border-white/5">
-            <p className="text-xs font-bold text-slate-400 mb-1 uppercase">Juez de Investigación</p>
-            <p className="text-sm">Señor Abogado, ¿cuál es su fundamento respecto a la falta de pruebas de concertación previa?</p>
+        {messages.length === 0 && (
+          <div className="flex justify-start">
+            <div className="max-w-[85%] chat-ai p-3 shadow-sm border border-white/5">
+              <p className="text-xs font-bold text-slate-400 mb-1 uppercase">Sistema</p>
+              <p className="text-sm">Selecciona tu rol para comenzar la simulación.</p>
+            </div>
           </div>
-        </div>
-        <div className="flex justify-end">
-          <div className="max-w-[85%] chat-user p-3 shadow-sm">
-            <p className="text-xs font-bold opacity-80 mb-1 uppercase">Tú (Abogado Defensor)</p>
-            <p className="text-sm">Señor Juez, conforme al Art. 384, no existe evidencia directa de pacto ilícito. Las reuniones citadas por Fiscalía son de carácter técnico...</p>
+        )}
+        {messages.map((m, i) => (
+          <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[85%] p-3 shadow-sm border border-white/5 ${m.from === 'user' ? 'chat-user' : 'chat-ai'}`}>
+              <p className="text-xs font-bold opacity-80 mb-1 uppercase">{m.from === 'user' ? `Tú (${rol})` : 'IA'}</p>
+              <p className="text-sm">{m.text}</p>
+            </div>
           </div>
-        </div>
+        ))}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="max-w-[85%] chat-ai p-3 shadow-sm border border-white/5">
+              <p className="text-xs font-bold text-slate-400 mb-1 uppercase">IA</p>
+              <p className="text-sm">Escribiendo...</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input */}
       <div className="px-4 pb-28">
         <div className="flex gap-2 items-center glass rounded-full pl-4 pr-1 py-1 shadow-[0_8px_24px_rgba(0,0,0,0.5)] border border-white/10">
-          <input className="flex-1 bg-transparent border-none outline-none text-sm py-2 placeholder:text-slate-500" placeholder="Escribe tu argumento legal..." />
-          <button className="bg-linear-to-br from-indigo-500 to-violet-600 text-white rounded-full p-2.5 flex items-center justify-center hover:scale-105 transition-transform shadow-lg">
+          <input
+            className="flex-1 bg-transparent border-none outline-none text-sm py-2 placeholder:text-slate-500"
+            placeholder="Escribe tu argumento legal..."
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSend()}
+          />
+          <button
+            onClick={handleSend}
+            disabled={loading || !input.trim()}
+            className="bg-linear-to-br from-indigo-500 to-violet-600 text-white rounded-full p-2.5 flex items-center justify-center hover:scale-105 transition-transform shadow-lg disabled:opacity-50"
+          >
             <AppIcon name="send" size={20} className="icon-raw" style={{ filter: 'brightness(0) invert(1)' }} />
           </button>
         </div>
