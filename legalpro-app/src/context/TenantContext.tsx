@@ -1,20 +1,41 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { api } from '../api/client';
+import type { TenantContextType, TenantState, LoginResult, Usuario, Organizacion } from '../types';
 
-const TenantContext = createContext(null);
+const TenantContext = createContext<TenantContextType | null>(null);
 
-function parseJwt(token) {
+interface JwtPayload {
+  sub?: string | number;
+  id?: string | number;
+  email?: string;
+  nombre_completo?: string;
+  nombre?: string;
+  rol?: string;
+  especialidad?: string;
+  organization_id?: string | number;
+  organization_name?: string;
+  organization_slug?: string;
+  plan?: string;
+  usuarios_max?: number;
+  expedientes_max?: number;
+  expedientes_usados?: number;
+  usuarios_usados?: number;
+  rol_org?: string;
+  exp?: number;
+}
+
+function parseJwt(token: string): JwtPayload | null {
   try {
-    return JSON.parse(atob(token.split('.')[1]));
+    return JSON.parse(atob(token.split('.')[1])) as JwtPayload;
   } catch {
     return null;
   }
 }
 
-function buildStateFromPayload(payload) {
+function buildStateFromPayload(payload: JwtPayload | null): Pick<TenantState, 'usuario' | 'organizacion'> {
   if (!payload) return { usuario: null, organizacion: null };
 
-  const usuario = {
+  const usuario: Usuario = {
     id: payload.sub ?? payload.id ?? null,
     email: payload.email ?? null,
     nombreCompleto: payload.nombre_completo ?? payload.nombre ?? payload.email ?? 'Usuario',
@@ -22,7 +43,7 @@ function buildStateFromPayload(payload) {
     especialidad: payload.especialidad ?? null,
   };
 
-  const organizacion = payload.organization_id
+  const organizacion: Organizacion | null = payload.organization_id
     ? {
         id: payload.organization_id,
         nombre: payload.organization_name ?? 'Mi Firma Legal',
@@ -40,7 +61,7 @@ function buildStateFromPayload(payload) {
   return { usuario, organizacion };
 }
 
-function loadFromStorage() {
+function loadFromStorage(): TenantState {
   const token = localStorage.getItem('legalpro_token');
   if (!token) return { token: null, usuario: null, organizacion: null };
   const payload = parseJwt(token);
@@ -52,12 +73,12 @@ function loadFromStorage() {
   return { token, usuario, organizacion };
 }
 
-export function TenantProvider({ children }) {
-  const [state, setState] = useState(() => loadFromStorage());
+export function TenantProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<TenantState>(() => loadFromStorage());
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -69,7 +90,7 @@ export function TenantProvider({ children }) {
       setState({ token, usuario, organizacion });
       return { token, usuario, organizacion };
     } catch (err) {
-      const msg = err.message?.includes('401')
+      const msg = (err as Error).message?.includes('401')
         ? 'Credenciales incorrectas. Verifica tu email y contraseña.'
         : 'No se pudo conectar al servidor. Intenta nuevamente.';
       setError(msg);
@@ -103,7 +124,7 @@ export function TenantProvider({ children }) {
     }
   }, []);
 
-  const value = useMemo(
+  const value = useMemo<TenantContextType>(
     () => ({
       token: state.token,
       usuario: state.usuario,
@@ -122,7 +143,7 @@ export function TenantProvider({ children }) {
 }
 
 /* eslint-disable-next-line react-refresh/only-export-components */
-export function useTenant() {
+export function useTenant(): TenantContextType {
   const ctx = useContext(TenantContext);
   if (ctx === null) throw new Error('useTenant debe usarse dentro de TenantProvider');
   return ctx;

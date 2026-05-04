@@ -23,7 +23,7 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      // Expedientes y documentos → .NET (C# backend)
+      // Expedientes y documentos ? .NET (C# backend)
       '/api/expedientes': {
         target: 'http://localhost:8080',
         changeOrigin: true,
@@ -34,7 +34,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
-      // Auth, organizaciones, gemini → Node.js backend
+      // Auth, organizaciones, gemini ? Node.js backend
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,

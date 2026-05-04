@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 
 /**
  * Detecta breakpoints responsive.
- * @param {string} query - Media query CSS
+ * @param query - Media query CSS
  */
-export function useMediaQuery(query) {
+export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia(query).matches;
@@ -12,7 +12,7 @@ export function useMediaQuery(query) {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(query);
-    const handler = (event) => setMatches(event.matches);
+    const handler = (event: MediaQueryListEvent) => setMatches(event.matches);
 
     mediaQuery.addEventListener('change', handler);
     return () => mediaQuery.removeEventListener('change', handler);
@@ -22,6 +22,6 @@ export function useMediaQuery(query) {
 }
 
 /* Breakpoints LegalPro */
-export function useIsMobile()  { return useMediaQuery('(max-width: 639px)'); }
-export function useIsTablet()  { return useMediaQuery('(min-width: 640px) and (max-width: 1023px)'); }
-export function useIsDesktop() { return useMediaQuery('(min-width: 1024px)'); }
+export function useIsMobile(): boolean  { return useMediaQuery('(max-width: 639px)'); }
+export function useIsTablet(): boolean  { return useMediaQuery('(min-width: 640px) and (max-width: 1023px)'); }
+export function useIsDesktop(): boolean { return useMediaQuery('(min-width: 1024px)'); }

@@ -6,7 +6,7 @@ import reactPlugin from 'eslint-plugin-react'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'node_modules', 'index.html']),
   // ── Frontend (React / Vite) ───────────────────────────────────────────────
   {
     files: ['src/**/*.{js,jsx}', 'index.html'],
