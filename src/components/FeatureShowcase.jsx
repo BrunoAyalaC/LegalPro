@@ -20,7 +20,7 @@ const roles = [
     visual: {
       label: 'Análisis IA en tiempo real',
       metrics: [
-        { name: 'Probabilidad de éxito', value: '87%', color: '#10B981' },
+        { name: 'Análisis de caso', value: 'En revisión', color: '#10B981' },
         { name: 'Precedentes similares', value: '312', color: '#00E5FF' },
         { name: 'Riesgo procesal', value: 'Bajo', color: '#F59E0B' },
       ],
@@ -43,7 +43,7 @@ const roles = [
     visual: {
       label: 'Requerimiento Fiscal Generado',
       metrics: [
-        { name: 'Calidad del escrito', value: '94/100', color: '#00E5FF' },
+        { name: 'Calidad del borrador', value: 'Revisado', color: '#00E5FF' },
         { name: 'Artículos citados', value: '18', color: '#7C3AED' },
         { name: 'Tiempo ahorrado', value: '6h', color: '#10B981' },
       ],
@@ -67,7 +67,7 @@ const roles = [
       label: 'Precedentes Vinculantes',
       metrics: [
         { name: 'Precedentes encontrados', value: '48', color: '#10B981' },
-        { name: 'Relevancia promedio', value: '91%', color: '#00E5FF' },
+        { name: 'Relevancia del análisis', value: 'Revisado', color: '#00E5FF' },
         { name: 'Tiempo de análisis', value: '2min', color: '#F59E0B' },
       ],
     },

@@ -71,7 +71,7 @@ const plans = [
       'Dashboard administrativo',
       'Módulos personalizados',
       'Integración con sistemas del estudio',
-      'SLA garantizado 99.9%',
+      'Alta disponibilidad',
       'Onboarding dedicado',
       'Account manager personal',
       'Facturación corporativa',

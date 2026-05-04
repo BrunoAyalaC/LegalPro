@@ -6,18 +6,18 @@ import { Users, Target, Wrench, HeartHandshake } from 'lucide-react'
 const stats = [
   {
     icon: Users,
-    value: 500,
+    value: 1,
     suffix: '+',
-    label: 'Abogados Activos',
-    desc: 'Profesionales legales que confían en Lex.ia cada día',
+    label: 'Comunidad Legal',
+    desc: 'Profesionales legales que utilizan Lex.ia',
     color: '#7C3AED',
   },
   {
     icon: Target,
-    value: 95,
-    suffix: '%',
-    label: 'Precisión IA',
-    desc: 'En predicción de resultados judiciales con datos reales',
+    value: 0,
+    suffix: '',
+    label: 'Asistente IA',
+    desc: 'Análisis basado en precedentes históricos',
     color: '#00E5FF',
   },
   {

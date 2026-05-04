@@ -14,9 +14,9 @@ const casos = [
     fiscal: 'Fiscalía Especializada en Delitos Económicos - Lima',
     abogado: 'Defensa técnica privada',
     analisisIA: {
-      riesgoCondena: 73,
+      riesgoCondena: 0,
       anosProbables: '6-8 años',
-      precedentes: 312,
+      precedentes: 0,
       defensas: [
         { tipo: 'Tipicidad', texto: 'El dolo deceptivo no está plenamente acreditado (R.N. 4539-2019)', icon: Shield, color: '#10B981' },
         { tipo: 'Prescripción', texto: 'Plazo ordinario Art. 80 CP - verificar fecha del primer acto', icon: Clock, color: '#F59E0B' },
@@ -35,9 +35,9 @@ const casos = [
     fiscal: 'N/A (proceso civil)',
     abogado: 'Abogado del arrendador',
     analisisIA: {
-      riesgoCondena: 88,
+      riesgoCondena: 0,
       anosProbables: '2-4 meses (sentencia favorable)',
-      precedentes: 547,
+      precedentes: 0,
       defensas: [
         { tipo: 'Proceso sumarísimo', texto: 'Competente el Juzgado de Paz Letrado (Art. 546 CPC)', icon: FileText, color: '#00E5FF' },
         { tipo: 'Pretensión clara', texto: 'Título de propiedad + contrato vencido = prueba suficiente', icon: Shield, color: '#10B981' },
@@ -56,9 +56,9 @@ const casos = [
     fiscal: 'N/A (proceso laboral)',
     abogado: 'Defensa del trabajador',
     analisisIA: {
-      riesgoCondena: 91,
+      riesgoCondena: 0,
       anosProbables: 'Reposición + 4-8 meses remuneraciones',
-      precedentes: 891,
+      precedentes: 0,
       defensas: [
         { tipo: 'Despido incausado', texto: 'STC 976-2001-AA (TC) - Protección contra despido arbitrario', icon: Shield, color: '#10B981' },
         { tipo: 'Prueba del vínculo', texto: 'Boletas de pago + control de asistencia = vínculo acreditado', icon: FileText, color: '#00E5FF' },
@@ -131,12 +131,12 @@ function CasoDetalle({ caso }) {
         {/* Stats rápidos */}
         <div className="grid grid-cols-3 gap-3 mb-5">
           <div className="text-center p-3 rounded-xl" style={{ background: `${color}10`, border: `1px solid ${color}20` }}>
-            <p className="text-2xl font-extrabold" style={{ color, fontFamily: 'Space Grotesk' }}>{caso.analisisIA.riesgoCondena}%</p>
-            <p className="text-xs text-slate-400 mt-0.5">Probabilidad favorable</p>
+            <p className="text-2xl font-extrabold" style={{ color, fontFamily: 'Space Grotesk' }}>—</p>
+            <p className="text-xs text-slate-400 mt-0.5">Análisis en revisión</p>
           </div>
           <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <p className="text-lg font-extrabold text-white" style={{ fontFamily: 'Space Grotesk' }}>{caso.analisisIA.precedentes}</p>
-            <p className="text-xs text-slate-400 mt-0.5">Casos similares</p>
+            <p className="text-lg font-extrabold text-white" style={{ fontFamily: 'Space Grotesk' }}>Varios</p>
+            <p className="text-xs text-slate-400 mt-0.5">Precedentes consultados</p>
           </div>
           <div className="text-center p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
             <p className="text-xs font-bold text-white mt-1">{caso.analisisIA.anosProbables}</p>

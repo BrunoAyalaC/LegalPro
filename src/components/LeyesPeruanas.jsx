@@ -101,8 +101,8 @@ export default function LeyesPeruanas() {
             Leyes peruanas que <span style={{ color: '#00E5FF' }}>dominamos</span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Lex.ia está entrenada con los principales códigos y leyes del ordenamiento jurídico peruano,
-            actualizada con jurisprudencia vinculante del TC y la Corte Suprema.
+            Lex.ia utiliza modelos de IA con contexto del ordenamiento jurídico peruano,
+            consultando jurisprudencia pública del Tribunal Constitucional y la Corte Suprema.
           </p>
         </motion.div>
 
@@ -202,10 +202,10 @@ export default function LeyesPeruanas() {
 
           {/* Bottom note */}
           <div className="flex flex-wrap gap-4 mt-6 text-xs text-slate-500">
-            <span>📚 +15,000 sentencias indexadas</span>
-            <span>⚖️ Tribunal Constitucional (2000–2026)</span>
-            <span>🏛️ Corte Suprema (2010–2026)</span>
-            <span>🔍 Búsqueda semántica inteligente</span>
+            <span>📚 Basado en jurisprudencia pública del Poder Judicial y TC</span>
+            <span>⚖️ Tribunal Constitucional</span>
+            <span>🏛️ Corte Suprema</span>
+            <span>🔍 Búsqueda en bases de datos legales</span>
           </div>
         </motion.div>
       </div>

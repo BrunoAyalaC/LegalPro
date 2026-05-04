@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Sparkles, ArrowRight, Play, ChevronDown } from 'lucide-react'
 
-const BADGES = ['✦ Nuevo', 'IA Legal Peruana', '# 1 en Perú']
+const BADGES = ['✦ Nuevo', 'IA Legal Peruana']
 
 export default function Hero() {
   return (
@@ -136,7 +136,7 @@ export default function Hero() {
               />
             ))}
           </div>
-          <span>+500 profesionales legales confían en Lex.ia</span>
+          <span>Comunidad en crecimiento de profesionales legales</span>
         </motion.div>
 
         {/* Phone mockup */}
@@ -169,8 +169,8 @@ export default function Hero() {
               {[
                 { text: 'Analiza el Art. 139 de la Constitución', right: false },
                 { text: 'El artículo 139 establece los principios de la función jurisdiccional, incluyendo...', right: true },
-                { text: '¿Cuál es la probabilidad de éxito?', right: false },
-                { text: '87% basado en 312 casos similares', right: true },
+                { text: '¿Cuál es el análisis del caso?', right: false },
+                { text: 'Análisis basado en precedentes históricos', right: true },
               ].map((msg, i) => (
                 <motion.div
                   key={i}

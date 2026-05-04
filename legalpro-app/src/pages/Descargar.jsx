@@ -15,7 +15,7 @@ const FEATURES = [
   { icon: '🔮', label: 'Predictor judicial en tiempo real' },
   { icon: '✍️', label: 'Redacción legal NCPP/CPC' },
   { icon: '🎭', label: 'Simulador de juicios orales' },
-  { icon: '🔔', label: 'Monitor SINOE integrado' },
+  { icon: '🔔', label: 'Información sobre sistemas judiciales peruanos' },
   { icon: '📚', label: 'Buscador de jurisprudencia' },
 ];
 
@@ -106,7 +106,7 @@ export default function Descargar() {
             <span style={{ color: '#06B6D4' }}>LegalPro</span>
           </h1>
           <p style={{ fontSize: 15, color: 'rgba(203,213,225,0.75)', lineHeight: 1.7, marginBottom: 32, maxWidth: 400 }}>
-            La plataforma legal con IA más avanzada del Perú, ahora en tu celular. Requiere Android 8.0+.
+            Plataforma legal con IA para el mercado peruano, ahora en tu celular. Requiere Android 8.0+.
           </p>
 
           {/* Download card */}

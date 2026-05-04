@@ -113,7 +113,7 @@ export default function JurisprudenciaFeed() {
             <Newspaper size={14} /> Jurisprudencia del Día
           </span>
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Lex.ia monitorea el <span style={{ color: '#A78BFA' }}>Poder Judicial</span> por ti
+            Información sobre <span style={{ color: '#A78BFA' }}>jurisprudencia peruana</span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
             Nuevas sentencias, plenos casatorios y acuerdos plenarios — analizados automáticamente con impacto en tu práctica diaria.
@@ -204,11 +204,9 @@ export default function JurisprudenciaFeed() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5, duration: 0.5 }}
           className="text-center mt-12">
           <p className="text-slate-500 text-sm mb-4">
-            Lex.ia monitorea <span className="text-white font-semibold">+850 resoluciones</span> del TC, Corte Suprema y SUNARP cada semana
+            Lex.ia consulta información de <span className="text-white font-semibold">jurisprudencia pública</span> del TC y Corte Suprema
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-400">
-            <span className="flex items-center gap-2"><ExternalLink size={14} color="#A78BFA" /> Integrado con SINOE</span>
-            <span className="flex items-center gap-2"><ExternalLink size={14} color="#10B981" /> Conectado al CEJ</span>
             <span className="flex items-center gap-2"><ExternalLink size={14} color="#00E5FF" /> Alertas personalizadas</span>
           </div>
         </motion.div>

@@ -72,14 +72,13 @@ export default function CTABanner() {
             fontSize: 'clamp(2rem, 5vw, 3.5rem)',
           }}
         >
-          Ejerce el derecho con la{' '}
+          Ejerce el derecho con{' '}
           <span
             className="gradient-text"
             style={{ display: 'inline-block' }}
           >
-            IA más avanzada
-          </span>{' '}
-          del Perú
+            IA para tu práctica legal
+          </span>
         </motion.h2>
 
         {/* Subtitle */}
@@ -90,7 +89,7 @@ export default function CTABanner() {
           className="mt-5 text-base md:text-lg max-w-xl mx-auto"
           style={{ color: '#94A3B8' }}
         >
-          Únete a +500 profesionales legales que ya trabajan más inteligente, más rápido
+          Únete a una comunidad en crecimiento de profesionales legales que ya trabajan más inteligente, más rápido
           y con mayor precisión gracias a Lex.ia.
         </motion.p>
 
@@ -149,7 +148,7 @@ export default function CTABanner() {
           className="mt-6 text-xs"
           style={{ color: '#475569' }}
         >
-          Sin tarjeta de crédito · Cancela en cualquier momento · Datos protegidos con AES-256
+          Sin tarjeta de crédito · Cancela en cualquier momento · Comunicación cifrada mediante HTTPS
         </motion.p>
       </div>
     </section>

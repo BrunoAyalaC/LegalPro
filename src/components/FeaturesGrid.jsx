@@ -16,7 +16,7 @@ const features = [
   {
     icon: TrendingUp,
     title: 'Predictor Judicial',
-    desc: 'Predice el resultado de tu caso con 95%+ precisión basándose en miles de precedentes del Poder Judicial peruano.',
+    desc: 'Asistente de IA para análisis legal basado en precedentes del Poder Judicial peruano.',
     color: '#00E5FF',
     glow: 'rgba(0,229,255,0.25)',
     tag: 'Machine Learning',
@@ -67,7 +67,7 @@ const features = [
     desc: 'Almacena y organiza evidencia digital con hash de integridad, cadena de custodia y permisos por rol.',
     color: '#EC4899',
     glow: 'rgba(236,72,153,0.25)',
-    tag: 'Seguridad Máxima',
+    tag: 'Seguridad de datos',
   },
 ]
 

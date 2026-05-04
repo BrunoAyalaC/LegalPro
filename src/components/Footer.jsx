@@ -74,8 +74,8 @@ export default function Footer() {
               </span>
             </a>
             <p className="text-sm leading-relaxed mb-6 max-w-xs" style={{ color: '#64748B' }}>
-              La plataforma de inteligencia artificial legal más avanzada del Perú. Diseñada para
-              abogados, fiscales, jueces y contadores peruanos.
+            Plataforma legal con IA para el mercado peruano. Diseñada para
+            abogados, fiscales, jueces y contadores peruanos.
             </p>
 
             {/* Contact */}

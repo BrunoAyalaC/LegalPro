@@ -3,43 +3,14 @@ import { useInView } from 'react-intersection-observer'
 import { ShieldCheck, Star, Quote, CheckCircle, XCircle, Award } from 'lucide-react'
 
 const testimonios = [
-  {
-    nombre: 'Dr. Carlos Mendoza R.',
-    cargo: 'Abogado Penalista — Lima',
-    colegiatura: 'CAL N° 34.872',
-    foto: 'CM',
-    texto: 'Lex.ia me ahorra 4 horas diarias en investigación. La semana pasada encontró un precedente del TC que cambió completamente mi estrategia de defensa. Mis colegas no pueden creer cómo preparo los casos ahora.',
-    rating: 5,
-    especialidad: 'Derecho Penal (NCPP)',
-    color: '#EF4444',
-  },
-  {
-    nombre: 'Dra. Patricia Vásquez L.',
-    cargo: 'Abogada Laboralista — Arequipa',
-    colegiatura: 'CAA N° 8.231',
-    foto: 'PV',
-    texto: 'Uso Lex.ia en todos mis casos de despido arbitrario. El análisis de jurisprudencia casatoria es impresionante — me mostró tendencias que no había visto en 12 años de ejercicio. Imprescindible.',
-    rating: 5,
-    especialidad: 'Derecho Laboral (LPCL)',
-    color: '#10B981',
-  },
-  {
-    nombre: 'Dr. Roberto Quispe V.',
-    cargo: 'Fiscal Adjunto Provincial — Cusco',
-    colegiatura: 'MP — Reg. 2.456',
-    foto: 'RQ',
-    texto: 'El predictor de sentencias penales es de una precisión asombrosa. He podido estimar correctamente el resultado en 18 de mis últimos 20 requerimientos. Lex.ia entiende el NCPP como pocos.',
-    rating: 5,
-    especialidad: 'Fiscalía Penal Especializada',
-    color: '#00E5FF',
-  },
+  // Testimonios eliminados: no se cuentan con testimonios reales verificables
 ]
 
 const comparacion = [
   { feature: 'Jurisprudencia peruana actualizada', lexia: true, tradicional: false },
   { feature: 'Análisis NCPP / CPC / LPCL', lexia: true, tradicional: false },
   { feature: 'Predicción de resultado judicial', lexia: true, tradicional: false },
-  { feature: 'Integración SINOE + CEJ', lexia: true, tradicional: false },
+  { feature: 'Información sobre sistemas judiciales peruanos', lexia: true, tradicional: false },
   { feature: 'Redacción de escritos legales', lexia: true, tradicional: false },
   { feature: 'Simulador de juicios interactivo', lexia: true, tradicional: false },
   { feature: 'Plazos procesales automáticos', lexia: true, tradicional: true },
@@ -47,9 +18,9 @@ const comparacion = [
 ]
 
 const certificaciones = [
-  { label: 'Validado con 1,000+ casos reales', sub: 'Precisión del 95% verificada', color: '#10B981', icon: ShieldCheck },
-  { label: 'Entrenado con legislación oficial', sub: 'Diario El Peruano + SPIJ', color: '#00E5FF', icon: Award },
-  { label: 'Compatible con CAL y CAA', sub: 'Colegios de Abogados del Perú', color: '#A78BFA', icon: CheckCircle },
+  { label: 'Asistente de IA para análisis legal', sub: 'Borradores generados con IA generativa', color: '#10B981', icon: ShieldCheck },
+  { label: 'Información basada en fuentes oficiales', sub: 'Diario El Peruano + SPIJ', color: '#00E5FF', icon: Award },
+  { label: 'Diseñado para operar en el marco legal peruano', sub: 'Colegios de Abogados del Perú', color: '#A78BFA', icon: CheckCircle },
 ]
 
 function AvatarLetras({ letras, color }) {
@@ -79,7 +50,7 @@ export default function ValidacionLegal() {
             <ShieldCheck size={14} /> Validación Legal
           </span>
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-            Confiado por <span style={{ color: '#10B981' }}>abogados reales</span>
+            Diseñado para <span style={{ color: '#10B981' }}>profesionales legales</span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
             Lex.ia no es una herramienta genérica — fue construida con y para abogados peruanos que ejercen en el día a día.
@@ -109,35 +80,7 @@ export default function ValidacionLegal() {
           })}
         </motion.div>
 
-        {/* Testimonios */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {testimonios.map((t, i) => (
-            <motion.div key={t.nombre}
-              initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.2 + i * 0.12, duration: 0.5 }}
-              whileHover={{ y: -4 }}
-              className="flex flex-col p-6 rounded-2xl"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <Quote size={28} color={t.color} className="mb-4 opacity-60" />
-              <p className="text-sm text-slate-300 leading-relaxed flex-grow mb-5">{t.texto}</p>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex gap-1">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} size={14} fill={t.color} color={t.color} />
-                  ))}
-                </div>
-                <span className="text-xs px-2 py-0.5 rounded" style={{ background: `${t.color}15`, color: t.color }}>{t.especialidad}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <AvatarLetras letras={t.foto} color={t.color} />
-                <div>
-                  <p className="text-sm font-bold text-white">{t.nombre}</p>
-                  <p className="text-xs text-slate-400">{t.cargo}</p>
-                  <p className="text-xs font-mono mt-0.5" style={{ color: t.color }}>{t.colegiatura}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {/* Testimonios eliminados por no contar con testimonios reales verificables */}
 
         {/* Comparación */}
         <motion.div initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4, duration: 0.6 }}>
