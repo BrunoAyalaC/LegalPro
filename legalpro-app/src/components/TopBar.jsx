@@ -28,18 +28,6 @@ const BREADCRUMB_MAP = {
   '/retroalimentacion':  ['IA Legal', 'Retroalimentación'],
 };
 
-const MOCK_NOTIFS = [
-  { id: 1, text: 'PLAZO VENCE MAÑANA: Exp. 04532-2023', type: 'urgente', time: '5m' },
-  { id: 2, text: 'Nueva resolución - Casación admitida', type: 'resolucion', time: '1h' },
-  { id: 3, text: 'Ley N° 31751 publicada en El Peruano', type: 'info', time: '3h' },
-];
-
-const NOTIF_DOT = {
-  urgente:   'bg-red-500',
-  resolucion:'bg-blue-500',
-  info:      'bg-slate-400',
-};
-
 export default function TopBar() {
   const location = useLocation();
   const { openCommand } = useUI();
@@ -118,9 +106,7 @@ function NotifButton() {
   const { toast } = useUI();
 
   const handleClick = () => {
-    toast.info('3 notificaciones pendientes', {
-      action: { label: 'Ver SINOE', onClick: () => window.location.href = '/monitor-sinoe' }
-    });
+    toast.info('Sistema de notificaciones en desarrollo.');
   };
 
   return (
@@ -129,10 +115,9 @@ function NotifButton() {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       className="relative p-2 rounded-xl hover:bg-white/8 text-slate-400 hover:text-slate-200 transition-colors"
-      aria-label="Notificaciones (3 nuevas)"
+      aria-label="Notificaciones"
     >
       <Bell size={18} />
-      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-[#0F172A] animate-pulse" />
     </motion.button>
   );
 }

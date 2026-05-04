@@ -37,7 +37,7 @@ const NAV_SECTIONS = [
   {
     label: 'Sistema',
     items: [
-      { to: '/monitor-sinoe',     icon: Bell,        label: 'Monitor SINOE', badge: '3' },
+      { to: '/monitor-sinoe',     icon: Bell,        label: 'Monitor SINOE' },
       { to: '/buscador',          icon: BookOpen,    label: 'Jurisprudencia' },
       { to: '/comparador',        icon: GitCompare,  label: 'Comparador' },
       { to: '/boveda',            icon: Shield,      label: 'Bóveda Evidencia' },

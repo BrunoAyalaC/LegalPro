@@ -10,6 +10,7 @@ import {
   RefreshCw, Copy, Check, MessageSquare,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { api } from '../api/client';
 
 /* ── Hook typewriter ─────────────────────────────────────── */
 function useTypewriter(text, speed = 18) {
@@ -27,13 +28,6 @@ function useTypewriter(text, speed = 18) {
   }, [text, speed]);
   return displayed;
 }
-
-/* ── Consultas de demo ───────────────────────────────────── */
-const DEMO_RESPONSES = [
-  'Según el Art. 442 del CPC, el emplazamiento debe efectuarse dentro de los 5 días hábiles. Recomiendo presentar el escrito de subsanación adjuntando los documentos faltantes antes del vencimiento del plazo.',
-  'Analizando los hechos descritos, existe fundamento para invocar la causal de nulidad por defecto de notificación conforme al Art. 171 del CPC. La jurisprudencia del TC en el Exp. 1209-2020-PA/TC respalda esta postura.',
-  'El expediente presenta plazos críticos: audiencia en 3 días y vencimiento de plazo probatorio en 8 días. Prioriza la presentación de los testigos y el peritaje contable.',
-];
 
 /**
  * @param {object} props
@@ -60,12 +54,20 @@ export default function AIAssistantPanel({ expediente, className = '' }) {
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
 
-    /* Simular delay de Gemini (reemplazar con llamada real a /api/ai) */
-    await new Promise(r => setTimeout(r, 1400 + Math.random() * 800));
-    const aiText = DEMO_RESPONSES[Math.floor(Math.random() * DEMO_RESPONSES.length)];
-    setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', content: aiText }]);
-    setLoading(false);
-  }, [input, loading]);
+    try {
+      const historial = messages.map(m => ({
+        role: m.role === 'ai' ? 'model' : 'user',
+        text: m.content,
+      }));
+      const data = await api.chat(text, historial, expediente?.id ?? null);
+      const aiText = data?.respuesta ?? data?.texto ?? data?.resultado ?? (typeof data === 'string' ? data : JSON.stringify(data));
+      setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', content: aiText }]);
+    } catch {
+      setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', content: 'No se pudo obtener respuesta. Intenta de nuevo.' }]);
+    } finally {
+      setLoading(false);
+    }
+  }, [input, loading, messages, expediente]);
 
   const handleKey = useCallback((e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -151,6 +153,7 @@ export default function AIAssistantPanel({ expediente, className = '' }) {
               <Sparkles className="w-3 h-3 text-violet-400" />
             </div>
             <div className="px-3 py-2.5 bg-white/5 border border-white/10 rounded-2xl rounded-bl-md">
+              <p className="text-[11px] text-slate-400 mb-1.5">Consultando...</p>
               <div className="flex gap-1.5">
                 {[0, 1, 2].map(i => (
                   <motion.span

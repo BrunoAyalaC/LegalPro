@@ -15,38 +15,6 @@ import {
 import { useTenant } from '../context/TenantContext';
 import api from '../api/client';
 
-/* â”€â”€ Datos de ejemplo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-const ACTIVITY_DATA = [
-  { mes: 'Oct', nuevos: 8, resueltos: 5, proceso: 14 },
-  { mes: 'Nov', nuevos: 12, resueltos: 9, proceso: 17 },
-  { mes: 'Dic', nuevos: 6, resueltos: 11, proceso: 12 },
-  { mes: 'Ene', nuevos: 15, resueltos: 8, proceso: 19 },
-  { mes: 'Feb', nuevos: 10, resueltos: 13, proceso: 16 },
-  { mes: 'Mar', nuevos: 18, resueltos: 14, proceso: 22 },
-];
-
-const MATERIA_DATA = [
-  { name: 'Civil',          value: 35, color: '#3B82F6' },
-  { name: 'Penal',          value: 25, color: '#EF4444' },
-  { name: 'Laboral',        value: 20, color: '#F59E0B' },
-  { name: 'Constitucional', value: 10, color: '#8B5CF6' },
-  { name: 'Familia',        value: 10, color: '#EC4899' },
-];
-
-const EXPEDIENTES_RECIENTES = [
-  { num: '04532-2023', materia: 'Civil',   titulo: 'Demanda por DaÃ±os y Perjuicios',       estado: 'urgente',   actores: 'GarcÃ­a vs. Constructora LP', dias: 1 },
-  { num: '01287-2024', materia: 'Penal',   titulo: 'Recurso de ApelaciÃ³n â€” Fraude',        estado: 'pendiente', actores: 'MP vs. RamÃ­rez Torres',      dias: 5 },
-  { num: '00891-2024', materia: 'Laboral', titulo: 'Cese de Hostilidades Laborales',       estado: 'activo',    actores: 'Mendoza vs. PerÃº SAC',       dias: 12 },
-  { num: '02201-2024', materia: 'Civil',   titulo: 'Nulidad de Acto JurÃ­dico',             estado: 'activo',    actores: 'Flores vs. NotarÃ­a Castro',  dias: 20 },
-  { num: '03387-2023', materia: 'Familia', titulo: 'Tenencia y RÃ©gimen de Visitas',        estado: 'archivado', actores: 'Paredes vs. Romero',         dias: 45 },
-];
-
-const NOTIFICACIONES = [
-  { id: 1, titulo: 'PLAZO VENCE MAÃ‘ANA',   desc: 'ApelaciÃ³n Exp. 04532-2023',       tipo: 'urgente',   tiempo: '5m' },
-  { id: 2, titulo: 'Nueva ResoluciÃ³n',      desc: 'CasaciÃ³n NÂ° 2841-2024 admitida',  tipo: 'resolucion',tiempo: '1h' },
-  { id: 3, titulo: 'ActualizaciÃ³n Normativa', desc: 'Ley NÂ° 31751 â€” CÃ³digo Penal',  tipo: 'info',      tiempo: '3h' },
-];
-
 const QUICK_LINKS = [
   { to: '/analista',  icon: BarChart3, label: 'Analista IA',     desc: 'Analiza expedientes',    color: 'from-blue-500/20 to-indigo-500/10',   iconClass: 'text-blue-400',    bg: 'bg-blue-500/15' },
   { to: '/redactor',  icon: FileEdit,  label: 'Redactor Legal',   desc: 'Escritos con IA',        color: 'from-cyan-500/20 to-sky-500/10',      iconClass: 'text-cyan-400',    bg: 'bg-cyan-500/15' },
@@ -99,7 +67,7 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 /* â”€â”€ KPI Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-function KpiCard({ icon: Icon, label, value, trend, trendUp, accentColor, glowColor, to }) {
+function KpiCard({ icon: Icon, label, value, loading, trend, trendUp, accentColor, glowColor, to }) {
   return (
     <motion.div variants={item} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
       <Link to={to || '#'} className="block">
@@ -110,7 +78,7 @@ function KpiCard({ icon: Icon, label, value, trend, trendUp, accentColor, glowCo
             <div className={`p-2.5 ${accentColor} rounded-xl border border-white/10`}>
               <Icon size={18} className="text-current" />
             </div>
-            {trend && (
+            {trend && !loading && (
               <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full
                 ${trendUp ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
                 {trendUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
@@ -118,13 +86,27 @@ function KpiCard({ icon: Icon, label, value, trend, trendUp, accentColor, glowCo
               </span>
             )}
           </div>
-          <p className="text-2xl lg:text-3xl font-extrabold text-white mb-1">
-            <CountUp end={value} duration={1.5} />
+          <p className="text-2xl lg:text-3xl font-extrabold text-white mb-1 h-10 flex items-center">
+            {loading ? (
+              <span className="inline-block w-6 h-6 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+            ) : (
+              <CountUp end={value} duration={1.5} />
+            )}
           </p>
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
         </div>
       </Link>
     </motion.div>
+  );
+}
+
+function EmptyState({ icon: Icon, title, subtitle }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-48 text-slate-400">
+      {Icon && <Icon size={32} className="mb-3 opacity-40" />}
+      <p className="text-sm font-semibold text-slate-300">{title}</p>
+      <p className="text-xs text-slate-500 mt-1 text-center max-w-xs">{subtitle}</p>
+    </div>
   );
 }
 
@@ -134,11 +116,40 @@ function KpiCard({ icon: Icon, label, value, trend, trendUp, accentColor, glowCo
 export default function Dashboard() {
   const { usuario, organizacion } = useTenant();
   const [stats, setStats] = useState({ civiles: 0, penales: 0, total: 0, urgentes: 0, laborales: 0, constitucionales: 0, familia: 0 });
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState(false);
+
+  const [activityData, setActivityData] = useState([]);
+  const [materiaData, setMateriaData] = useState([]);
+
+  const [expedientesRecientes, setExpedientesRecientes] = useState([]);
+  const [loadingExpedientes, setLoadingExpedientes] = useState(true);
+
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [loadingNotifs, setLoadingNotifs] = useState(true);
 
   useEffect(() => {
     api.getStats()
-      .then(setStats)
-      .catch(() => setStats({ civiles: 28, penales: 12, total: 47, urgentes: 3, laborales: 5, constitucionales: 2, familia: 4 }));
+      .then((data) => {
+        setStats(data);
+        if (data.activity) setActivityData(data.activity);
+        if (data.materia) setMateriaData(data.materia);
+        setStatsError(false);
+      })
+      .catch(() => setStatsError(true))
+      .finally(() => setLoadingStats(false));
+
+    const expPromise = api.getExpedientes ? api.getExpedientes({ limit: 5 }) : Promise.resolve([]);
+    expPromise
+      .then(setExpedientesRecientes)
+      .catch(() => setExpedientesRecientes([]))
+      .finally(() => setLoadingExpedientes(false));
+
+    const notifPromise = api.getNotificaciones ? api.getNotificaciones() : Promise.resolve([]);
+    notifPromise
+      .then(setNotificaciones)
+      .catch(() => setNotificaciones([]))
+      .finally(() => setLoadingNotifs(false));
   }, []);
 
   const nombreCorto = (usuario?.nombreCompleto || usuario?.nombre || 'Abogado').split(' ')[0];
@@ -180,11 +191,16 @@ export default function Dashboard() {
       </motion.div>
 
       {/* â”€â”€ KPI ROW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {statsError && (
+        <motion.div variants={item} className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
+          No se pudieron cargar las estadísticas. Intenta recargar.
+        </motion.div>
+      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <KpiCard icon={FolderOpen}    label="Expedientes Activos" value={stats.total || 47}             trend="+12%" trendUp to="/expedientes" accentColor="bg-blue-500/15 text-blue-400"    glowColor="bg-blue-500/20" />
-        <KpiCard icon={AlertTriangle} label="Vencen Esta Semana"  value={stats.urgentes || 3}           trend="â†‘ Urgente" trendUp={false} to="/expedientes" accentColor="bg-red-500/15 text-red-400" glowColor="bg-red-500/20" />
-        <KpiCard icon={FileText}      label="Escritos Este Mes"   value={12}                             trend="+3 con IA" trendUp to="/redactor" accentColor="bg-violet-500/15 text-violet-400" glowColor="bg-violet-500/20" />
-        <KpiCard icon={CheckCircle2}  label="Tasa de Ã‰xito"       value={89} trend="+2%"  trendUp accentColor="bg-emerald-500/15 text-emerald-400" glowColor="bg-emerald-500/20" />
+        <KpiCard icon={FolderOpen}    label="Expedientes Activos" value={stats.total || 0}             loading={loadingStats} trend="+12%" trendUp to="/expedientes" accentColor="bg-blue-500/15 text-blue-400"    glowColor="bg-blue-500/20" />
+        <KpiCard icon={AlertTriangle} label="Vencen Esta Semana"  value={stats.urgentes || 0}           loading={loadingStats} trend="â†‘ Urgente" trendUp={false} to="/expedientes" accentColor="bg-red-500/15 text-red-400" glowColor="bg-red-500/20" />
+        <KpiCard icon={FileText}      label="Escritos Este Mes"   value={0}                             loading={loadingStats} accentColor="bg-violet-500/15 text-violet-400" glowColor="bg-violet-500/20" />
+        <KpiCard icon={CheckCircle2}  label="Tasa de Ã‰xito"       value={0} loading={loadingStats} accentColor="bg-emerald-500/15 text-emerald-400" glowColor="bg-emerald-500/20" />
       </div>
 
       {/* â”€â”€ GRID PRINCIPAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
@@ -197,62 +213,82 @@ export default function Dashboard() {
               <h2 className="text-base font-bold text-white">Actividad de Expedientes</h2>
               <p className="text-xs text-slate-400 mt-0.5">Útimos 6 meses</p>
             </div>
-            <div className="flex items-center gap-3 text-xs">
-              <span className="flex items-center gap-1.5 text-blue-400"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Nuevos</span>
-              <span className="flex items-center gap-1.5 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />Resueltos</span>
-              <span className="flex items-center gap-1.5 text-amber-400"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />En proceso</span>
-            </div>
+            {activityData.length > 0 && (
+              <div className="flex items-center gap-3 text-xs">
+                <span className="flex items-center gap-1.5 text-blue-400"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Nuevos</span>
+                <span className="flex items-center gap-1.5 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />Resueltos</span>
+                <span className="flex items-center gap-1.5 text-amber-400"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />En proceso</span>
+              </div>
+            )}
           </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={ACTIVITY_DATA} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="gBlue"    x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#3B82F6" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="gGreen"   x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#10B981" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="gAmber"   x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#F59E0B" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
-              <Area type="monotone" dataKey="nuevos"    name="Nuevos"    stroke="#3B82F6" strokeWidth={2} fill="url(#gBlue)" />
-              <Area type="monotone" dataKey="resueltos" name="Resueltos" stroke="#10B981" strokeWidth={2} fill="url(#gGreen)" />
-              <Area type="monotone" dataKey="proceso"   name="En proceso" stroke="#F59E0B" strokeWidth={2} fill="url(#gAmber)" />
-            </AreaChart>
-          </ResponsiveContainer>
+          {activityData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={activityData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="gBlue"    x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#3B82F6" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="gGreen"   x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#10B981" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="gAmber"   x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#F59E0B" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
+                <Area type="monotone" dataKey="nuevos"    name="Nuevos"    stroke="#3B82F6" strokeWidth={2} fill="url(#gBlue)" />
+                <Area type="monotone" dataKey="resueltos" name="Resueltos" stroke="#10B981" strokeWidth={2} fill="url(#gGreen)" />
+                <Area type="monotone" dataKey="proceso"   name="En proceso" stroke="#F59E0B" strokeWidth={2} fill="url(#gAmber)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyState
+              icon={BarChart3}
+              title="Aún no hay actividad registrada"
+              subtitle="Los gráficos aparecerán cuando tengas expedientes en el sistema."
+            />
+          )}
         </motion.div>
 
         {/* â”€ DistribuciÃ³n por materia (1/3) â”€ */}
         <motion.div variants={item} className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-5 shadow-lg">
           <h2 className="text-base font-bold text-white mb-1">Por Materia</h2>
           <p className="text-xs text-slate-400 mb-5">Distribución actual</p>
-          <ResponsiveContainer width="100%" height={160}>
-            <PieChart>
-              <Pie data={MATERIA_DATA} cx="50%" cy="50%" innerRadius={45} outerRadius={72} paddingAngle={3} dataKey="value">
-                {MATERIA_DATA.map((entry, i) => <Cell key={i} fill={entry.color} strokeWidth={0} />)}
-              </Pie>
-              <Tooltip contentStyle={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: 12 }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="space-y-2 mt-3">
-            {MATERIA_DATA.map((m) => (
-              <div key={m.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: m.color }} />
-                  <span className="text-xs text-slate-400">{m.name}</span>
-                </div>
-                <span className="text-xs font-bold text-white">{m.value}%</span>
+          {materiaData.length > 0 ? (
+            <>
+              <ResponsiveContainer width="100%" height={160}>
+                <PieChart>
+                  <Pie data={materiaData} cx="50%" cy="50%" innerRadius={45} outerRadius={72} paddingAngle={3} dataKey="value">
+                    {materiaData.map((entry, i) => <Cell key={i} fill={entry.color} strokeWidth={0} />)}
+                  </Pie>
+                  <Tooltip contentStyle={{ background: '#1E293B', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-2 mt-3">
+                {materiaData.map((m) => (
+                  <div key={m.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ background: m.color }} />
+                      <span className="text-xs text-slate-400">{m.name}</span>
+                    </div>
+                    <span className="text-xs font-bold text-white">{m.value}%</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          ) : (
+            <EmptyState
+              icon={Scale}
+              title="Sin datos de materia"
+              subtitle="Aquí se mostrará la distribución por materia cuando registres expedientes."
+            />
+          )}
         </motion.div>
       </div>
 
@@ -294,38 +330,52 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="divide-y divide-white/5">
-            {EXPEDIENTES_RECIENTES.map((exp, i) => {
-              const es = ESTADO_STYLES[exp.estado] ?? ESTADO_STYLES.activo;
-              return (
-                <motion.div
-                  key={i}
-                  whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-                  className="flex items-center gap-4 px-5 py-3.5 cursor-pointer transition-colors"
-                >
-                  {/* NÃºmero */}
-                  <div className="shrink-0">
-                    <p className="text-xs font-mono text-slate-400">NÂ° {exp.num}</p>
-                    <p className={`text-[11px] font-bold ${MATERIA_STYLES[exp.materia] ?? 'text-slate-400'}`}>{exp.materia}</p>
-                  </div>
-                  {/* TÃ­tulo */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-200 truncate">{exp.titulo}</p>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">{exp.actores}</p>
-                  </div>
-                  {/* Estado + tiempo */}
-                  <div className="shrink-0 flex flex-col items-end gap-1.5">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${es.bg} ${es.text} ${es.border}
-                      ${exp.estado === 'urgente' ? 'animate-pulse' : ''}`}>
-                      {es.label}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs text-slate-400">
-                      <Clock size={9} /> hace {exp.dias}d
-                    </span>
-                  </div>
-                  <ArrowUpRight size={14} className="text-slate-400 shrink-0" />
-                </motion.div>
-              );
-            })}
+            {loadingExpedientes ? (
+              <div className="flex items-center justify-center h-32">
+                <span className="inline-block w-6 h-6 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+              </div>
+            ) : expedientesRecientes.length > 0 ? (
+              expedientesRecientes.map((exp, i) => {
+                const es = ESTADO_STYLES[exp.estado] ?? ESTADO_STYLES.activo;
+                return (
+                  <motion.div
+                    key={i}
+                    whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+                    className="flex items-center gap-4 px-5 py-3.5 cursor-pointer transition-colors"
+                  >
+                    {/* NÃºmero */}
+                    <div className="shrink-0">
+                      <p className="text-xs font-mono text-slate-400">NÂ° {exp.num}</p>
+                      <p className={`text-[11px] font-bold ${MATERIA_STYLES[exp.materia] ?? 'text-slate-400'}`}>{exp.materia}</p>
+                    </div>
+                    {/* TÃ­tulo */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-200 truncate">{exp.titulo}</p>
+                      <p className="text-xs text-slate-400 truncate mt-0.5">{exp.actores}</p>
+                    </div>
+                    {/* Estado + tiempo */}
+                    <div className="shrink-0 flex flex-col items-end gap-1.5">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${es.bg} ${es.text} ${es.border}
+                        ${exp.estado === 'urgente' ? 'animate-pulse' : ''}`}>
+                        {es.label}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-slate-400">
+                        <Clock size={9} /> hace {exp.dias}d
+                      </span>
+                    </div>
+                    <ArrowUpRight size={14} className="text-slate-400 shrink-0" />
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+                <FolderOpen size={28} className="mb-3 opacity-40" />
+                <p className="text-sm font-semibold text-slate-300">No hay expedientes recientes</p>
+                <Link to="/expedientes/nuevo" className="mt-3 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all">
+                  Crear primer expediente
+                </Link>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -341,24 +391,35 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="divide-y divide-white/5">
-            {NOTIFICACIONES.map((notif) => (
-              <motion.div
-                key={notif.id}
-                whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-                className="flex items-start gap-3 px-5 py-3.5 cursor-pointer transition-colors"
-              >
-                <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                  notif.tipo === 'urgente' ? 'bg-red-500' : notif.tipo === 'resolucion' ? 'bg-blue-500' : 'bg-slate-500'
-                } ${notif.tipo === 'urgente' ? 'animate-pulse' : ''}`} />
-                <div className="flex-1 min-w-0">
-                  <p className={`text-xs font-bold ${notif.tipo === 'urgente' ? 'text-red-400' : 'text-slate-200'}`}>
-                    {notif.titulo}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-0.5 truncate">{notif.desc}</p>
-                </div>
-                <span className="text-xs text-slate-400 shrink-0">{notif.tiempo}</span>
-              </motion.div>
-            ))}
+            {loadingNotifs ? (
+              <div className="flex items-center justify-center h-24">
+                <span className="inline-block w-5 h-5 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+              </div>
+            ) : notificaciones.length > 0 ? (
+              notificaciones.map((notif) => (
+                <motion.div
+                  key={notif.id}
+                  whileHover={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+                  className="flex items-start gap-3 px-5 py-3.5 cursor-pointer transition-colors"
+                >
+                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
+                    notif.tipo === 'urgente' ? 'bg-red-500' : notif.tipo === 'resolucion' ? 'bg-blue-500' : 'bg-slate-500'
+                  } ${notif.tipo === 'urgente' ? 'animate-pulse' : ''}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-bold ${notif.tipo === 'urgente' ? 'text-red-400' : 'text-slate-200'}`}>
+                      {notif.titulo}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5 truncate">{notif.desc}</p>
+                  </div>
+                  <span className="text-xs text-slate-400 shrink-0">{notif.tiempo}</span>
+                </motion.div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                <Bell size={24} className="mb-2 opacity-40" />
+                <p className="text-sm font-semibold text-slate-300">No hay notificaciones pendientes</p>
+              </div>
+            )}
           </div>
 
           {/* IA Quick Panel */}
@@ -368,7 +429,7 @@ export default function Dashboard() {
               <span className="text-xs font-bold text-violet-400">Asistente IA</span>
             </div>
             <p className="text-xs text-slate-400 leading-snug">
-              Tienes 3 expedientes que requieren atenciÃ³n urgente en los prÃ³ximos 2 dÃ­as.
+              Consulta el estado de tus expedientes en la sección correspondiente.
             </p>
             <Link to="/chat-ia"
               className="mt-3 flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-violet-500/15 border border-violet-500/25 text-violet-400 text-xs font-bold hover:bg-violet-500/25 transition-colors">
