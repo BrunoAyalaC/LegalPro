@@ -4,6 +4,7 @@ import AppIcon from '../components/AppIcon';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import IADisclaimerModal from '../components/IADisclaimerModal';
 import { api } from '../api/client';
+import { generateLegalPDF, exportToDocx } from '../utils/documents';
 
 export default function RedactorEscritos() {
   const [tipoEscrito, setTipoEscrito] = useState('Demanda de Alimentos');
@@ -14,6 +15,8 @@ export default function RedactorEscritos() {
   const [error, setError] = useState('');
   const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
+  const [exportLoading, setExportLoading] = useState({ preview: false, docx: false });
+  const [exportError, setExportError] = useState('');
 
   const handleGenerar = async () => {
     if (!hechos.trim()) return;
@@ -108,13 +111,22 @@ export default function RedactorEscritos() {
                 <p className="text-sm text-slate-400">El borrador del escrito aparecerá aquí después de generarlo.</p>
               </div>
             )}
-            <div className="pt-4 flex justify-end gap-2 border-t border-border-dark">
+            {exportError && <p className="text-red-400 text-xs">{exportError}</p>}
+            <div className="pt-4 flex justify-end gap-2 border-t border-border-dark flex-wrap">
               <button className="btn btn-secondary text-xs py-2 px-3"><AppIcon name="list_alt" size={20} /> Anexos</button>
+              <button 
+                className="btn btn-secondary text-xs py-2 px-3"
+                onClick={() => { setPendingAction('docx'); setShowDisclaimerModal(true); }}
+                disabled={exportLoading.docx || !resultado}
+              >
+                <AppIcon name="description" size={20} /> {exportLoading.docx ? 'Generando DOCX...' : 'Descargar DOCX'}
+              </button>
               <button 
                 className="btn btn-primary text-xs py-2 px-3"
                 onClick={() => { setPendingAction('preview'); setShowDisclaimerModal(true); }}
+                disabled={exportLoading.preview || !resultado}
               >
-                <AppIcon name="picture_as_pdf" size={20} /> Vista Previa
+                <AppIcon name="picture_as_pdf" size={20} /> {exportLoading.preview ? 'Generando PDF...' : 'Vista Previa PDF'}
               </button>
             </div>
           </div>
@@ -123,11 +135,45 @@ export default function RedactorEscritos() {
 
       <IADisclaimerModal
         isOpen={showDisclaimerModal}
-        actionLabel={pendingAction === 'preview' ? 'Ver Vista Previa' : 'Continuar'}
-        onConfirm={() => {
+        actionLabel={pendingAction === 'preview' ? 'Ver Vista Previa' : pendingAction === 'docx' ? 'Descargar DOCX' : 'Continuar'}
+        onConfirm={async () => {
           setShowDisclaimerModal(false);
-          setPendingAction(null);
-          alert('Vista previa: recuerde revisar este documento antes de su uso profesional.');
+          setExportError('');
+          const today = new Date().toISOString().split('T')[0];
+          const safeTitle = tipoEscrito.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g, '_');
+
+          if (pendingAction === 'preview') {
+            setExportLoading(prev => ({ ...prev, preview: true }));
+            try {
+              await generateLegalPDF({
+                title: tipoEscrito,
+                content: resultado,
+                metadata: { distrito: distritoJudicial },
+                filename: `Escrito_${safeTitle}_${today}.pdf`
+              });
+            } catch {
+              setExportError('Error al generar el PDF. Intenta de nuevo.');
+            } finally {
+              setExportLoading(prev => ({ ...prev, preview: false }));
+              setPendingAction(null);
+            }
+          } else if (pendingAction === 'docx') {
+            setExportLoading(prev => ({ ...prev, docx: true }));
+            try {
+              await exportToDocx({
+                title: tipoEscrito,
+                content: resultado,
+                filename: `Escrito_${safeTitle}_${today}.docx`
+              });
+            } catch {
+              setExportError('Error al generar el DOCX. Intenta de nuevo.');
+            } finally {
+              setExportLoading(prev => ({ ...prev, docx: false }));
+              setPendingAction(null);
+            }
+          } else {
+            setPendingAction(null);
+          }
         }}
         onCancel={() => { setShowDisclaimerModal(false); setPendingAction(null); }}
       />

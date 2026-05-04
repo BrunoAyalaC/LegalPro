@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
 import { api } from '../api/client';
+import { generateLegalPDF } from '../utils/documents';
 
 export default function ReporteRetroalimentacion() {
   const [reporte, setReporte] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportError, setExportError] = useState('');
 
   useEffect(() => {
     const cargar = async () => {
@@ -53,6 +56,39 @@ export default function ReporteRetroalimentacion() {
             <p className="text-[10px] text-slate-400 uppercase">Consultas/Mes</p>
           </div>
         </div>
+
+        {exportError && <p className="text-red-400 text-xs">{exportError}</p>}
+        <button
+          className="btn btn-secondary w-full text-xs"
+          onClick={async () => {
+            setExportLoading(true);
+            setExportError('');
+            try {
+              const today = new Date().toISOString().split('T')[0];
+              const areasText = (reporte?.areasMejora || []).map(a => `- ${a.area}: ${a.score}%\n  Tip: ${a.tip}`).join('\n\n');
+              const content = [
+                `Precisión Legal: ${reporte?.precision ?? '-'}%`,
+                `Consultas este mes: ${reporte?.consultasMes ?? '-'}`,
+                '',
+                'ÁREAS DE MEJORA',
+                areasText || 'Sin áreas registradas.'
+              ].join('\n');
+              await generateLegalPDF({
+                title: 'Reporte de Retroalimentación LegalPro',
+                content,
+                filename: `Reporte_Desempeno_${today}.pdf`
+              });
+            } catch {
+              setExportError('Error al generar el PDF. Intenta de nuevo.');
+            } finally {
+              setExportLoading(false);
+            }
+          }}
+          disabled={exportLoading}
+        >
+          <AppIcon name="picture_as_pdf" size={20} /> {exportLoading ? 'Generando...' : 'Exportar PDF'}
+        </button>
+
         <div className="space-y-3">
           <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Áreas de Mejora</h3>
           {(reporte?.areasMejora ?? []).map((m, i) => (

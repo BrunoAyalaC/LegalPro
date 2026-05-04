@@ -3,12 +3,14 @@ import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import { api } from '../api/client';
+import { generateLegalPDF } from '../utils/documents';
 
 export default function ResumenEjecutivo() {
   const [expediente, setExpediente] = useState(null);
   const [analisis, setAnalisis] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportError, setExportError] = useState('');
 
   useEffect(() => {
     // Ejemplo: cargar expediente seleccionado
@@ -81,8 +83,43 @@ export default function ResumenEjecutivo() {
           )}
         </div>
 
+        {exportError && <p className="text-red-400 text-xs">{exportError}</p>}
         <div className="flex gap-2">
-          <button className="btn btn-secondary flex-1 text-xs"><AppIcon name="picture_as_pdf" size={20} /> Exportar PDF</button>
+          <button 
+            className="btn btn-secondary flex-1 text-xs"
+            onClick={async () => {
+              if (!analisis) return;
+              setExportLoading(true);
+              setExportError('');
+              try {
+                const today = new Date().toISOString().split('T')[0];
+                const num = expediente?.numero?.replace(/[^a-zA-Z0-9_-]/g, '') || 'SIN_NUM';
+                const content = [
+                  'HECHOS RELEVANTES',
+                  analisis.hechosRelevantes || 'Sin datos.',
+                  '',
+                  'PUNTOS DÉBILES',
+                  analisis.puntosDebiles || 'Sin datos.',
+                  '',
+                  'RECOMENDACIONES',
+                  analisis.recomendaciones || 'Sin datos.'
+                ].join('\n');
+                await generateLegalPDF({
+                  title: 'Resumen Ejecutivo',
+                  content,
+                  metadata: { expediente: expediente?.numero, caso: expediente?.materia },
+                  filename: `Resumen_${num}_${today}.pdf`
+                });
+              } catch {
+                setExportError('Error al generar el PDF. Intenta de nuevo.');
+              } finally {
+                setExportLoading(false);
+              }
+            }}
+            disabled={exportLoading || !analisis}
+          >
+            <AppIcon name="picture_as_pdf" size={20} /> {exportLoading ? 'Generando...' : 'Exportar PDF'}
+          </button>
           <button className="btn btn-primary flex-1 text-xs"><AppIcon name="share" size={20} /> Compartir</button>
         </div>
       </div>

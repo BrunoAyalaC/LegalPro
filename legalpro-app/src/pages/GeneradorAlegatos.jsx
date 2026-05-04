@@ -4,6 +4,7 @@ import AppIcon from '../components/AppIcon';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import IADisclaimerModal from '../components/IADisclaimerModal';
 import { api } from '../api/client';
+import { generateLegalPDF, exportToDocx } from '../utils/documents';
 
 export default function GeneradorAlegatos() {
   const [tipoAlegato, setTipoAlegato] = useState('Alegato de Clausura - Defensa');
@@ -12,6 +13,8 @@ export default function GeneradorAlegatos() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
+  const [exportLoading, setExportLoading] = useState({ pdf: false, docx: false });
+  const [exportError, setExportError] = useState('');
 
   const handleGenerar = async () => {
     if (!teoriaDelCaso.trim()) return;
@@ -70,23 +73,65 @@ export default function GeneradorAlegatos() {
             <p className="text-sm text-slate-500 leading-relaxed">El borrador del alegato aparecerá aquí después de generarlo.</p>
           )}
           {resultado && (
-            <div className="pt-4 flex justify-end gap-2 border-t border-border-dark mt-4">
-              <button 
-                className="btn btn-primary text-xs py-2 px-3"
-                onClick={() => setShowDisclaimerModal(true)}
-              >
-                <AppIcon name="picture_as_pdf" size={20} /> Descargar PDF
-              </button>
-            </div>
+            <>
+              {exportError && <p className="text-red-400 text-xs mt-2">{exportError}</p>}
+              <div className="pt-4 flex justify-end gap-2 border-t border-border-dark mt-4 flex-wrap">
+                <button 
+                  className="btn btn-secondary text-xs py-2 px-3"
+                  onClick={async () => {
+                    setExportError('');
+                    setExportLoading(prev => ({ ...prev, docx: true }));
+                    try {
+                      const today = new Date().toISOString().split('T')[0];
+                      const safeTitle = tipoAlegato.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g, '_');
+                      await exportToDocx({
+                        title: tipoAlegato,
+                        content: resultado,
+                        filename: `Alegato_${safeTitle}_${today}.docx`
+                      });
+                    } catch {
+                      setExportError('Error al generar el DOCX. Intenta de nuevo.');
+                    } finally {
+                      setExportLoading(prev => ({ ...prev, docx: false }));
+                    }
+                  }}
+                  disabled={exportLoading.docx}
+                >
+                  <AppIcon name="description" size={20} /> {exportLoading.docx ? 'Generando...' : 'Descargar DOCX'}
+                </button>
+                <button 
+                  className="btn btn-primary text-xs py-2 px-3"
+                  onClick={() => setShowDisclaimerModal(true)}
+                  disabled={exportLoading.pdf}
+                >
+                  <AppIcon name="picture_as_pdf" size={20} /> {exportLoading.pdf ? 'Generando...' : 'Descargar PDF'}
+                </button>
+              </div>
+            </>
           )}
         </div>
 
         <IADisclaimerModal
           isOpen={showDisclaimerModal}
           actionLabel="Descargar PDF"
-          onConfirm={() => {
+          onConfirm={async () => {
             setShowDisclaimerModal(false);
-            alert('Descarga iniciada: recuerde revisar este documento antes de su uso profesional.');
+            setExportError('');
+            setExportLoading(prev => ({ ...prev, pdf: true }));
+            try {
+              const today = new Date().toISOString().split('T')[0];
+              const safeTitle = tipoAlegato.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g, '_');
+              await generateLegalPDF({
+                title: tipoAlegato,
+                content: resultado,
+                metadata: { caso: teoriaDelCaso.substring(0, 100) },
+                filename: `Alegato_${safeTitle}_${today}.pdf`
+              });
+            } catch {
+              setExportError('Error al generar el PDF. Intenta de nuevo.');
+            } finally {
+              setExportLoading(prev => ({ ...prev, pdf: false }));
+            }
           }}
           onCancel={() => setShowDisclaimerModal(false)}
         />

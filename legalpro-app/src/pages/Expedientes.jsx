@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import EmptyState from '../components/EmptyState';
 import api from '../api/client';
+import { exportToExcel } from '../utils/documents';
 import sinExpedientesImg from '../assets/empty-states/sin_expedientes.png';
 
 export default function Expedientes() {
@@ -14,6 +15,7 @@ export default function Expedientes() {
   const [fetchError, setFetchError] = useState('');
 
   const [showModal, setShowModal] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [formData, setFormData] = useState({
     numero: '',
     titulo: '',
@@ -85,7 +87,40 @@ export default function Expedientes() {
   return (
     <div className="page-enter">
       <Header title="Mis Expedientes" rightAction={
-        <button onClick={() => setShowModal(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white"><AppIcon name="add" size={20} /></button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={async () => {
+              if (!filtrados.length) return;
+              setExportLoading(true);
+              try {
+                const today = new Date().toISOString().split('T')[0];
+                const data = filtrados.map(e => ({
+                  'Número': e.numero,
+                  'Título': e.titulo,
+                  'Tipo': e.tipo,
+                  'Estado': e.estado?.replace('_', ' '),
+                  'Prioridad': e.prioridad,
+                  'Juzgado': e.juzgado
+                }));
+                await exportToExcel(data, `Expedientes_${today}.xlsx`, ['Número', 'Título', 'Tipo', 'Estado', 'Prioridad', 'Juzgado']);
+              } catch {
+                setFetchError('Error al exportar a Excel. Intenta de nuevo.');
+              } finally {
+                setExportLoading(false);
+              }
+            }}
+            disabled={exportLoading || !filtrados.length}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-dark border border-border-dark text-slate-300 hover:bg-white/5 disabled:opacity-50"
+            title="Exportar a Excel"
+          >
+            {exportLoading ? (
+              <span className="inline-block w-4 h-4 rounded-full border-2 border-slate-400 border-t-transparent animate-spin" />
+            ) : (
+              <AppIcon name="table_chart" size={18} />
+            )}
+          </button>
+          <button onClick={() => setShowModal(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white"><AppIcon name="add" size={20} /></button>
+        </div>
       } />
 
       {/* Search */}

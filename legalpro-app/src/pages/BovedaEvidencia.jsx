@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
+import { generateCustodyPDF } from '../utils/documents';
 
 export default function BovedaEvidencia() {
   const [evidencias, setEvidencias] = useState([]);
@@ -8,6 +9,8 @@ export default function BovedaEvidencia() {
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [tipo, setTipo] = useState('documento');
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportError, setExportError] = useState('');
 
   const iconMap = { imagen: 'image', documento: 'description', video: 'videocam' };
 
@@ -89,10 +92,31 @@ export default function BovedaEvidencia() {
           </div>
         )}
 
+        {exportError && <p className="text-red-400 text-xs text-center">{exportError}</p>}
         {!showForm && (
-          <button className="btn btn-primary w-full" onClick={() => setShowForm(true)}>
-            <AppIcon name="upload" size={20} /> Agregar Evidencia
-          </button>
+          <div className="flex flex-col gap-2">
+            <button 
+              className="btn btn-secondary w-full text-xs"
+              onClick={async () => {
+                setExportLoading(true);
+                setExportError('');
+                try {
+                  const today = new Date().toISOString().split('T')[0];
+                  await generateCustodyPDF(evidencias, `Cadena_Custodia_${today}.pdf`);
+                } catch {
+                  setExportError('Error al generar el PDF. Intenta de nuevo.');
+                } finally {
+                  setExportLoading(false);
+                }
+              }}
+              disabled={exportLoading || evidencias.length === 0}
+            >
+              <AppIcon name="security" size={20} /> {exportLoading ? 'Generando...' : 'Generar Cadena de Custodia PDF'}
+            </button>
+            <button className="btn btn-primary w-full" onClick={() => setShowForm(true)}>
+              <AppIcon name="upload" size={20} /> Agregar Evidencia
+            </button>
+          </div>
         )}
       </div>
     </div>

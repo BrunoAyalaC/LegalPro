@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import organizacionesRoutes from './routes/organizaciones.js';
 import datosPersonalesRoutes from './routes/datos-personales.js';
 import aiRoutes from './routes/ai.js';
+import documentosRoutes from './routes/documentos.js';
 import { initDb } from './initDb.js';
 
 const app = express();
@@ -156,6 +157,7 @@ app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOS
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/organizaciones', organizacionesRoutes);
 app.use('/api/mis-datos', datosPersonalesRoutes);
+app.use('/api/documentos', documentosRoutes);
 // /api/expedientes → BACKEND C# (LegalProBackend_Net) — no Node.js
 app.use('/api/gemini', geminiLimiter, aiRoutes);
 

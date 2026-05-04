@@ -233,3 +233,13 @@ export function isValidCAL(cal) {
   // CAL Perú: 5-6 dígitos
   return /^\d{5,6}$/.test(String(cal).trim());
 }
+
+/* ── Exportación de documentos ──────────────────────────── */
+
+export {
+  exportToPDF,
+  exportToExcel,
+  exportToDocx,
+  generateLegalPDF,
+  generateCustodyPDF,
+} from './documents.js';

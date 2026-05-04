@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import api from '../api/client';
+import { exportToExcel } from '../utils/documents';
 
 const QUICK_LINKS = [
   { to: '/analista',  icon: BarChart3, label: 'Analista IA',     desc: 'Analiza expedientes',    color: 'from-blue-500/20 to-indigo-500/10',   iconClass: 'text-blue-400',    bg: 'bg-blue-500/15' },
@@ -127,6 +128,7 @@ export default function Dashboard() {
 
   const [notificaciones, setNotificaciones] = useState([]);
   const [loadingNotifs, setLoadingNotifs] = useState(true);
+  const [exportLoading, setExportLoading] = useState(false);
 
   useEffect(() => {
     api.getStats()
@@ -213,13 +215,39 @@ export default function Dashboard() {
               <h2 className="text-base font-bold text-white">Actividad de Expedientes</h2>
               <p className="text-xs text-slate-400 mt-0.5">Útimos 6 meses</p>
             </div>
-            {activityData.length > 0 && (
-              <div className="flex items-center gap-3 text-xs">
-                <span className="flex items-center gap-1.5 text-blue-400"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Nuevos</span>
-                <span className="flex items-center gap-1.5 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />Resueltos</span>
-                <span className="flex items-center gap-1.5 text-amber-400"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />En proceso</span>
-              </div>
-            )}
+            <div className="flex items-center gap-3">
+              {activityData.length > 0 && (
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="flex items-center gap-1.5 text-blue-400"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />Nuevos</span>
+                  <span className="flex items-center gap-1.5 text-emerald-400"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />Resueltos</span>
+                  <span className="flex items-center gap-1.5 text-amber-400"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />En proceso</span>
+                </div>
+              )}
+              <button
+                onClick={async () => {
+                  if (!activityData.length) return;
+                  setExportLoading(true);
+                  try {
+                    const today = new Date().toISOString().split('T')[0];
+                    await exportToExcel(activityData, `Estadisticas_Actividad_${today}.xlsx`, ['mes', 'nuevos', 'resueltos', 'proceso']);
+                  } catch {
+                    // Error silencioso para no romper UI
+                  } finally {
+                    setExportLoading(false);
+                  }
+                }}
+                disabled={exportLoading || !activityData.length}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 border border-white/10 hover:bg-white/12 text-slate-300 text-[10px] font-semibold transition-all disabled:opacity-50"
+                title="Exportar estadísticas"
+              >
+                {exportLoading ? (
+                  <span className="inline-block w-3 h-3 rounded-full border-2 border-slate-400 border-t-transparent animate-spin" />
+                ) : (
+                  <BarChart3 size={12} />
+                )}
+                Exportar
+              </button>
+            </div>
           </div>
           {activityData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
