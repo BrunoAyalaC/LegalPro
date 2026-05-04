@@ -49,4 +49,15 @@ public class AuthController : ControllerBase
             expiresAt = result.ExpiresAt,
         });
     }
+
+    // ── GET /api/auth/me ──────────────────────────────────────────────────
+    // Retorna los datos del usuario autenticado basado en el JWT token.
+    // ─────────────────────────────────────────────────────────────────────
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> Me(CancellationToken ct)
+    {
+        var dto = await _mediator.Send(new GetCurrentUserQuery(), ct);
+        return Ok(dto);
+    }
 }

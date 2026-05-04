@@ -31,6 +31,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     // Audit trail de seguridad
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    // Documentos de expedientes
+    public DbSet<Documento> Documentos => Set<Documento>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

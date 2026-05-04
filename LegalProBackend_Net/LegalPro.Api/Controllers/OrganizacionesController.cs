@@ -84,6 +84,49 @@ public class OrganizacionesController : ControllerBase
         });
     }
 
+    // ── GET /api/organizaciones/me/miembros ──────────────────────────────
+    // Lista los miembros activos de la organización del usuario actual.
+    // ─────────────────────────────────────────────────────────────────────
+    [HttpGet("me/miembros")]
+    public async Task<IActionResult> GetMiembros(CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetMiembrosOrganizacionQuery(), ct);
+        return Ok(result);
+    }
+
+    // ── POST /api/organizaciones/invitar ──────────────────────────────────
+    // Alias en español para /invite (compatibilidad con frontend).
+    // ─────────────────────────────────────────────────────────────────────
+    [HttpPost("invitar")]
+    public async Task<IActionResult> InvitarMiembroAlias([FromBody] InvitarMiembroCommand command, CancellationToken ct)
+    {
+        var result = await _mediator.Send(command, ct);
+        return Ok(new
+        {
+            invitacionId = result.InvitacionId,
+            email = result.Email,
+            token = result.Token,
+            expiresAt = result.ExpiresAt
+        });
+    }
+
+    // ── POST /api/organizaciones/aceptar-invitacion ───────────────────────
+    // Alias en español para /accept-invite (compatibilidad con frontend).
+    // ─────────────────────────────────────────────────────────────────────
+    [HttpPost("aceptar-invitacion")]
+    public async Task<IActionResult> AceptarInvitacionAlias([FromBody] AceptarInvitacionCommand command, CancellationToken ct)
+    {
+        var result = await _mediator.Send(command, ct);
+        return Ok(new
+        {
+            mensaje = "Invitación aceptada. Bienvenido a la organización.",
+            token = result.NuevoToken,
+            organizacionId = result.OrganizacionId,
+            organizacionNombre = result.OrgNombre,
+            organizacionSlug = result.OrgSlug
+        });
+    }
+
     // ── DELETE /api/organizaciones/members/{usuarioId} ───────────────────
     // Owner/Admin remueve un miembro de la organización.
     // ─────────────────────────────────────────────────────────────────────
