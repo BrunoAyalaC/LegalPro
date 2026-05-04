@@ -28,6 +28,7 @@ const GeneradorCasosCriticos  = lazy(() => import('./pages/GeneradorCasosCritico
 const ResumenEjecutivo        = lazy(() => import('./pages/ResumenEjecutivo'));
 const ReporteRetroalimentacion= lazy(() => import('./pages/ReporteRetroalimentacion'));
 const ConfigEspecialidad      = lazy(() => import('./pages/ConfigEspecialidad'));
+const OrganizacionMiembros    = lazy(() => import('./pages/OrganizacionMiembros'));
 const SetupOrganizacion       = lazy(() => import('./pages/SetupOrganizacion'));
 const Descargar               = lazy(() => import('./pages/Descargar'));
 const Landing                 = lazy(() => import('./pages/Landing'));
@@ -65,6 +66,7 @@ export default function App() {
           <Route path="/resumen-ejecutivo" element={<ResumenEjecutivo />} />
           <Route path="/retroalimentacion" element={<ReporteRetroalimentacion />} />
           <Route path="/config-especialidad" element={<ConfigEspecialidad />} />
+          <Route path="/organizacion/miembros" element={<OrganizacionMiembros />} />
           {/* Chat IA y detalle: dentro del Layout para tener sidebar en desktop */}
           <Route path="/chat-ia" element={<ChatIA />} />
           <Route path="/expediente/:id" element={<AnalistaExpedientes />} />

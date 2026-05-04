@@ -50,6 +50,7 @@ const NAV_SECTIONS = [
     items: [
       { to: '/herramientas',        icon: Wrench,      label: 'Más Herramientas' },
       { to: '/config-especialidad', icon: Sliders,     label: 'Especialidad Legal' },
+      { to: '/organizacion/miembros', icon: Building2, label: 'Mi Organización' },
       { to: '/perfil',              icon: UserCircle,  label: 'Mi Perfil' },
     ],
   },

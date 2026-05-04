@@ -209,7 +209,8 @@ export default function Login() {
         nombreCompleto: nombreCompleto.trim(),
         rol: 'ABOGADO',
         especialidad: 'GENERAL',
-        aceptaTransferenciaInternacional: true,
+        aceptaTerminos,
+        aceptaPrivacidad,
       });
       // Auto-login después de registro
       const { organizacion } = await login(email, password);

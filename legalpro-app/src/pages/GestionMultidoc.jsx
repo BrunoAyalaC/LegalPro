@@ -33,9 +33,10 @@ export default function GestionMultidoc() {
     setLoading(true);
     setError('');
     try {
-      const doc = await api.createDocumento?.(expediente.id, {
+      const doc = await api.createDocumento?.({
         titulo: nuevoTitulo,
         contenido: nuevoContenido,
+        expediente_id: expediente.id,
       });
       if (doc) {
         setDocumentos(prev => [...prev, doc]);
