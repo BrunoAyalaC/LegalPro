@@ -1,8 +1,30 @@
 import { Router } from 'express';
 import puppeteer from 'puppeteer';
-import { authMiddleware, tenantMiddleware } from '../middleware/authMiddleware.js';
+import multer from 'multer';
+import { GoogleGenAI } from '@google/genai';
+import db from '../db.js';
+import { TokenRepository } from '../repositories/TokenRepository.js';
+import crypto from 'crypto';
+import { authMiddleware, tenantMiddleware, requireRole } from '../middleware/authMiddleware.js';
+import { idempotencyMiddleware } from '../middleware/idempotencyMiddleware.js';
+import { validate } from '../middleware/validate.js';
+import { documentoExportarSchema } from '../schemas/documentoExportarSchema.js';
+import { generarDocx, generarPdf, generarNombreArchivo } from '../services/documentoExportador.js';
+import logger from '../logger.js';
 
 const router = Router();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024 }
+});
+
+const tokenRepo = new TokenRepository(db);
+
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error('GEMINI_API_KEY no está configurada.');
+}
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const TIPOS_VALIDOS = ['escrito', 'alegato', 'resumen', 'custodia'];
 
@@ -255,5 +277,264 @@ router.post('/exportar-pdf', authMiddleware, tenantMiddleware, async (req, res, 
     next(err);
   }
 });
+
+/**
+ * POST /api/documentos/upload
+ *
+ * Sube un documento (imagen/PDF), realiza la extracción de texto mediante OCR multimodal
+ * con Gemini, guarda el texto extraído en el expediente y debita 2 créditos.
+ */
+router.post('/upload', authMiddleware, tenantMiddleware, idempotencyMiddleware(), upload.single('file'), async (req, res, next) => {
+  try {
+    const orgId = req.organizationId;
+    const userId = req.user?.sub;
+
+    if (!userId || !orgId) {
+      return res.status(401).json({ error: 'No autorizado.' });
+    }
+
+    // 1. Verificar créditos
+    const creditos = await tokenRepo.verificarCreditos(orgId);
+    if (creditos < 2) {
+      return res.status(402).json({
+        error: 'Créditos insuficientes para realizar la extracción OCR (requiere 2 créditos).',
+        code: 'INSUFFICIENT_CREDITS'
+      });
+    }
+
+    // 2. Validar archivo
+    if (!req.file) {
+      return res.status(400).json({ error: 'El archivo es obligatorio (parámetro "file").' });
+    }
+
+    // 3. Validar expediente_id
+    const expedienteId = req.body.expediente_id || req.query.expediente_id;
+    if (!expedienteId) {
+      return res.status(400).json({ error: 'El expediente_id es obligatorio.' });
+    }
+
+    // Verificar que el expediente pertenezca a la organización
+    const { rows: [exp] } = await db.query(
+      'SELECT id FROM expedientes WHERE id=$1 AND organization_id=$2',
+      [expedienteId, orgId]
+    );
+    if (!exp) {
+      return res.status(404).json({ error: 'Expediente no encontrado o no pertenece a su organización.' });
+    }
+
+    // 4. Preparar el archivo para Gemini OCR
+    const filePart = {
+      inlineData: {
+        data: req.file.buffer.toString('base64'),
+        mimeType: req.file.mimetype,
+      },
+    };
+
+    // 5. Llamar a Gemini para realizar el OCR multimodal
+    const ocrResponse = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: [
+        filePart,
+        'Realiza un OCR (Reconocimiento Óptico de Caracteres) preciso de este documento legal peruano. Extrae todo el texto legible con exactitud, manteniendo la estructura general del documento y sin omitir nada de información. No agregues introducciones, resúmenes ni comentarios adicionales; solo devuelve el texto extraído.'
+      ],
+    });
+
+    const textoOcr = ocrResponse.text ?? 'No se pudo extraer texto del documento.';
+
+    // 6. Actualizar expedientes con el texto OCR
+    await db.query(
+      'UPDATE expedientes SET texto_ocr=$1 WHERE id=$2',
+      [textoOcr, expedienteId]
+    );
+
+    // 7. Calcular hash SHA256 del archivo
+    const hashSha256 = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
+
+    // 8. Registrar el documento en la base de datos
+    const { rows: [doc] } = await db.query(
+      `INSERT INTO documentos (
+        expediente_id,
+        usuario_id,
+        organization_id,
+        nombre,
+        tipo_documento,
+        descripcion,
+        archivo_url,
+        archivo_nombre,
+        archivo_tipo,
+        archivo_tamano,
+        hash_sha256
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+      [
+        expedienteId,
+        userId,
+        orgId,
+        req.file.originalname,
+        req.body.tipo_documento || 'escrito',
+        req.body.descripcion || 'Documento procesado con OCR multimodal de Gemini',
+        `/uploads/${hashSha256}-${req.file.originalname}`,
+        req.file.originalname,
+        req.file.mimetype,
+        req.file.size,
+        hashSha256
+      ]
+    );
+
+    // 9. Registrar consumo de tokens de Gemini
+    const promptTokens = ocrResponse.usageMetadata?.promptTokenCount || 0;
+    const completionTokens = ocrResponse.usageMetadata?.candidatesTokenCount || 0;
+    tokenRepo.registrarConsumo(
+      userId,
+      orgId,
+      'document_ocr',
+      'gemini-1.5-flash',
+      promptTokens,
+      completionTokens,
+      req.headers['x-idempotency-key'] || null
+    ).catch(err => {
+      console.error('Error al registrar consumo de OCR:', err);
+    });
+
+    // 10. Debitar 2 créditos por el OCR
+    await tokenRepo.debitarCreditos(
+      userId,
+      orgId,
+      expedienteId,
+      2,
+      `Extracción OCR Multimodal - Archivo: ${req.file.originalname}`
+    );
+
+    return res.status(200).json({
+      success: true,
+      mensaje: 'Documento procesado con OCR y registrado exitosamente.',
+      documento: doc,
+      textoOcr: textoOcr
+    });
+
+  } catch (err) {
+    console.error('Error en POST /api/documentos/upload:', err);
+    next(err);
+  }
+});
+
+/**
+ * POST /api/documentos/exportar
+ *
+ * Exporta un documento legal peruano en formato DOCX (Word) o PDF.
+ * Incluye el formato oficial requerido por el Poder Judicial peruano:
+ *   - Márgenes: 3cm izquierdo, 2cm derecho, 2cm superior, 2cm inferior
+ *   - Fuente: Times New Roman 12pt
+ *   - Interlineado: 1.5
+ *   - Encabezado con datos del juzgado y expediente
+ *   - Sumilla, Fundamentos, Petitorio, Firmas, Disclaimer legal
+ *   - Numeración de páginas
+ *
+ * @param {string} tipo - Tipo de documento (demanda, apelacion, casacion, etc.)
+ * @param {string} juzgado - Nombre del juzgado
+ * @param {string} numeroExpediente - Número de expediente
+ * @param {string} sumilla - Sumilla del documento
+ * @param {string} contenido - Cuerpo del documento (texto plano con saltos de línea)
+ * @param {string} recurrente - Nombre del recurrente
+ * @param {string} abogado - Nombre del abogado
+ * @param {string} formato - Formato de exportación ("docx" | "pdf")
+ * @param {string} [colegiatura] - Número de colegiatura (opcional)
+ * @param {string} [organizacion] - Nombre del estudio jurídico (opcional)
+ *
+ * @returns {Buffer} Archivo binario con Content-Disposition adecuado
+ */
+router.post('/exportar',
+  authMiddleware,
+  tenantMiddleware,
+  requireRole(['OWNER', 'ADMIN', 'MEMBER']),
+  validate(documentoExportarSchema),
+  async (req, res, next) => {
+    try {
+      const {
+        tipo,
+        juzgado,
+        numeroExpediente,
+        sumilla,
+        contenido,
+        recurrente,
+        abogado,
+        colegiatura,
+        organizacion,
+        formato,
+      } = req.body;
+
+      const orgId = req.organizationId;
+      const userId = req.user?.sub;
+
+      if (!userId || !orgId) {
+        return res.status(401).json({ error: 'No autorizado.' });
+      }
+
+      logger.info('exportar_documento_inicio', {
+        tipo,
+        formato,
+        expediente: numeroExpediente,
+        orgId,
+        userId,
+      });
+
+      const params = {
+        tipo,
+        juzgado,
+        numeroExpediente,
+        sumilla,
+        contenido,
+        recurrente,
+        abogado,
+        colegiatura,
+        organizacion: organizacion || req.user?.org_name,
+      };
+
+      const nombreArchivo = generarNombreArchivo(params, formato);
+      let buffer;
+
+      if (formato === 'docx') {
+        buffer = await generarDocx(params);
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      } else if (formato === 'pdf') {
+        buffer = await generarPdf(params);
+        res.setHeader('Content-Type', 'application/pdf');
+      }
+
+      res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
+      res.setHeader('Content-Length', buffer.length);
+      // Cache-Control: no cache para archivos descargables
+      res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+
+      logger.info('exportar_documento_exito', {
+        tipo,
+        formato,
+        expediente: numeroExpediente,
+        sizeBytes: buffer.length,
+        orgId,
+        userId,
+      });
+
+      return res.send(buffer);
+    } catch (err) {
+      logger.error('exportar_documento_error', {
+        error: err.message,
+        stack: err.stack?.split('\n')[1],
+        body: req.body,
+      });
+
+      // Errores específicos de Puppeteer
+      if (err.message?.includes('Could not find Chromium') || err.message?.includes('Failed to launch')) {
+        return res.status(500).json({
+          error: 'El servicio de generación de PDF no está disponible. Contacte al administrador.',
+          code: 'PDF_SERVICE_UNAVAILABLE',
+        });
+      }
+
+      next(err);
+    }
+  }
+);
 
 export default router;
