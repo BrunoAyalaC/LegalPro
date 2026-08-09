@@ -1,0 +1,369 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.3.0",
+  "descripcion": "Plazos procesales canónicos de los códigos procesales peruanos. Reglas hardcoded con base legal.",
+  "fuente_oficial": "SPIJ (MINJUS)",
+  "changelog_1_3_0": "Ampliación a sub-materias (Obligaciones, Alimentos, Delitos contra el honor). Caso de uso: vencimientosService matchea por materia libre (TEXT) además de tipo (CHECK constraint).",
+  "plazos": [
+    {
+      "id": "plazo_contestacion_demanda_civil",
+      "materia": "civil",
+      "codigo": "CPC",
+      "articulo": "486",
+      "acto": "Contestación de demanda",
+      "dias": 30,
+      "tipo": "habiles",
+      "dies_a_quem": "Fecha de notificación válida",
+      "suspension_feriado": "Sí, no cuentan sábados/domingos/feriados",
+      "consecuencia_vencimiento": "Rebeldía automática (CPC art. 461)"
+    },
+    {
+      "id": "plazo_apelacion_sentencia_civil",
+      "materia": "civil",
+      "codigo": "CPC",
+      "articulo": "367",
+      "acto": "Apelación de sentencia",
+      "dias": 10,
+      "tipo": "habiles",
+      "consecuencia_vencimiento": "Consentimiento / ejecutoria",
+      "nota": "CPC art. 367: las sentencias se apelan en 10 días hábiles; los autos en 5 días hábiles"
+    },
+    {
+      "id": "plazo_apelacion_autos_civil",
+      "materia": "civil",
+      "codigo": "CPC",
+      "articulo": "367",
+      "acto": "Apelación de autos",
+      "dias": 5,
+      "tipo": "habiles",
+      "consecuencia_vencimiento": "Consentimiento / ejecutoria",
+      "nota": "CPC art. 367: los autos se apelan en 5 días hábiles, salvo disposición legal distinta"
+    },
+    {
+      "id": "plazo_casacion_civil",
+      "materia": "civil",
+      "codigo": "CPC",
+      "articulo": "388",
+      "acto": "Interposición de casación civil",
+      "dias": 10,
+      "tipo": "habiles",
+      "requisito": "Sentencia de segunda instancia"
+    },
+    {
+      "id": "plazo_acusacion_ncpp",
+      "materia": "penal",
+      "codigo": "NCPP",
+      "articulo": "349",
+      "acto": "Acusación fiscal",
+      "dias": 15,
+      "tipo": "habiles",
+      "contexto": "Conclusión de investigación preparatoria"
+    },
+    {
+      "id": "plazo_investigacion_preparatoria",
+      "materia": "penal",
+      "codigo": "NCPP",
+      "articulo": "342",
+      "acto": "Investigación preparatoria (delitos comunes)",
+      "dias": 120,
+      "tipo": "naturales",
+      "extension": "Hasta 60 días adicionales por complejidad",
+      "consecuencia_vencimiento": "Sobreseimiento o archivo",
+      "nota": "NCPP art. 342: plazo de 120 días naturales prorrogables hasta 60 días naturales adicionales"
+    },
+    {
+      "id": "plazo_investigacion_preparatoria_compleja",
+      "materia": "penal",
+      "codigo": "NCPP",
+      "articulo": "342",
+      "acto": "Investigación preparatoria (delitos complejos)",
+      "dias": 240,
+      "tipo": "naturales",
+      "nota": "NCPP art. 342: plazo de 240 días naturales para casos complejos, prorrogable por igual plazo"
+    },
+    {
+      "id": "plazo_prision_preventiva",
+      "materia": "penal",
+      "codigo": "NCPP",
+      "articulo": "272",
+      "acto": "Prisión preventiva (delitos comunes)",
+      "dias_meses": "9 meses",
+      "extension": "Hasta 18 meses (delitos graves) o 36 meses (organización criminal)"
+    },
+    {
+      "id": "plazo_revocatoria_medida_coercion",
+      "materia": "penal",
+      "codigo": "NCPP",
+      "articulo": "283",
+      "acto": "Revocatoria de medida coercitiva",
+      "dias": "cualquier momento"
+    },
+    {
+      "id": "plazo_amparo",
+      "materia": "constitucional",
+      "codigo": "Ley 31307 (NCPCConst 2021)",
+      "articulo": "45",
+      "acto": "Demanda de amparo",
+      "dias": 30,
+      "tipo": "habiles",
+      "dies_a_quem": "Desde la afectación del derecho",
+      "nota": "Plazo de caducidad: 30 días hábiles bajo Ley 31307 (NCPCConst 2021) art. 45, vigente desde 2022",
+      "nota_transicion": "60 días hábiles bajo la derogada Ley 28237 art. 44 (Código Procesal Constitucional anterior)"
+    },
+    {
+      "id": "plazo_habeas_corpus",
+      "materia": "constitucional",
+      "codigo": "Ley 28237 (CPCConst)",
+      "articulo": "27",
+      "acto": "Demanda de habeas corpus",
+      "dias": "sin plazo",
+      "nota": "Procede en cualquier momento mientras subsista la amenaza o violación"
+    },
+    {
+      "id": "plazo_habeas_data",
+      "materia": "constitucional",
+      "codigo": "Ley 31307 (NCPCConst 2021)",
+      "articulo": "45",
+      "acto": "Demanda de habeas data",
+      "dias": 30,
+      "tipo": "habiles",
+      "nota": "Plazo de caducidad: 30 días hábiles bajo Ley 31307 (NCPCConst 2021) art. 45, vigente desde 2022",
+      "nota_transicion": "60 días hábiles bajo la derogada Ley 28237 art. 61 (Código Procesal Constitucional anterior)"
+    },
+    {
+      "id": "plazo_demanda_laboral",
+      "materia": "laboral",
+      "codigo": "CPCL (Ley 29497)",
+      "articulo": "28",
+      "acto": "Demanda laboral",
+      "dias_prescripcion_contrato": "4 años desde extinguido el vínculo laboral (TUO D.L. 728 art. 36); 2 años si la relación duró menos de 1 año",
+      "dias_prescripcion_tributaria": "4 años (CT art. 43)"
+    },
+    {
+      "id": "plazo_caducidad_impugnacion_despido",
+      "materia": "laboral",
+      "codigo": "TUO LPCL (D.S. 003-97-TR)",
+      "articulo": "36",
+      "acto": "Impugnación de despido",
+      "dias": 30,
+      "tipo": "habiles",
+      "nota": "Plazo de caducidad: 30 días hábiles desde la fecha de cese efectivo. Vencido el plazo caduca el derecho a impugnar el despido"
+    },
+    {
+      "id": "plazo_contestacion_laboral",
+      "materia": "laboral",
+      "codigo": "CPCL (Ley 29497)",
+      "articulo": "24",
+      "acto": "Contestación de demanda laboral",
+      "dias": 10,
+      "tipo": "habiles",
+      "nota": "Inadmisibilidad: subsanable en 5 días"
+    },
+    {
+      "id": "plazo_apelacion_laboral",
+      "materia": "laboral",
+      "codigo": "CPCL (Ley 29497)",
+      "articulo": "32",
+      "acto": "Apelación de sentencia laboral",
+      "dias": 5,
+      "tipo": "habiles"
+    },
+    {
+      "id": "plazo_arbitraje_demanda",
+      "materia": "arbitraje",
+      "codigo": "DLeg 1071",
+      "articulo": "37",
+      "acto": "Solicitud de arbitraje",
+      "dias_prescripcion": "Depende de la materia"
+    },
+    {
+      "id": "plazo_contencioso_administrativo",
+      "materia": "administrativo",
+      "codigo": "TUO Ley 27584",
+      "articulo": "18",
+      "acto": "Demanda contencioso-administrativa",
+      "dias": 90,
+      "tipo": "naturales",
+      "nota": "Plazo de caducidad: 3 meses (90 días naturales) desde la notificación de la resolución que agota la vía administrativa (TUO Ley 27584 art. 18, con excepciones del art. 19)"
+    },
+    {
+      "id": "plazo_apelacion_arbitral",
+      "materia": "arbitraje",
+      "codigo": "DLeg 1071",
+      "articulo": "59",
+      "acto": "Anulación de laudo arbitral",
+      "dias": 20,
+      "tipo": "habiles"
+    },
+    {
+      "id": "plazo-bancario-reclamo",
+      "materia": "bancario",
+      "nombre": "Reclamo ante SBS",
+      "plazo_dias": 30,
+      "base_legal": "Ley 26702",
+      "descripcion": "Plazo para presentar reclamo ante la SBS"
+    },
+    {
+      "id": "plazo-contrataciones-recurso",
+      "materia": "contrataciones",
+      "nombre": "Recurso de apelación contrataciones",
+      "plazo_dias": 8,
+      "base_legal": "Ley 30225",
+      "descripcion": "Plazo para apelar ante el Tribunal de Contrataciones (8 días hábiles)"
+    },
+    {
+      "id": "plazo-aduanero-recurso",
+      "materia": "aduanero",
+      "nombre": "Recurso de apelación aduanero",
+      "plazo_dias": 15,
+      "base_legal": "D.Leg. 1053",
+      "descripcion": "Plazo para apelar resoluciones de SUNAT en materia aduanera"
+    },
+    {
+      "id": "plazo-competencia-descargo",
+      "materia": "competencia",
+      "nombre": "Descargo ante INDECOPI",
+      "plazo_dias": 15,
+      "base_legal": "D.Leg. 1034",
+      "descripcion": "Plazo para presentar descargo en procedimientos de libre competencia"
+    },
+    {
+      "id": "plazo-electoral-tacha",
+      "materia": "electoral",
+      "nombre": "Tacha de inscripción",
+      "plazo_dias": 3,
+      "base_legal": "Ley 26859",
+      "descripcion": "Plazo para formular tacha ante el JNE"
+    },
+    {
+      "id": "plazo-penitenciario-beneficio",
+      "materia": "penitenciario",
+      "nombre": "Solicitud beneficio penitenciario",
+      "plazo_dias": 30,
+      "base_legal": "D.Leg. 654",
+      "descripcion": "Plazo para resolver solicitud de beneficio penitenciario"
+    },
+    {
+      "id": "plazo-genero-medidas",
+      "materia": "genero",
+      "nombre": "Medidas de protección Ley 30364",
+      "plazo_dias": 72,
+      "base_legal": "Ley 30364",
+      "descripcion": "Plazo en horas (72h) para otorgar medidas de protección"
+    },
+    {
+      "id": "plazo-ejecucion-remate",
+      "materia": "ejecucion",
+      "nombre": "Remate judicial",
+      "plazo_dias": 10,
+      "base_legal": "CPC arts. 731-737",
+      "descripcion": "Plazo para postores en remate judicial"
+    },
+    {
+      "id": "plazo-seguros-reclamo",
+      "materia": "seguros",
+      "nombre": "Reclamo ante SBS seguros",
+      "plazo_dias": 30,
+      "base_legal": "Ley 29946",
+      "descripcion": "Plazo para reclamar ante la SBS en materia de seguros"
+    },
+    {
+      "id": "plazo_prescripcion_penal",
+      "materia": "penal",
+      "codigo": "CP",
+      "articulo": "80",
+      "acto": "Prescripción de la acción penal",
+      "dias": "según pena máxima (20/15/10/5 años)",
+      "tipo": "naturales",
+      "nota": "CP art. 80: 20 años (pena mayor a 20), 15 años (pena entre 10 y 20), 10 años (pena entre 5 y 10), 5 años (pena menor a 5). No opera en delitos imprescriptibles (crímenes de lesa humanidad, genocidio, desaparición forzada)"
+    },
+    {
+      "id": "plazo_prescripcion_civil",
+      "materia": "civil",
+      "codigo": "CC",
+      "articulo": "2001",
+      "acto": "Prescripción de la acción civil",
+      "dias": "según tipo de acción (10/5/2/1 años)",
+      "tipo": "naturales",
+      "nota": "CC art. 2001: 10 años (acción real, art. 2000), 5 años (acción personal), 2 años (honorarios de servicios), 1 año (acción de nulidad por causal del art. 221.2)"
+    },
+    {
+      "id": "plazo_reclamacion_tributaria",
+      "materia": "tributario",
+      "codigo": "TUO Código Tributario (D.S. 133-2013-EF)",
+      "articulo": "137",
+      "acto": "Reclamación ante SUNAT / administración tributaria",
+      "dias": 20,
+      "tipo": "habiles",
+      "nota": "CT art. 137: la reclamación se interpone dentro del plazo de 20 días hábiles de notificada la resolución"
+    },
+    {
+      "id": "plazo_apelacion_tribunal_fiscal",
+      "materia": "tributario",
+      "codigo": "TUO Código Tributario (D.S. 133-2013-EF)",
+      "articulo": "146",
+      "acto": "Apelación ante el Tribunal Fiscal",
+      "dias": 15,
+      "tipo": "habiles",
+      "nota": "CT art. 146: la apelación se interpone dentro del plazo de 15 días hábiles de notificada la resolución que resuelve la reclamación"
+    },
+    {
+      "id": "plazo_obligaciones_contestacion",
+      "materia": "obligaciones",
+      "codigo": "CPC",
+      "articulo": "486",
+      "acto": "Contestación de demanda de obligaciones",
+      "dias": 30,
+      "tipo": "habiles",
+      "consecuencia_vencimiento": "Rebeldía automática (CPC art. 461)",
+      "nota": "Sub-materia de civil. CPC art. 486 aplica supletoriamente a obligaciones de dar suma de dinero cuando no se ha pactado vía procedimental"
+    },
+    {
+      "id": "plazo_obligaciones_prescripcion_personal",
+      "materia": "obligaciones",
+      "codigo": "CC",
+      "articulo": "2001 inc. 4",
+      "acto": "Prescripción de acción personal por obligaciones",
+      "dias": 1825,
+      "tipo": "naturales",
+      "nota": "CC art. 2001 inc. 4: la acción personal prescribe a los 5 años (1825 días naturales). Plazo general para obligaciones de dar, hacer y no hacer"
+    },
+    {
+      "id": "plazo_alimentos_contestacion",
+      "materia": "alimentos",
+      "codigo": "CPC",
+      "articulo": "486",
+      "acto": "Contestación en proceso de alimentos",
+      "dias": 10,
+      "tipo": "habiles",
+      "nota": "Proceso sumarísimo de familia. CPC art. 486 + Ley 28457. Plazo abreviado por la urgencia del derecho alimentario (CC arts. 472-487)"
+    },
+    {
+      "id": "plazo_alimentos_apelacion",
+      "materia": "alimentos",
+      "codigo": "CPC",
+      "articulo": "367",
+      "acto": "Apelación de sentencia de alimentos",
+      "dias": 5,
+      "tipo": "habiles",
+      "nota": "CPC art. 367: régimen general de apelación de sentencias (5 días hábiles). Aplicación a procesos de familia alimentos"
+    },
+    {
+      "id": "plazo_honor_investigacion",
+      "materia": "delitos contra el honor",
+      "codigo": "NCPP",
+      "articulo": "342",
+      "acto": "Investigación preparatoria en delitos contra el honor",
+      "dias": 120,
+      "tipo": "naturales",
+      "extension": "Hasta 60 días adicionales por complejidad (NCPP art. 342)",
+      "nota": "Difamación (CP art. 131), injuria (CP art. 132) y calumnia (CP art. 130) son delitos de acción privada (querella). El plazo de investigación preparatoria sigue NCPP art. 342 (120 días naturales)"
+    }
+  ],
+  "reglas_globales": {
+    "dias_habiles_no_cuentan": ["sabado", "domingo", "feriado_nacional", "feriado_regional", "feriado_local"],
+    "si_ultimo_dia_es_inhabil": "Prorroga al siguiente día hábil",
+    "plazo_maximo_dias_calendario_laboral": "No aplica para laborales que son hábiles",
+    "publicidad_feriados": "Publicados por el Ministerio de Justicia (MINJUS)"
+  }
+}
