@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { BaseRepository } from './BaseRepository.js';
 
 export class OrganizacionRepository extends BaseRepository {
@@ -16,12 +17,53 @@ export class OrganizacionRepository extends BaseRepository {
   async create(data, userId) {
     const { nombre, slug, plan, maxUsuarios, maxExpedientes } = data;
 
+    // [FIX P0 2026-08-08] RLS multi-tenant (BUG#1 #P0 del auditor-legal).
+    //
+    // ANTECEDENTE:
+    //   La BD de producción tiene RLS habilitado en `organizaciones` y
+    //   `miembros_organizacion` con policies `tenant_isolation_*` (creadas
+    //   por el backend .NET EF Core, distintas a las `p_*` del init.sql).
+    //   Dichas policies exigen:
+    //     organizaciones:    id              = current_setting('app.current_org_id', true)
+    //     miembros_organiz: organizacion_id = current_setting('app.current_org_id', true)
+    //   El rol de BD que usa el backend (`legalpro_app`) NO es superuser ni
+    //   tiene BYPASSRLS, por lo que RLS SÍ aplica — a diferencia del rol
+    //   `postgres` que sí lo bypasa (lo que hacía que los tests con
+    //   connectionString de admin no detectaran el bug).
+    //
+    // BUG ORIGINAL:
+    //   POST /api/organizaciones llama a este método con un usuario recién
+    //   registrado que todavía no tiene organización (no hay row en
+    //   `miembros_organizacion` para él). Por lo tanto, el contexto tenant
+    //   no tiene `app.current_org_id` seteado, y el INSERT fallaba con:
+    //     42501 new row violates row-level security policy for table "organizaciones"
+    //   Resultado: HTTP 500 — usuarios nuevos no podían crear organizaciones;
+    //   solo funcionaba para los usuarios demo pre-sembrados (que ya
+    //   tenían un OWNER row y por lo tanto su `app.current_org_id`
+    //   entraba al contexto tenant desde el JWT).
+    //
+    // FIX:
+    //   Pre-generamos el UUID en Node y lo seteamos en la misma transacción
+    //   con SET LOCAL antes del INSERT. Así la policy RLS ve
+    //   `id = current_setting('app.current_org_id')` y coincide (no es un
+    //   bypass — seguimos bajo RLS, solo satisfacemos la policy de forma
+    //   legítima usando el mismo UUID que vamos a persistir).
+    //   No se deshabilita RLS ni se tocan policies: la BD queda intacta.
+    const newOrgId = crypto.randomUUID();
+
     return this.transaction(async (client) => {
+      // Activar el contexto RLS para esta transacción.
+      // SET LOCAL (tercer argumento `true`) asegura que las variables
+      // mueren al COMMIT/ROLLBACK — no contaminan el pool ni otras requests.
+      await client.query(`SELECT set_config('app.current_user_id', $1, true)`, [userId]);
+      await client.query(`SELECT set_config('app.current_org_id',  $1, true)`, [newOrgId]);
+      await client.query(`SELECT set_config('app.current_user_rol', 'OWNER', true)`);
+
       const { rows: orgRows } = await client.query(
-        `INSERT INTO organizaciones (nombre, slug, plan, max_usuarios, max_expedientes)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO organizaciones (id, nombre, slug, plan, max_usuarios, max_expedientes)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING *`,
-        [nombre.trim(), slug, plan, maxUsuarios, maxExpedientes]
+        [newOrgId, nombre.trim(), slug, plan, maxUsuarios, maxExpedientes]
       );
       const org = orgRows[0];
 

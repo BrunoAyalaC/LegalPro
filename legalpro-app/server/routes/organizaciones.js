@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import crypto from 'crypto';
-import db from '../db.js';
+import db, { tenantQuery } from '../db.js';
 import { authMiddleware, tenantMiddleware, requireRole } from '../middleware/authMiddleware.js';
 import { validate } from '../middleware/validate.js';
+import { idempotencyMiddleware } from '../middleware/idempotencyMiddleware.js';
 import { createOrganizacionSchema } from '../schemas/organizacionSchema.js';
 import { OrganizacionRepository } from '../repositories/OrganizacionRepository.js';
 
@@ -10,10 +11,20 @@ const router = Router();
 const organizacionRepo = new OrganizacionRepository(db);
 
 // ─── PLAN LIMITS ─────────────────────────────────────────────────────────────
+// [FIX P0 2026-08-08] BUG #2: los dbValue deben coincidir con el CHECK
+// constraint `organizaciones_plan_check` en la BD, que solo acepta:
+//   'free', 'pro', 'enterprise'
+// (definido en init.sql:95 y reforzado por initDb.js:97-98).
+// ANTES: dbValue usaba 'basico'/'profesional'/'empresa' — valores que NO
+// pasan el CHECK constraint y disparaban:
+//   23514 new row for relation "organizaciones" violates check constraint
+// Por eso un POST /api/organizaciones con plan='BASICO' retornaba 500.
+// El Zod schema sigue aceptando 'BASICO'/'PROFESIONAL'/'EMPRESA' (idioma
+// del cliente) y aquí se mapea al valor que espera la BD.
 const PLAN_LIMITS = {
-  BASICO:       { dbValue: 'basico',       max_usuarios: 3,   max_expedientes: 10  },
-  PROFESIONAL:  { dbValue: 'profesional',  max_usuarios: 15,  max_expedientes: 200 },
-  EMPRESA:      { dbValue: 'empresa',      max_usuarios: 100, max_expedientes: 5000 },
+  BASICO:       { dbValue: 'free',       max_usuarios: 3,   max_expedientes: 10  },
+  PROFESIONAL:  { dbValue: 'pro',        max_usuarios: 15,  max_expedientes: 200 },
+  EMPRESA:      { dbValue: 'enterprise', max_usuarios: 100, max_expedientes: 5000 },
 };
 
 const PLAN_ALIASES = {
@@ -29,7 +40,7 @@ function normalizePlan(plan) {
 
 // ─── POST /api/organizaciones ─────────────────────────────────────────────────
 // Crea una nueva organización y convierte al usuario en OWNER.
-router.post('/', authMiddleware, validate(createOrganizacionSchema), async (req, res, next) => {
+router.post('/', authMiddleware, idempotencyMiddleware(), validate(createOrganizacionSchema), async (req, res, next) => {
   try {
     const { nombre, plan } = req.body;
     const usuarioId = req.user.sub;
@@ -50,7 +61,10 @@ router.post('/', authMiddleware, validate(createOrganizacionSchema), async (req,
     // Verificar que el usuario no tenga ya una organización como OWNER
     const ownerRol = await organizacionRepo.getMemberRole(null, usuarioId);
     // getMemberRole requiere orgId; usamos query directa para este check global
-    const { rows: ownerCheck } = await db.query(
+    // FIX C-03: tenantQuery — si el request llega con contexto tenant activo
+    // (JWT con organization_id) se respeta RLS; sin contexto cae a pool.query
+    // (mismo comportamiento que db.query). Es seguro en ambos casos.
+    const { rows: ownerCheck } = await tenantQuery(
       `SELECT mo.id FROM miembros_organizacion mo
        WHERE mo.usuario_id = $1 AND mo.rol = 'OWNER' AND mo.activo = TRUE
        LIMIT 1`,
@@ -93,6 +107,7 @@ router.get('/me', authMiddleware, tenantMiddleware, async (req, res, next) => {
       plan: org.plan,
       maxUsuarios: org.max_usuarios,
       maxExpedientes: org.max_expedientes,
+      creditosDisponibles: org.creditos_disponibles ?? 0,
       usuariosUsados: parseInt(org.usuarios_usados, 10),
       expedientesUsados: parseInt(org.expedientes_usados, 10),
     });
