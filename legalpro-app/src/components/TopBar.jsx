@@ -1,8 +1,10 @@
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, Bell, ChevronRight, Menu } from 'lucide-react';
+import { Search, Bell, ChevronRight, Sparkles } from 'lucide-react';
 import { useUI } from '../context/UIContext';
 import { useTenant } from '../context/TenantContext';
+import { fixUtf8Mojibake } from '../utils/utf8';
+import { IA_ACTIVE_PROVIDER_ID, getProviderLabel } from '../api/client';
 
 const BREADCRUMB_MAP = {
   '/dashboard':          ['Dashboard'],
@@ -23,6 +25,7 @@ const BREADCRUMB_MAP = {
   '/resumen-ejecutivo':  ['Sistema', 'Resumen Ejecutivo'],
   '/herramientas':       ['Cuenta', 'Herramientas'],
   '/config-especialidad':['Cuenta', 'Especialidad Legal'],
+  '/creditos':           ['Cuenta', 'Mis Créditos'],
   '/perfil':             ['Cuenta', 'Mi Perfil'],
   '/casos-criticos':     ['IA Legal', 'Casos Críticos'],
   '/retroalimentacion':  ['IA Legal', 'Retroalimentación'],
@@ -37,7 +40,7 @@ export default function TopBar() {
 
   return (
     <header
-      className="sticky top-0 z-30 h-16 flex items-center px-4 lg:px-6 gap-4
+      className="sticky top-0 z-30 h-16 flex items-center px-4 lg:px-6 gap-3
                  bg-[#0F172A]/85 backdrop-blur-xl border-b border-white/8
                  shadow-sm shadow-black/20"
     >
@@ -56,6 +59,9 @@ export default function TopBar() {
 
       {/* Spacer on mobile */}
       <div className="flex-1 sm:hidden" />
+
+      {/* Badge IA Provider activo (single source of truth en client.ts) */}
+      <IAProviderBadge />
 
       {/* Buscador global (Cmd+K) */}
       <motion.button
@@ -91,7 +97,7 @@ export default function TopBar() {
         </div>
         <div className="hidden xl:block text-left">
           <p className="text-xs font-semibold text-white leading-tight">
-            {usuario?.nombreCompleto || usuario?.nombre || 'Usuario'}
+            {fixUtf8Mojibake(usuario?.nombreCompleto || usuario?.nombre || 'Usuario')}
           </p>
           <p className="text-xs text-slate-400 capitalize">
             {usuario?.rol?.toLowerCase() || 'abogado'}
@@ -102,11 +108,42 @@ export default function TopBar() {
   );
 }
 
+/**
+ * Badge IA Provider activo — modelo visible en el header para reforzar la
+ * confianza del usuario sobre QUÉ modelo está respondiendo.
+ *
+ * La etiqueta y el proveedor se derivan de constantes en `src/api/client.ts`
+ * (single source of truth). NO hardcodear strings aquí — si se cambia el
+ * proveedor en `iaProviders.js`, este badge se actualiza automáticamente.
+ */
+function IAProviderBadge() {
+  const label = getProviderLabel(IA_ACTIVE_PROVIDER_ID);
+  return (
+    <div
+      className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+                 bg-violet-500/10 border border-violet-500/25 text-violet-200
+                 hover:bg-violet-500/15 transition-colors"
+      title={`IA activa: ${label}`}
+      aria-label={`Modelo IA activo: ${label}`}
+      data-testid="ia-provider-badge"
+    >
+      <Sparkles size={11} aria-hidden="true" />
+      <span className="text-[10px] font-bold tracking-wide whitespace-nowrap">{label}</span>
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+      </span>
+    </div>
+  );
+}
+
 function NotifButton() {
   const { toast } = useUI();
+  const navigate = useNavigate();
 
   const handleClick = () => {
-    toast.info('Sistema de notificaciones en desarrollo.');
+    // El sistema de notificaciones ya está implementado en /monitor-sinoe
+    navigate('/monitor-sinoe');
   };
 
   return (
