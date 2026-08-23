@@ -4,6 +4,7 @@ import AppIcon from '../components/AppIcon';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import IADisclaimerModal from '../components/IADisclaimerModal';
 import { api } from '../api/client';
+import { getProviderLabel } from '../lib/iaProviders.js';
 import { generateLegalPDF, exportToDocx } from '../utils/documents';
 
 export default function GeneradorAlegatos() {
@@ -33,7 +34,7 @@ export default function GeneradorAlegatos() {
 
   return (
     <div className="page-enter">
-      <Header title="Alegatos de Clausura IA" showBack rightAction={<span className="badge badge-primary">IA Gemini</span>} />
+      <Header title="Alegatos de Clausura IA" showBack rightAction={<span className="badge badge-primary">IA {getProviderLabel('opencode')}</span>} />
       <div className="px-4 py-6 space-y-6">
         <div className="space-y-3">
           <label className="block"><span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 block">Tipo de Alegato</span>
@@ -62,7 +63,7 @@ export default function GeneradorAlegatos() {
           disabled={loading || !teoriaDelCaso.trim()}
         >
           <AppIcon name="auto_awesome" size={20} />
-          {loading ? ' Analizando con Gemini...' : ' Generar Alegato con Gemini'}
+          {loading ? ' Analizando con DeepSeek V4 Flash...' : ' Generar Alegato con IA'}
         </button>
         <div className="card bg-primary/5 border-primary/20 min-h-[200px] p-5">
           <h3 className="text-xs font-bold uppercase tracking-wider text-primary mb-3">Borrador del Alegato</h3>

@@ -8,20 +8,17 @@ import request from 'supertest';
 
 // ── Mock db (pg Pool) ANTES de importar la app ──────────────────────────────
 // Intercepta server/db.js para evitar conexión real a PostgreSQL en tests
-vi.mock('../db.js', () => {
-  return {
-    default: {
-      query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
-    },
-  };
-});
-
-// ── Mock supabase.js (shim deprecado) — mantener por si algún import lo usa ─
-vi.mock('../supabase.js', () => ({
-  default: null,
-  supabaseAdmin: null,
-  createUserClient: vi.fn(),
+// FIX R-01: las rutas usan `tenantQuery` además de `db.query`, por lo que
+// el mock debe exportarlo también.
+const _dbQueryMock = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 });
+vi.mock('../db.js', () => ({
+  default: {
+    query: (...args) => _dbQueryMock(...args),
+  },
+  tenantQuery: (...args) => _dbQueryMock(...args),
+  tenantContext: { getStore: () => undefined, run: (_ctx, fn) => fn() },
 }));
+
 
 let app;
 
@@ -140,16 +137,16 @@ describe('Organizaciones — auth guard', () => {
 // 6. GEMINI ROUTES — sin auth
 // ═══════════════════════════════════════════════════════════════════════
 describe('Gemini — auth guard', () => {
-  it('should_return_401_for_POST_/api/gemini/chat_without_token', async () => {
+  it('should_return_401_for_POST_/api/ai/chat_without_token', async () => {
     const res = await request(app)
-      .post('/api/gemini/chat')
+      .post('/api/ai/chat')
       .send({ message: 'hola' });
     expect(res.status).toBe(401);
   });
 
-  it('should_return_401_for_POST_/api/gemini/consulta_without_token', async () => {
+  it('should_return_401_for_POST_/api/ai/consulta_without_token', async () => {
     const res = await request(app)
-      .post('/api/gemini/consulta')
+      .post('/api/ai/consulta')
       .send({ tipo: 'analisis', texto: 'test' });
     expect(res.status).toBe(401);
   });
@@ -202,5 +199,16 @@ describe('CORS & Content-Type', () => {
       .set('Origin', 'http://localhost:5173');
     // CORS permite en dev
     expect(res.status).toBe(200);
+  });
+
+  it('should_allow_correlation_id_header_in_preflight', async () => {
+    const res = await request(app)
+      .options('/api/auth/login')
+      .set('Origin', 'http://localhost:5173')
+      .set('Access-Control-Request-Method', 'POST')
+      .set('Access-Control-Request-Headers', 'content-type,x-correlation-id');
+    expect(res.status).toBe(204);
+    const allowHeaders = (res.headers['access-control-allow-headers'] || '').toLowerCase();
+    expect(allowHeaders).toContain('x-correlation-id');
   });
 });

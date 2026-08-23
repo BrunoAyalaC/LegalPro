@@ -1,0 +1,87 @@
+# CODEOWNERS — Reglas de propiedad de código
+# Cada cambio en una ruta requiere aprobación del equipo listado
+
+# Default: nadie es owner (cualquiera puede modificar)
+* @arquitecto-chief
+
+# Backend .NET
+/LegalProBackend_Net/ @backend-dotnet @arquitecto-chief
+/LegalProBackend_Net/LegalPro.Api/Controllers/ @backend-dotnet
+/LegalProBackend_Net/LegalPro.Application/ @backend-dotnet
+/LegalProBackend_Net/LegalPro.Domain/ @backend-dotnet @arquitecto-chief
+/LegalProBackend_Net/LegalPro.Infrastructure/ @backend-dotnet
+
+# Backend Node
+/legalpro-app/server/ @backend-node @arquitecto-chief
+/legalpro-app/server/middleware/ @backend-node @auditor-seguridad
+/legalpro-app/server/routes/ai.js @backend-node @ia-legal
+/legalpro-app/server/utils/opencodeClient.js @backend-node @ia-legal @auditor-lpdp
+/legalpro-app/server/utils/visionClient.js @backend-node @ia-legal @auditor-lpdp
+/legalpro-app/server/utils/providerRouter.js @backend-node @ia-legal @auditor-lpdp
+/legalpro-app/server/routes/datos-personales.js @backend-node @auditor-lpdp
+
+# Frontend
+/legalpro-app/src/ @frontend @arquitecto-chief
+/legalpro-app/src/pages/ @frontend
+/legalpro-app/src/components/ @frontend @auditor-accesibilidad
+/legalpro-app/src/api/ @frontend @backend-node
+
+# Android
+/LegalProAndroid/ @android @arquitecto-chief
+/LegalProAndroid/app/src/main/java/com/legalpro/app/data/remote/ @android @backend-node
+
+# Database
+/catalogs/supabase-schema.md @database @arquitecto-chief @auditor-lpdp
+/legalpro-app/server/migrations/ @database @arquitecto-chief
+/LegalProBackend_Net/LegalPro.Infrastructure/Migrations/ @database @arquitecto-chief
+/legalpro-app/server/initDb.js @database
+
+# Seguridad, LPDP, multi-tenant
+/legalpro-app/server/middleware/authMiddleware.js @auditor-seguridad @backend-node
+/legalpro-app/server/middleware/tenantMiddleware.js @auditor-multi-tenant @backend-node
+/legalproBackend_Net/LegalPro.Api/Middleware/BruteForceProtectionMiddleware.cs @auditor-seguridad @backend-dotnet
+/LegalProBackend_Net/LegalPro.Api/Middleware/TenantMiddleware.cs @auditor-multi-tenant @backend-dotnet
+/legalproBackend_Net/LegalPro.Api/Middleware/MaskingTextFormatter.cs @auditor-seguridad @backend-dotnet
+
+# IA / OpenCode Go (DeepSeek V4 Flash)
+/LegalProBackend_Net/LegalPro.Application/Common/Interfaces/IMinimaxService.cs @ia-legal @auditor-lpdp @backend-dotnet
+/.opencode/agents/ia-*.md @ia-legal
+/.opencode/skills/* @arquitecto-chief
+/catalogs/opencode-functions.json @ia-legal @arquitecto-chief
+/catalogs/gemini-functions.json @ia-legal @arquitecto-chief # DEPRECATED 2026-08-01
+
+# Catálogos legales
+/catalogs/codigos-leyes.json @auditor-legal @arquitecto-chief
+/catalogs/tipos-penales-peru.json @auditor-legal
+/catalogs/plazos-procesales.json @auditor-legal
+/catalogs/glosario-juridico.md @auditor-legal
+
+# Regulación y compliance
+/catalogs/lpdp* @auditor-lpdp @gobernanza-chief
+/catalogs/audit-events.json @auditor-seguridad @auditor-lpdp
+/catalogs/role-tools.json @arquitecto-chief @product-owner
+
+# Documentos regulatorios
+/docs/REGISTRO_TRATAMIENTO_LPDP.md @gobernanza-chief @auditor-lpdp
+/docs/POLITICA_PRIVACIDAD.md @gobernanza-chief
+/docs/TERMINOS_CONDICIONES.md @gobernanza-chief
+/docs/TRANSFERENCIA_INTERNACIONAL.md @gobernanza-chief @auditor-lpdp
+/docs/SECRET_ROTATION_PLAN.md @devops @auditor-seguridad
+/PLAN_MADUREZ_LEGAL_PERU.md @gobernanza-chief
+/PRODUCTION_READINESS_CHECKLIST.md @release-manager
+
+# Agentes y skills del arnés
+/.opencode/agents/ @arquitecto-chief
+/.opencode/skills/ @arquitecto-chief
+/.opencode/commands/ @arquitecto-chief
+/.opencode/rules/ @arquitecto-chief
+
+# Catálogos del arnés
+/catalogs/ @arquitecto-chief
+/arneses/ @arquitecto-chief
+/tools/verifiers/ @auditor-seguridad @arquitecto-chief
+
+# Workflows y CI
+/.github/workflows/ @devops @arquitecto-chief
+/.github/CODEOWNERS @arquitecto-chief
+/.github/SECURITY.md @gobernanza-chief @auditor-seguridad

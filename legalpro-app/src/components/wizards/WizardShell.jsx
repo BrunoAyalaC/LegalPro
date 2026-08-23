@@ -151,6 +151,23 @@ export default function WizardShell({
     try { sessionStorage.setItem(`wizard_step_${storageKey}`, String(currentStep)); } catch { /* ignore */ }
   }, [currentStep, storageKey]);
 
+  /* FIX P0 #7: handleCancel debe declararse ANTES del useEffect que lo referencia
+     (evita Temporal Dead Zone / ReferenceError). Movido desde la línea ~210. */
+  const handleCancel = useCallback(async () => {
+    const ok = await confirm({
+      title:       'Salir del asistente',
+      description: 'Perderás el progreso no guardado. ¿Deseas salir?',
+      confirmText: 'Salir',
+      danger:      false,
+    });
+    if (ok) {
+      if (storageKey) {
+        try { sessionStorage.removeItem(`wizard_step_${storageKey}`); } catch { /* ignore */ }
+      }
+      onCancel?.();
+    }
+  }, [confirm, onCancel, storageKey]);
+
   /* Keyboard → Enter avanza, Esc cancela */
   useEffect(() => {
     function handler(e) {
@@ -206,21 +223,6 @@ export default function WizardShell({
     setDir(-1);
     setCurrentStep(s => s - 1);
   }, [isFirst]);
-
-  const handleCancel = useCallback(async () => {
-    const ok = await confirm({
-      title:       'Salir del asistente',
-      description: 'Perderás el progreso no guardado. ¿Deseas salir?',
-      confirmText: 'Salir',
-      danger:      false,
-    });
-    if (ok) {
-      if (storageKey) {
-        try { sessionStorage.removeItem(`wizard_step_${storageKey}`); } catch { /* ignore */ }
-      }
-      onCancel?.();
-    }
-  }, [confirm, onCancel, storageKey]);
 
   if (!steps.length) return null;
 

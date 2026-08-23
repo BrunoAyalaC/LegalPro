@@ -1,0 +1,107 @@
+{
+  "metadata": {
+    "periodo": "2026-06-12",
+    "total_eventos": 8
+  },
+  "eventos": [
+    {
+      "id": 1,
+      "organization_id": "ORG-PRO-001",
+      "user_id": "USR-ABOG-001",
+      "event_name": "AUTH_LOGIN_SUCCESS",
+      "severity": "INFO",
+      "ip_address": "190.235.45.10",
+      "user_agent": "Mozilla/5.0",
+      "payload_masked": {"method": "password"},
+      "created_at": "2026-06-12T08:30:00Z"
+    },
+    {
+      "id": 2,
+      "organization_id": "ORG-PRO-001",
+      "user_id": "USR-ABOG-001",
+      "event_name": "GEMINI_REQUEST",
+      "severity": "INFO",
+      "ip_address": "190.235.45.10",
+      "payload_masked": {
+        "modelo": "gemini-2.5-flash",
+        "herramienta": "analizar_expediente",
+        "tokens_input": 1247,
+        "tokens_output": 583,
+        "costo_usd": 0.0127
+      },
+      "created_at": "2026-06-12T10:00:00Z"
+    },
+    {
+      "id": 3,
+      "organization_id": "ORG-PRO-001",
+      "user_id": "USR-ABOG-001",
+      "event_name": "RESOURCE_CREATE",
+      "severity": "INFO",
+      "table_name": "expedientes",
+      "record_key": "EXP-CIV-001",
+      "created_at": "2026-06-12T10:15:00Z"
+    },
+    {
+      "id": 4,
+      "organization_id": "ORG-PRO-001",
+      "user_id": "USR-FIS-001",
+      "event_name": "GEMINI_REQUEST",
+      "severity": "INFO",
+      "ip_address": "190.235.45.20",
+      "payload_masked": {
+        "modelo": "gemini-2.5-flash",
+        "herramienta": "redactar_escrito",
+        "costo_usd": 0.0421
+      },
+      "created_at": "2026-06-12T11:15:00Z"
+    },
+    {
+      "id": 5,
+      "organization_id": "ORG-PRO-001",
+      "user_id": "USR-ABOG-001",
+      "event_name": "AUTH_LOGIN_FAILURE",
+      "severity": "WARNING",
+      "ip_address": "190.235.45.99",
+      "payload_masked": {"reason": "wrong_password"},
+      "created_at": "2026-06-12T12:00:00Z"
+    },
+    {
+      "id": 6,
+      "organization_id": "ORG-ENT-001",
+      "user_id": "USR-JUEZ-001",
+      "event_name": "GEMINI_REQUEST",
+      "severity": "INFO",
+      "ip_address": "200.10.50.30",
+      "payload_masked": {
+        "modelo": "gemini-2.5-pro",
+        "herramienta": "predecir_resultado",
+        "costo_usd": 0.0756
+      },
+      "created_at": "2026-06-12T14:30:00Z"
+    },
+    {
+      "id": 7,
+      "organization_id": "ORG-ENT-001",
+      "event_name": "FIRMA_DIGITAL_GENERATED",
+      "severity": "INFO",
+      "payload_masked": {
+        "documento_id": "DOC-001",
+        "hash_sha256": "abc123..."
+      },
+      "created_at": "2026-06-12T14:45:00Z"
+    },
+    {
+      "id": 8,
+      "organization_id": "ORG-PRO-001",
+      "event_name": "RATE_LIMIT_HIT",
+      "severity": "WARNING",
+      "ip_address": "45.32.10.5",
+      "payload_masked": {
+        "endpoint": "/api/analista",
+        "limit": 60,
+        "window": "1min"
+      },
+      "created_at": "2026-06-12T15:00:00Z"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "USR-FIS-001",
+  "organization_id": "ORG-PRO-001",
+  "email": "maria.lopez@mpfn.gob.pe",
+  "email_hash": "f6e5d4c3b2a1...",
+  "nombres": "Maria Elena",
+  "apellidos": "Lopez Vargas",
+  "dni": "87654321",
+  "rol_usuario": "FISCAL",
+  "especialidad": "penal-economico",
+  "is_active": true,
+  "email_verified": true,
+  "acepto_transferencia_internacional": true
+}

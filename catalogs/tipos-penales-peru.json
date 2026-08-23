@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.1.0",
+  "descripcion": "Taxonomía canónica de tipos penales del Código Penal peruano (DL 635 y modificatorias).",
+  "fuente_oficial": "SPIJ - Sistema Peruano de Información Jurídica (MINJUS)",
+  "ultima_actualizacion": "2026-01-01",
+  "tipos": [
+    {
+      "id": "hurto_simple",
+      "nombre": "Hurto Simple",
+      "articulo_cp": "185",
+      "bien_juridico": "Patrimonio",
+      "pena_minima": "1 día-multa",
+      "pena_maxima": "3 años",
+      "forma_culposo": false,
+      "agravantes": [
+        "hurto_agravado_art_186"
+      ],
+      "jurisprudencia_vinculante": [
+        "Casación 386-2015-Lambayeque"
+      ]
+    },
+    {
+      "id": "hurto_agravado",
+      "nombre": "Hurto Agravado",
+      "articulo_cp": "186",
+      "bien_juridico": "Patrimonio",
+      "pena_minima": "3 años",
+      "pena_maxima": "6 años",
+      "forma_culposo": false,
+      "agravantes_principales": [
+        "casa_habitada",
+        "escalamiento",
+        "llave_falsa",
+        "valor_superior_1UIT",
+        "nocturnidad",
+        "pluralidad_agentes"
+      ]
+    },
+    {
+      "id": "robo",
+      "nombre": "Robo",
+      "articulo_cp": "188",
+      "bien_juridico": "Patrimonio + Integridad física",
+      "pena_minima": "6 años",
+      "pena_maxima": "15 años",
+      "agravantes": [
+        "robo_agravado_art_189",
+        "robo_mano_armada"
+      ]
+    },
+    {
+      "id": "robo_agravado",
+      "nombre": "Robo Agravado",
+      "articulo_cp": "189",
+      "bien_juridico": "Patrimonio + Integridad física + Seguridad pública",
+      "pena_minima": "12 años",
+      "pena_maxima": "20 años",
+      "circunstancias": [
+        "a_mano_armada",
+        "pluralidad_agentes",
+        "lugar_habitado",
+        "nocturnidad",
+        "vehiculo_motor",
+        "agresion_mano_armada",
+        "victima_menor_edad_o_anciano"
+      ]
+    },
+    {
+      "id": "estafa",
+      "nombre": "Estafa",
+      "articulo_cp": "196",
+      "bien_juridico": "Patrimonio",
+      "pena_minima": "1 año",
+      "pena_maxima": "6 años",
+      "elementos_tipicos": [
+        "engaño",
+        "error",
+        "disposición_patrimonial",
+        "perjuicio"
+      ]
+    },
+    {
+      "id": "apropiacion_ilicita",
+      "nombre": "Apropiación Ilícita",
+      "articulo_cp": "190",
+      "bien_juridico": "Patrimonio",
+      "pena_minima": "1 año",
+      "pena_maxima": "4 años"
+    },
+    {
+      "id": "lesiones_leves",
+      "nombre": "Lesiones Leves",
+      "articulo_cp": "122",
+      "bien_juridico": "Integridad física",
+      "pena_minima": "60 días-multa",
+      "pena_maxima": "1 año",
+      "dias_asistencia_medica": "hasta 9"
+    },
+    {
+      "id": "lesiones_graves",
+      "nombre": "Lesiones Graves",
+      "articulo_cp": "121",
+      "bien_juridico": "Integridad física",
+      "pena_minima": "3 años",
+      "pena_maxima": "6 años",
+      "nota": "CP art. 121: daño grave en el cuerpo o la salud que cause incapacidad para el trabajo o enfermedad incurable; pena no menor de 3 ni mayor de 6 años"
+    },
+    {
+      "id": "lesiones_seguidas_muerte",
+      "nombre": "Lesiones Seguidas de Muerte",
+      "articulo_cp": "124",
+      "bien_juridico": "Vida + Integridad física",
+      "pena_minima": "4 años",
+      "pena_maxima": "8 años",
+      "nota": "CP art. 124: cuando a consecuencia de la lesión se produce la muerte de la víctima; pena no menor de 4 ni mayor de 8 años"
+    },
+    {
+      "id": "homicidio_simple",
+      "nombre": "Homicidio Simple",
+      "articulo_cp": "106",
+      "bien_juridico": "Vida",
+      "pena_minima": "6 años",
+      "pena_maxima": "20 años"
+    },
+    {
+      "id": "homicidio_calificado",
+      "nombre": "Homicidio Calificado (asesinato)",
+      "articulo_cp": "108",
+      "bien_juridico": "Vida",
+      "pena_minima": "15 años",
+      "pena_maxima": "35 años",
+      "circunstancias": [
+        "ferocidad",
+        "lucro",
+        "placer",
+        "motivos_aborrecibles",
+        "feminicidio",
+        "odio",
+        "rehén",
+        "vinculo_familiar"
+      ]
+    },
+    {
+      "id": "violacion_sexual",
+      "nombre": "Violación Sexual",
+      "articulo_cp": "170",
+      "bien_juridico": "Libertad sexual",
+      "pena_minima": "12 años",
+      "pena_maxima": "18 años",
+      "nota": "Modificado por Ley 30838 (2018): pena no menor de 12 ni mayor de 18 años"
+    },
+    {
+      "id": "violacion_menor",
+      "nombre": "Violación de Menor de 14 años",
+      "articulo_cp": "173",
+      "bien_juridico": "Libertad sexual + Indemnidad sexual",
+      "pena_minima": "30 años",
+      "pena_maxima": "Cadena perpetua",
+      "nota": "Modificado por Ley 30838 (2018): pena no menor de 30 años. Cadena perpetua si la víctima tiene menos de 10 años o en supuestos agravados del art. 173-A. Delito imprescriptible"
+    },
+    {
+      "id": "peculado",
+      "nombre": "Peculado (Dolo)",
+      "articulo_cp": "387",
+      "bien_juridico": "Administración pública",
+      "pena_minima": "4 años",
+      "pena_maxima": "8 años",
+      "sujeto_activo": "Funcionario público",
+      "nota": "CP art. 387: pena no menor de 4 ni mayor de 8 años. Agravado en 8-12 años (art. 387 primer párrafo agravado)"
+    },
+    {
+      "id": "peculado_culposo",
+      "nombre": "Peculado por Culpa",
+      "articulo_cp": "388",
+      "bien_juridico": "Administración pública",
+      "pena_minima": "1 año",
+      "pena_maxima": "4 años"
+    },
+    {
+      "id": "colusion",
+      "nombre": "Colusión",
+      "articulo_cp": "384",
+      "bien_juridico": "Administración pública + Patrimonio del Estado",
+      "pena_minima": "3 años",
+      "pena_maxima": "15 años",
+      "nota": "Modificado por Ley 30424 (2016): pena no menor de 3 ni mayor de 15 años. Tipo agravado en art. 385"
+    },
+    {
+      "id": "colusion_agravada",
+      "nombre": "Colusión Agravada",
+      "articulo_cp": "385",
+      "bien_juridico": "Administración pública + Patrimonio del Estado",
+      "pena_minima": "5 años",
+      "pena_maxima": "12 años",
+      "nota": "Modificado por Ley 30424 (2016): pena no menor de 5 ni mayor de 12 años cuando el agente actúa por su propio interés o el de terceros"
+    },
+    {
+      "id": "concusion",
+      "nombre": "Concusión",
+      "articulo_cp": "382",
+      "bien_juridico": "Administración pública",
+      "pena_minima": "2 años",
+      "pena_maxima": "8 años"
+    },
+    {
+      "id": "cohecho_pasivo_propio",
+      "nombre": "Cohecho Pasivo Propio",
+      "articulo_cp": "393",
+      "bien_juridico": "Administración pública",
+      "pena_minima": "5 años",
+      "pena_maxima": "8 años",
+      "nota": "CP art. 393: pena no menor de 5 ni mayor de 8 años, más inhabilitación"
+    },
+    {
+      "id": "lavado_activos",
+      "nombre": "Lavado de Activos",
+      "articulo_cp": "1 DL 1249",
+      "bien_juridico": "Orden socioeconómico",
+      "pena_minima": "8 años",
+      "pena_maxima": "18 años",
+      "complementaria": "DL 1249 (Decreto Legislativo de Lavado de Activos)"
+    },
+    {
+      "id": "enriquecimiento_ilicito",
+      "nombre": "Enriquecimiento Ilícito",
+      "articulo_cp": "401",
+      "bien_juridico": "Administración pública",
+      "pena_minima": "5 años",
+      "pena_maxima": "10 años"
+    },
+    {
+      "id": "fraude_expediente",
+      "nombre": "Fraude Procesal",
+      "articulo_cp": "416",
+      "bien_juridico": "Administración de justicia",
+      "pena_minima": "1 año",
+      "pena_maxima": "5 años"
+    },
+    {
+      "id": "falsa_declaracion",
+      "nombre": "Falsa Declaración en Proceso Judicial",
+      "articulo_cp": "409",
+      "bien_juridico": "Administración de justicia",
+      "pena_minima": "2 años",
+      "pena_maxima": "4 años"
+    },
+    {
+      "id": "omision_asistencia_familiar",
+      "nombre": "Omisión de Asistencia Familiar",
+      "articulo_cp": "149",
+      "bien_juridico": "Familia + Patrimonio",
+      "pena_minima": "1 año",
+      "pena_maxima": "3 años"
+    },
+    {
+      "id": "extorsion",
+      "nombre": "Extorsión",
+      "articulo_cp": "200",
+      "bien_juridico": "Libertad + Patrimonio",
+      "pena_minima": "10 años",
+      "pena_maxima": "20 años"
+    },
+    {
+      "id": "chantaje",
+      "nombre": "Chantaje",
+      "articulo_cp": "201",
+      "bien_juridico": "Libertad + Patrimonio",
+      "pena_minima": "3 años",
+      "pena_maxima": "6 años"
+    },
+    {
+      "id": "usurpacion",
+      "nombre": "Usurpación",
+      "articulo_cp": "202",
+      "bien_juridico": "Patrimonio",
+      "pena_minima": "1 año",
+      "pena_maxima": "3 años"
+    },
+    {
+      "id": "tp-mineria-ilegal",
+      "nombre": "Minería Ilegal",
+      "articulo": "307-A CP",
+      "descripcion": "Delito de minería ilegal en zonas prohibidas, agravada por daño ambiental",
+      "materia": "penal",
+      "pena": "8-10 años"
+    },
+    {
+      "id": "tp-trata",
+      "nombre": "Trata de Personas",
+      "articulo": "153 CP",
+      "descripcion": "Captación, traslado y explotación de personas con fines de explotación",
+      "materia": "penal",
+      "pena": "8-15 años"
+    },
+    {
+      "id": "tp-delitos-informaticos",
+      "nombre": "Delitos Informáticos",
+      "articulo": "Ley 30096",
+      "descripcion": "Acceso ilícito, interceptación, daño informático, fraude informático",
+      "materia": "ciberespacio",
+      "pena": "1-8 años"
+    },
+    {
+      "id": "tp-terrorismo",
+      "nombre": "Terrorismo",
+      "articulo": "D.L. 25475",
+      "descripcion": "Actos de terrorismo, colaboración, apología, pertenencia a organización terrorista",
+      "materia": "penal",
+      "pena": "20 años-cadena perpetua"
+    }
+  ]
+}

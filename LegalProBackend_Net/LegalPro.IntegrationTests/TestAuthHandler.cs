@@ -9,7 +9,7 @@ namespace LegalPro.IntegrationTests;
 /// <summary>
 /// Authentication handler de testing: autentica cualquier request automáticamente
 /// con un usuario ficticio. Permite que los integration tests de endpoints protegidos
-/// (Gemini, Chat, etc.) corran sin depender de JWT reales ni base de datos.
+/// (MiniMax, Chat, etc.) corran sin depender de JWT reales ni base de datos.
 /// </summary>
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -33,6 +33,8 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
             new Claim("sub", testUserId),
             new Claim("organization_id", testOrgId),
             new Claim("email", "test@legalpro.test"),
+            // "rol" replica el claim emitido por Node.js (legalpro-app/server/utils/jwt.js)
+            new Claim("rol", "Abogado"),
             new Claim("role", "Abogado"),
             new Claim("is_org_admin", "true"),
             new Claim("org_slug", "test-org")

@@ -75,7 +75,7 @@ export default function EstrategiaInterrogatorio() {
         {error && <p className="text-red-400 text-xs">{error}</p>}
         <button className="btn btn-primary w-full" onClick={handleGenerar} disabled={loading || (!nombreTestigo.trim() && !puntosProbar.trim())}>
           <AppIcon name="psychology" size={20} />
-          {loading ? ' Analizando con Gemini...' : ' Generar Estrategia'}
+          {loading ? ' Analizando con DeepSeek V4 Flash...' : ' Generar Estrategia'}
         </button>
         <div className="space-y-3">
           <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Preguntas Sugeridas</h3>

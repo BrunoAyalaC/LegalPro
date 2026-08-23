@@ -105,3 +105,25 @@ export function middlewareDeteccionSensibles(campos = ['prompt', 'mensaje', 'hec
     next();
   };
 }
+
+/**
+ * Anonimiza/Pseudonimiza datos sensibles (DNI, RUC, emails, teléfonos) en un texto
+ * antes de ser enviado a proveedores de IA internacionales (Cumplimiento LPDP Art. 21).
+ * 
+ * @param {string} texto 
+ * @returns {string} Texto anonimizado
+ */
+export function anonimizarDatosSensibles(texto) {
+  if (!texto || typeof texto !== 'string') return texto;
+
+  return texto
+    // Reemplaza RUC (11 dígitos empezando por 10 o 20)
+    .replace(/\b(10|20)\d{9}\b/g, '[RUC_ANONIMIZADO]')
+    // Reemplaza DNI (8 dígitos)
+    .replace(/\b\d{8}\b/g, '[DNI_ANONIMIZADO]')
+    // Reemplaza correos electrónicos
+    .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, '[EMAIL_ANONIMIZADO]')
+    // Reemplaza números de teléfono celular (9 dígitos empezando con 9)
+    .replace(/\b9\d{8}\b/g, '[TELEFONO_ANONIMIZADO]');
+}
+

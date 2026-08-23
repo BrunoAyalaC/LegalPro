@@ -9,7 +9,7 @@ namespace LegalPro.Application.Juez.Queries;
 /// <summary>
 /// Compara el caso actual con precedentes vinculantes del TC, Casaciones de la Corte Suprema
 /// y Acuerdos Plenarios relevantes — esencial para motivación judicial (art. 139.5 Const.).
-/// FC forzado: Gemini actúa como estudioso del derecho, no como parte.
+/// FC forzado: el proveedor IA actúa como estudioso del derecho, no como parte.
 /// </summary>
 public class CompararPrecedentesQuery : IRequest<PrecedentesDto>
 {
@@ -65,13 +65,13 @@ public class CompararPrecedentesQueryValidator : AbstractValidator<CompararPrece
 
 public class CompararPrecedentesQueryHandler : IRequestHandler<CompararPrecedentesQuery, PrecedentesDto>
 {
-    private readonly ILegalJuez _gemini;
+    private readonly ILegalJuez _minimax;
 
-    public CompararPrecedentesQueryHandler(ILegalJuez gemini) => _gemini = gemini;
+    public CompararPrecedentesQueryHandler(ILegalJuez minimax) => _minimax = minimax;
 
     public async Task<PrecedentesDto> Handle(CompararPrecedentesQuery request, CancellationToken cancellationToken)
     {
-        var json = await _gemini.CompararPrecedentesAsync(
+        var json = await _minimax.CompararPrecedentesAsync(
             request.CasoActual,
             request.RamaDerecho,
             request.TipoResolucionBuscada,

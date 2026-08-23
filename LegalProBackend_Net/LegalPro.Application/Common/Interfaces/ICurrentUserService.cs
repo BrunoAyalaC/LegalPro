@@ -17,7 +17,7 @@ public interface ICurrentUserService
     /// <summary>Email del usuario autenticado (claim "email").</summary>
     string? Email { get; }
 
-    /// <summary>Rol legal del usuario (claim "role").</summary>
+    /// <summary>Rol del usuario. Lee los claims "rol" (Node.js), ClaimTypes.Role o "role".</summary>
     string? Role { get; }
 
     /// <summary>Slug de la organización (claim "org_slug").</summary>

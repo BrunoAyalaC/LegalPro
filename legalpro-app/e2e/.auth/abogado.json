@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMTEiLCJlbWFpbCI6ImFib2dhZG9AbGVnYWxwcm8ucGUiLCJyb2wiOiJBQk9HQURPIiwibm9tYnJlX2NvbXBsZXRvIjoiRHIuIEp1YW4gR2FyY8OtYSBQw6lyZXoiLCJlc3BlY2lhbGlkYWQiOiJDSVZJTCIsIm9yZ2FuaXphdGlvbl9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMSIsIm9yZ2FuaXphdGlvbl9uYW1lIjoiRXN0dWRpbyBKdXLDrWRpY28gRGVtbyIsIm9yZ2FuaXphdGlvbl9zbHVnIjoiZXN0dWRpby1kZW1vIiwicGxhbiI6ImVudGVycHJpc2UiLCJ1c3Vhcmlvc19tYXgiOjUwLCJleHBlZGllbnRlc19tYXgiOjUwMCwicm9sX29yZyI6Ik1FTUJFUiIsImlzX29yZ19hZG1pbiI6ZmFsc2UsImlhdCI6MTc4MjIyMzIyNiwiZXhwIjoxNzgyMjI2ODI2LCJhdWQiOiJMZWdhbFByb0NsaWVudHMiLCJpc3MiOiJMZWdhbFByb0FQSSJ9.LxAbsBe8UEzloEBDyvkqVDKI0OF2FQ46-CHZuf3RXQM",
+      "domain": "legalpro-node-production-34ac.up.railway.app",
+      "path": "/api",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://legalpro-frontend-production-a988.up.railway.app",
+      "localStorage": [
+        {
+          "name": "legalpro_tour_completed",
+          "value": "1"
+        }
+      ]
+    }
+  ]
+}

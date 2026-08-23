@@ -1,0 +1,13 @@
+{
+  "id": "USR-JUEZ-001",
+  "organization_id": "ORG-ENT-001",
+  "email": "carlos.mendoza@pj.gob.pe",
+  "nombres": "Carlos Alberto",
+  "apellidos": "Mendoza Rojas",
+  "dni": "45678912",
+  "rol_usuario": "JUEZ",
+  "especialidad": "civil",
+  "is_active": true,
+  "email_verified": true,
+  "acepto_transferencia_internacional": true
+}

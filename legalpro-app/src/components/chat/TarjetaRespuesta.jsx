@@ -14,9 +14,10 @@ import {
   Scale, FileText, BarChart3, Gavel, TrendingUp,
   ChevronDown, ChevronUp, Download, Copy, AlertTriangle,
   CheckCircle2, XCircle, ExternalLink, Calendar, BookOpen,
-  Hash, Sparkles,
+  Hash, Sparkles, Clock,
 } from 'lucide-react';
 import AppIcon from '../AppIcon';
+import LegalMarkdown from './LegalMarkdown';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -63,6 +64,22 @@ function trunc(texto, n = 240) {
   return t.slice(0, n - 1).trimEnd() + '…';
 }
 
+/** Normaliza un score/similitud a fracción 0..1 (acepta escala 0-1 o 0-100). */
+function normalizarScore(v) {
+  if (typeof v !== 'number' || Number.isNaN(v)) return null;
+  const n = v > 1 ? v / 100 : v;
+  return Math.max(0, Math.min(1, n));
+}
+
+/** Chip de color por tribunal de origen (TC / PJ / INDECOPI / otro). */
+function claseChipFuente(fuente) {
+  const f = String(fuente || '').toLowerCase();
+  if (/indeco/.test(f)) return 'bg-orange-500/15 border-orange-500/30 text-orange-300';
+  if (/(^|[^a-z])(tc|tribunal\s+constitucional)([^a-z]|$)/.test(f)) return 'bg-purple-500/15 border-purple-500/30 text-purple-300';
+  if (/(^|[^a-z])(pj|poder\s+judicial|corte\s+suprema)([^a-z]|$)/.test(f)) return 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300';
+  return 'bg-indigo-500/15 border-indigo-500/25 text-indigo-300';
+}
+
 /** Copia al portapapeles. */
 async function copiar(texto) {
   try {
@@ -91,11 +108,25 @@ function TarjetaPlazo({ data }) {
     return { ini, fin };
   }, [fechaInicio, fechaVencimiento]);
 
+  // Urgencia por días restantes hasta el vencimiento (vs. hoy a medianoche).
+  const urgencia = useMemo(() => {
+    const fin = parseLocalDate(fechaVencimiento);
+    if (!fin) return null;
+    const hoy = new Date();
+    const hoy0 = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const dias = Math.round((fin.getTime() - hoy0.getTime()) / 86400000);
+    if (dias < 0) return { bd: 'border-red-500/40', badge: 'bg-red-500/15 text-red-300 border border-red-500/40', texto: `⚠ Vencido hace ${Math.abs(dias)}d` };
+    if (dias === 0) return { bd: 'border-red-500/40', badge: 'bg-red-500/15 text-red-300 border border-red-500/40', texto: '⚠ Vence hoy' };
+    if (dias < 3) return { bd: 'border-red-500/40', badge: 'bg-red-500/15 text-red-300 border border-red-500/40', texto: `⚠ Vence en ${dias}d` };
+    if (dias < 7) return { bd: 'border-amber-500/40', badge: 'bg-amber-500/15 text-amber-300 border border-amber-500/40', texto: `Vence en ${dias} días` };
+    return { bd: 'border-emerald-500/30', badge: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30', texto: `Vence en ${dias} días` };
+  }, [fechaVencimiento]);
+
   return (
     <div
       role="region"
       aria-label={`Plazo procesal: ${acto}`}
-      className="mt-1 rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 via-cyan-500/5 to-transparent overflow-hidden"
+      className={`mt-1 rounded-2xl border ${urgencia ? urgencia.bd : 'border-cyan-500/30'} bg-gradient-to-br from-cyan-500/10 via-cyan-500/5 to-transparent overflow-hidden transition-all duration-200 hover:border-white/20`}
     >
       <div className="px-4 py-3 flex items-start gap-3 border-b border-cyan-500/20 bg-cyan-500/10">
         <div className="w-10 h-10 shrink-0 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
@@ -127,6 +158,16 @@ function TarjetaPlazo({ data }) {
           <Stat icon="article" label="Artículo" value={String(data.plazo_info.articulo)} />
         )}
       </div>
+
+      {/* Badge countdown de urgencia (visible para AT: fuera del bloque aria-hidden) */}
+      {urgencia && (
+        <div className={`px-4 ${timeline ? 'pt-3' : 'py-3'}`}>
+          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${urgencia.badge}`}>
+            <Clock size={11} aria-hidden="true" />
+            {urgencia.texto}
+          </span>
+        </div>
+      )}
 
       {/* Mini-timeline CSS */}
       {timeline && (
@@ -194,7 +235,7 @@ function TarjetaEscrito({ data, onDownload }) {
     <div
       role="region"
       aria-label={`Escrito legal: ${tipo}`}
-      className="mt-1 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/10 via-violet-500/5 to-transparent overflow-hidden"
+      className="mt-1 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/10 via-violet-500/5 to-transparent overflow-hidden transition-all duration-200 hover:border-white/20"
     >
       <div className="px-4 py-3 flex items-start gap-3 border-b border-violet-500/20 bg-violet-500/10">
         <div className="w-10 h-10 shrink-0 rounded-xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center text-violet-300">
@@ -296,7 +337,7 @@ function TarjetaAnalisis({ data }) {
     <div
       role="region"
       aria-label="Análisis de expediente"
-      className="mt-1 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent overflow-hidden"
+      className="mt-1 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent overflow-hidden transition-all duration-200 hover:border-white/20"
     >
       <div className="px-4 py-3 flex items-start gap-3 border-b border-blue-500/20 bg-blue-500/10">
         <div className="w-10 h-10 shrink-0 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-300">
@@ -391,6 +432,9 @@ function TarjetaJurisprudencia({ data }) {
   const citaciones = Array.isArray(data?.citaciones) ? data.citaciones : [];
   const chunks = data?.chunks_usados ?? data?.chunks ?? null;
   const disponible = data?.disponible !== false;
+  // FIX LOW: no anunciar "citas verificadas" si el RAG respondió degradado
+  const ragDegradado = data?.rag_degradado === true;
+  const avisoDegradacion = typeof data?.aviso_degradacion === 'string' ? data.aviso_degradacion : null;
 
   if (!disponible) {
     return (
@@ -412,7 +456,7 @@ function TarjetaJurisprudencia({ data }) {
     <div
       role="region"
       aria-label="Resultados de jurisprudencia"
-      className="mt-1 rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent overflow-hidden"
+      className="mt-1 rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent overflow-hidden transition-all duration-200 hover:border-white/20"
     >
       <div className="px-4 py-3 flex items-center justify-between border-b border-indigo-500/20 bg-indigo-500/10">
         <div className="flex items-center gap-2.5">
@@ -432,42 +476,57 @@ function TarjetaJurisprudencia({ data }) {
       </div>
 
       <ul className="divide-y divide-white/5">
-        {resultados.map((r, i) => (
-          <li key={i} className="p-3 hover:bg-white/5 transition-colors">
-            <div className="flex items-start gap-2.5">
-              <div className="shrink-0 w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-200 text-[10px] font-bold">
-                {String(i + 1).padStart(2, '0')}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[12px] font-bold text-white leading-snug">
-                  {r.titulo || r.fuente || 'Resultado sin título'}
-                </p>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-slate-400">
-                  {r.fuente && <span className="font-semibold text-indigo-300/90">{r.fuente}</span>}
-                  {r.materia && <span>· {r.materia}</span>}
-                  {r.articulo && <span>· art. {r.articulo}</span>}
-                  {r.numero && <span>· {r.numero}</span>}
-                  {typeof r.similitud === 'number' && (
-                    <span className="px-1.5 py-0.5 rounded bg-indigo-500/15 border border-indigo-500/25 text-indigo-200 font-mono">
-                      {r.similitud.toFixed(1)}% sim
-                    </span>
+        {resultados.map((r, i) => {
+          const score = normalizarScore(r.score ?? r.similitud);
+          return (
+            <li key={i} className="p-3 hover:bg-white/5 transition-colors">
+              <div className="flex items-start gap-2.5">
+                <div className="shrink-0 w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center text-indigo-200 text-[10px] font-bold">
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-bold text-white leading-snug">
+                    {r.titulo || r.fuente || 'Resultado sin título'}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-slate-400">
+                    {r.fuente && (
+                      <span className={`px-1.5 py-0.5 rounded border font-semibold ${claseChipFuente(r.fuente)}`}>
+                        {r.fuente}
+                      </span>
+                    )}
+                    {r.materia && <span>· {r.materia}</span>}
+                    {r.articulo && <span>· art. {r.articulo}</span>}
+                    {r.numero && <span>· {r.numero}</span>}
+                  </div>
+                  {score != null && (
+                    <div className="mt-1.5 flex items-center gap-2" aria-hidden="true">
+                      <div className="flex-1 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400"
+                          style={{ width: `${Math.round(score * 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-[9px] font-mono text-slate-400 tabular-nums shrink-0">
+                        {Math.round(score * 100)}% sim
+                      </span>
+                    </div>
                   )}
                 </div>
+                {r.url && (
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-indigo-300 transition-colors"
+                    aria-label={`Abrir ${r.titulo || r.fuente || 'fuente'} en nueva pestaña`}
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                )}
               </div>
-              {r.url && (
-                <a
-                  href={r.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-indigo-300 transition-colors"
-                  aria-label={`Abrir ${r.titulo || r.fuente || 'fuente'} en nueva pestaña`}
-                >
-                  <ExternalLink size={14} />
-                </a>
-              )}
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
 
       {citaciones.length > 0 && resultados.length === 0 && (
@@ -477,10 +536,17 @@ function TarjetaJurisprudencia({ data }) {
       )}
 
       <div className="px-4 py-2 border-t border-white/5 bg-indigo-500/5">
-        <p className="text-[10px] text-amber-300/80 flex items-center gap-1">
-          <AlertTriangle size={10} aria-hidden="true" />
-          Citas verificadas vía RAG · requieren confirmación con el texto completo
-        </p>
+        {ragDegradado ? (
+          <p role="alert" className="text-[10px] text-red-300 flex items-center gap-1">
+            <AlertTriangle size={10} aria-hidden="true" />
+            {avisoDegradacion || 'Búsqueda RAG degradada · citas SIN verificación completa, confirmar con fuente oficial'}
+          </p>
+        ) : (
+          <p className="text-[10px] text-amber-300/80 flex items-center gap-1">
+            <AlertTriangle size={10} aria-hidden="true" />
+            Citas verificadas vía RAG · requieren confirmación con el texto completo
+          </p>
+        )}
       </div>
     </div>
   );
@@ -510,7 +576,7 @@ function TarjetaPrediccion({ data }) {
     <div
       role="region"
       aria-label="Predicción judicial"
-      className="mt-1 rounded-2xl border border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-500/10 via-fuchsia-500/5 to-transparent overflow-hidden"
+      className="mt-1 rounded-2xl border border-fuchsia-500/30 bg-gradient-to-br from-fuchsia-500/10 via-fuchsia-500/5 to-transparent overflow-hidden transition-all duration-200 hover:border-white/20"
     >
       <div className="px-4 py-3 flex items-center gap-3 border-b border-fuchsia-500/20 bg-fuchsia-500/10">
         <div className="w-10 h-10 shrink-0 rounded-xl bg-fuchsia-500/20 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-300">
@@ -523,29 +589,46 @@ function TarjetaPrediccion({ data }) {
       </div>
 
       {/* Indicador de probabilidad */}
-      <div className="p-4 flex items-center gap-4 border-b border-white/5">
-        <div className="relative w-20 h-20 shrink-0">
-          <svg viewBox="0 0 36 36" className="w-20 h-20 -rotate-90" aria-hidden="true">
-            <circle cx="18" cy="18" r="15.915" className="fill-none stroke-white/10" strokeWidth="2.5" />
-            <circle
-              cx="18" cy="18" r="15.915"
-              className={`fill-none ${tones.fill.replace('bg-', 'stroke-')} transition-all duration-700`}
-              strokeWidth="2.5"
-              strokeDasharray={`${pct} ${100 - pct}`}
-              strokeLinecap="round"
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className={`text-lg font-extrabold ${tones.text}`}>{pct}%</span>
-            <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold">éxito</span>
+      <div className="p-4 border-b border-white/5">
+        <div className="flex items-center gap-4">
+          <div className="relative w-20 h-20 shrink-0">
+            <svg viewBox="0 0 36 36" className="w-20 h-20 -rotate-90" aria-hidden="true">
+              <circle cx="18" cy="18" r="15.915" className="fill-none stroke-white/10" strokeWidth="2.5" />
+              <circle
+                cx="18" cy="18" r="15.915"
+                className={`fill-none ${tones.fill.replace('bg-', 'stroke-')} transition-all duration-700`}
+                strokeWidth="2.5"
+                strokeDasharray={`${pct} ${100 - pct}`}
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className={`text-lg font-extrabold tabular-nums ${tones.text}`}>{pct}%</span>
+              <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold">éxito</span>
+            </div>
           </div>
+          {veredicto && (
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Veredicto probable</p>
+              <p className="text-xs text-slate-100 leading-relaxed">{veredicto}</p>
+            </div>
+          )}
         </div>
-        {veredicto && (
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Veredicto probable</p>
-            <p className="text-xs text-slate-100 leading-relaxed">{veredicto}</p>
-          </div>
-        )}
+
+        {/* Barra de progreso visual grande */}
+        <div
+          className="mt-3 h-2.5 rounded-full bg-slate-700 overflow-hidden"
+          role="progressbar"
+          aria-valuenow={pct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Probabilidad de éxito: ${pct}%`}
+        >
+          <div
+            className={`h-full rounded-full ${tones.fill} transition-all duration-700`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
       </div>
 
       <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -584,7 +667,7 @@ function TarjetaRespuestaSimple({ data, texto }) {
   const leyes = Array.isArray(data?.leyes) ? data.leyes : (Array.isArray(data?.referencias) ? data.referencias : null);
   return (
     <div className="space-y-2">
-      {texto && <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-200">{texto}</p>}
+      {texto && <LegalMarkdown text={texto} />}
       {leyes && leyes.length > 0 && (
         <details className="text-xs">
           <summary className="cursor-pointer text-slate-400 hover:text-cyan-300 flex items-center gap-1">

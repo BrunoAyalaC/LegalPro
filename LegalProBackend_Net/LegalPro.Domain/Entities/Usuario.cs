@@ -8,8 +8,11 @@ namespace LegalPro.Domain.Entities;
 /// <summary>
 /// Aggregate Root: Usuario
 /// Contains business logic for user registration, role validation, and password management.
+/// Implements ITenantEntity: un usuario pertenece a una organización (OrganizationId nullable
+/// porque el usuario se puede registrar sin invitación; una vez asignado a una org, queda
+/// filtrado por el query filter global de DbContext).
 /// </summary>
-public class Usuario : BaseGuidEntity
+public class Usuario : BaseGuidEntity, ITenantEntity
 {
     public string NombreCompleto { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;

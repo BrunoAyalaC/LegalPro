@@ -99,6 +99,16 @@ public class ExceptionHandlingMiddleware
                     Detail = notFoundEx.Message
                 }
             ),
+            TenantAccessViolationException tenantEx => (
+                HttpStatusCode.Forbidden,
+                new ErrorResponse
+                {
+                    Type = "TenantAccessViolation",
+                    Title = "Violación de Aislamiento de Tenant",
+                    Status = (int)HttpStatusCode.Forbidden,
+                    Detail = tenantEx.Message ?? "Acceso cruzado de tenant denegado."
+                }
+            ),
             ForbiddenAccessException => (
                 HttpStatusCode.Forbidden,
                 new ErrorResponse

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using LegalPro.Application.Auth.Commands;
 using LegalPro.Application.Auth.Queries;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace LegalPro.Api.Controllers;
 
@@ -16,13 +17,45 @@ namespace LegalPro.Api.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(IMediator mediator) => _mediator = mediator;
+    public AuthController(IMediator mediator, IConfiguration configuration)
+    {
+        _mediator = mediator;
+        _configuration = configuration;
+    }
+
+    // R-03: __Secure-Session — HttpOnly, Secure, SameSite=Strict, Path=/api, MaxAge 60min alineado con JWT
+    private void SetSecureSessionCookie(string token)
+    {
+        var expiryMinutes = int.TryParse(_configuration["JWT_EXPIRY_MINUTES"], out var m) ? m : 60;
+        Response.Cookies.Append("__Secure-Session", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Path = "/api",
+            MaxAge = TimeSpan.FromMinutes(expiryMinutes),
+            IsEssential = true
+        });
+    }
+
+    private void ClearSecureSessionCookie()
+    {
+        Response.Cookies.Delete("__Secure-Session", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Path = "/api"
+        });
+    }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterCommand command)
     {
         var token = await _mediator.Send(command);
+        SetSecureSessionCookie(token);
         return Ok(new { Token = token, Mensaje = "Usuario registrado exitosamente." });
     }
 
@@ -30,7 +63,16 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginQuery query)
     {
         var token = await _mediator.Send(query);
+        SetSecureSessionCookie(token);
         return Ok(new { token, mensaje = "Login exitoso." });
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    public IActionResult Logout()
+    {
+        ClearSecureSessionCookie();
+        return Ok(new { mensaje = "Sesión cerrada." });
     }
 
     /// <summary>

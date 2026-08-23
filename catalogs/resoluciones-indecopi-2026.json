@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "nombre": "Resoluciones y Precedentes de INDECOPI - Actualizado al 01/08/2026",
+    "fuente_principal": "https://www.gob.pe/indecopi",
+    "fecha_actualizacion": "2026-08-01",
+    "version": "1.0",
+    "descripcion": "Resoluciones, precedentes y noticias recientes del INDECOPI",
+    "total_documentos": 12
+  },
+  "resoluciones": [
+    {
+      "id": "INDECOPI-2026-RES-047",
+      "tipo": "Resolución de Presidencia",
+      "numero": "N.° 000047-2026-PRE/INDECOPI",
+      "fecha_publicacion": "2026-05-13",
+      "titulo": "Aprueban modificación del TUPA del INDECOPI",
+      "sumilla": "Aprueban modificación del Texto Único de Procedimientos Administrativos (TUPA) del INDECOPI.",
+      "materia": "Administrativo - Procedimientos Administrativos",
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "ALTA - TUPA aplicable a marcas, patentes, publicidad"
+    },
+    {
+      "id": "INDECOPI-2025-RES-082",
+      "tipo": "Resolución de Presidencia",
+      "numero": "N.° 000082-2025-PRE/INDECOPI",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Formalizan designación de miembro de comisión",
+      "sumilla": "Formalizan designación de miembro de comisión del INDECOPI.",
+      "materia": "Institucional",
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "INDECOPI-2026-RES-085",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N.° 000085-2026-GEG/INDECOPI",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Designan fedatarios titulares y alternos",
+      "sumilla": "Designan fedatarios titulares y alternos del INDECOPI.",
+      "materia": "Institucional - Fedatarios",
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "INDECOPI-2026-RES-069",
+      "tipo": "Resolución de Presidencia",
+      "numero": "N.° 000069-2026-PRE/INDECOPI",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "Aprueban desagregación de recursos",
+      "sumilla": "Aprueban desagregación de recursos en favor del INDECOPI.",
+      "materia": "Presupuesto - Administrativo",
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "BAJA - Presupuestario"
+    },
+    {
+      "id": "INDECOPI-2026-RES-084",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N.° 000084-2026-GEG/INDECOPI",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "Aceptan renuncia de funcionario",
+      "sumilla": "Aceptan renuncia de funcionario del INDECOPI.",
+      "materia": "Recursos Humanos",
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "BAJA"
+    },
+    {
+      "id": "INDECOPI-2026-SANCION-BANCO",
+      "tipo": "Noticia - Sanción",
+      "fecha": "2026-07-31",
+      "titulo": "INDECOPI sanciona a banco por cobranza abusiva",
+      "sumilla": "INDECOPI sanciona a banco por emplear métodos abusivos de cobranza (cobro coactivo, amenaza, intimidación).",
+      "materia": "Protección al Consumidor - Código 29571",
+      "palabras_clave": ["banco", "cobranza abusiva", "sancion", "métodos abusivos", "proteccion consumidor"],
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "ALTA - Precedente cobranza"
+    },
+    {
+      "id": "INDECOPI-2026-LICUADORAS",
+      "tipo": "Noticia - Alerta",
+      "fecha": "2026-07-30",
+      "titulo": "INDECOPI alerta sobre licuadoras que generan descargas eléctricas",
+      "sumilla": "INDECOPI alerta a consumidores sobre licuadoras portátiles que podrían generar descargas eléctricas.",
+      "materia": "Seguridad de Productos - Protección al Consumidor",
+      "palabras_clave": ["licuadoras", "descargas electricas", "alerta", "seguridad producto"],
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA - Producto defectuoso"
+    },
+    {
+      "id": "INDECOPI-2026-REMATE",
+      "tipo": "Noticia",
+      "fecha": "2026-07-30",
+      "titulo": "INDECOPI rematará 40 inmuebles en Lima, Junín y Ucayali",
+      "sumilla": "INDECOPI rematará cerca de 40 inmuebles ubicados en Lima, Junín y Ucayali este 31 de julio.",
+      "materia": "Procedimientos Concursales",
+      "palabras_clave": ["remate", "inmuebles", "Lima", "Junin", "Ucayali"],
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA - Remate concursal"
+    },
+    {
+      "id": "INDECOPI-2026-ASESORIAS",
+      "tipo": "Noticia - Cifras",
+      "fecha": "2026-07-30",
+      "titulo": "INDECOPI: más de 890,000 asesorías gratuitas 2025-2026",
+      "sumilla": "INDECOPI brindó más de 890,000 asesorías gratuitas entre 2025 y 2026.",
+      "materia": "Protección al Consumidor",
+      "palabras_clave": ["asesorias gratuitas", "890000", "proteccion consumidor"],
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA - Cifras institucionales"
+    },
+    {
+      "id": "INDECOPI-2026-DOMINIO-PISCO",
+      "tipo": "Noticia - DO",
+      "fecha": "2026-07-26",
+      "titulo": "Cinco recomendaciones para reconocer Pisco con DO",
+      "sumilla": "Día Nacional del Pisco: Cinco recomendaciones para reconocer un Pisco con Denominación de Origen y evitar adulteraciones. En Perú se protegen 10 recetas y preparaciones tradicionales.",
+      "materia": "Propiedad Intelectual - Denominaciones de Origen",
+      "palabras_clave": ["Pisco", "denominacion de origen", "adulteracion", "DO", "10 recetas"],
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA - DO y PI tradicional"
+    },
+    {
+      "id": "INDECOPI-2026-VEHICULOS",
+      "tipo": "Noticia - Llamados a revisión",
+      "fecha": "2026-07-24",
+      "titulo": "Llamados a revisión de vehículos por fallas de seguridad",
+      "sumilla": "INDECOPI informa sobre llamados a revisión de vehículos y motocicletas de reconocidas marcas por posibles fallas de seguridad.",
+      "materia": "Seguridad de Productos",
+      "palabras_clave": ["llamado revision", "vehiculos", "motocicletas", "fallas seguridad"],
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA - Recall"
+    },
+    {
+      "id": "INDECOPI-2026-TRANSPORTE",
+      "tipo": "Noticia - Feriado",
+      "fecha": "2026-07-24",
+      "titulo": "Transporte debe garantizar información clara",
+      "sumilla": "Ante feriado largo, INDECOPI informa que empresas de transporte deben garantizar información clara y un servicio idóneo.",
+      "materia": "Protección al Consumidor - Transporte",
+      "palabras_clave": ["transporte", "feriado largo", "informacion clara", "servicio idoneo"],
+      "url_fuente": "https://www.gob.pe/indecopi",
+      "relevancia_legalpro": "MEDIA - Servicio de transporte"
+    }
+  ],
+  "casaciones_destacadas": [
+    {
+      "id": "INDECOPI-CASACION-COBRANZA",
+      "tipo": "Precedente Observado",
+      "materia": "Protección al Consumidor - Cobranza",
+      "nota": "Casaciones reiteradas sobre métodos abusivos de cobranza",
+      "relevancia_legalpro": "ALTA"
+    }
+  ],
+  "enlaces_relevantes": {
+    "casaciones_buscar": "https://www.gob.pe/indecopi/buscar-resoluciones",
+    "proteccion_datos": "https://www.gob.pe/indecopi/proteccion-de-datos-personales",
+    "servicios_linea": "https://www.gob.pe/indecopi/servicios-en-linea-del-indecopi",
+    "codigo_proteccion_consumidor": "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682697",
+    "registra_marca": "https://www.gob.pe/indecopi/registra-tu-marca",
+    "reclamos": "https://www.gob.pe/indecopi/proteccion-al-consumidor"
+  }
+}

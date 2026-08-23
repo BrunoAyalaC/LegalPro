@@ -41,6 +41,14 @@ import {
   extraerUuid,
   MATERIAS,
 } from './intentFase0.js';
+// SKILL enrutamiento-intenciones-chat v1.2.0 — prompts maestros reutilizables
+// (idioma, OCR-aware, RAG, LOPD, citas, velocidad). Reemplaza los systemPrompts
+// hardcoded que vivían en este archivo. Cero drift entre tools.
+import {
+  buildPromptAnalisis,
+  buildPromptPredictor,
+  buildPromptRouter,
+} from './systemPrompts.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -96,7 +104,7 @@ function loadDisclaimers() {
   }
   return _disclaimersCache;
 }
-function getDisclaimer(id) {
+export function getDisclaimer(id) {
   const d = loadDisclaimers().find((x) => x.id === id);
   return d ? d.texto : '';
 }
@@ -165,34 +173,75 @@ const PREDICCION_DECLARATION = {
   },
 };
 
-const SISTEMA_ANALISIS = `Eres un analista jurídico experto peruano. Analiza el expediente o documento proporcionado
-identificando: hechos relevantes, pretensiones, fundamentos jurídicos, pruebas clave,
-riesgos procesales (prescripción, caducidad, nulidades) y estrategia recomendada.
-Usa SOLO la información proporcionada y el contexto legal verificado (RAG). NUNCA inventes hechos ni normas.
-Responde en español (Perú).`;
+// ─── System prompts: delegación al módulo de prompts maestros ────────────────
+// FIX 2026-08-09 (SKILL enrutamiento-intenciones-chat v1.2.0): los system prompts
+// ya NO están hardcoded aquí. Se componen vía `systemPrompts.js` combinando
+// bloques (ROL, MATERIA, OCR-AWARE, RAG, LOPD, FORMATO, CITAS, VELOCIDAD).
+// Esto elimina drift entre tools y centraliza idioma/anti-alucinación.
+//
+// Las constantes legacy (`SISTEMA_ANALISIS`, `SISTEMA_ANALISIS_OCR_AWARE`,
+// `SISTEMA_PREDICTOR`, `SYSTEM_ROUTER`) y el helper `buildSistemaAnalisis()`
+// se mantienen como wrappers finos para no romper el contrato interno; toda la
+// lógica vive ahora en `utils/systemPrompts.js`.
 
-const SISTEMA_PREDICTOR = `Eres un analista predictivo judicial peruano. Basándote en la información del caso,
-evalúa la probabilidad de éxito (porcentaje), veredicto probable, factores favorables y
-desfavorables, y recomendaciones estratégicas. NUNCA presentes la predicción como verdad
-absoluta: es un análisis probabilístico. Responde en español (Perú).`;
+/**
+ * Devuelve el system prompt del análisis, delegando al módulo de prompts
+ * maestros. Mantiene el flag `hayTextoOcr` para activar el bloque OCR-aware.
+ *
+ * @param {boolean} hayTextoOcr - true si textoExpediente viene de OCR
+ * @returns {string} system prompt completo
+ */
+function buildSistemaAnalisis(hayTextoOcr) {
+  return buildPromptAnalisis({ ocr_aware: Boolean(hayTextoOcr) });
+}
 
-// ─── System prompt del Router (FASE 1) ───────────────────────────────────────
-const SYSTEM_ROUTER = `Eres el Router de Intenciones del chat legal LegalPro/LexIA (derecho peruano).
+/**
+ Enriquece el bloque de texto del expediente con metadatos de origen (OCR vs
+ texto nativo). Esto le da al modelo una pista explícita en el `user content`
+ * para reforzar las instrucciones del system prompt.
+ *
+ * FIX 2026-08-08 (P0-REC-2): añade marca explícita `[texto_truncado:true|false]`
+ * cuando el texto fue cortado a TEXTO_EXPEDIENTE_MAX_CHARS. El system prompt
+ * OCR-aware (sección 3b punto 4) usa esta marca para indicarle al LLM que
+ * el análisis puede omitir secciones finales del documento original.
+ *
+ * @param {object} params
+ * @param {string} params.textoExpediente - Contenido del expediente
+ * @param {object} [params.ocrMetadata] - { modelo, provider, cached, hash }
+ * @returns {string} bloque formateado para el prompt del usuario
+ */
+// FIX 2026-08-08 (P0-REC-2): limite canonico del bloque del expediente en el prompt.
+// El system prompt OCR-aware (seccion 3b punto 4) usa la marca `[texto_truncado:...]`
+// para indicar al LLM si el analisis puede omitir secciones finales del documento original.
+const TEXTO_EXPEDIENTE_MAX_CHARS = 6000;
+function enriquecerBloqueTextoExpediente({ textoExpediente, ocrMetadata }) {
+  if (!textoExpediente) return '';
+  const totalChars = textoExpediente.length;
+  const truncado = totalChars > TEXTO_EXPEDIENTE_MAX_CHARS;
+  const fragmento = textoExpediente.slice(0, TEXTO_EXPEDIENTE_MAX_CHARS);
+  const marcaTruncado = `[texto_truncado:${truncado}, total_chars:${totalChars}, max_chars:${TEXTO_EXPEDIENTE_MAX_CHARS}]`;
+  if (!ocrMetadata) {
+    // Texto nativo (no OCR)
+    return `\nCONTENIDO DEL EXPEDIENTE (texto nativo) ${marcaTruncado}:\n${fragmento}`;
+  }
+  const meta = [
+    ocrMetadata.modelo ? `modelo_ocr=${ocrMetadata.modelo}` : null,
+    ocrMetadata.provider ? `proveedor_ocr=${ocrMetadata.provider}` : null,
+    ocrMetadata.cached ? 'fuente=cache_ocr' : 'fuente=ocr_fresh',
+    ocrMetadata.hash ? `sha256=${String(ocrMetadata.hash).slice(0, 12)}...` : null,
+  ].filter(Boolean).join(', ');
+  return [
+    `\nCONTENIDO DEL EXPEDIENTE (TRANSCRIPCIÓN OCR — ${meta || 'sin metadatos'}) ${marcaTruncado}:`,
+    fragmento,
+  ].join('\n');
+}
 
-Analiza el mensaje del usuario y decide UNA de estas opciones:
+// SISTEMA_PREDICTOR y SYSTEM_ROUTER ahora se delegan a `systemPrompts.js`.
+// Conservamos los nombres como `let` (no `const`) porque ya no se exportan
+// como constantes; los puntos de uso invocan los builders directamente.
+const SISTEMA_PREDICTOR = buildPromptPredictor();
 
-1. REDACTAR un escrito legal (demanda, contestación, apelación, casación, amparo, hábeas corpus, medida cautelar, memorial, alegato, acusación, requerimiento...) → llama a la herramienta "redactar_documento" con tipo_documento, materia y hechos.
-2. CALCULAR un plazo procesal (cuándo vence, cuántos días hábiles, prescripción, caducidad, término, feriado...) → llama a "calcular_plazo" con fecha_inicio (YYYY-MM-DD, usa hoy si no la da) y acto_procesal.
-3. ANALIZAR un expediente (riesgos, fortalezas, debilidades, estrategia, resumen del caso, nulidades...) → llama a "analizar_expediente" con expediente_id (si lo menciona) y tipo_analisis.
-4. BUSCAR jurisprudencia (casaciones, precedentes vinculantes, sentencias, qué ha dicho el TC, INDECOPI, SUNARP, MINJUS...) → llama a "buscar_jurisprudencia" con query.
-5. PREDECIR el resultado/probabilidad de éxito de un caso (vamos a ganar, qué probabilidad, chances, porcentaje de éxito...) → llama a "predecir_resultado" con expediente_id (si lo menciona) y materia.
-6. Consulta legal general (qué dice la ley, explicación, concepto, diferencia entre...) o saludo/agradecimiento → responde TEXTO DIRECTO, SIN llamar ninguna herramienta.
-
-Reglas:
-- Completa los argumentos requeridos de la tool con lo razonable del mensaje; si falta un dato esencial (p. ej. fecha), usa un valor sensato o el más probable.
-- NO inventes datos que no estén en el mensaje (expediente_id, fechas, números).
-- Responde SIEMPRE en español (Perú).
-- Si el usuario pide redactar pero además menciona jurisprudencia como apoyo, prioriza la acción principal (redactar).`;
+const SYSTEM_ROUTER = buildPromptRouter();
 
 // ─── FASE 1: LLM con tools AUTO (temperatura 0.1 — determinismo legal) ──────
 async function ejecutarFase1({ mensaje, historial = [], model, req }) {
@@ -219,6 +268,38 @@ async function ejecutarFase1({ mensaje, historial = [], model, req }) {
 
 // ─── Ejecutores de herramientas (servicios REALES) ───────────────────────────
 
+/**
+ * FIX P0 (auditor-legal 2026-08-12): el router FASE 1 a veces devuelve su
+ * razonamiento interno como prefijo de la respuesta directa ("El usuario
+ * pregunta...", "Es una consulta general..."). Esta función limpia esos
+ * prefijos para que la respuesta visible al usuario empiece con el contenido.
+ */
+function limpiarRazonamiento(texto) {
+  if (!texto || typeof texto !== 'string') return texto;
+  let limpio = texto.trim();
+  const prefijosRazonamiento = [
+    /^(el usuario pregunta[^\n]*\n?)/i,
+    /^(la consulta del usuario[^\n]*\n?)/i,
+    /^(es una consulta general[^\n]*\n?)/i,
+    /^(esto es una consulta (sobre|acerca de)[^\n]*\n?)/i,
+    /^(como asistente[^\n]*\n?)/i,
+    /^(voy a responder[^\n]*\n?)/i,
+    /^(respondo texto directo[^\n]*\n?)/i,
+    /^(analizando el mensaje[^\n]*\n?)/i,
+    /^(the user asks[^\n]*\n?)/i,
+    /^(this is a general query[^\n]*\n?)/i,
+    /^(i'll respond[^\n]*\n?)/i,
+    /^(this is a consultation[^\n]*\n?)/i,
+  ];
+  for (const regex of prefijosRazonamiento) {
+    if (regex.test(limpio)) {
+      limpio = limpio.replace(regex, '').trim();
+      break; // un prefijo por respuesta
+    }
+  }
+  return limpio;
+}
+
 /** redactar_documento → services/documentoRedactor.js (flujo real de documento-chat) */
 async function ejecutarRedactarDocumento(args, req) {
   const {
@@ -226,14 +307,80 @@ async function ejecutarRedactarDocumento(args, req) {
     expediente_id, _texto = '',
   } = args;
 
-  const tipo = tipo_documento || detectarTipoDocumentoTexto(_texto || hechos) || 'demanda';
+  // FIX P0-REC-4 (2026-08-08): inyectar texto_ocr del expediente cuando NO hay
+  // hechos ni _texto explícitos. Sin esto, el chat decía "no tengo hechos
+  // para redactar" y devolvía error 400 aunque el expediente ya tuviera el
+  // documento OCR subido. Ahora:
+  //   - Si el usuario pasó `hechos` o `_texto` → se respeta (modo normal).
+  //   - Si NO los pasó PERO hay `expediente_id` → leemos expedientes.texto_ocr
+  //     (multi-tenant: WHERE organization_id=$2) y lo usamos como base,
+  //     truncado a TEXTO_EXPEDIENTE_MAX_CHARS (6000) para no desbordar el
+  //     prompt.
+  //   - Si NO hay texto_ocr NI hechos/_texto → devolvemos error explicativo
+  //     indicando cómo subir el documento al expediente.
+  let textoBase = _texto || '';
+  let fuenteTextoOcr = false;
+  let datosExpedienteRedaccion = null;
+  const orgId = req.organizationId;
+  if (!textoBase && !hechos && expediente_id) {
+    try {
+      const { rows: [exp] } = await db.query(
+        'SELECT id, numero, titulo, tipo, estado, texto_ocr FROM expedientes WHERE id=$1 AND organization_id=$2',
+        [expediente_id, orgId]
+      );
+      if (exp && exp.texto_ocr && exp.texto_ocr.trim()) {
+        textoBase = exp.texto_ocr.slice(0, TEXTO_EXPEDIENTE_MAX_CHARS);
+        fuenteTextoOcr = true;
+        datosExpedienteRedaccion = {
+          id: exp.id, numero: exp.numero, titulo: exp.titulo,
+          tipo: exp.tipo, estado: exp.estado,
+          texto_truncado: exp.texto_ocr.length > TEXTO_EXPEDIENTE_MAX_CHARS,
+          texto_total_chars: exp.texto_ocr.length,
+        };
+        req.logger?.info?.('[INTENT-ROUTER] redactar_documento: usando texto_ocr del expediente', {
+          expediente_id, orgId, totalChars: exp.texto_ocr.length, truncado: datosExpedienteRedaccion.texto_truncado,
+        });
+      } else if (exp) {
+        datosExpedienteRedaccion = {
+          id: exp.id, numero: exp.numero, titulo: exp.titulo,
+          tipo: exp.tipo, estado: exp.estado,
+          texto_truncado: false, texto_total_chars: 0,
+        };
+      }
+    } catch (err) {
+      req.logger?.warn?.('[INTENT-ROUTER] Error leyendo texto_ocr del expediente para redactar:', err?.message);
+    }
+  }
+
+  // FIX P0-REC-4: si llegamos aquí sin textoBase y sin hechos, devolvemos error
+  // explicativo (no llamamos al LLM "a ciegas"). Esto evita que el modelo
+  // invente hechos del caso.
+  if (!textoBase && !hechos) {
+    return {
+      texto: 'No tengo hechos para redactar. Sube el documento al expediente o proporciónamelos en el chat.',
+      data: {
+        error: 'NO_HECHOS_PARA_REDACTAR',
+        requiere_subir_documento: true,
+        expediente_id: expediente_id || null,
+        expediente: datosExpedienteRedaccion,
+      },
+    };
+  }
+
+  const tipo = tipo_documento || detectarTipoDocumentoTexto(textoBase || hechos) || 'demanda';
 
   // Construir conversación para el redactor (mismo contrato que /redactar-documento).
+  // FIX P0-REC-4: si el contenido proviene del OCR del expediente, lo etiquetamos
+  // explícitamente para que el redactor sepa que es una transcripción (no texto
+  // nativo) y NO invente correcciones.
+  const prefijoFuenteOcr = fuenteTextoOcr
+    ? 'HECHOS (transcripción OCR del expediente — pueden existir errores tipográficos; NO corrijas silenciosamente):\n'
+    : '';
   const contenido = [
-    hechos && hechos !== _texto ? `HECHOS: ${hechos}` : '',
+    hechos && hechos !== textoBase ? `HECHOS: ${hechos}` : '',
     fundamentos ? `FUNDAMENTOS DE DERECHO: ${fundamentos}` : '',
     petitorio ? `PETITORIO: ${petitorio}` : '',
-    (_texto && !hechos) ? _texto : '',
+    (textoBase && !hechos) ? `${prefijoFuenteOcr}${textoBase}` : '',
   ].filter(Boolean).join('\n') || 'Redacta el escrito legal solicitado.';
 
   const conversacion = [{ rol: 'usuario', contenido }];
@@ -269,6 +416,9 @@ async function ejecutarRedactarDocumento(args, req) {
       tokens: documento.tokens ?? null,
       provider: documento.provider || null,
       model: documento.model || null,
+      // FIX P0-REC-4: trazabilidad de fuente para el frontend.
+      fuente_texto: fuenteTextoOcr ? 'texto_ocr_expediente' : 'usuario',
+      expediente: datosExpedienteRedaccion,
     },
     tokens: documento.tokens || null,
   };
@@ -442,7 +592,16 @@ async function ejecutarCalcularPlazo(args, req) {
 
 /** analizar_expediente → DB (expedientes.texto_ocr) + RAG + LLM structured */
 async function ejecutarAnalizarExpediente(args, req) {
-  const { expediente_id, tipo_analisis = 'completo', materia = 'general', _texto = '' } = args;
+  const {
+    expediente_id,
+    tipo_analisis = 'completo',
+    materia = 'general',
+    _texto = '',
+    // FIX 2026-08-08 (pipeline visión→cerebro→juniors): aceptar metadata OCR
+    // desde el nuevo endpoint /api/documentos/:id/analizar o desde el chat
+    // cuando se invoca sobre un documento subido.
+    ocr_metadata = null,
+  } = args;
   const orgId = req.organizationId;
 
   // 1. Cargar expediente REAL de DB (multi-tenant: WHERE organization_id=$2)
@@ -486,19 +645,36 @@ async function ejecutarAnalizarExpediente(args, req) {
     };
   }
 
+  // FIX 2026-08-08 (pipeline visión→cerebro→juniors): detectar si el contenido
+  // proviene de OCR para enriquecer tanto el system prompt (instrucciones
+  // OCR-aware) como el bloque del usuario (metadatos de origen). Cuando se
+  // pasa `ocr_metadata` desde el endpoint, ese flag es la fuente de verdad;
+  // cuando NO se pasa, inferimos por heurística simple: si hay texto y su
+  // longitud es "moderada" (entre 200 y 100.000 chars), es probablemente OCR.
+  const hayTextoOcr = Boolean(ocr_metadata) || (
+    typeof textoExpediente === 'string'
+    && textoExpediente.length >= 200
+    && textoExpediente.length <= 100000
+  );
+
   const prompt = [
     `Tipo de análisis solicitado: ${tipo_analisis}`,
     `Consulta del usuario: ${_texto || 'Analiza el expediente'}`,
     datosExpediente ? `\nExpediente: ${datosExpediente.numero} — ${datosExpediente.titulo} (${datosExpediente.tipo}, ${datosExpediente.estado})` : '',
-    textoExpediente ? `\nCONTENIDO DEL EXPEDIENTE (OCR):\n${textoExpediente.slice(0, 6000)}` : '',
+    // FIX: usar helper para distinguir OCR vs texto nativo en el bloque del usuario.
+    hayTextoOcr
+      ? enriquecerBloqueTextoExpediente({ textoExpediente, ocrMetadata: ocr_metadata || { cached: false, modelo: null, provider: null } })
+      : enriquecerBloqueTextoExpediente({ textoExpediente, ocrMetadata: null }),
     ragContexto ? `\nCONTEXTO LEGAL VERIFICADO (RAG):\n${ragContexto}` : '',
   ].filter(Boolean).join('\n');
 
+  // FIX: usar buildSistemaAnalisis() para inyectar instrucciones OCR-aware
+  // SOLO cuando el contenido proviene de OCR.
   const respuesta = await getAi().models.generateContent({
     model: req.model || MODEL,
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
     config: {
-      systemInstruction: SISTEMA_ANALISIS,
+      systemInstruction: buildSistemaAnalisis(hayTextoOcr),
       maxOutputTokens: 4096,
       temperature: 0.3,
       tools: [{ functionDeclarations: [ANALISIS_DECLARATION] }],
@@ -519,6 +695,9 @@ async function ejecutarAnalizarExpediente(args, req) {
       riesgos: Array.isArray(resultado.riesgosProcesales) ? resultado.riesgosProcesales : [],
       estrategia: resultado.estrategiaRecomendada || null,
       inconsistencias: Array.isArray(resultado.inconsistencias) ? resultado.inconsistencias : [],
+      // FIX 2026-08-08: exponer al frontend si se usó el modo OCR-aware
+      // (útil para mostrar disclaimers específicos en la UI).
+      ocr_aware: hayTextoOcr,
       // Extras de compatibilidad (resultado crudo de la declaration + expediente).
       resultado,
       expediente: datosExpediente,
@@ -531,7 +710,29 @@ async function ejecutarAnalizarExpediente(args, req) {
 /** buscar_jurisprudencia → RAG local (consultarBaseLegal). NUNCA inventar. */
 async function ejecutarBuscarJurisprudencia(args, req) {
   const { query = '', materia = 'general', fuente = '', max_resultados = 10 } = args;
-  const consulta = String(query || '').trim();
+
+  // FIX 2026-08-09 (SKILL enrutamiento-intenciones-chat v1.2.0): aceptar enum
+  // en minúsculas ('pj'|'tc'|'indecopi'|'sunarp'|'minjus'|'auto'). Se tolera
+  // también MAYÚSCULAS por compatibilidad con catálogos previos. Si llega
+  // vacío o 'auto' → no se filtra por fuente.
+  const fuenteNormalizada = String(fuente || '').trim().toLowerCase();
+
+  // Auto-inferencia de fuente desde el texto del query (sin sobre-ingeniería):
+  // si el usuario escribió "del TC", "casaciones", "de INDECOPI", etc., y NO
+  // pasó `fuente` explícita, la inferimos para activar el filtro del RAG.
+  // Solo se aplica si `fuente` está vacía (no pisamos una elección explícita).
+  const consultaOriginal = String(query || '').trim();
+  let fuenteEfectiva = fuenteNormalizada;
+  if (!fuenteEfectiva || fuenteEfectiva === 'auto') {
+    const q = consultaOriginal.toLowerCase();
+    if (/\b(tc|tribunal constitucional|precedentes?\s+vinculantes?)\b/.test(q)) fuenteEfectiva = 'tc';
+    else if (/\b(casacion(es)?\s+(laboral|civil|penal)?)\b/.test(q) || /\bpj\b|poder\s+judicial/.test(q)) fuenteEfectiva = 'pj';
+    else if (/indecopi/.test(q)) fuenteEfectiva = 'indecopi';
+    else if (/sunarp/.test(q)) fuenteEfectiva = 'sunarp';
+    else if (/minjus|ministerio\s+de\s+justicia/.test(q)) fuenteEfectiva = 'minjus';
+  }
+
+  const consulta = consultaOriginal;
   if (!consulta || consulta.length < 5) {
     return {
       texto: 'Indícame qué tema jurídico quieres buscar (p. ej. "desalojo", "despido arbitrario", "prescripción adquisitiva").',
@@ -547,17 +748,22 @@ async function ejecutarBuscarJurisprudencia(args, req) {
     };
   }
 
+  // FIX 2026-08-09: pasamos `fuente` como parámetro dedicado al wrapper
+  // (consultarBaseLegal) que mapea al filtro `rag_vectors_v2.source`. Esto
+  // mejora precisión y reduce ruido: si el usuario pide "del TC", el retrieval
+  // semántico NO cae en chunks de INDECOPI o casaciones PJ.
   const base = await consultarBaseLegal({
     materia,
     consulta: consulta.substring(0, 500),
-    contexto: fuente || '',
+    contexto: '', // sin contexto adicional (la fuente va como parámetro dedicado)
+    fuente: fuenteEfectiva || null,
   });
   const chunks = base?.chunks_usados || 0;
 
   if (chunks === 0) {
     return {
-      texto: `No encontré jurisprudencia real verificada para "${consulta}". **No invento jurisprudencia**: si no hay resultados reales, lo digo explícitamente. Prueba con otros términos o revisa el buscador de jurisprudencia.`,
-      data: { chunks_usados: 0, resultados: [], citaciones: [] },
+      texto: `No encontré jurisprudencia real verificada para "${consulta}"${fuenteEfectiva && fuenteEfectiva !== 'auto' ? ` filtrando por fuente "${fuenteEfectiva.toUpperCase()}"` : ''}. **No invento jurisprudencia**: si no hay resultados reales, lo digo explícitamente. Prueba con otros términos, quita el filtro de fuente, o revisa el buscador de jurisprudencia.`,
+      data: { chunks_usados: 0, resultados: [], citaciones: [], fuente_solicitada: fuenteEfectiva || null },
     };
   }
 
@@ -577,6 +783,7 @@ async function ejecutarBuscarJurisprudencia(args, req) {
   const citas = (base.citaciones || []).slice(0, max_resultados).map((c) => `[${c.numero}] ${c.fuente}${c.url ? ` — ${c.url}` : ''}`);
   const lineas = [
     `# Jurisprudencia sobre: ${consulta}`,
+    fuenteEfectiva && fuenteEfectiva !== 'auto' ? `*Filtro de fuente aplicado: **${fuenteEfectiva.toUpperCase()}***` : '',
     '',
     'Resultados recuperados de **fuentes reales** (RAG local):',
     '',
@@ -594,7 +801,7 @@ async function ejecutarBuscarJurisprudencia(args, req) {
 
   return {
     texto: lineas,
-    data: { resultados, chunks_usados: chunks, citaciones: base.citaciones, fuentes: base.fuentes },
+    data: { resultados, chunks_usados: chunks, citaciones: base.citaciones, fuentes: base.fuentes, fuente_solicitada: fuenteEfectiva || null },
   };
 }
 
@@ -622,10 +829,51 @@ async function ejecutarPredecirResultado(args, req) {
     }
   }
 
+  // 2. FIX P0-REC-3 (2026-08-08): conectar predecir_resultado con RAG.
+  // ANTES de invocar el LLM, consultamos la base legal indexada (rag_vectors_v2)
+  // para obtener casos similares fundados en jurisprudencia REAL. Si el RAG no
+  // está disponible (fail-open), continuamos sin base jurisprudencial y el
+  // system prompt SISTEMA_PREDICTOR instruye al LLM a decir "no encuentro base
+  // suficiente" en vez de inventar precedentes.
+  let ragContexto = '';
+  let ragCitaciones = [];
+  let ragChunksUsados = 0;
+  try {
+    const consultarBaseLegal = await getRagConsulta();
+    if (consultarBaseLegal) {
+      // La consulta se construye combinando materia + titulo del expediente +
+      // texto del usuario. Esto da al RAG suficiente señal para encontrar
+      // casos similares en la materia indicada.
+      const consultaRag = [
+        'Casos similares a:',
+        datosExpediente?.titulo || '',
+        _texto || '',
+      ].filter(Boolean).join(' ').substring(0, 500);
+      const base = await consultarBaseLegal({
+        materia,
+        consulta: consultaRag,
+        contexto: datosExpediente?.numero || '',
+      });
+      ragContexto = base?.contexto || '';
+      ragCitaciones = Array.isArray(base?.citaciones) ? base.citaciones : [];
+      ragChunksUsados = typeof base?.chunks_usados === 'number' ? base.chunks_usados : 0;
+    }
+  } catch (err) {
+    // Fail-open: si el RAG falla, continuar sin base jurisprudencial.
+    req.logger?.warn('[INTENT-ROUTER] RAG no disponible para predicción:', err?.message);
+  }
+
+  // Bloque RAG inyectado en el prompt del usuario (FIX P0-REC-3). Solo se
+  // incluye cuando ragContexto tiene contenido; si viene vacío, el system
+  // prompt SISTEMA_PREDICTOR instruye al LLM a declarar que NO encontró base.
+  const bloqueRag = ragContexto
+    ? `\n\nBASE DE CASOS SIMILARES (RAG) - ${ragChunksUsados} chunks de rag_vectors_v2:\n${ragContexto}`
+    : '\n\n(BASE DE CASOS SIMILARES (RAG): 0 chunks - no se encontró jurisprudencia indexada para esta consulta. Indica esto explícitamente en veredictoGeneral y baja la confianza.)';
+
   const prompt = `Basándote en la siguiente información del caso peruano, emite una predicción estructurada de viabilidad judicial.
 Tipo de predicción solicitada: ${tipo_prediccion}
 ${_texto ? `Consulta del usuario: ${_texto}` : ''}
-${contexto || '\n(Sin expediente en contexto: predicción basada únicamente en la consulta del usuario)'}`;
+${contexto || '\n(Sin expediente en contexto: predicción basada únicamente en la consulta del usuario)'}${bloqueRag}`;
 
   const respuesta = await getAi().models.generateContent({
     model: req.model || MODEL,
@@ -642,7 +890,7 @@ ${contexto || '\n(Sin expediente en contexto: predicción basada únicamente en 
   const fc = respuesta.functionCalls?.[0];
   const resultado = fc?.args ?? {};
 
-  // 2. Persistir en predicciones_judiciales (mismo patrón que ai.js /consulta)
+  // 3. Persistir en predicciones_judiciales (mismo patrón que ai.js /consulta)
   if (resultado.probabilidadExito !== undefined) {
     try {
       await db.query(
@@ -655,7 +903,12 @@ ${contexto || '\n(Sin expediente en contexto: predicción basada únicamente en 
           datosExpediente?.tipo || 'GENERAL',
           materia || 'GENERAL',
           resultado.probabilidadExito,
-          JSON.stringify({ veredictoGeneral: resultado.veredictoGeneral }),
+          JSON.stringify({
+            veredictoGeneral: resultado.veredictoGeneral,
+            // FIX P0-REC-3: persistir trazabilidad de qué chunks RAG se usaron.
+            rag_chunks_usados: ragChunksUsados,
+            rag_fuentes: ragCitaciones.map((c) => c?.fuente || c?.metadata?.fuente).filter(Boolean).slice(0, 10),
+          }),
           JSON.stringify(resultado.factoresFavorables || []),
           JSON.stringify(resultado.factoresDesfavorables || []),
           JSON.stringify([resultado.recomendacion || '']),
@@ -676,6 +929,12 @@ ${contexto || '\n(Sin expediente en contexto: predicción basada únicamente en 
       factores_favorables: Array.isArray(resultado.factoresFavorables) ? resultado.factoresFavorables : [],
       factores_desfavorables: Array.isArray(resultado.factoresDesfavorables) ? resultado.factoresDesfavorables : [],
       recomendacion: resultado.recomendacion || null,
+      // FIX P0-REC-3: exponer trazabilidad RAG al frontend para que el
+      // abogado pueda ver de dónde salió la predicción.
+      rag: {
+        chunks_usados: ragChunksUsados,
+        citaciones: ragCitaciones,
+      },
       // Extra de compatibilidad: resultado crudo de la declaration.
       resultado,
     },
@@ -792,7 +1051,7 @@ export async function enrutarMensaje({ mensaje, historial = [], expediente_id, m
 
   // El modelo respondió texto directo → es la respuesta limpia normal.
   if (fase1.text?.trim() && !fase1.functionCalls?.length) {
-    return { respuesta: fase1.text.trim(), intent: null, tipo_respuesta: 'respuesta', fase: 'fase1-texto', tokens: null, data: null };
+    return { respuesta: limpiarRazonamiento(fase1.text.trim()), intent: null, tipo_respuesta: 'respuesta', fase: 'fase1-texto', tokens: null, data: null };
   }
 
   // FASE 2 — ejecutar las tools llamadas por el modelo.

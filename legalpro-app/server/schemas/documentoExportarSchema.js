@@ -93,3 +93,50 @@ export const documentoExportarSchema = z.object({
     .max(200, 'El nombre de la organización no puede exceder 200 caracteres.')
     .optional(),
 }).strict({ message: 'Campos adicionales no permitidos en la solicitud.' });
+
+/**
+ * Schema de validación Zod para POST /api/documentos/:id/analizar
+ *
+ * FIX 2026-08-08 (pipeline visión→cerebro→juniors): nuevo endpoint opcional
+ * que ejecuta el pipeline completo de análisis sobre un documento ya subido:
+ *   1. Recupera el texto OCR del documento (o del expediente asociado).
+ *   2. Llama a `ejecutarHerramienta('analizar_expediente', ...)` con
+ *      ocr_metadata para activar el prompt OCR-aware.
+ *   3. Devuelve el análisis estructurado (shape canónico v3).
+ *
+ * Campos:
+ *   - materia          : materia legal del análisis (default 'general').
+ *   - tipo_analisis    : subtipo ('completo', 'riesgos', 'fortalezas', 'estrategia').
+ *   - consulta         : texto libre que el usuario quiere enfocar.
+ *   - incluir_rag      : si true, intenta recuperar contexto legal verificado.
+ *   - usar_cache_ocr   : si true y existe cache hit, NO se vuelve a procesar.
+ */
+export const documentoAnalizarSchema = z.object({
+  materia: z
+    .string()
+    .min(2, 'La materia debe tener al menos 2 caracteres.')
+    .max(60, 'La materia no puede exceder 60 caracteres.')
+    .default('general'),
+
+  tipo_analisis: z
+    .enum(['completo', 'riesgos', 'fortalezas', 'estrategia', 'resumen'], {
+      errorMap: () => ({ message: 'tipo_analisis debe ser uno de: completo, riesgos, fortalezas, estrategia, resumen.' }),
+    })
+    .default('completo'),
+
+  consulta: z
+    .string()
+    .max(2000, 'La consulta no puede exceder 2000 caracteres.')
+    .optional()
+    .default(''),
+
+  incluir_rag: z
+    .boolean()
+    .optional()
+    .default(true),
+
+  usar_cache_ocr: z
+    .boolean()
+    .optional()
+    .default(true),
+}).strict({ message: 'Campos adicionales no permitidos en la solicitud de análisis.' });

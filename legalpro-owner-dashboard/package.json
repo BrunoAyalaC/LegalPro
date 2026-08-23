@@ -1,0 +1,20 @@
+{
+  "name": "legalpro-owner-dashboard",
+  "version": "6.12.0",
+  "description": "Dashboard de Administración Aislado para el Owner de LegalPro - Monitoreo de Costos en USD y Tokens",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test crypto.test.mjs"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "pg": "^8.12.0"
+  }
+}

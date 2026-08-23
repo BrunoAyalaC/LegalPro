@@ -1,0 +1,434 @@
+{
+  "metadata": {
+    "nombre": "Normativa Reciente OEFA - Organismo de Evaluación y Fiscalización Ambiental",
+    "fuente_principal": "https://www.gob.pe/oefa",
+    "fuentes_secundarias": [
+      "https://www.gob.pe/institucion/oefa/normas-legales",
+      "https://www.gob.pe/institucion/oefa/colecciones/4240-normas-juridicas",
+      "https://www.gob.pe/institucion/oefa/colecciones/16294-compendio-de-resoluciones-de-actualizacion-de-los-inventarios-de-residuos-solidos-del-oefa"
+    ],
+    "fecha_consulta": "2026-08-01",
+    "fecha_actualizacion": "2026-08-01",
+    "version": "1.0",
+    "autor": "lexia-orchestrator + integraciones-peru",
+    "descripcion": "Catálogo de resoluciones y normativa reciente del Organismo de Evaluación y Fiscalización Ambiental (OEFA), ente rector del Sistema Nacional de Evaluación y Fiscalización Ambiental (SINEFA) adscrito al MINAM.",
+    "total_documentos": 27,
+    "relevancia_legalpro": "MEDIA-ALTA - Compliance ambiental para proyectos industriales, minería, residuos sólidos",
+    "ente_rector": "MINAM - Ministerio del Ambiente",
+    "normas_relevantes_peruanas": [
+      "Ley N° 28611 - Ley General del Ambiente",
+      "Ley N° 29325 - Ley del Sistema Nacional de Evaluación y Fiscalización Ambiental (SINEFA)",
+      "D.S. N° 013-2017-MINAM - Reglamento de Organización y Funciones (ROF) del OEFA (Vigente)",
+      "Ley N° 30011 - Ley que modifica la Ley 29325"
+    ],
+    "total_normas_en_plataforma": 9740,
+    "notas": "Se incluyen las 25 resoluciones más recientes de julio 2026 y 2 normas relevantes destacadas. La mayoría de resoluciones recientes son sobre fraccionamiento de multas y recursos de apelación."
+  },
+  "normativa_relevante_destacada": [
+    {
+      "id": "OEFA-DS-013-2017-MINAM",
+      "tipo": "Decreto Supremo",
+      "numero": "N° 013-2017-MINAM",
+      "fecha_publicacion": "2017-12-20",
+      "titulo": "Reglamento de Organización y Funciones del OEFA",
+      "sumilla": "Aprueba el Reglamento de Organización y Funciones (ROF) del Organismo de Evaluación y Fiscalización Ambiental (OEFA), actualmente VIGENTE.",
+      "materia": "Organización del Estado - OEFA",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/1211414-013-2017-minam",
+      "url_descarga": "https://cdn.www.gob.pe/uploads/document/file/1318582/Reglamento%20de%20Organizaci%C3%B3n%20y%20Funciones%20del%20OEFA%20-%20publicaci%C3%B3n%20en%20el%20diario%20oficial%20El%20Peruano%20%28Vigente%29.pdf",
+      "relevancia_legalpro": "ALTA - Norma fundacional OEFA"
+    },
+    {
+      "id": "OEFA-RCD-010-2022",
+      "tipo": "Resolución de Consejo Directivo",
+      "numero": "N° 010-2022-OEFA/CD",
+      "fecha_publicacion": "2022-04-11",
+      "titulo": "Reglamento para la elaboración, administración y actualización del Inventario Nacional de Áreas Degradadas por Residuos Sólidos e Inventario Nacional de Infraestructuras de Residuos Sólidos",
+      "sumilla": "Aprueba el reglamento para la elaboración, administración y actualización del Inventario Nacional de Áreas Degradadas por Residuos Sólidos e Inventario Nacional de Infraestructuras de Residuos Sólidos.",
+      "materia": "Residuos sólidos - Inventario Nacional",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/2907583-010-2022-oefa-cd",
+      "url_descarga": "https://cdn.www.gob.pe/uploads/document/file/3010820/Resoluci%C3%B3n%20de%20Consejo%20Directivo%20N%C2%B0%200010-2022-OEFA/CD%20%28versi%C3%B3n%20publicada%20en%20El%20Peruano%29%20.pdf",
+      "relevancia_legalpro": "ALTA - Residuos sólidos"
+    },
+    {
+      "id": "OEFA-RCD-00019-2025",
+      "tipo": "Resolución de Consejo Directivo",
+      "numero": "N° 00019-2025-OEFA/CD",
+      "fecha_publicacion": "2025-07-24",
+      "titulo": "Reglamento de Supervisión del OEFA",
+      "sumilla": "Aprueba el Reglamento de Supervisión del Organismo de Evaluación y Fiscalización Ambiental (OEFA). Define los alcances, criterios y procedimientos de las supervisiones ambientales.",
+      "materia": "Supervisión Ambiental",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/6985709-00019-2025-oefa-cd",
+      "url_descarga": "https://cdn.www.gob.pe/uploads/document/file/8405192/6985709-1-publicacion-version-el-peruano.PDF",
+      "relevancia_legalpro": "CRÍTICA - Base legal fiscalización"
+    }
+  ],
+  "normas": [
+    {
+      "id": "OEFA-RA-00262-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00262-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Aprobar solicitud de beneficio de fraccionamiento de multa ambiental",
+      "sumilla": "Aprobar la solicitud de beneficio de fraccionamiento presentada mediante escritos de registro N° 2026-E01-088373 del 13 julio y N° 2026-E01-093172 del 22 julio 2026 por administrado.",
+      "materia": "Fraccionamiento de Multas Ambientales",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8431184-00262-2026-oefa-oad",
+      "relevancia_legalpro": "MEDIA - Fraccionamiento multas"
+    },
+    {
+      "id": "OEFA-RA-00263-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00263-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Denegar solicitud de beneficio de fraccionamiento de multa",
+      "sumilla": "Denegar la solicitud de beneficio de fraccionamiento presentada mediante escrito de registro N° 2026-E01-090039 del 16 julio 2026 por JUAN ROQUE LIZUNDE CCOICCA, con RUC N° 10311439923.",
+      "materia": "Fraccionamiento de Multas - Denegatoria",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8431185-00263-2026-oefa-oad",
+      "relevancia_legalpro": "MEDIA - Denegatoria fraccionamiento"
+    },
+    {
+      "id": "OEFA-RGG-00092-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 00092-2026-OEFA/GEG",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Modificar Resolución de conformación de Unidad Funcional Supervisión...",
+      "sumilla": "Modificar los artículos 1° y 2° de la Resolución de Gerencia General N° 121-2024-OEFA/GEG sobre conformación de la Unidad Funcional Supervisión (reorganización interna).",
+      "materia": "Reorganización interna OEFA",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8427701-00092-2026-oefa-geg",
+      "relevancia_legalpro": "BAJA - RRHH interno OEFA"
+    },
+    {
+      "id": "OEFA-RA-00261-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00261-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "Asignar fondos bajo modalidad de Encargo",
+      "sumilla": "Aprobar asignación de fondos bajo modalidad de Encargo a favor de SANDRA FABIOLA GATICA ACOSTA, Especialista en Gestión Administrativa – Especialista IV de la Oficina Desconcentrada de San Martín.",
+      "materia": "Fondos por encargo - Gestión administrativa",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8418869-00261-2026-oefa-oad",
+      "relevancia_legalpro": "BAJA - Gestión administrativa"
+    },
+    {
+      "id": "OEFA-RA-00260-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00260-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "Asignar fondos bajo modalidad de Encargo - Ayacucho",
+      "sumilla": "Aprobar asignación de fondos bajo modalidad de Encargo a favor de JOSE SIXTO AVILA ZAMORA, Chofer – Auxiliar II para la Oficina Desconcentrada de Ayacucho.",
+      "materia": "Fondos por encargo - Ayacucho",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8418846-00260-2026-oefa-oad",
+      "relevancia_legalpro": "BAJA - Gestión administrativa"
+    },
+    {
+      "id": "OEFA-RPCD-00098-2026",
+      "tipo": "Resolución de Presidencia del Consejo Directivo",
+      "numero": "N° 00098-2026-OEFA/PCD",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "Autorizar Procurador Público OEFA a conciliar",
+      "sumilla": "Autorizar al abogado Juan Carlos Portocarrero Zamora, Procurador Público del Organismo de Evaluación y Fiscalización Ambiental - OEFA, a participar y conciliar en la audiencia de conciliación que se programme.",
+      "materia": "Procuraduría Pública - Conciliaciones",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8421214-00098-2026-oefa-pcd",
+      "relevancia_legalpro": "MEDIA - Representación procesal"
+    },
+    {
+      "id": "OEFA-RPCD-00097-2026",
+      "tipo": "Resolución de Presidencia del Consejo Directivo",
+      "numero": "N° 00097-2026-OEFA/PCD",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "Autorizar viaje al exterior para Workshop APEC",
+      "sumilla": "Autorizar el viaje al exterior, en comisión de servicios, a los siguientes servidores, a fin de que participen en el evento denominado Workshop APEC 'Bridging the Gap: Capacity Building for Formalization'.",
+      "materia": "Comisión de servicios - APEC internacional",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8420609-00097-2026-oefa-pcd",
+      "relevancia_legalpro": "BAJA - Cooperación internacional APEC"
+    },
+    {
+      "id": "OEFA-RGG-00091-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 00091-2026-OEFA/GEG",
+      "fecha_publicacion": "2026-07-23",
+      "titulo": "Autorizar Procurador a conciliar",
+      "sumilla": "Autorizar al abogado Juan Carlos Portocarrero Zamora, Procurador Público del OEFA, a participar y conciliar en audiencia de conciliación.",
+      "materia": "Procuraduría Pública - Conciliaciones",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8417672-00091-2026-oefa-geg",
+      "relevancia_legalpro": "MEDIA - Representación procesal"
+    },
+    {
+      "id": "OEFA-RPCD-00096-2026",
+      "tipo": "Resolución de Presidencia del Consejo Directivo",
+      "numero": "N° 00096-2026-OEFA/PCD",
+      "fecha_publicacion": "2026-07-22",
+      "titulo": "Desagregación de Recursos - Ley N° 32732",
+      "sumilla": "Apruébese la desagregación de los recursos autorizados mediante el numeral 3.1 del artículo 3° de la Ley N° 32732, Ley que aprueba créditos suplementarios para el financiamiento de gastos.",
+      "materia": "Presupuesto Público - Créditos suplementarios",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8416737-00096-2026-oefa-pcd",
+      "relevancia_legalpro": "MEDIA - Asignación presupuestal"
+    },
+    {
+      "id": "OEFA-RGG-00090-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 00090-2026-OEFA/GEG",
+      "fecha_publicacion": "2026-07-22",
+      "titulo": "Aprobar contratación de Servicio de Alquiler - Huánuco",
+      "sumilla": "Aprobar la contratación del 'SERVICIO DE ALQUILER DE INMUEBLE PARA LA OFICINA DESCONCENTRADA DE HUÁNUCO', convocado mediante el Procedimiento de Selección No Competitivo N° 009-2026-OEFA.",
+      "materia": "Contrataciones públicas OEFA",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8417611-00090-2026-oefa-geg",
+      "relevancia_legalpro": "MEDIA - Contrataciones OEFA"
+    },
+    {
+      "id": "OEFA-RGG-00089-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 00089-2026-OEFA/GEG",
+      "fecha_publicacion": "2026-07-22",
+      "titulo": "Autorizar Procurador - múltiples audiencias de conciliación",
+      "sumilla": "Autorizar al abogado Juan Carlos Portocarrero Zamora, Procurador Público del OEFA, a participar y conciliar en las audiencias de conciliación que se desarrollen.",
+      "materia": "Procuraduría Pública",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8417600-00089-2026-oefa-geg",
+      "relevancia_legalpro": "MEDIA - Representación procesal"
+    },
+    {
+      "id": "OEFA-RA-00259-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00259-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-21",
+      "titulo": "Aprobar fraccionamiento - GASOLINERAS S.A.C.",
+      "sumilla": "Aprobar la solicitud de beneficio de fraccionamiento de multa ambiental presentada por GASOLINERAS S.A.C., con RUC N° 20101313833 (relacionada a multas por contaminación en grifos).",
+      "materia": "Fraccionamiento - Sector hidrocarburos",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8411800-00259-2026-oefa-oad",
+      "relevancia_legalpro": "ALTA - Sector hidrocarburos"
+    },
+    {
+      "id": "OEFA-RA-00258-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00258-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-21",
+      "titulo": "Aprobar fraccionamiento - CURTIEMBRE BUENAVENTURA S.A.C.",
+      "sumilla": "Aprobar la solicitud de beneficio de fraccionamiento de multa ambiental presentada por CURTIEMBRE BUENAVENTURA S.A.C., con RUC N° 20606965053 (sector curtiembre - impacto ambiental).",
+      "materia": "Fraccionamiento - Sector curtiembre",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8410345-00258-2026-oefa-oad",
+      "relevancia_legalpro": "ALTA - Sector curtiembre"
+    },
+    {
+      "id": "OEFA-RA-00257-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00257-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-21",
+      "titulo": "Aprobar fraccionamiento - SIHUASINOS S.A.C.",
+      "sumilla": "Aprobar la solicitud de beneficio de fraccionamiento de multa ambiental presentada por SIHUASINOS S.A.C., con RUC N° 20531902191.",
+      "materia": "Fraccionamiento",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8410343-00257-2026-oefa-oad",
+      "relevancia_legalpro": "MEDIA - Fraccionamiento multa"
+    },
+    {
+      "id": "OEFA-RPCD-00095-2026",
+      "tipo": "Resolución de Presidencia del Consejo Directivo",
+      "numero": "N° 00095-2026-OEFA/PCD",
+      "fecha_publicacion": "2026-07-21",
+      "titulo": "Autorizar Procurador a audiencias de conciliación",
+      "sumilla": "Autorizar al abogado Juan Carlos Portocarrero Zamora, Procurador Público del OEFA, a participar en las audiencias de conciliación que se desarrollen.",
+      "materia": "Procuraduría Pública - Conciliaciones",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8411855-00095-2026-oefa-pcd",
+      "relevancia_legalpro": "MEDIA - Representación procesal"
+    },
+    {
+      "id": "OEFA-RGG-00088-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 00088-2026-OEFA/GEG",
+      "fecha_publicacion": "2026-07-21",
+      "titulo": "Declarar prescripción de potestad administrativa disciplinaria",
+      "sumilla": "Declarar la prescripción de oficio de la potestad administrativa disciplinaria para el inicio del procedimiento administrativo disciplinario respecto de servidores que habrían participado en hechos materia de procedimiento.",
+      "materia": "Procedimiento administrativo disciplinario - Prescripción",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8412015-00088-2026-oefa-geg",
+      "relevancia_legalpro": "MEDIA - Procedimiento disciplinario"
+    },
+    {
+      "id": "OEFA-RGG-00086-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 00086-2026-OEFA/GEG",
+      "fecha_publicacion": "2026-07-21",
+      "titulo": "Declarar infundado recurso de apelación de PETROPERÚ",
+      "sumilla": "Declarar infundado el recurso de apelación interpuesto por PETRÓLEOS DEL PERÚ - PETROPERÚ S.A. contra la Resolución de Administración N° 00205-2026-OEFA/OAD; y confirmar la resolución apelada. CASO SIGNIFICATIVO: empresa estatal.",
+      "materia": "Apelación Multa - Hidrocarburos - PETROPERÚ",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8411400-00086-2026-oefa-geg",
+      "relevancia_legalpro": "CRÍTICA - Precedente PETROPERÚ"
+    },
+    {
+      "id": "OEFA-RA-00256-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00256-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-17",
+      "titulo": "Asignar fondos - Piura",
+      "sumilla": "Aprobar asignación de fondos bajo modalidad de Encargo a favor de MARY LLUVIANA AVILA RUIZ, Especialista en Gestión Administrativa – Profesional III de la Oficina Desconcentrada de Piura.",
+      "materia": "Fondos por encargo - Piura",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8402314-00256-2026-oefa-oad",
+      "relevancia_legalpro": "BAJA - Gestión administrativa"
+    },
+    {
+      "id": "OEFA-RA-00255-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00255-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-17",
+      "titulo": "Aprobar Compatibilización NetBackup Enterprise",
+      "sumilla": "Aprobar la Compatibilización del Servicio de suscripción de licencia de software NetBackup Enterprise y Servicio de soporte para los equipos Appliance NetBackup Master y Expansion Shelf.",
+      "materia": "Tecnología - Compatibilización de software",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8398280-00255-2026-oefa-oad",
+      "relevancia_legalpro": "BAJA - Tecnología interna"
+    },
+    {
+      "id": "OEFA-RA-00252-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00252-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-17",
+      "titulo": "Declarar pérdida de beneficio de fraccionamiento - Grifo García",
+      "sumilla": "Declarar la pérdida de beneficio de fraccionamiento de multa ambiental otorgado a GRIFO INVERSIONES GARCÍA S.R.L. mediante Resolución N° 00450-2025-OEFA/OAD.",
+      "materia": "Pérdida de fraccionamiento",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8402304-00252-2026-oefa-oad",
+      "relevancia_legalpro": "ALTA - Pérdida beneficio"
+    },
+    {
+      "id": "OEFA-RA-00254-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00254-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-16",
+      "titulo": "Aprobar fraccionamiento - PESQUERA Z Y T S.A.C.",
+      "sumilla": "Aprobar la solicitud de beneficio de fraccionamiento de multa ambiental presentada por PESQUERA Z Y T S.A.C., con RUC N° 20488667191 (sector pesquero).",
+      "materia": "Fraccionamiento - Sector pesca",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8397750-00254-2026-oefa-oad",
+      "relevancia_legalpro": "ALTA - Sector pesca"
+    },
+    {
+      "id": "OEFA-RA-00253-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00253-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-16",
+      "titulo": "Aprobar fraccionamiento - PAMI S.R.L.",
+      "sumilla": "Aprobar la solicitud de beneficio de fraccionamiento de multa ambiental presentada por NEGOCIOS Y SERVICIOS DIVERSOS PAMI S.R.L.",
+      "materia": "Fraccionamiento",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8397748-00253-2026-oefa-oad",
+      "relevancia_legalpro": "MEDIA - Fraccionamiento multa"
+    },
+    {
+      "id": "OEFA-RGG-00085-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 00085-2026-OEFA/GEG",
+      "fecha_publicacion": "2026-07-16",
+      "titulo": "Aprobar alquiler inmueble Espinar",
+      "sumilla": "Aprobar la contratación del 'Servicio de alquiler de Inmueble para la Oficina de Enlace Espinar del OEFA', Procedimiento de Selección No Competitivo.",
+      "materia": "Contrataciones públicas - Espinar (Cusco)",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8397303-00085-2026-oefa-geg",
+      "relevancia_legalpro": "MEDIA - Contratación OEFA"
+    },
+    {
+      "id": "OEFA-RA-00251-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00251-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-15",
+      "titulo": "Aprobar fraccionamiento - SUMINISTROS FERMAR S.A.C.",
+      "sumilla": "Aprobar la solicitud de beneficio de fraccionamiento de multa ambiental presentada por SUMINISTROS FERMAR S.A.C., con RUC N° 20127171212.",
+      "materia": "Fraccionamiento",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8385038-00251-2026-oefa-oad",
+      "relevancia_legalpro": "MEDIA - Fraccionamiento multa"
+    },
+    {
+      "id": "OEFA-RA-00250-2026",
+      "tipo": "Resolución de Administración",
+      "numero": "N° 00250-2026-OEFA/OAD",
+      "fecha_publicacion": "2026-07-15",
+      "titulo": "Aprobar aplazamiento y fraccionamiento conjunto",
+      "sumilla": "Aprobar la solicitud de beneficio de aplazamiento y fraccionamiento de manera conjunta, presentada por SEGISMUNDO ALVARADO C.",
+      "materia": "Aplazamiento y fraccionamiento conjunto",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/normas-legales/8384941-00250-2026-oefa-oad",
+      "relevancia_legalpro": "MEDIA - Beneficio conjunto"
+    }
+  ],
+  "noticias_destacadas_2026": [
+    {
+      "id": "OEFA-NEWS-TACNA",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "OEFA reafirma su compromiso de fiscalización ambiental y trabajo articulado en Tacna",
+      "sumilla": "OEFA reafirma su compromiso de fiscalización ambiental y trabajo articulado en Tacna.",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/noticias/1424916-oefa-reafirma-su-compromiso-de-fiscalizacion-ambiental-y-trabajo-articulado-en-tacna",
+      "relevancia_legalpro": "MEDIA - Trabajo articulado regional"
+    },
+    {
+      "id": "OEFA-NEWS-CUSCO-JAQUIRA",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Cusco: OEFA realizó visita preventiva al botadero de Jaquira",
+      "sumilla": "OEFA realizó visita preventiva al botadero de Jaquira (Cusco). Botaderos municipales - gestión de residuos sólidos.",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/noticias/1424712-cusco-oefa-realizo-visita-preventiva-al-botadero-de-jaquira",
+      "relevancia_legalpro": "MEDIA - Gestión residuos sólidos"
+    },
+    {
+      "id": "OEFA-NEWS-JUNIN-SISMOS",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-07-26",
+      "titulo": "Junín: OEFA verificó diez botaderos e infraestructuras de residuos sólidos tras sismos en Chupaca",
+      "sumilla": "OEFA verificó diez botaderos e infraestructuras de residuos sólidos tras sismos registrados en Chupaca, Junín. Verificación post-desastre ambiental.",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/noticias/1423323-junin-oefa-verifico-diez-botaderos-e-infraestructuras-de-residuos-solidos-tras-sismos-registrados-en-chupaca",
+      "relevancia_legalpro": "MEDIA - Respuesta a desastres"
+    },
+    {
+      "id": "OEFA-NEWS-LORETO",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-07-25",
+      "titulo": "OEFA fortalece el conocimiento en fiscalización ambiental en Loreto",
+      "sumilla": "OEFA fortalece el conocimiento en fiscalización ambiental y promueve la participación ciudadana de la comunidad de Loreto.",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/noticias/1423186-oefa-fortalece-el-conocimiento-en-fiscalizacion-ambiental-y-promueve-la-participacion-ciudadana-de-la-comunidad-de-loreto",
+      "relevancia_legalpro": "BAJA - Participación ciudadana"
+    },
+    {
+      "id": "OEFA-NEWS-LOS-OLIVOS",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "OEFA vigila ambientalmente la calidad del aire durante incendio de fábrica en Los Olivos",
+      "sumilla": "OEFA vigila ambientalmente la calidad del aire durante incendio de fábrica en Los Olivos (Lima Norte). Monitoreo ambiental en tiempo real.",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/noticias/1423005-oefa-vigila-ambientalmente-la-calidad-del-aire-durante-incendio-de-fabrica-en-los-olivos",
+      "relevancia_legalpro": "MEDIA - Monitoreo ambiental"
+    }
+  ],
+  "informes_destacados_2026": [
+    {
+      "id": "OEFA-PEI-2026",
+      "tipo": "Reporte de Seguimiento PEI",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Reporte de Seguimiento del PEI al I Semestre 2026",
+      "sumilla": "Reporte de Seguimiento del Plan Estratégico Institucional (PEI) 2025-2030 al primer semestre 2026.",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/informes-publicaciones/8432996-reporte-de-seguimiento-del-pei-al-i-semestre-2026",
+      "relevancia_legalpro": "MEDIA - Planificación estratégica"
+    },
+    {
+      "id": "OEFA-INNOVA-2026",
+      "tipo": "Cotización - Servicio análisis indicadores",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Req 3756-2026 Servicio de análisis de indicadores OEFA INNOVA",
+      "sumilla": "Presentación de cotizaciones hasta las 17:00 PM del 03 de agosto 2026 para Servicio de Análisis de Indicadores de Evaluación, Seguimiento y Monitoreo de Iniciativas del Laboratorio de Innovación OEFA INNOVA.",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/informes-publicaciones/8432768-req-3756-2026-servicio-de-analisis-de-indicadores-de-evaluacion-seguimiento-y-monitoreo-de-las-iniciativas-estrategicas-del-laboratorio-de-innovacion-oefa-innova",
+      "relevancia_legalpro": "BAJA - Compra pública"
+    },
+    {
+      "id": "OEFA-DEAM-STEC-2026",
+      "tipo": "Reporte Técnico",
+      "numero": "Reporte N° 00034-2026-OEFA/DEAM-STEC",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Reporte técnico OEFA/DEAM-STEC",
+      "sumilla": "Reporte técnico de la Dirección de Evaluación Ambiental (DEAM), Subdirección Técnica y Científica (STEC).",
+      "url_fuente": "https://www.gob.pe/institucion/oefa/informes-publicaciones/8431945-reporte-n-00034-2026-oefa-deam-stec",
+      "relevancia_legalpro": "ALTA - Reporte técnico ambiental"
+    }
+  ],
+  "agregados_estadisticos": {
+    "total_normas_plataforma": 9740,
+    "sectores_sancionados_destacados_2026": ["Hidrocarburos (PETROPERÚ, gasolineras)", "Pesquería", "Curtiembre", "Residuos Sólidos", "Oficinas desconcentradas"],
+    "caso_emblematico_2026": "PETROPERÚ - Recurso de apelación declarado infundado por Gerencia General (RGG 00086-2026-OEFA/GEG del 21 julio 2026)",
+    "herramientas_internas_oeofa": [
+      "SICE - Sistema de Casillas Electrónicas",
+      "SIREM - Sistema de Registro de Entidades de Fiscalización Ambiental",
+      "PIFA - Plataforma Integral de Fiscalización Ambiental",
+      "Vigilancia Ambiental - pifa.oefa.gob.pe",
+      "SISOA - Sistema de Información de Obligaciones Ambientales",
+      "SISRIAM - Sistema de Información de Sitios Impactados",
+      "PLUS D - Plataforma Única de Servicios Digitales"
+    ],
+    "campaña_destacada": "Modelo de Integridad del OEFA (30 enero 2026)"
+  }
+}

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LegalPro Owner Panel — Control de Costos IA</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons via CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Glow Backgrounds -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- CONTAINER DE LOGIN -->
+  <div id="login-container" class="glass-card login-card">
+    <div class="card-header">
+      <div class="logo-wrapper">
+        <i data-lucide="shield-check" class="logo-icon"></i>
+      </div>
+      <h2>LegalPro Owner Portal</h2>
+      <p>Acceso seguro para el Owner y Auditor general. Encriptación de datos activa.</p>
+    </div>
+    
+    <form id="login-form">
+      <div class="input-group">
+        <label for="owner-key">Owner API Secret Key</label>
+        <div class="input-wrapper">
+          <i data-lucide="key" class="input-icon"></i>
+          <input type="password" id="owner-key" placeholder="Ingresa la clave de API del Owner" required autocomplete="current-password">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="decrypt-phrase">Owner Decryption Passphrase</label>
+        <div class="input-wrapper">
+          <i data-lucide="lock" class="input-icon"></i>
+          <input type="password" id="decrypt-phrase" placeholder="Frase de descifrado local (E2EE)" required autocomplete="new-password">
+        </div>
+        <p class="input-tip">Los datos sensibles de costos en la base de datos se transfieren cifrados. Esta frase los descifra localmente en tu navegador.</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="login-btn">
+        <span>Acceder al Dashboard</span>
+        <i data-lucide="arrow-right" class="btn-icon"></i>
+      </button>
+      <div id="login-error" class="alert alert-error hidden"></div>
+    </form>
+  </div>
+
+  <!-- CONTAINER DE DASHBOARD -->
+  <div id="dashboard-container" class="hidden">
+    <header class="app-header">
+      <div class="header-brand">
+        <i data-lucide="terminal" class="brand-icon"></i>
+        <div>
+          <h1>LegalPro Owner Stats</h1>
+          <div class="security-badge">
+            <span class="status-dot"></span>
+            <span>Seguridad y Cifrado AES-256-GCM Activo (E2EE)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-refresh" class="btn btn-secondary btn-icon-only" title="Actualizar datos">
+          <i data-lucide="refresh-cw" id="icon-refresh"></i>
+        </button>
+        <button id="btn-logout" class="btn btn-danger">
+          <i data-lucide="log-out"></i>
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="dashboard-grid">
+      <!-- PANEL DE CONTROL DE FACTURACIÓN (Moneda y IGV) -->
+      <section class="glass-card billing-controls-card">
+        <div class="controls-wrapper">
+          <div class="control-group">
+            <label for="currency-select"><i data-lucide="coins" class="control-icon"></i> Moneda de Visualización</label>
+            <div class="select-wrapper">
+              <select id="currency-select" class="glass-select">
+                <option value="USD">USD ($ - Dólar Americano)</option>
+                <option value="PEN">PEN (S/. - Sol Peruano)</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group checkbox-group">
+            <label class="glass-checkbox-label">
+              <input type="checkbox" id="tax-checkbox" class="glass-checkbox">
+              <span class="checkbox-custom"></span>
+              <span class="checkbox-text">Aplicar Impuesto Local (IGV 18%)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- PANEL SUPERIOR: KPIs -->
+      <section class="kpis-section">
+        <!-- KPI 1: Costo Histórico -->
+        <div class="glass-card kpi-card">
+          <div class="kpi-icon-wrapper kpi-purple">
+            <i data-lucide="banknote" class="kpi-icon"></i>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">Costo Total Histórico</span>
+            <h3 class="kpi-value" id="kpi-costo-total">$0.00 USD</h3>
+            <span class="kpi-subtext" id="kpi-peticiones-totales">0 peticiones realizadas</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Costo Mensual -->
+        <div class="glass-card kpi-card">
+          <div class="kpi-icon-wrapper kpi-cyan">
+            <i data-lucide="calendar-range" class="kpi-icon"></i>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">Presupuesto del Mes Actual</span>
+            <h3 class="kpi-value" id="kpi-costo-mes">$0.00 USD</h3>
+            <span class="kpi-subtext" id="kpi-peticiones-mes">0 peticiones del mes</span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Tokens Acumulados -->
+        <div class="glass-card kpi-card">
+          <div class="kpi-icon-wrapper kpi-green">
+            <i data-lucide="cpu" class="kpi-icon"></i>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">Tokens Totales del Mes</span>
+            <h3 class="kpi-value" id="kpi-tokens-mes">0</h3>
+            <span class="kpi-subtext" id="kpi-promedio-tokens">Costo promedio bajo control</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN PRINCIPAL: Gráfica -->
+      <section class="glass-card chart-card-wrapper">
+        <div class="card-header">
+          <h3 class="section-title">Consumo de IA y Costo por Día (Últimos 30 días)</h3>
+          <p class="section-subtitle">Visualización del gasto total en USD y volumen de tokens generados diariamente.</p>
+        </div>
+        <div class="chart-container">
+          <canvas id="consumption-chart"></canvas>
+        </div>
+      </section>
+
+      <!-- GRID DE TABLAS -->
+      <div class="tables-grid">
+        <!-- Tabla de Tenants / Organizaciones -->
+        <section class="glass-card table-card">
+          <div class="card-header">
+            <h3 class="section-title">Consumo de Tokens por Organización (Tenant)</h3>
+            <p class="section-subtitle">Costos calculados de manera inmutable y consumo por límites diarios.</p>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Organización</th>
+                  <th>Plan</th>
+                  <th>Peticiones</th>
+                  <th>Tokens Totales</th>
+                  <th>Costo Estimado</th>
+                </tr>
+              </thead>
+              <tbody id="tenants-table-body">
+                <tr>
+                  <td colspan="5" class="table-loading">Cargando información segura...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Tabla de Modelos de IA -->
+        <section class="glass-card table-card">
+          <div class="card-header">
+            <h3 class="section-title">Estadísticas por Modelo de IA</h3>
+            <p class="section-subtitle">Distribución del consumo según modelos Flash vs Pro de Gemini.</p>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Modelo de Gemini</th>
+                  <th>Peticiones</th>
+                  <th>Tokens Prompts</th>
+                  <th>Tokens Completion</th>
+                  <th>Costo Estimado</th>
+                </tr>
+              </thead>
+              <tbody id="models-table-body">
+                <tr>
+                  <td colspan="5" class="table-loading">Cargando información segura...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p>LegalPro Owner Panel v1.0.0 — Modificaciones de Costo en USD. Los datos están encriptados AES-GCM localmente. No se guardan las claves de cifrado en el servidor.</p>
+      <p id="last-update-text">Actualizado por última vez: --/--/---- --:--</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Inicializar iconos de Lucide
+    lucide.createIcons();
+  </script>
+</body>
+</html>

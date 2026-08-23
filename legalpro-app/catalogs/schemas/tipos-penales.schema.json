@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Schema de Tipos Penales Peru",
+  "type": "object",
+  "required": ["version", "tipos"],
+  "properties": {
+    "version": { "type": "string" },
+    "fuente_oficial": { "type": "string" },
+    "ultima_actualizacion": { "type": "string" },
+    "tipos": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TipoPenal" }
+    }
+  },
+  "$defs": {
+    "TipoPenal": {
+      "type": "object",
+      "required": ["id", "nombre", "articulo_cp"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "nombre": { "type": "string" },
+        "articulo_cp": { "type": "string" },
+        "bien_juridico": { "type": "string" },
+        "pena_minima": { "type": "string" },
+        "pena_maxima": { "type": "string" },
+        "forma_culposo": { "type": "boolean" },
+        "agravantes": { "type": "array", "items": { "type": "string" } },
+        "elementos_tipicos": { "type": "array", "items": { "type": "string" } },
+        "circunstancias": { "type": "array", "items": { "type": "string" } },
+        "jurisprudencia_vinculante": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

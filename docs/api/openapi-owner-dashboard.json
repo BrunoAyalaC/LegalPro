@@ -1,0 +1,36 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Owner Dashboard API",
+    "version": "1.0.0",
+    "description": "API para el dashboard del owner"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3005",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/api/owner/stats": {
+      "get": {
+        "summary": "Obtiene estadisticas del owner",
+        "responses": {
+          "200": {
+            "description": "Estadisticas obtenidas correctamente"
+          }
+        }
+      }
+    },
+    "/api/owner/login": {
+      "post": {
+        "summary": "Login del owner",
+        "responses": {
+          "200": {
+            "description": "Login exitoso"
+          }
+        }
+      }
+    }
+  }
+}

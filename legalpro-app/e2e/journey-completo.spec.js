@@ -353,7 +353,7 @@ test.describe('Journey 7 — Simulador de Juicios con mock Gemini', () => {
   test.beforeEach(async ({ page }) => {
     await setupAuth(page, 'ABOGADO');
     // Mock endpoint Gemini/IA
-    await page.route('**/api/gemini**', route =>
+    await page.route('**/api/ai**', route =>
       route.fulfill({
         status: 200,
         body: JSON.stringify({ resultado: 'Respuesta simulada del juicio.', tokens: 120 }),

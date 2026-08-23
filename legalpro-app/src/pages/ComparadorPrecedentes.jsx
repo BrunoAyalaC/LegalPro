@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import { api } from '../api/client';
 
 export default function ComparadorPrecedentes() {
@@ -28,6 +29,9 @@ export default function ComparadorPrecedentes() {
     <div className="page-enter">
       <Header title="Comparador Precedentes" showBack rightAction={<span className="badge badge-primary">INDECOPI/TC</span>} />
       <div className="px-4 py-6 space-y-6">
+        {/* LPDP Art.21: disclaimer predictor obligatorio, no dismissible (regla dura #10) */}
+        <IADisclaimerBanner variant="predictor" dismissible={false} />
+
         <div className="space-y-3">
           <label className="block">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 block">Casación A</span>
@@ -63,7 +67,7 @@ export default function ComparadorPrecedentes() {
           disabled={loading || !casacionA.trim() || !casacionB.trim()}
         >
           <AppIcon name="auto_awesome" size={20} />
-          {loading ? ' Analizando...' : ' Comparar con Gemini'}
+          {loading ? ' Analizando...' : ' Comparar con IA'}
         </button>
 
         {resultado ? (

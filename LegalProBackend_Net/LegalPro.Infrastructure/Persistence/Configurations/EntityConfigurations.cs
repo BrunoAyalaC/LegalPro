@@ -1,5 +1,6 @@
 using LegalPro.Domain.Entities;
 using LegalPro.Domain.Enums;
+using LegalPro.Infrastructure.Persistence.Conversions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,6 +18,8 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 
         builder.HasKey(u => u.Id);
         builder.HasIndex(u => u.Email).IsUnique();
+        // FIX P2 perf 2026-08-21: índice para HasQueryFilter por OrganizationId (tenant isolation → evita Seq Scan)
+        builder.HasIndex(u => u.OrganizationId).HasDatabaseName("ix_usuarios_organization_id");
 
         builder.Property(u => u.NombreCompleto)
             .HasMaxLength(200)
@@ -46,8 +49,20 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.EstaActivo)
             .HasDefaultValue(true);
 
+        // FIX 2026-08-21 deleted_at drift: .NET query filter usa ISoftDelete.DeletedAt
+        // pero DB tenía eliminado_en. Shadow property mapea a deleted_at para soft-delete.
+        // Incluso si Usuario no implementa ISoftDelete, este mapping permite que el
+        // filtro global de ApplicationDbContext ((ISoftDelete)e).DeletedAt funcione si se agrega la interfaz en el futuro.
+        builder.Property<DateTime?>("DeletedAt")
+            .HasColumnName("deleted_at");
+
         // Ignore domain events from being persisted
         builder.Ignore(u => u.DomainEvents);
+
+        builder.HasOne(u => u.Organizacion)
+            .WithMany(o => o.Miembros)
+            .HasForeignKey(u => u.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
@@ -59,6 +74,10 @@ public class ExpedienteConfiguration : IEntityTypeConfiguration<Expediente>
 
         builder.HasKey(e => e.Id);
         builder.HasIndex(e => e.Numero).IsUnique();
+        // FIX P2 perf 2026-08-21: índice para HasQueryFilter OrganizationId (evita Seq Scan en cada query tenant).
+        // El composite ILIKE(titulo, numero) usa índices GIN trigram separados creados por migración pg_trgm (no se declaran aquí vía Fluent API para evitar operador gin_trgm_ops en snapshot).
+        builder.HasIndex(e => e.OrganizationId).HasDatabaseName("ix_expedientes_organization_id");
+        builder.HasIndex(e => e.UsuarioId).HasDatabaseName("ix_expedientes_usuario_id");
 
         builder.Property(e => e.Numero)
             .HasMaxLength(20)
@@ -70,20 +89,29 @@ public class ExpedienteConfiguration : IEntityTypeConfiguration<Expediente>
 
         builder.Property(e => e.Tipo)
             .HasConversion(
-                v => v.ToString().ToUpperInvariant(),
-                v => Enum.Parse<TipoRamaProcesal>(v, true))
+                v => NodeExpedienteMappings.TipoToDb(v),
+                v => NodeExpedienteMappings.TipoFromDb(v))
             .HasMaxLength(50);
 
         builder.Property(e => e.Estado)
             .HasConversion(
-                v => v.ToString().ToUpperInvariant(),
-                v => Enum.Parse<EstadoExpediente>(v, true))
+                v => NodeExpedienteMappings.EstadoToDb(v),
+                v => NodeExpedienteMappings.EstadoFromDb(v))
             .HasMaxLength(50);
 
         builder.HasOne(e => e.Usuario)
             .WithMany(u => u.Expedientes)
             .HasForeignKey(e => e.UsuarioId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(e => e.Organizacion)
+            .WithMany()
+            .HasForeignKey(e => e.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // FIX 2026-08-21 deleted_at drift: Expediente implementa ISoftDelete
+        builder.Property(e => e.DeletedAt)
+            .HasColumnName("deleted_at");
 
         builder.Ignore(e => e.DomainEvents);
     }
@@ -96,6 +124,9 @@ public class SimulacionConfiguration : IEntityTypeConfiguration<Simulacion>
         builder.ToTable("simulaciones");
 
         builder.HasKey(s => s.Id);
+
+        // FIX P2 perf 2026-08-21: índice para HasQueryFilter OrganizationId (tenant isolation)
+        builder.HasIndex(s => s.OrganizationId).HasDatabaseName("ix_simulaciones_organization_id");
 
         builder.Property(s => s.RamaDerecho)
             .HasConversion(
@@ -186,15 +217,14 @@ public class OrganizacionConfiguration : IEntityTypeConfiguration<Organizacion>
 
         builder.Property(o => o.Activo).HasDefaultValue(true);
 
-        builder.HasMany(o => o.MembresiaDetallada)
-            .WithOne(m => m.Organizacion)
-            .HasForeignKey(m => m.OrganizacionId)
-            .OnDelete(DeleteBehavior.Cascade);
+        // FIX 2026-08-21 deleted_at drift: organizaciones ahora tiene deleted_at (Owner soft-delete)
+        builder.Property<DateTime?>("DeletedAt")
+            .HasColumnName("deleted_at");
 
-        builder.HasMany(o => o.Invitaciones)
-            .WithOne(i => i.Organizacion)
-            .HasForeignKey(i => i.OrganizacionId)
-            .OnDelete(DeleteBehavior.Cascade);
+        // Las relaciones HasMany().WithOne() con MiembroOrganizacion e InvitacionOrganizacion
+        // están definidas en las configuraciones de esas entidades (lado que posee la FK),
+        // para mantener una única fuente de verdad y evitar warnings de EF Core por
+        // relación duplicada (esta convención se sigue también en OrganizacionConfiguration).
 
         builder.Ignore(o => o.Miembros);
         builder.Ignore(o => o.DomainEvents);
@@ -221,12 +251,36 @@ public class MiembroOrganizacionConfiguration : IEntityTypeConfiguration<Miembro
 
         builder.Property(m => m.Activo).HasDefaultValue(true);
 
+        // P0 Fix 2026-08-21: remover shadow property duplicada "OrganizationId" -> "organizacion_id"
+        // Antes duplicaba la columna con la FK OrganizacionId (ambas a organizacion_id).
+        // Ahora se mapea directamente la propiedad real OrganizacionId a la columna, sin shadow.
+        builder.Property(m => m.OrganizacionId)
+            .HasColumnName("organizacion_id")
+            .IsRequired();
+
+        builder.HasOne(m => m.Organizacion)
+            .WithMany(o => o.MembresiaDetallada)
+            .HasForeignKey(m => m.OrganizacionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne(m => m.Usuario)
             .WithMany()
             .HasForeignKey(m => m.UsuarioId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Ignore(m => m.DomainEvents);
+    }
+}
+
+public class PrediccionJudicialConfiguration : IEntityTypeConfiguration<PrediccionJudicial>
+{
+    public void Configure(EntityTypeBuilder<PrediccionJudicial> builder)
+    {
+        builder.ToTable("predicciones_judiciales");
+        builder.HasKey(p => p.Id);
+        // FIX P2 perf 2026-08-21: índice para HasQueryFilter OrganizationId (tenant isolation)
+        builder.HasIndex(p => p.OrganizationId).HasDatabaseName("ix_predicciones_organization_id");
+        builder.Property(p => p.ProbabilidadExito).HasColumnName("probabilidad_exito");
     }
 }
 
@@ -237,6 +291,8 @@ public class InvitacionOrganizacionConfiguration : IEntityTypeConfiguration<Invi
         builder.ToTable("invitaciones_organizacion");
 
         builder.HasKey(i => i.Id);
+        // FIX P2 perf: OrganizationId ya tiene índice via HasIndex OrganizacionId en FK (OrganisationId -> OrganizacionId), explícito para HasQueryFilter
+        builder.HasIndex(i => i.OrganizacionId).HasDatabaseName("ix_invitaciones_organizacion_org_id");
         builder.HasIndex(i => i.Token).IsUnique();
 
         builder.Property(i => i.Email).HasMaxLength(256).IsRequired();
@@ -250,6 +306,16 @@ public class InvitacionOrganizacionConfiguration : IEntityTypeConfiguration<Invi
             .IsRequired();
 
         builder.Property(i => i.EsAceptada).HasDefaultValue(false);
+
+        // P0 Fix 2026-08-21: remover shadow property duplicada — usar columna directa
+        builder.Property(i => i.OrganizacionId)
+            .HasColumnName("organizacion_id")
+            .IsRequired();
+
+        builder.HasOne(i => i.Organizacion)
+            .WithMany(o => o.Invitaciones)
+            .HasForeignKey(i => i.OrganizacionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Ignore(i => i.DomainEvents);
     }

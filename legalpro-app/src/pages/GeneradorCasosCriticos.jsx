@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import casosCriticosFondo from '../assets/backgrounds/casos_criticos_fondo.jpeg';
+import casosCriticosFondoWebp from '../assets/backgrounds/casos_criticos_fondo.webp';
 import { api } from '../api/client';
 
 export default function GeneradorCasosCriticos() {
@@ -15,8 +17,10 @@ export default function GeneradorCasosCriticos() {
     setLoading(true);
     setError('');
     try {
-      const data = await api.consulta?.(situacion, 'casos-criticos');
-      const res = data?.resultado;
+      // Convención snake_case (unificada con el mapa de rutas de client.ts).
+      // /api/ai/chat (Node) responde con `respuesta` (no `resultado`).
+      const data = await api.consulta?.(situacion, 'casos_criticos');
+      const res = data?.respuesta ?? data?.resultado;
       if (Array.isArray(res)) {
         setEscenarios(res);
       } else if (res) {
@@ -31,15 +35,21 @@ export default function GeneradorCasosCriticos() {
 
   return (
     <div className="page-enter">
-      {/* ─── FULL SCREEN BACKGROUND ─── */}
+      {/* ─── FULL SCREEN BACKGROUND — WebP con fallback JPEG, lazy ─── */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <img src={casosCriticosFondo} alt="Fondo" className="w-full h-full object-cover" />
+        <picture>
+          <source srcSet={casosCriticosFondoWebp} type="image/webp" />
+          <img src={casosCriticosFondo} alt="Fondo" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+        </picture>
         <div className="absolute inset-0 bg-linear-to-b from-[#0f131a]/80 via-[#0f131a]/95 to-[#0f131a]"></div>
       </div>
 
       <Header title="Casos Críticos" subtitle="Generador de Escenarios" showBack rightAction={<span className="badge badge-danger">IA</span>} />
       
       <div className="px-4 py-6 space-y-6">
+        {/* LPDP Art.21: disclaimer obligatorio, no dismissible (regla dura #10) */}
+        <IADisclaimerBanner variant="general" dismissible={false} />
+
         {/* Intro */}
         <div className="text-center px-4">
           <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-[0_8px_32px_rgba(249,115,22,0.4)] mx-auto mb-4 border border-white/20">

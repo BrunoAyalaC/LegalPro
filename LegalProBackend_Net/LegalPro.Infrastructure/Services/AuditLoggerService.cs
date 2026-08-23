@@ -151,10 +151,10 @@ public class AuditLoggerService : IAuditLogger
             },
         });
 
-    public Task LogGeminiRequestAsync(Guid userId, Guid orgId, string feature, int inputLength) =>
+    public Task LogAIRequestAsync(Guid userId, Guid orgId, string feature, int inputLength) =>
         LogAsync(new AuditEvent
         {
-            EventType = "GEMINI_REQUEST",
+            EventType = "AI_REQUEST",
             Severity = "INFO",
             UserId = userId,
             OrganizationId = orgId,

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "arnes_name": "LegalPro LexIA Arnés Agentic",
+  "version": "4.0.0",
+  "descripcion": "Índice maestro del arnés agentic con 3 agente(s) PRIMARY + 132 subagents (total 135 en opencode.json), 133 agentes con archivo .md en .opencode/agents/ al 2026-08-06.",
+  "arquitectura": {
+    "primary_agent": {
+      "id": "lexia-orchestrator",
+      "tipo": "primary",
+      "descripcion": "UNICO agente primary custom. Clasifica consultas, delega a 132 subagents via @task tool, coordina resultados, valida disclaimers IA. (build/plan son built-in de opencode)",
+      "temperatura": 0.2,
+      "steps": 200,
+      "modelo": "heredado del global (no especificado)"
+    },
+    "subagents_total": 132,
+    "subagents_modo": "subagent (todos)",
+    "subagents_sin_modelo": true,
+    "subagents_temperatura_diferenciada": true,
+    "task_permissions": "lexia-orchestrator puede delegar a TODOS los 132 subagents via @task (con allow)"
+  },
+  "capas_cubiertas": [
+    "CAPA 0: Orquestador PRIMARY (lexia-orchestrator) + built-ins (build, plan)",
+    "CAPA 1: 132 subagents especializados (abogados, contadores, IA, stack, auditores, etc.)",
+    "CAPA 2: skills RAG-optimized (unidades de conocimiento)"
+  ],
+  "estadisticas": {
+    "version": "4.0",
+    "last_updated": "2026-08-06",
+    "agentes_total": 135,
+    "agentes": 135,
+    "primary_agents": 3,
+    "subagents": 132,
+    "archivos_md_agentes": 133,
+    "agentes_por_categoria": {
+      "builtin": 2,
+      "primary": 1,
+      "abogados": 64,
+      "stack_engineers": 5,
+      "mando_chiefs": 5,
+      "auditores": 7,
+      "contadores": 8,
+      "operacion_interna": 4,
+      "integraciones": 2,
+      "ia_legal_especialistas": 16,
+      "observabilidad": 4,
+      "legal_legacy": 5,
+      "owner_plataforma": 5,
+      "red_team": 1,
+      "refutadores": 5,
+      "reviser": 1
+    },
+    "catalogs": 25,
+    "verifiers": 28
+  },
+  "mega_areas_juridicas": {
+    "abogados_total": 64,
+    "contadores_total": 8,
+    "ia_legal_total": 16,
+    "legal_legacy_total": 5,
+    "auditores_total": 7,
+    "refutadores_total": 5,
+    "stack_ingenieria_total": 11,
+    "mando_chiefs_total": 5
+  },
+  "cambios_v40_agosto_2026": [
+    "REGENERADO registry: de 97 a 135 agentes (132 subagents + 3 primary + built-ins)",
+    "AGREGADOS 38 nuevos agentes desde v3.1 (bancario, aduanero, competencia, contrataciones, telecomunicaciones, electoral, penitenciario, genero, extranjeria, previsional, maritimo, aeronautico, agrario, pesca, aguas, forestal, datos-personales, internacional, municipal, ejecucion, seguros, ciberespacio, deporte, turismo, militar, policial, cooperativo, cultura, adulto-mayor, discapacidad, asistentes, contador-chief, etc.)",
+    "FORMATO agents.json v2.0: id, description, mode, temperature, steps, color (color extraido del frontmatter .md)",
+    "INDEX.json v4.0.0 con conteos por categoria recalculados al 2026-08-06"
+  ],
+  "ruta_configuracion": "opencode.json",
+  "ruta_opencode_agents": ".opencode/agents/",
+  "ruta_catalogs": "catalogs/",
+  "ruta_registros": "arneses/registry/"
+}

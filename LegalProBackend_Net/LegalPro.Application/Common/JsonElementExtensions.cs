@@ -4,7 +4,7 @@ namespace LegalPro.Application.Common;
 
 /// <summary>
 /// Helpers de extensión para JsonElement.
-/// Usados por los handlers CQRS que parsean respuestas de Function Calling de Gemini.
+/// Usados por los handlers CQRS que parsean respuestas de Function Calling del proveedor IA (MiniMax M3 / OpenCode Go).
 /// </summary>
 public static class JsonElementExtensions
 {

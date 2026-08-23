@@ -1,0 +1,13 @@
+{
+  "id": "USR-CONT-001",
+  "organization_id": "ORG-PRO-001",
+  "email": "ana.torres@estudio-pro.pe",
+  "nombres": "Ana Lucia",
+  "apellidos": "Torres Mendoza",
+  "dni": "56789123",
+  "rol_usuario": "CONTADOR",
+  "especialidad": "tributario",
+  "is_active": true,
+  "email_verified": true,
+  "acepto_transferencia_internacional": true
+}

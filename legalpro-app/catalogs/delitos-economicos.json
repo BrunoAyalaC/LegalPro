@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "descripcion": "Delitos económicos y contra la administración pública. Catálogo para análisis pericial y auditoría legal.",
+  "delitos": [
+    {
+      "id": "lavado_activos_dl1249",
+      "nombre": "Lavado de Activos",
+      "tipo": "Delito económico",
+      "base_legal": "D.L. 1249 (Decreto Legislativo de Lavado de Activos)",
+      "articulos": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"],
+      "elementos_tipicos": ["bienes_origen_ilicito", "operaciones_de_ocultamiento", "trasiego", "adquisicion_uso_administracion"],
+      "pena_minima": "8 años",
+      "pena_maxima": "18 años",
+      "agravantes": ["pertenencia_organizacion_criminal", "uso_infraestructura_publica", "monto_superior_500UIT"],
+      "concatenacion": "Con delito precedente (mineria ilegal, trafico drogas, corrupcion, etc.)",
+      "uif": "Unidad de Inteligencia Financiera del Perú (UIF-Perú)",
+      "entidad_reguladora": "SBS (Superintendencia de Banca y Seguros)",
+      "jurisprudencia_vinculante": ["Casación 114-2012-Lambayeque"]
+    },
+    {
+      "id": "peculado_dolo",
+      "nombre": "Peculado (Dolo)",
+      "tipo": "Delito contra la administración pública",
+      "articulo_cp": "387",
+      "pena_minima": "4 años",
+      "pena_maxima": "10 años",
+      "sujeto_activo": "Funcionario o servidor público",
+      "elementos_tipicos": ["apropiacion", "uso", "destino_diferente", "bienes_publicos", "cargo"],
+      "jurisprudencia": ["Casación 658-2016-Lima"]
+    },
+    {
+      "id": "peculado_culposo",
+      "nombre": "Peculado por Culpa",
+      "articulo_cp": "388",
+      "pena_minima": "1 año",
+      "pena_maxima": "4 años"
+    },
+    {
+      "id": "colusion",
+      "nombre": "Colusión",
+      "articulo_cp": "384",
+      "pena_minima": "4 años",
+      "pena_maxima": "8 años",
+      "elementos_tipicos": ["convenio_fraudulento", "perjuicio_estatal", "funcionario_publico", "contratacion_publica"]
+    },
+    {
+      "id": "colusion_agravada",
+      "nombre": "Colusión Agravada",
+      "articulo_cp": "385",
+      "pena_minima": "6 años",
+      "pena_maxima": "10 años",
+      "cuando": "Consecuencia de contratos viciados por convenios fraudulentos"
+    },
+    {
+      "id": "concusion",
+      "nombre": "Concusión",
+      "articulo_cp": "382",
+      "pena_minima": "2 años",
+      "pena_maxima": "8 años",
+      "elementos_tipicos": ["abuso_cargo", "constreñimiento", "donacion_promesa"]
+    },
+    {
+      "id": "cohecho_pasivo_propio",
+      "nombre": "Cohecho Pasivo Propio",
+      "articulo_cp": "393",
+      "pena_minima": "5 años",
+      "pena_maxima": "10 años",
+      "elementos_tipicos": ["aceptacion_donacion_promesa", "acto_incompatible", "funcionario_publico"]
+    },
+    {
+      "id": "cohecho_pasivo_impropio",
+      "nombre": "Cohecho Pasivo Impropio",
+      "articulo_cp": "394",
+      "pena_minima": "4 años",
+      "pena_maxima": "8 años"
+    },
+    {
+      "id": "cohecho_activo",
+      "nombre": "Cohecho Activo",
+      "articulo_cp": "397",
+      "pena_minima": "4 años",
+      "pena_maxima": "8 años",
+      "sujeto_activo": "Particular que corrompe al funcionario"
+    },
+    {
+      "id": "negociacion_incompatible",
+      "nombre": "Negociación Incompatible",
+      "articulo_cp": "399",
+      "pena_minima": "4 años",
+      "pena_maxima": "6 años",
+      "elementos_tipicos": ["interes_particular", "patrimonio_publico", "contrato_operacion"]
+    },
+    {
+      "id": "enriquecimiento_ilicito",
+      "nombre": "Enriquecimiento Ilícito",
+      "articulo_cp": "401",
+      "pena_minima": "5 años",
+      "pena_maxima": "10 años",
+      "presuncion": "El incremento patrimonial no justificado se presume ilícito"
+    },
+    {
+      "id": "prevaricato",
+      "nombre": "Prevaricato",
+      "articulo_cp": "418",
+      "pena_minima": "3 años",
+      "pena_maxima": "5 años",
+      "sujeto_activo": "Juez, fiscal o árbitro",
+      "elementos_tipicos": ["resolucion_contraria_ley", "a sabiendas"]
+    },
+    {
+      "id": "denegacion_a_la_administracion_de_justicia",
+      "nombre": "Denegación a la Administración de Justicia",
+      "articulo_cp": "402",
+      "pena_minima": "1 año",
+      "pena_maxima": "4 años"
+    },
+    {
+      "id": "favorecimiento_real",
+      "nombre": "Favorecimiento Real",
+      "articulo_cp": "404",
+      "pena_minima": "1 año",
+      "pena_maxima": "3 años"
+    },
+    {
+      "id": "fraude_procesal",
+      "nombre": "Fraude Procesal",
+      "articulo_cp": "416",
+      "pena_minima": "1 año",
+      "pena_maxima": "5 años"
+    },
+    {
+      "id": "evasion_procesal",
+      "nombre": "Evasión de la Acción Penal",
+      "articulo_cp": "412",
+      "pena_minima": "1 año",
+      "pena_maxima": "3 años"
+    }
+  ]
+}

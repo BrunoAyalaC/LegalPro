@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,10 @@ namespace LegalPro.Application.Simulacion.Queries;
 // Tenant isolation: filtra por UsuarioId + OrganizationId.
 // ═══════════════════════════════════════════════════════
 
-public class GetSimulacionesQuery : IRequest<GetSimulacionesResult>
+public class GetSimulacionesQuery : IRequest<GetSimulacionesResult>, ITenantRequest
 {
-    public int Limit { get; set; } = 20;
+    public int Limit { get; set; }
+    public Guid OrganizationId { get; set; } = Guid.Empty;
 }
 
 public record SimulacionResumenDto(
@@ -58,6 +60,7 @@ public class GetSimulacionesQueryHandler : IRequestHandler<GetSimulacionesQuery,
         var orgId = _currentUser.OrganizationId;
 
         var lista = await _context.Simulaciones
+            .AsNoTracking()
             .Where(s => s.UsuarioId == userId && s.OrganizationId == orgId)
             .OrderByDescending(s => s.CreatedAt)
             .Take(request.Limit)

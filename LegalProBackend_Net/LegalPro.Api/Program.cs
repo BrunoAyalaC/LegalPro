@@ -9,6 +9,9 @@ using System.Threading.RateLimiting;
 using Serilog;
 using LegalPro.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,44 +21,33 @@ builder.Configuration.AddEnvironmentVariables();
 // ── Serilog full configuration ────────────────────────────────────────────
 builder.Host.UseSerilog((ctx, cfg) =>
 {
+    var consoleFormatter = new MaskingTextFormatter(new Serilog.Formatting.Display.MessageTemplateTextFormatter(
+        "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}", null));
+
+    var fileFormatter = new MaskingTextFormatter(new Serilog.Formatting.Display.MessageTemplateTextFormatter(
+        "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}", null));
+
     cfg.ReadFrom.Configuration(ctx.Configuration)
        .Enrich.FromLogContext()
-   .Enrich.WithProperty("Application", "LegalPro.Api")
-   .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
-   .WriteTo.Console(outputTemplate:
-       "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}")
-   .WriteTo.File(
-       path: "logs/legalpro-.log",
-       rollingInterval: RollingInterval.Day,
-       retainedFileCountLimit: 7,
-       outputTemplate:
-           "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}");
+       .Enrich.WithProperty("Application", "LegalPro.Api")
+       .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+       // FIX P2 LPDP 2026-08-21: Serilog DestructuringPolicy global para PII (Password/Email/DNI + [NotLogged])
+       // Complementa PiiMaskingHelper.Mask() en LoggingBehaviour (defensa en profundidad) y MaskingTextFormatter (fallback texto)
+       .Destructure.With<LegalPro.Application.Common.Behaviours.PiiMaskingDestructuringPolicy>()
+       .WriteTo.Console(consoleFormatter)
+       .WriteTo.File(
+           formatter: fileFormatter,
+           path: "logs/legalpro-.log",
+           rollingInterval: RollingInterval.Day,
+           retainedFileCountLimit: 7);
 });
 
 
-// ── Rate Limiting (OWASP API4 — evita abuso de Gemini y flooding) ───────────────
+// ── Rate Limiting particionado por tenant (OWASP API4 / CWE-770 — R-02 Fix 2026-08-21) ───────
+// PartitionedRateLimiter: cada tenant (organization_id) tiene su propio bucket 60/min y minimax 10/min.
+// Fallback a RemoteIpAddress si no hay JWT (anon) para evitar bloqueo global cross-tenant.
 builder.Services.AddRateLimiter(o =>
 {
-    // Regla general: 60 req/min por IP (ventana deslizante)
-    o.AddSlidingWindowLimiter("general", opts =>
-    {
-        opts.PermitLimit = 60;
-        opts.Window = TimeSpan.FromMinutes(1);
-        opts.SegmentsPerWindow = 6;  // ventanas de 10s
-        opts.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opts.QueueLimit = 0;
-    });
-
-    // Regla Gemini estricta: 10 req/min por IP (costoso en tokens)
-    o.AddSlidingWindowLimiter("gemini", opts =>
-    {
-        opts.PermitLimit = 10;
-        opts.Window = TimeSpan.FromMinutes(1);
-        opts.SegmentsPerWindow = 6;
-        opts.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        opts.QueueLimit = 0;
-    });
-
     o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     o.OnRejected = async (ctx, ct) =>
     {
@@ -63,6 +55,28 @@ builder.Services.AddRateLimiter(o =>
         await ctx.HttpContext.Response.WriteAsync(
             "{\"error\":\"Demasiadas solicitudes. Intente nuevamente en 60 segundos.\"}", ct);
     };
+
+    // Regla general particionada: 60 req/min por tenant (organization_id) o IP anon
+    o.AddPolicy("per_tenant", context => RateLimitPartition.GetSlidingWindowLimiter(
+        partitionKey: context.User.FindFirst("organization_id")?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anon",
+        factory: _ => new SlidingWindowRateLimiterOptions
+        {
+            PermitLimit = 60,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            SegmentsPerWindow = 4
+        }));
+
+    // Regla MiniMax estricta particionada: 10 req/min por tenant (costoso en tokens)
+    o.AddPolicy("minimax", context => RateLimitPartition.GetSlidingWindowLimiter(
+        partitionKey: context.User.FindFirst("organization_id")?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anon",
+        factory: _ => new SlidingWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            SegmentsPerWindow = 4
+        }));
 });
 
 
@@ -121,12 +135,63 @@ builder.Services.AddSwaggerGen(c =>
 // IHttpContextAccessor: requerido por CurrentUserService para leer JWT claims
 builder.Services.AddHttpContextAccessor();
 
+// IMemoryCache: requerido por IdempotencyMiddleware y BruteForceProtectionMiddleware
+builder.Services.AddMemoryCache();
+
 // Clean Architecture Layers (DDD + CQRS + FluentValidation + Pipeline Behaviours)
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// Health Checks for Docker/Kubernetes readiness
-builder.Services.AddHealthChecks();
+// ── OpenTelemetry Tracing & Metrics (OTel) — R-01 Fix 2026-08-21 ────────────────
+// Producción: solo OTLP, fail-fast si falta endpoint (sin ConsoleExporter en prod).
+// Desarrollo: ConsoleExporter para debug local.
+if (builder.Environment.IsProduction())
+{
+    var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]
+        ?? throw new InvalidOperationException("OTEL_EXPORTER_OTLP_ENDPOINT es obligatorio en Production para OTel OTLP.");
+
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tracing =>
+        {
+            tracing
+                .AddAspNetCoreInstrumentation(opts => { opts.RecordException = true; })
+                .AddHttpClientInstrumentation()
+                .AddEntityFrameworkCoreInstrumentation(opts => { opts.SetDbStatementForText = true; })
+                .AddSource("LegalPro.Api")
+                .AddOtlpExporter(o => { o.Endpoint = new Uri(otlpEndpoint); });
+        })
+        .WithMetrics(metrics =>
+        {
+            metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation()
+                .AddMeter("LegalPro.Api")
+                .AddOtlpExporter(o => { o.Endpoint = new Uri(otlpEndpoint); });
+        });
+}
+else // Development / Testing / Staging — ConsoleExporter (sin OTLP)
+{
+    builder.Services.AddOpenTelemetry()
+        .WithTracing(tracing =>
+        {
+            tracing
+                .AddAspNetCoreInstrumentation(opts => { opts.RecordException = true; })
+                .AddHttpClientInstrumentation()
+                .AddEntityFrameworkCoreInstrumentation(opts => { opts.SetDbStatementForText = true; })
+                .AddSource("LegalPro.Api")
+                .AddConsoleExporter();
+        })
+        .WithMetrics(metrics =>
+        {
+            metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddRuntimeInstrumentation()
+                .AddMeter("LegalPro.Api")
+                .AddConsoleExporter();
+        });
+}
 
 // CORS: orígenes permitidos configurables desde variable de entorno ALLOWED_ORIGINS
 // En Railway: ALLOWED_ORIGINS=https://mi-frontend.railway.app,https://legalpro.app
@@ -155,14 +220,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Railway environment variables with fallback to appsettings
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-// Override connection string if DATABASE_URL is provided by Railway
-// Railway injects DATABASE_URL in URI format (postgresql://user:pass@host:5432/db)
-// Npgsql requires key-value format — convert explicitly to avoid "initialization string" errors
+// ── Cadena de conexión: DATABASE_URL (Railway) tiene prioridad ──────────
+// Railway inyecta DATABASE_URL en formato URI (postgresql://user:pass@host:5432/db).
+// Npgsql requiere formato key-value — se convierte explícitamente para evitar errores
+// de "initialization string". Fallback: ConnectionStrings:DefaultConnection.
+// NOTA: el DbContext real se registra en AddInfrastructureServices (ya prioriza
+// DATABASE_URL); este bloque evita que el arranque falle cuando solo existe DATABASE_URL.
 var rawDbUrl = builder.Configuration["DATABASE_URL"] ?? builder.Configuration["DATABASE_PUBLIC_URL"];
+var connectionString = string.IsNullOrEmpty(rawDbUrl)
+    ? builder.Configuration.GetConnectionString("DefaultConnection")
+    : rawDbUrl;
+
 if (!string.IsNullOrEmpty(rawDbUrl))
 {
     if (rawDbUrl.StartsWith("postgresql://") || rawDbUrl.StartsWith("postgres://"))
@@ -189,16 +257,24 @@ if (!string.IsNullOrEmpty(rawDbUrl))
     }
 }
 
-// Configuration values with Railway environment variable priority
-var supabaseUrl = builder.Configuration["SUPABASE_URL"] ?? builder.Configuration["Supabase:Url"];
-var supabaseKey = builder.Configuration["SUPABASE_SERVICE_KEY"] ?? builder.Configuration["Supabase:ServiceKey"];
+// Solo lanzar si no hay NINGUNA cadena de conexión configurada
+if (string.IsNullOrEmpty(connectionString))
+    throw new InvalidOperationException("Cadena de conexión no configurada: define DATABASE_URL o ConnectionStrings:DefaultConnection.");
+
+// ── Health Checks — R-01: separación liveness vs readiness ──────────────────
+// - postgres + outbox => tag "ready" (depende de BD)
+// - self => tag "live" (siempre Healthy, sin dependencias)
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString, name: "postgres", tags: new[] { "ready" })
+    .AddCheck<LegalPro.Infrastructure.HealthChecks.OutboxHealthCheck>("outbox", tags: new[] { "ready" })
+    .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(), tags: new[] { "live" });
 
 // JWT_SECRET NUNCA debe tener fallback con valor fijo — si falta la variable, falla al arrancar
 var jwtSecret = builder.Configuration["JWT_SECRET"]
     ?? builder.Configuration["JwtSettings:Secret"]
     ?? throw new InvalidOperationException("JWT_SECRET no está configurado. Configura la variable de entorno en Railway.");
 
-var geminiKey = builder.Configuration["GEMINI_API_KEY"] ?? builder.Configuration["Gemini:ApiKey"];
+var minimaxKey = builder.Configuration["MINIMAX_API_KEY"] ?? builder.Configuration["Minimax:ApiKey"];
 // Railway usa PORT. En desarrollo local usamos 5000 para no conflictar con altri servicios
 var port = builder.Configuration["PORT"] ?? "5000";
 
@@ -214,9 +290,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            RequireExpirationTime = true,
+            RequireSignedTokens = true,
+            ClockSkew = TimeSpan.Zero,
             ValidIssuer = "LegalProAPI",
             ValidAudience = "LegalProClients",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var authorization = context.Request.Headers.Authorization.ToString();
+                if (string.IsNullOrEmpty(authorization))
+                {
+                    if (context.Request.Cookies.TryGetValue("__Secure-Session", out var cookieToken))
+                    {
+                        context.Token = cookieToken;
+                    }
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -230,6 +325,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 // Global Exception Handling (replaces try/catch in every controller)
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -246,6 +343,12 @@ app.UseRateLimiter();
 app.UseCors("DefaultCors");
 
 app.UseAuthentication();
+
+// Idempotencia — garantiza que peticiones POST con X-Idempotency-Key
+// se procesen exactamente una vez (OWASP API6, LPDP Art. 7)
+app.UseMiddleware<IdempotencyMiddleware>();
+
+app.UseMiddleware<TenantMiddleware>();
 app.UseAuthorization();
 
 // Serilog request logging — registra cada HTTP request con duración y status
@@ -254,10 +357,24 @@ app.UseSerilogRequestLogging(opts =>
     opts.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} en {Elapsed:0.0}ms";
 });
 
-app.MapControllers();
+app.MapControllers().RequireRateLimiting("per_tenant");
 
-// Health Check endpoint for Docker/Kubernetes
-app.MapHealthChecks("/health");
+// ── Health Checks — R-01: liveness vs readiness (OWASP + K8s) ───────────────
+// /health/live  → tag "live"  (no toca DB, siempre Healthy si proceso vivo)
+// /health/ready → tag "ready" (postgres + outbox → requiere BD)
+// /health       → legacy → también readiness (compatibilidad Dockerfile/legacy probes)
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("live")
+});
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("ready")
+});
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = r => r.Tags.Contains("ready")
+});
 
 // ── EF Core Migrations en startup ──────────────────────────────────────────
 // Solo en Production para evitar fallo en Development/Testing sin DB real.
@@ -268,61 +385,110 @@ if (app.Environment.IsProduction())
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        // Workaround: Si la DB fue creada fuera de EF (por Node.js initDb.js),
-        // __EFMigrationsHistory puede estar vacío/ausente aunque las tablas existan.
-        // Sembramos el historial para que MigrateAsync solo aplique migraciones nuevas.
+        // Workaround: BD compartida Node.js + EF Core (Railway PostgreSQL).
+        // __ef_migrations_history puede estar vacío aunque las tablas existan.
+        const string historyTable = "__ef_migrations_history";
+
         var conn = db.Database.GetDbConnection();
         if (conn.State != System.Data.ConnectionState.Open)
             await conn.OpenAsync();
 
         await using var checkCmd = conn.CreateCommand();
-        checkCmd.CommandText = @"
+        checkCmd.CommandText = $@"
             SELECT
                 EXISTS(SELECT 1 FROM information_schema.tables
                        WHERE table_schema='public' AND table_name='usuarios')
+                AND EXISTS(SELECT 1 FROM information_schema.columns
+                       WHERE table_schema='public' AND table_name='expedientes'
+                         AND column_name='organization_id')
                 AND (
                     NOT EXISTS(SELECT 1 FROM information_schema.tables
-                               WHERE table_schema='public' AND table_name='__EFMigrationsHistory')
-                    OR (SELECT COUNT(*) FROM ""__EFMigrationsHistory"") = 0
+                               WHERE table_schema='public' AND table_name='{historyTable}')
+                    OR (SELECT COUNT(*) FROM {historyTable}) = 0
                 )";
         var needsSeed = (bool)(await checkCmd.ExecuteScalarAsync() ?? false);
 
         if (needsSeed)
         {
-            Log.Information("Schema legacy detectado. Sembrando historial de migraciones EF Core...");
+            Log.Information("Schema Node/Railway detectado. Sembrando historial EF Core (sin migraciones destructivas)...");
             await using var seedCmd = conn.CreateCommand();
-            seedCmd.CommandText = @"
-                CREATE TABLE IF NOT EXISTS ""__EFMigrationsHistory"" (
-                    migration_id character varying(150) NOT NULL,
-                    product_version character varying(32) NOT NULL,
-                    CONSTRAINT pk___ef_migrations_history PRIMARY KEY (migration_id)
+            seedCmd.CommandText = $@"
+                CREATE TABLE IF NOT EXISTS {historyTable} (
+                    migration_id character varying(150) NOT NULL PRIMARY KEY,
+                    product_version character varying(32) NOT NULL
                 );
-                INSERT INTO ""__EFMigrationsHistory"" (migration_id, product_version) VALUES
-                    ('20260305222244_InitialCreate',             '9.0.1'),
-                    ('20260312184741_UpdateSchema',              '9.0.1'),
-                    ('20260316191058_AddMensajeChatRefreshToken','9.0.1'),
-                    ('20260319011004_SnakeCaseColumns',          '9.0.1')
+                INSERT INTO {historyTable} (migration_id, product_version) VALUES
+                    ('20260305222244_InitialCreate',              '9.0.1'),
+                    ('20260312184741_UpdateSchema',               '9.0.1'),
+                    ('20260316191058_AddMensajeChatRefreshToken', '9.0.1'),
+                    ('20260319011004_SnakeCaseColumns',           '9.0.1'),
+                    ('20260413033854_PendingModelChanges',        '9.0.1'),
+                    ('20260521213343_UnifyDatabaseModel',         '9.0.1'),
+                    ('20260522004427_AddOutboxMessagesTable',      '9.0.1')
                 ON CONFLICT (migration_id) DO NOTHING";
             await seedCmd.ExecuteNonQueryAsync();
-            Log.Information("Historial de migraciones sembrado para schema existente.");
 
-            // Agregar columnas que EF Core espera pero que el schema legacy de Node.js no tiene
-            await using var patchCmd = conn.CreateCommand();
-            patchCmd.CommandText = @"
-                ALTER TABLE usuarios
-                    ADD COLUMN IF NOT EXISTS es_admin_organizacion BOOLEAN NOT NULL DEFAULT FALSE";
-            await patchCmd.ExecuteNonQueryAsync();
-            Log.Information("Schema legacy parchado: columna es_admin_organizacion agregada (IF NOT EXISTS).");
+            await using var outboxCmd = conn.CreateCommand();
+            outboxCmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS outbox_messages (
+                    id uuid PRIMARY KEY,
+                    type varchar(255) NOT NULL,
+                    content text NOT NULL,
+                    occurred_on_utc timestamptz NOT NULL,
+                    processed_on_utc timestamptz,
+                    error text,
+                    retry_count integer NOT NULL DEFAULT 0
+                );
+                CREATE INDEX IF NOT EXISTS ix_outbox_messages_processed_on_utc ON outbox_messages (processed_on_utc);";
+            await outboxCmd.ExecuteNonQueryAsync();
+            Log.Information("Historial EF sembrado; UnifyDatabaseModel marcada como aplicada (schema Node preservado).");
         }
 
-        // Patch incondicional: columnas que deben existir siempre (idempotente con IF NOT EXISTS)
-        // Cubre el caso donde el deploy anterior ya sembró el historial pero no ejecutó el patch.
+        // Si el schema es el de Node (organization_id en expedientes), marcar migraciones
+        // destructivas como aplicadas para que EF no las ejecute sobre la BD compartida.
+        await using var nodeSchemaCmd = conn.CreateCommand();
+        nodeSchemaCmd.CommandText = @"
+            SELECT EXISTS(
+              SELECT 1 FROM information_schema.columns
+              WHERE table_schema='public' AND table_name='expedientes' AND column_name='organization_id'
+            )";
+        var isNodeSchema = (bool)(await nodeSchemaCmd.ExecuteScalarAsync() ?? false);
+
+        if (isNodeSchema)
+        {
+            await using var markCmd = conn.CreateCommand();
+            markCmd.CommandText = $@"
+                CREATE TABLE IF NOT EXISTS {historyTable} (
+                    migration_id character varying(150) NOT NULL PRIMARY KEY,
+                    product_version character varying(32) NOT NULL
+                );
+                INSERT INTO {historyTable} (migration_id, product_version) VALUES
+                    ('20260413033854_PendingModelChanges',   '9.0.1'),
+                    ('20260521213343_UnifyDatabaseModel',    '9.0.1'),
+                    ('20260522004427_AddOutboxMessagesTable', '9.0.1')
+                ON CONFLICT (migration_id) DO NOTHING";
+            await markCmd.ExecuteNonQueryAsync();
+
+            await using var outboxEnsureCmd = conn.CreateCommand();
+            outboxEnsureCmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS outbox_messages (
+                    id uuid PRIMARY KEY,
+                    type varchar(255) NOT NULL,
+                    content text NOT NULL,
+                    occurred_on_utc timestamptz NOT NULL,
+                    processed_on_utc timestamptz,
+                    error text,
+                    retry_count integer NOT NULL DEFAULT 0
+                )";
+            await outboxEnsureCmd.ExecuteNonQueryAsync();
+        }
+
+        // Patch incondicional: columnas que EF espera en schema Node
         await using var alwaysPatchCmd = conn.CreateCommand();
         alwaysPatchCmd.CommandText = @"
             ALTER TABLE IF EXISTS usuarios
                 ADD COLUMN IF NOT EXISTS es_admin_organizacion BOOLEAN NOT NULL DEFAULT FALSE;";
         await alwaysPatchCmd.ExecuteNonQueryAsync();
-        Log.Information("Patch incondicional aplicado (es_admin_organizacion).");
 
         await db.Database.MigrateAsync();
         Log.Information("EF Core migrations aplicadas correctamente.");
@@ -331,7 +497,7 @@ if (app.Environment.IsProduction())
     {
         Log.Error(ex, "Error aplicando EF Core migrations al iniciar. El servicio continúa.");
         Log.Warning("Si las migraciones no están aplicadas, ejecuta: dotnet ef database update");
-        Log.Warning("Para DDL en Supabase usa conexión directa (puerto 5432) en MIGRATION_DB_URL");
+        Log.Warning("Para DDL en Railway PostgreSQL usa MIGRATION_DB_URL si aplica.");
     }
 }
 

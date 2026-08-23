@@ -9,11 +9,19 @@ namespace LegalPro.Domain.Entities;
 /// <summary>
 /// Entidad: Invitación para unirse a una Organización.
 /// Contiene un token único que expira y solo puede aceptarse una vez.
+///
+/// Implementa ITenantEntity: la invitación pertenece a una Organización específica.
+/// Se expone OrganizationId como shadow property mapeada a la misma columna
+/// 'organizacion_id' para activar el query filter global del DbContext.
 /// </summary>
-public class InvitacionOrganizacion : BaseGuidEntity
+public class InvitacionOrganizacion : BaseGuidEntity, ITenantEntity
 {
     public Guid OrganizacionId { get; private set; }
     public Organizacion? Organizacion { get; private set; }
+
+    // Mapeado via shadow property en InvitacionOrganizacionConfiguration a la columna
+    // 'organizacion_id'. Permite implementar ITenantEntity sin duplicar la FK.
+    public Guid? OrganizationId => OrganizacionId;
 
     public string Email { get; private set; } = string.Empty;
     public string Token { get; private set; } = string.Empty;

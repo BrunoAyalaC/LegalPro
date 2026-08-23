@@ -1,0 +1,187 @@
+{
+  "metadata": {
+    "nombre": "Fuentes y Metodología de Investigación RAG - LegalPro",
+    "fecha_compilacion": "2026-08-01",
+    "version": "1.0",
+    "autor": "lexia-orchestrator + 6 subagentes en paralelo",
+    "proposito": "Documentar las fuentes oficiales consultadas para alimentar el corpus RAG del sistema LegalPro"
+  },
+  "fuentes_oficiales_consultadas": [
+    {
+      "id": "SPIJ",
+      "nombre": "Sistema Peruano de Información Jurídica",
+      "url": "https://spij.minjus.gob.pe",
+      "organismo": "Ministerio de Justicia y Derechos Humanos",
+      "tipo_contenido": "Códigos, leyes, decretos supremos, resoluciones",
+      "formato_acceso": "Web SPA (Angular) + URLs por ID de norma",
+      "ejemplos_urls": [
+        "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682692 (Código Penal)",
+        "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682684 (Código Civil)",
+        "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682685 (TUO CPC)",
+        "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682694 (CPP D.L. 638)",
+        "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682695 (Nuevo CPP D.L. 957)",
+        "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682696 (TUO Código Tributario)",
+        "https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682697 (Código Protección Consumidor)"
+      ],
+      "total_documentos_recomendados": 16,
+      "estado_indexacion": "Pendiente",
+      "notas": "Acceso libre sin login. Cada norma tiene un ID único H######. Sumillas son referenciales (Ley 25362)."
+    },
+    {
+      "id": "TC",
+      "nombre": "Tribunal Constitucional del Perú",
+      "url": "https://www.tc.gob.pe",
+      "organismo": "Tribunal Constitucional",
+      "tipo_contenido": "Sentencias constitucionales (amparo, habeas corpus, habeas data, acción popular, inconstitucionalidad)",
+      "formato_acceso": "Web HTML + Jurisprudencia Sistematizada",
+      "ejemplos_urls": [
+        "https://www.tc.gob.pe (portada)",
+        "https://jurisprudencia.sedetc.gob.pe (Búsqueda sistematizada)",
+        "https://www.tc.gob.pe/informacion/jurisprudencia (últimas sentencias)"
+      ],
+      "total_documentos_recomendados": 5000,
+      "estado_indexacion": "Parcial (8 sentencias recientes)",
+      "notas": "Sentencias del 2024-2026 son las más relevantes. Sala Primera y Segunda publican semanalmente."
+    },
+    {
+      "id": "MINJUSDH",
+      "nombre": "Ministerio de Justicia y Derechos Humanos",
+      "url": "https://www.gob.pe/minjus",
+      "organismo": "Ministerio de Justicia",
+      "tipo_contenido": "Decretos supremos, resoluciones directorales, planes operativos",
+      "formato_acceso": "Plataforma gob.pe",
+      "total_documentos_recomendados": 200,
+      "estado_indexacion": "Completo (12 normas recientes)",
+      "notas": "Normativa del 2025-2026 con impacto en procedimientos administrativos, entidades religiosas, derechos humanos."
+    },
+    {
+      "id": "INDECOPI",
+      "nombre": "Instituto Nacional de Defensa de la Competencia y Protección de la Propiedad Intelectual",
+      "url": "https://www.gob.pe/indecopi",
+      "organismo": "INDECOPI",
+      "tipo_contenido": "Resoluciones de Presidencia, Casaciones, precedentes de propiedad intelectual, protección al consumidor",
+      "formato_acceso": "Plataforma gob.pe",
+      "total_documentos_recomendados": 150,
+      "estado_indexacion": "Completo (12 resoluciones y noticias)",
+      "notas": "Casaciones clave en cobranza, DO (Pisco), marcas, patentes."
+    },
+    {
+      "id": "PJ",
+      "nombre": "Poder Judicial del Perú",
+      "url": "https://www.pj.gob.pe",
+      "organismo": "Poder Judicial",
+      "tipo_contenido": "Casaciones, sentencias de cortes superiores, ejecutorias supremas",
+      "formato_acceso": "Web + Buscador de Jurisprudencia (requiere exploración adicional)",
+      "total_documentos_recomendados": 30000,
+      "estado_indexacion": "Pendiente",
+      "notas": "Casaciones laborales, civiles, penales. Sistema requiere búsqueda específica por número de expediente."
+    },
+    {
+      "id": "SUNARP",
+      "nombre": "Superintendencia Nacional de los Registros Públicos",
+      "url": "https://www.sunarp.gob.pe",
+      "organismo": "SUNARP",
+      "tipo_contenido": "Directivas registrales, precedentes administrativos registrales",
+      "formato_acceso": "Web institucional",
+      "total_documentos_recomendados": 100,
+      "estado_indexacion": "Pendiente",
+      "notas": "Directivas registrales son precedentes administrativos en materia de inscripciones."
+    },
+    {
+      "id": "SUNAT",
+      "nombre": "Superintendencia Nacional de Aduanas y de Administración Tributaria",
+      "url": "https://www.sunat.gob.pe",
+      "organismo": "SUNAT",
+      "tipo_contenido": "Resoluciones de Superintendencia, Informes, jurisprudencia tributaria",
+      "formato_acceso": "Web + Portal de jurisprudencia",
+      "total_documentos_recomendados": 500,
+      "estado_indexacion": "Pendiente",
+      "notas": "RTF (Tribunal Fiscal) y resoluciones SUNAT son clave para tributario."
+    },
+    {
+      "id": "ANPDP",
+      "nombre": "Autoridad Nacional de Protección de Datos Personales",
+      "url": "https://www.gob.pe/anpd",
+      "organismo": "ANPDP",
+      "tipo_contenido": "Resoluciones, opiniones consultivas, precedentes en protección de datos",
+      "formato_acceso": "Web institucional",
+      "total_documentos_recomendados": 80,
+      "estado_indexacion": "Pendiente",
+      "notas": "CRÍTICO para compliance LPDP. Resoluciones sobre transferencias internacionales, ARCO, consentimientos."
+    },
+    {
+      "id": "El_Peruano",
+      "nombre": "Diario Oficial El Peruano",
+      "url": "https://www.elperuano.pe",
+      "organismo": "Editora Perú",
+      "tipo_contenido": "Publicación oficial de todas las normas",
+      "formato_acceso": "Web + API",
+      "total_documentos_recomendados": 50000,
+      "estado_indexacion": "Pendiente",
+      "notas": "Fuente primaria de publicación. Permite verificar fecha exacta de vigencia."
+    }
+  ],
+  "metodologia_investigacion": {
+    "fecha_ejecucion": "2026-08-01",
+    "tecnicas_usadas": [
+      "webfetch - Obtención de páginas HTML estáticas",
+      "Playwright MCP - Navegación interactiva en SPA (Angular)",
+      "JavaScript injection - Extracción de DOM text",
+      "Análisis estructural - Identificación de IDs de documentos",
+      "Compilación manual - Estructuración JSON para RAG"
+    ],
+    "limitaciones_encontradas": [
+      "Algunas URLs retornan 404 (cambio de paths)",
+      "SPIJ es una SPA Angular (no scraping tradicional)",
+      "PJ e INDECOPI tienen buscadores internos no accesibles vía URL directa",
+      "SUNARP no expone API pública de directivas",
+      "ANPDP no tiene web pública accesible (requiere login)"
+    ],
+    "plan_ampliacion": [
+      "Sprint 1: Implementar scrapers específicos para SPIJ (por ID)",
+      "Sprint 2: Indexar 5,000 sentencias TC relevantes",
+      "Sprint 3: Conectar con API de El Peruano (si existe)",
+      "Sprint 4: Crawler de casaciones PJ por materia",
+      "Sprint 5: Indexar jurisprudencia tributaria SUNAT/RTF"
+    ]
+  },
+  "metricas_indexacion": {
+    "catalogos_base": {
+      "codigos-leyes": 20,
+      "plazos-procesales": 17,
+      "tipos-penales-peru": 25,
+      "delitos-economicos": 16,
+      "disclaimers-ia": 13
+    },
+    "catalogos_nuevos_2026": {
+      "jurisprudencia-tc-2026": 8,
+      "normas-minjusdh-2026": 12,
+      "resoluciones-indecopi-2026": 12
+    },
+    "total_documentos_indexados_inmediatos": 123,
+    "estimacion_para_alfa_monetizable": 500,
+    "estimacion_para_v1_produccion": 50000
+  },
+  "chunks_generados": {
+    "estrategia": "Cada documento genera 2-4 chunks: titulo, sumilla, caso, keywords",
+    "tamaño_promedio_chunk": 250,
+    "total_chunks_inmediatos": "Entre 250 y 500 chunks",
+    "embedding_dimensions": 768,
+    "vector_store": "Supabase pgvector con ivfflat (lists=100)"
+  },
+  "compliance": {
+    "LPDP": "Los embeddings NO contienen PII (representaciones matemáticas)",
+    "LOPJ_Art_290": "Citas verificables con URL fuente",
+    "D_S_016_2024_JUS": "Trazabilidad de fuente",
+    "copyright": "Material oficial del Estado Peruano - uso permitido",
+    "atribucion": "Cada chunk incluye metadata.source y metadata.url"
+  },
+  "proximos_pasos": [
+    "Ejecutar indexación inicial con catálogos base",
+    "Implementar scraper SPIJ por ID",
+    "Validar retrieval precision con casos de prueba",
+    "Integrar en /api/ai/consulta con feature flag",
+    "Medir métricas: retrieval_precision_at_k, citation_accuracy",
+    "Re-indexar mensualmente vía CRON"
+  ]
+}

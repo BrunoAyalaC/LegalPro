@@ -7,19 +7,26 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
 // Mock pg Pool (db.js) — previene conexión real a PostgreSQL en tests
+// FIX R-01: las rutas usan `tenantQuery` además de `db.query`, por lo que
+// el mock debe exportarlo también.
+const _dbQueryMock = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 });
 vi.mock('../db.js', () => ({
   default: {
-    query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+    query: (...args) => _dbQueryMock(...args),
   },
+  tenantQuery: (...args) => _dbQueryMock(...args),
+  tenantContext: { getStore: () => undefined, run: (_ctx, fn) => fn() },
 }));
-// Backwards-compat shim
-vi.mock('../supabase.js', () => ({ default: null, supabaseAdmin: null, createUserClient: vi.fn() }));
 
 let app;
 const JWT_SECRET = process.env.JWT_SECRET || 'TestSmokeKey_MustBe32CharsLongForValidation!';
 
 function makeToken(overrides = {}) {
-  return jwt.sign({ id: 1, email: 'abogado@legalpro.pe', rol: 'ABOGADO', ...overrides }, JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign(
+    { sub: '1', id: 1, email: 'abogado@legalpro.pe', rol: 'ABOGADO', ...overrides },
+    JWT_SECRET,
+    { issuer: 'LegalProAPI', audience: 'LegalProClients', expiresIn: '1h' }
+  );
 }
 
 beforeAll(async () => {
@@ -126,7 +133,7 @@ describe('Journey Seguridad — Inyección', () => {
     const payload = { mensaje: 'A'.repeat(10000), sesionId: 'test' };
     const token = makeToken();
     const res = await request(app)
-      .post('/api/gemini/chat')
+      .post('/api/ai/chat')
       .set('Authorization', `Bearer ${token}`)
       .send(payload);
     // El servidor debe responder (puede ser 400, 413, 500) pero no crashear

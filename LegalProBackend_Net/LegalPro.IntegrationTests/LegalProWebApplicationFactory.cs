@@ -12,8 +12,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 namespace LegalPro.IntegrationTests;
 
 /// <summary>
-/// Factory de integración con EF Core InMemory, auth fake y Gemini fake.
-/// NO requiere PostgreSQL real ni API key de Gemini para correr.
+/// Factory de integración con EF Core InMemory, auth fake y MiniMax fake.
+/// NO requiere PostgreSQL real ni API key de MiniMax para correr.
 /// </summary>
 public class LegalProWebApplicationFactory : WebApplicationFactory<Program>
 {
@@ -66,14 +66,14 @@ public class LegalProWebApplicationFactory : WebApplicationFactory<Program>
                 provider.GetRequiredService<ApplicationDbContext>());
 
             // ═══════════════════════════════════════════════════════════════════
-            // 2. REEMPLAZAR IGeminiService por FakeGeminiService
+            // 2. REEMPLAZAR IMinimaxService por FakeMinimaxService
             // ═══════════════════════════════════════════════════════════════════
-            var geminiDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(IGeminiService));
-            if (geminiDescriptor != null)
-                services.Remove(geminiDescriptor);
+            var minimaxDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IMinimaxService));
+            if (minimaxDescriptor != null)
+                services.Remove(minimaxDescriptor);
 
-            services.AddScoped<IGeminiService, FakeGeminiService>();
+            services.AddScoped<IMinimaxService, FakeMinimaxService>();
 
             // ═══════════════════════════════════════════════════════════════════
             // 3. AUTENTICACIÓN FAKE para endpoints protegidos

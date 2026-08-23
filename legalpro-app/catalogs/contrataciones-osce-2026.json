@@ -1,0 +1,485 @@
+{
+  "metadata": {
+    "nombre": "Normativa OECE/OSCE - Organismo Especializado para las Contrataciones Públicas Eficientes (ex-OSCE)",
+    "fuente_principal": "https://www.gob.pe/oece",
+    "fuentes_secundarias": [
+      "https://www.gob.pe/institucion/oece/normas-legales",
+      "https://www.gob.pe/institucion/oece/colecciones/1681-resoluciones-de-presidencia-ejecutiva",
+      "https://www.gob.pe/institucion/oece/colecciones/716-resoluciones-del-tribunal-de-contrataciones-del-estado",
+      "https://www.gob.pe/institucion/oece/colecciones/68030-resoluciones-del-tribunal-de-contrataciones-publicas",
+      "https://www.gob.pe/institucion/oece/colecciones/45029-ley-n-32069-ley-general-de-contrataciones-publicas"
+    ],
+    "url_legacy_referencia": "https://www.gob.pe/osce (redirige a /oece)",
+    "fecha_consulta": "2026-08-01",
+    "fecha_actualizacion": "2026-08-01",
+    "version": "1.0",
+    "autor": "lexia-orchestrator + integraciones-peru",
+    "descripcion": "Catálogo de normativa, directivas y resoluciones del OECE (Organismo Especializado para las Contrataciones Públicas Eficientes), antes OSCE. Incluye TUO Ley N° 30225, Ley N° 32069 (nueva), D.S. N° 082-2019-EF, D.Leg. N° 1071 (Arbitraje) y resoluciones del Tribunal de Contrataciones Públicas.",
+    "total_documentos": 25,
+    "relevancia_legalpro": "MEDIA-ALTA - Compliance contratación pública, arbitraje, sanciones administrativas a proveedores",
+    "ente_rector": "MEF - Ministerio de Economía y Finanzas",
+    "HALLAZGO_CRITICO": {
+      "titulo": "OSCE renombrado a OECE en 2025",
+      "descripcion": "El ex-Organismo Supervisor de las Contrataciones del Estado (OSCE) fue renombrado a Organismo Especializado para las Contrataciones Públicas Eficientes (OECE). La nueva Ley N° 32069 (Ley General de Contrataciones Públicas) crea el Tribunal de Contrataciones Públicas (TCP) en reemplazo del Tribunal de Contrataciones del Estado (TCE). Las resoluciones ahora se emiten como TCP-S1, TCP-S2, ..., TCP-S6 (6 Salas).",
+      "implicancia": "Para LegalPro, todas las referencias históricas a OSCE/PRE deben entenderse como OECE/PRE a partir de 2025. Las URLs antiguas tipo 'apps.osce.gob.pe' siguen activas por compatibilidad pero las nuevas son 'apps.oece.gob.pe'.",
+      "evidencias": [
+        "URL www.gob.pe/osce redirige a www.gob.pe/oece",
+        "Nueva Ley N° 32069 derogó esquema OSCE/TCE",
+        "Resoluciones de Tribunales ahora son TCP-S1 a TCP-S6"
+      ]
+    },
+    "normas_relevantes_peruanas": [
+      "Ley N° 32069 - Ley General de Contrataciones Públicas (NUEVA, 2024)",
+      "D.S. N° 082-2019-EF - TUO de la Ley N° 30225 (Ley de Contrataciones del Estado, derogada por Ley N° 32069 con período de transición)",
+      "D.Leg. N° 1071 - Decreto Legislativo que norma el Arbitraje (vigente desde 1/9/2008)",
+      "Ley N° 30225 - Ley de Contrataciones del Estado (derogada)",
+      "D.S. N° 344-2018-EF - Reglamento de la Ley N° 30225 (derogada por nuevo reglamento de la Ley 32069)"
+    ],
+    "total_normas_en_plataforma": 85796,
+    "notas": "Se incluyen 8 resoluciones destacadas y las primeras 17 resoluciones del TCP del 30 julio 2026 (denominación por Sala: TCP-S1, TCP-S2, ...). Es el compendio más importante después de la transición OSCE→OECE."
+  },
+  "normativa_relevante_destacada": [
+    {
+      "id": "OECE-Ley-32069",
+      "tipo": "Ley",
+      "numero": "N° 32069",
+      "fecha_publicacion": "2024-XX-XX",
+      "titulo": "Ley General de Contrataciones Públicas",
+      "sumilla": "Nueva Ley General de Contrataciones Públicas que reemplaza a la Ley N° 30225. Crea el Tribunal de Contrataciones Públicas (TCP) en reemplazo del antiguo Tribunal de Contrataciones del Estado (TCE).",
+      "materia": "Contrataciones Públicas - Ley marco",
+      "url_fuente": "https://www.gob.pe/institucion/osce/colecciones/45029-ley-n-32069-ley-general-de-contrataciones-publicas",
+      "relevancia_legalpro": "CRÍTICA - Base legal contrataciones"
+    },
+    {
+      "id": "OECE-DS-082-2019-EF",
+      "tipo": "Decreto Supremo",
+      "numero": "N° 082-2019-EF",
+      "fecha_publicacion": "2019-03-13",
+      "titulo": "TUO Ley N° 30225 - Ley de Contrataciones del Estado",
+      "sumilla": "Publican el Texto Único Ordenado de la Ley N° 30225, Ley de Contrataciones del Estado. NORMA FUNDACIONAL HISTÓRICA (actualmente reemplazada por Ley N° 32069, citada por transición).",
+      "materia": "Contrataciones del Estado - TUO",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/266672-082-2019-ef",
+      "url_descarga": "https://cdn.www.gob.pe/uploads/document/file/298343/DS082_2019EF.pdf",
+      "relevancia_legalpro": "CRÍTICA - Norma fundacional (histórica)"
+    },
+    {
+      "id": "OECE-DL-1071",
+      "tipo": "Decreto Legislativo",
+      "numero": "N° 1071",
+      "fecha_publicacion": "2008-09-01",
+      "titulo": "Decreto Legislativo que norma el Arbitraje",
+      "sumilla": "Decreto Legislativo N° 1071, norma el Arbitraje en el Perú. Vigente desde el 1 de septiembre de 2008. Norma fundamental para controversias en contrataciones públicas.",
+      "materia": "Arbitraje - Solución de Controversias",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/308659-1071",
+      "url_descarga": "https://cdn.www.gob.pe/uploads/document/file/377449/DL-1071-ley-que-norma-el-arbitraje.pdf",
+      "relevancia_legalpro": "CRÍTICA - Arbitraje en contrataciones"
+    },
+    {
+      "id": "OECE-Directiva-001-2025-RNP",
+      "tipo": "Directiva",
+      "numero": "N° 001-2025-OECE-CD",
+      "fecha_publicacion": "2025-04-19",
+      "titulo": "Directiva de procedimientos y trámites ante el Registro Nacional de Proveedores",
+      "sumilla": "Directiva que regula los procedimientos y trámites ante el Registro Nacional de Proveedores (RNP) del OECE.",
+      "materia": "Registro Nacional de Proveedores - RNP",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/6682380-001-2025-oece-cd",
+      "url_descarga": "https://cdn.www.gob.pe/uploads/document/file/7946960/6682380-directiva-de-procedimientos-y-tramites-ante-el-registro-nacional-de-proveedores.pdf",
+      "relevancia_legalpro": "ALTA - Inscripción RNP"
+    },
+    {
+      "id": "OECE-Directiva-018-2025-SEACE",
+      "tipo": "Directiva",
+      "numero": "N° 018-2025-OECE-CD",
+      "fecha_publicacion": "2025-12-02",
+      "titulo": "Directiva del registro de las valorizaciones de obra a través del SEACE",
+      "sumilla": "Directiva del registro de las valorizaciones de obra a través del Sistema Electrónico de Contrataciones del Estado (SEACE).",
+      "materia": "SEACE - Valorizaciones de obra",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/7472600-018-2025-oece-cd",
+      "url_descarga": "https://cdn.www.gob.pe/uploads/document/file/9102570/7472600-directiva-n-018-2025-oece-cd-directiva-del-registro-de-las-valorizaciones-de-obra-a-traves-del-seace.pdf",
+      "relevancia_legalpro": "ALTA - Valorizaciones obras"
+    },
+    {
+      "id": "OECE-RPE-244-2022",
+      "tipo": "Resolución de Presidencia",
+      "numero": "N° 244-2022-OSCE/PRE",
+      "fecha_publicacion": "2022-12-19",
+      "titulo": "Ampliación de vigencia de certificaciones de profesionales y técnicos",
+      "sumilla": "Formalizar la aprobación de la ampliación de la vigencia de las certificaciones de profesionales y técnicos en contrataciones del Estado.",
+      "materia": "Certificaciones - Funcionarios y servidores públicos",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/3745188-244-2022-osce-pre",
+      "relevancia_legalpro": "MEDIA - Certificaciones"
+    }
+  ],
+  "normas": [
+    {
+      "id": "OECE-RPE-212-2026",
+      "tipo": "Resolución de Presidencia Ejecutiva",
+      "numero": "N° 212-2026-OECE/PRE",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Aceptar renuncia - Ejecutivo Subdirección Operaciones Registrales",
+      "sumilla": "Aceptar la renuncia presentada por el señor Jhohan Stéfany Villegas Morales al puesto de Ejecutivo de la Subdirección de Operaciones Registrales de la Dirección del Registro Nacional de Proveedores.",
+      "materia": "Recursos Humanos - Cese RNP",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8431934-212-2026-oece-pre",
+      "relevancia_legalpro": "BAJA - RRHH interno"
+    },
+    {
+      "id": "OECE-RGG-064-2026",
+      "tipo": "Resolución de Gerencia General",
+      "numero": "N° 064-2026-OECE/GG",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Aprobar Directiva N° 004-2025-OECE-GG para contratos menores v.02",
+      "sumilla": "Aprobar la Directiva N° 004-2025-OECE-GG, 'Directiva para contratos menores en el Organismo Especializado para las Contrataciones Públicas Eficientes (OECE)', versión 02.",
+      "materia": "Contratos menores - Directiva interna",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8431755-064-2026-oece-gg",
+      "relevancia_legalpro": "ALTA - Contratos menores OECE"
+    },
+    {
+      "id": "OECE-Res-7694-2026-TCP-S3",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7694-2026-TCP-S3",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra TRATAMIENTO DE AIRE S.A.C. - RUC 20514546267",
+      "sumilla": "Procedimiento administrativo sancionador instaurado contra la empresa TRATAMIENTO DE AIRE SOCIEDAD ANONIMA CERRADA, por su presunta responsabilidad al haber incumplido con las normas de contratación pública.",
+      "materia": "Procedimiento Administrativo Sancionador - TCP Sala 3",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430790-7694-2026-tcp-s3",
+      "relevancia_legalpro": "ALTA - PAS contrataciones"
+    },
+    {
+      "id": "OECE-Res-7693-2026-TCP-S1",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07693-2026-TCP-S1",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación - CONSORCIO CORPORACIÓN PERUANA DE MANTENIMIENTO ELÉCTRICO",
+      "sumilla": "Recurso de apelación interpuesto por el CONSORCIO CORPORACIÓN PERUANA DE MANTENIMIENTO ELÉCTRICO - CONSORCIO COPEMANE, integrado por CORPORACION PERUANA DE MANTENIMIENTO ELECTRICO S.A., en el marco de la Licitación Pública.",
+      "materia": "Apelación TCP Sala 1",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430777-07693-2026-tcp-s1",
+      "relevancia_legalpro": "ALTA - Apelación licitación"
+    },
+    {
+      "id": "OECE-Res-7691-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7691-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra SERVICIO LOGISTICO ALYMAC S.A.C.",
+      "sumilla": "Procedimiento administrativo sancionador generado contra SERVICIO LOGISTICO ALYMAC S.A.C., por su presunta responsabilidad al haber contratado con el Estado estando impedido conforme a Ley.",
+      "materia": "PAS TCP Sala 2 - Impedimento",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430762-7691-2026-tcp-s2",
+      "relevancia_legalpro": "CRÍTICA - Sancionador proveedor impedido"
+    },
+    {
+      "id": "OECE-Res-7688-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7688-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra CONSORCIO YURNAY",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el CONSORCIO YURNAY, conformado por GRUPO YURNAY S.A.C. y SERVICIO DE REPRESENTACIONES CONSIGNACIONES Y LIMPIEZA MEGA INTEGRAL.",
+      "materia": "PAS TCP Sala 2",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430752-7688-2026-tcp-s2",
+      "relevancia_legalpro": "ALTA - PAS consorcio"
+    },
+    {
+      "id": "OECE-Res-7681-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7681-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra CONSORCIO FULL METALMAX",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el CONSORCIO FULL METALMAX (integrado por METALMAX TITANIC S.R.L. y ARCO ACERO E.I.R.L.).",
+      "materia": "PAS TCP Sala 2 - Metalmax",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430739-7681-2026-tcp-s2",
+      "relevancia_legalpro": "ALTA - PAS consorcio"
+    },
+    {
+      "id": "OECE-Res-7680-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7680-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra WALDO FELIX BALTAZAR NAVARRO - Persona natural",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el señor WALDO FELIX BALTAZAR NAVARRO, por presunta responsabilidad al haber contratado con el Estado estando impedido conforme a Ley.",
+      "materia": "PAS TCP Sala 2 - Persona natural impedida",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430732-7680-2026-tcp-s2",
+      "relevancia_legalpro": "ALTA - PAS persona natural"
+    },
+    {
+      "id": "OECE-Res-7679-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7679-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra CARLOS ENRIQUE MANCO MALASQUEZ",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el señor CARLOS ENRIQUE MANCO MALASQUEZ, por presunta responsabilidad al haber contratado con el Estado estando impedido conforme a Ley.",
+      "materia": "PAS TCP Sala 2 - Persona natural",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430721-7679-2026-tcp-s2",
+      "relevancia_legalpro": "ALTA - PAS persona natural"
+    },
+    {
+      "id": "OECE-Res-7678-2026-TCP-S6",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07678-2026-TCP-S6",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra José Luis Soller Salcedo, Julián Cusi Alhuay e Ítalo Felipe Maldonado López",
+      "sumilla": "Procedimientos administrativos sancionadores seguidos a los proveedores José Luis Soller Salcedo, Julián Cusi Alhuay e Ítalo Felipe Maldonado López por su supuesta responsabilidad al haber contratado con el Estado.",
+      "materia": "PAS TCP Sala 6 - Múltiples proveedores",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430715-07678-2026-tcp-s6",
+      "relevancia_legalpro": "ALTA - PAS múltiples personas"
+    },
+    {
+      "id": "OECE-Res-7677-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7677-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra José Manuel Cedillo Cruz",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el señor José Manuel Cedillo Cruz por su supuesta responsabilidad al haber contratado con el Estado estando impedido conforme a Ley.",
+      "materia": "PAS TCP Sala 2",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430699-7677-2026-tcp-s2",
+      "relevancia_legalpro": "ALTA - PAS persona natural"
+    },
+    {
+      "id": "OECE-Res-7676-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7676-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra RENATO ROMAN RODRIGUEZ GUEVARA",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el señor RENATO ROMAN RODRIGUEZ GUEVARA por presunta responsabilidad al haber suscrito contratos o Acuerdos Marco sin contar con inscripción RNP.",
+      "materia": "PAS TCP Sala 2 - Falta de inscripción RNP",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430687-7676-2026-tcp-s2",
+      "relevancia_legalpro": "CRÍTICA - Sin RNP válida"
+    },
+    {
+      "id": "OECE-Res-7675-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7675-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Solicitud retroactividad benigna - ALDESA CONSTRUCCIONES SA",
+      "sumilla": "Solicitud de retroactividad benigna presentada por la empresa ALDESA CONSTRUCCIONES SA SUCURSAL EN PERÚ contra la Resolución N° 0353-2017-TCE-S2 del 21 de marzo de 2017. CASO RETROACTIVIDAD.",
+      "materia": "Retroactividad benigna - Sala 2",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430657-7675-2026-tcp-s2",
+      "relevancia_legalpro": "CRÍTICA - Retroactividad benigna"
+    },
+    {
+      "id": "OECE-Res-7674-2026-TCP-S1",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07674-2026-TCP-S1",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación CONSORCIO MyS MOSNA",
+      "sumilla": "Recurso de apelación interpuesto por el CONSORCIO MyS MOSNA, integrado por SAMAEL INGENIEROS S.A.C. y JESUS OMAR NICOMEDES MELENDEZ LLERENA, en el marco del Concurso Público Abreviado.",
+      "materia": "Apelación TCP Sala 1",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430433-07674-2026-tcp-s1",
+      "relevancia_legalpro": "ALTA - Apelación concurso"
+    },
+    {
+      "id": "OECE-Res-7673-2026-TCP-S1",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07673-2026-TCP-S1",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación ROYANM E.I.R.L. - Subasta Inversa",
+      "sumilla": "Recurso de apelación interpuesto por la empresa ROYANM E.I.R.L., en el marco de la Subasta Inversa Electrónica N° 01 2026-MPSP/CS-PRIMERA CONVOCATORIA, convocada por la Municipalidad Provincial de Sullana.",
+      "materia": "Apelación TCP Sala 1 - Subasta Inversa",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430393-07673-2026-tcp-s1",
+      "relevancia_legalpro": "ALTA - Apelación Subasta Inversa"
+    },
+    {
+      "id": "OECE-Res-7672-2026-TCP-S1",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07672-2026-TCP-S1",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación CONSORCIO EJECUTOR 7 DE JUNIO",
+      "sumilla": "Recurso de apelación interpuesto por el CONSORCIO EJECUTOR 7 DE JUNIO (MAS CAMUS INGENIEROS E.I.R.L. y BRAGA COMPANY S.A.C.) contra el otorgamiento de la buena pro.",
+      "materia": "Apelación TCP Sala 1 - Buena pro",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430371-07672-2026-tcp-s1",
+      "relevancia_legalpro": "ALTA - Apelación buena pro"
+    },
+    {
+      "id": "OECE-Res-7671-2026-TCP-S1",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07671-2026-TCP-S1",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación CONSORCIO LA UNION",
+      "sumilla": "Recurso de apelación interpuesto por el CONSORCIO LA UNION (SAN AGUSTIN E.I.R.L. CONTRATISTAS GENERALES y ATARJEA CONTRATISTAS GENERALES S.A.C.) en el marco de la Licitación.",
+      "materia": "Apelación TCP Sala 1",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430334-07671-2026-tcp-s1",
+      "relevancia_legalpro": "ALTA - Apelación licitación"
+    },
+    {
+      "id": "OECE-Res-7670-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07670-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación BEMQ PERU - GOB.REG.HVCA",
+      "sumilla": "Recurso de apelación interpuesto por el postor BEMQ PERU E.I.R.L., en el marco de la Licitación Pública Abreviada para Bienes N° 14-2026/GOB.REG.HVCA/OC-1, convocada por el Gobierno Regional de Huancavelica.",
+      "materia": "Apelación TCP Sala 2 - Bienes",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430320-07670-2026-tcp-s2",
+      "relevancia_legalpro": "ALTA - Apelación regional"
+    },
+    {
+      "id": "OECE-Res-7669-2026-TCP-S3",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7669-2026-TCP-S3",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra JOAN CARLO BRAVO MONDOÑEDO y otros",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el señor JOAN CARLO BRAVO MONDOÑEDO (RUC N° 10408417479), y las empresas CONTRATISTA ATLAS E.I.R.L., AGREGADOS..., por contratación con impedimento.",
+      "materia": "PAS TCP Sala 3 - Múltiples personas",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430299-7669-2026-tcp-s3",
+      "relevancia_legalpro": "ALTA - PAS personas múltiples"
+    },
+    {
+      "id": "OECE-Res-7668-2026-TCP-S3",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7668-2026-TCP-S3",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación COMERCIAL EL CHOTANITO - GOB.REG.CAJAMARCA",
+      "sumilla": "Recurso de apelación interpuesto por la empresa COMERCIAL EL CHOTANITO S.R.L., en el marco de la LICITACIÓN PÚBLICA ABREVIADA PARA BIENES N° LP-ABR-002-2026-GR.CAJ 2, Gobierno Regional de Cajamarca.",
+      "materia": "Apelación TCP Sala 3 - Regional Cajamarca",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430285-7668-2026-tcp-s3",
+      "relevancia_legalpro": "ALTA - Apelación regional"
+    },
+    {
+      "id": "OECE-Res-7667-2026-TCP-S3",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7667-2026-TCP-S3",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra NEGOCIOS PC STORE SULLANA",
+      "sumilla": "Procedimiento administrativo sancionador instaurado contra la empresa NEGOCIOS Y SERVICIOS GENERALES PC STORE SULLANA EIRL (RUC N° 20526578067).",
+      "materia": "PAS TCP Sala 3",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430253-7667-2026-tcp-s3",
+      "relevancia_legalpro": "ALTA - PAS empresa"
+    },
+    {
+      "id": "OECE-Res-7666-2026-TCP-S2",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07666-2026-TCP-S2",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Apelación CONSTRUCTORA JHR - Municipalidad Huancayo",
+      "sumilla": "Recurso de apelación interpuesto por el postor CONSTRUCTORA JHR S.R.L., en el marco de la Licitación Pública Abreviada de Obras N° 7-2026-MPHZ/C - 2, Municipalidad Provincial de Huancayo.",
+      "materia": "Apelación TCP Sala 2 - Obras",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430203-07666-2026-tcp-s2",
+      "relevancia_legalpro": "ALTA - Apelación obras"
+    },
+    {
+      "id": "OECE-Res-7665-2026-TCP-S6",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7665-2026-TCP-S6",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra LIDIA ESTHER PAÍS HIDALGO",
+      "sumilla": "Procedimiento administrativo sancionador seguido a la proveedora LIDIA ESTHER PAÍS HIDALGO, por presunta responsabilidad al haber presentado supuesta documentación falsa o adulterada.",
+      "materia": "PAS TCP Sala 6 - Documentación falsa",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430187-7665-2026-tcp-s6",
+      "relevancia_legalpro": "CRÍTICA - Documentación falsa"
+    },
+    {
+      "id": "OECE-Res-7664-2026-TCP-S5",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 07664-2026-TCP-S5",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra Abraham Luciano Galdos Tutucayo",
+      "sumilla": "Procedimiento administrativo sancionador generado contra el señor Abraham Luciano Galdos Tutucayo, por presunta responsabilidad al haber contratado con el Estado estando impedido conforme a Ley.",
+      "materia": "PAS TCP Sala 5 - Persona natural",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430163-07664-2026-tcp-s5",
+      "relevancia_legalpro": "ALTA - PAS persona natural"
+    },
+    {
+      "id": "OECE-Res-7663-2026-TCP-S3",
+      "tipo": "Resolución del Tribunal de Contrataciones Públicas",
+      "numero": "N° 7663-2026-TCP-S3",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "PAS contra CONSTRUCTORA D'LA VEGA y otros",
+      "sumilla": "Procedimiento administrativo sancionador instaurado contra CONSTRUCTORA & CONTRATISTAS D' LA VEGA S.R.L. (RUC N° 20602838286) e ISUM CONTRATISTAS E.I.R.L. (RUC N° 2045369...).",
+      "materia": "PAS TCP Sala 3 - Múltiples empresas",
+      "url_fuente": "https://www.gob.pe/institucion/oece/normas-legales/8430148-7663-2026-tcp-s3",
+      "relevancia_legalpro": "ALTA - PAS múltiples"
+    }
+  ],
+  "noticias_destacadas_2026": [
+    {
+      "id": "OECE-NEWS-FEN-NINO",
+      "tipo": "Capacitación",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "OECE capacita a funcionarios y servidores para garantizar respuesta rápida frente al fenómeno El Niño",
+      "sumilla": "OECE capacita a funcionarios y servidores para garantizar respuesta rápida frente al fenómeno El Niño. Capacitación en contrataciones para emergencias.",
+      "url_fuente": "https://www.gob.pe/institucion/oece/noticias/1422831-oece-capacita-a-funcionarios-y-servidores-para-garantizar-respuesta-rapida-frente-al-fenomeno-el-nino",
+      "relevancia_legalpro": "ALTA - Contrataciones emergencia"
+    },
+    {
+      "id": "OECE-NEWS-ARBITRAJE-TRANSPARENCIA",
+      "tipo": "Comunicado Oficial",
+      "numero": "Comunicado N° 008-2026-OECE",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "OECE reafirma su compromiso con la transparencia y la calidad del arbitraje en las contrataciones públicas",
+      "sumilla": "OECE reafirma su compromiso con la transparencia y la calidad del arbitraje en las contrataciones públicas. Comunicado oficial.",
+      "url_fuente": "https://www.gob.pe/institucion/oece/noticias/1422684-comunicado-n-008-2026-oece-oece-reafirma-su-compromiso-con-la-transparencia-y-la-calidad-del-arbitraje-en-las-contrataciones-publicas",
+      "relevancia_legalpro": "ALTA - Política institucional"
+    },
+    {
+      "id": "OECE-NEWS-COMUNICADO-007",
+      "tipo": "Comunicado Oficial",
+      "numero": "Comunicado N° 007-2026-OECE",
+      "fecha_publicacion": "2026-07-17",
+      "titulo": "Comunicado N° 007-2026-OECE",
+      "sumilla": "Comunicado oficial del OECE.",
+      "url_fuente": "https://www.gob.pe/institucion/oece/noticias/1420290-comunicado-n-007-2026-oece",
+      "relevancia_legalpro": "MEDIA - Comunicación oficial"
+    },
+    {
+      "id": "OECE-NEWS-RNP-OBRAS",
+      "tipo": "Noticia Tecnológica",
+      "fecha_publicacion": "2026-07-10",
+      "titulo": "OECE implementará mejoras tecnológicas en el Récord de Obras para agilizar trámites del RNP",
+      "sumilla": "OECE implementará mejoras tecnológicas en el Récord de Obras para agilizar trámites del Registro Nacional de Proveedores (RNP).",
+      "url_fuente": "https://www.gob.pe/institucion/oece/noticias/1417193-oece-implementara-mejoras-tecnologicas-en-el-record-de-obras-para-agilizar-tramites-del-rnp",
+      "relevancia_legalpro": "ALTA - RNP tecnológico"
+    },
+    {
+      "id": "OECE-NEWS-CUBSO",
+      "tipo": "Aviso Oficial SEACE",
+      "fecha_publicacion": "2026-07-07",
+      "titulo": "Aviso: Actualización del Catálogo Único de Bienes, Servicios y Obras (CUBSO)",
+      "sumilla": "Aviso oficial del SEACE: Actualización del Catálogo Único de Bienes, Servicios y Obras (CUBSO). Sistema de actualización de catálogo.",
+      "url_fuente": "https://www.gob.pe/institucion/oece/noticias/1415990-aviso-actualizacion-del-catalogo-unico-de-bienes-servicios-y-obras-cubso",
+      "relevancia_legalpro": "MEDIA - Catálogo CUBSO"
+    },
+    {
+      "id": "OECE-NEWS-BUENA-PRO",
+      "tipo": "Aviso Oficial SEACE",
+      "fecha_publicacion": "2026-07-07",
+      "titulo": "Consentimiento Automático de la Buena Pro en concurso público de servicios en SEACE",
+      "sumilla": "Aviso: Consentimiento Automático de la Buena Pro en los procedimientos de concurso público de servicios en el SEACE.",
+      "url_fuente": "https://www.gob.pe/institucion/oece/noticias/1416026-aviso-consentimiento-automatico-de-la-buena-pro-en-los-procedimientos-de-concurso-publico-de-servicios-en-el-seace",
+      "relevancia_legalpro": "MEDIA - Buena pro SEACE"
+    }
+  ],
+  "campanas_destacadas_2026": [
+    {
+      "id": "OECE-CAMP-SEGUIMIENTO",
+      "titulo": "Boletines de Seguimiento de las Contrataciones Públicas",
+      "fecha_publicacion": "2026-04-22",
+      "url_fuente": "https://www.gob.pe/institucion/oece/campa%C3%B1as/141206-boletines-de-seguimiento-de-las-contrataciones-publicas",
+      "relevancia_legalpro": "MEDIA - Boletines mensuales"
+    },
+    {
+      "id": "OECE-CAMP-EMERGENCIAS",
+      "titulo": "Preguntas Frecuentes sobre contrataciones para la atención de emergencias",
+      "fecha_publicacion": "2026-03-05",
+      "url_fuente": "https://www.gob.pe/institucion/oece/campa%C3%B1as/139903-preguntas-frecuentes-sobre-contrataciones-para-la-atencion-de-emergencias",
+      "relevancia_legalpro": "ALTA - Contratación emergencias"
+    }
+  ],
+  "agregados_estadisticos": {
+    "total_normas_plataforma": 85796,
+    "salas_TCP_activas": 6,
+    "tipos_resoluciones_TCP": ["PAS (sancionador)", "Apelación", "Nulidad", "Rectificación", "Retroactividad benigna", "Medidas cautelares"],
+    "sujetos_procesales_comunes": ["Personas naturales", "Personas jurídicas", "Consorcios", "Entidades públicas"],
+    "cambio_institucional_clave": {
+      "antes": "OSCE/PRE - OSCE/GG - TCE (Tribunal de Contrataciones del Estado)",
+      "ahora": "OECE/PRE - OECE/GG - TCP (Tribunal de Contrataciones Públicas) con 6 Salas (S1-S6)",
+      "norma_transicion": "Ley N° 32069",
+      "url_apps": ["apps.oece.gob.pe", "apps.osce.gob.pe (legacy)"]
+    },
+    "herramientas_clave": [
+      "SEACE - Sistema Electrónico de Contrataciones del Estado",
+      "RNP - Registro Nacional de Proveedores",
+      "DREGAJU - Registro de Instituciones Arbitrales",
+      "Buscador de interpretación normativa",
+      "Calculadora de gastos arbitrales",
+      "Record Arbitral"
+    ],
+    "caso_destacado_2026": "ALDESA CONSTRUCCIONES SA - Solicitud de retroactividad benigna contra Resolución del antiguo TCE (Resolución N° 0353-2017-TCE-S2)"
+  }
+}

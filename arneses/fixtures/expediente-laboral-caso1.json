@@ -1,0 +1,30 @@
+{
+  "id": "EXP-LAB-001",
+  "numero_expediente": "01145-2025",
+  "materia": "laboral",
+  "tipo_proceso": "CPCL",
+  "instancia": "JUZGADO",
+  "partes": {
+    "demandante": {
+      "nombre": "[NOMBRE_TRABAJADOR]",
+      "dni": "[DNI_TRABAJADOR]",
+      "calidad": "demandante"
+    },
+    "demandado": {
+      "nombre": "[NOMBRE_EMPRESA]",
+      "ruc": "[RUC_EMPRESA]",
+      "calidad": "demandado"
+    }
+  },
+  "hechos": "Trabajador con 5 anos de servicio fue despedido sin causa justa el 10-08-2024. Solicita reposicion + pago de beneficios sociales.",
+  "pretensiones": {
+    "demandante": "Reposicion en el puesto de trabajo o indemnizacion por despido arbitrario (LPCL art. 38) + CTS + gratificaciones + vacaciones + AFP"
+  },
+  "calculo_estimado": {
+    "cts": 8333.33,
+    "gratificaciones": 16666.66,
+    "vacaciones": 4166.66,
+    "indemnizacion_despido": 50000,
+    "total_estimado": 79166.65
+  }
+}

@@ -1,0 +1,54 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  node-lint:
+    name: Node.js Lint (legalpro-app)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: legalpro-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: legalpro-app
+
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: legalpro-app
+
+  dotnet-build:
+    name: .NET Core Build (Backend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore LegalPro.sln
+        working-directory: LegalProBackend_Net
+
+      - name: Build solution
+        run: dotnet build LegalPro.sln --no-restore --configuration Release
+        working-directory: LegalProBackend_Net
+
+      - name: Run Unit Tests
+        run: dotnet test LegalPro.sln --no-build --configuration Release --verbosity normal
+        working-directory: LegalProBackend_Net

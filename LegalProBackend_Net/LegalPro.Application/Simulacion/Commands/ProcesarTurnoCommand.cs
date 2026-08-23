@@ -9,7 +9,7 @@ namespace LegalPro.Application.Simulacion.Commands;
 
 // ═══════════════════════════════════════════════════════
 // COMMAND: Procesar Turno de Simulación
-// Gemini (FC) actúa como parte adversarial y evalúa la
+// MiniMax (FC) actúa como parte adversarial y evalúa la
 // calidad del argumento del usuario (+/-puntaje).
 // Seguridad OWASP A01: verifica OrganizationId en el load.
 // ═══════════════════════════════════════════════════════
@@ -73,7 +73,7 @@ public class ProcesarTurnoCommandHandler : IRequestHandler<ProcesarTurnoCommand,
         if (simulacion.EstaFinalizada)
             throw new DomainException("Esta simulación ya ha finalizado.");
 
-        // Construir historial textual para contexto de Gemini
+        // Construir historial textual para contexto de MiniMax
         var historial = string.Join("\n",
             simulacion.Eventos
                       .OrderBy(e => e.Turno)
@@ -88,7 +88,7 @@ public class ProcesarTurnoCommandHandler : IRequestHandler<ProcesarTurnoCommand,
             _ => "Parte contraria"
         };
 
-        // Gemini procesa el turno — Function Call garantiza estructura
+        // MiniMax procesa el turno — Function Call garantiza estructura
         var jsonRaw = await _simulacionAI.ProcesarTurnoSimulacionAsync(
             historialTurnos: historial,
             intervencionUsuario: request.MensajeUsuario,
@@ -127,10 +127,10 @@ public class ProcesarTurnoCommandHandler : IRequestHandler<ProcesarTurnoCommand,
         var eventoIA = simulacion.AgregarEvento(rolAdversarial, mensajeRespuesta, leyesInvocadas);
         _context.EventosSimulacion.Add(eventoIA);
 
-        // Ajustar puntaje según evaluación de Gemini
+        // Ajustar puntaje según evaluación del proveedor IA
         simulacion.AjustarPuntaje(puntajeDelta);
 
-        // Finalizar automáticamente si Gemini indica fin
+        // Finalizar automáticamente si el proveedor IA indica fin
         if (esFinSimulacion)
             simulacion.Finalizar();
 

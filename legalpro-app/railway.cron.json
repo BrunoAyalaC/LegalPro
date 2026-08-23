@@ -1,0 +1,22 @@
+{
+  "jobs": [
+    {
+      "name": "rag-daily-update",
+      "schedule": "0 6 * * *",
+      "command": "node tools/rag/daily-update.mjs",
+      "description": "Actualización diaria del corpus RAG a las 6am PET",
+      "timeout": 900,
+      "retry": {
+        "max_attempts": 3,
+        "delay_seconds": 300
+      }
+    },
+    {
+      "name": "rag-weekly-full-update",
+      "schedule": "0 2 * * 0",
+      "command": "node tools/rag/daily-update.mjs --full",
+      "description": "Actualización semanal completa (Sundays 2am)",
+      "timeout": 3600
+    }
+  ]
+}

@@ -918,6 +918,632 @@
       .stats-grid-4 { grid-template-columns: 1fr; }
       .cta-final { padding: 70px 16px; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RAG FEATURE — Inteligencia Legal con Base Actualizada
+       Design System 06-J (Cyan + Gold) · Glassmorphism coherente
+    ═══════════════════════════════════════════════════════════════ */
+    .rag-section {
+      padding: 110px 24px;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(6,182,212,0.06) 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg-deep) 0%, rgba(6,182,212,0.025) 50%, var(--bg-deep) 100%);
+      border-top: 1px solid var(--border-base);
+      border-bottom: 1px solid var(--border-base);
+      position: relative;
+      overflow: hidden;
+    }
+    .rag-section::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(6,182,212,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6,182,212,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, #000 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, #000 30%, transparent 80%);
+    }
+    .rag-header { position: relative; z-index: 1; }
+
+    .rag-tag-rag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--cyan-ghost);
+      border: 1px solid var(--border-cyan);
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--cyan-bright);
+      margin-bottom: 22px;
+    }
+    .rag-tag-rag::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--cyan); border-radius: 50%;
+      box-shadow: 0 0 8px var(--cyan);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .rag-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 900; letter-spacing: -1.5px; line-height: 1.1;
+      color: var(--text-white);
+      margin-bottom: 18px;
+    }
+    .rag-title .grad-cyan {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-soft) 60%, var(--gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(6,182,212,0.25));
+    }
+    .rag-subtitle {
+      font-size: 17px; color: var(--text-body);
+      max-width: 640px; line-height: 1.65; margin: 0 auto 56px;
+    }
+    .rag-subtitle strong { color: var(--cyan-bright); font-weight: 700; }
+
+    .rag-grid {
+      display: grid; position: relative; z-index: 1;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      max-width: 1180px; margin: 0 auto;
+    }
+
+    .rag-card {
+      background: linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid var(--border-base);
+      border-radius: 18px;
+      padding: 26px 24px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .rag-card::before {
+      content: '';
+      position: absolute; inset: 0; border-radius: 18px;
+      background: linear-gradient(135deg, rgba(6,182,212,0.06) 0%, transparent 50%);
+      opacity: 0; transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .rag-card:hover {
+      border-color: rgba(6,182,212,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35), 0 0 30px rgba(6,182,212,0.08);
+    }
+    .rag-card:hover::before { opacity: 1; }
+    .rag-card.tone-gold:hover { border-color: rgba(201,168,76,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.35), 0 0 30px rgba(201,168,76,0.08); }
+    .rag-card.tone-gold::before { background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, transparent 50%); }
+    .rag-card.tone-violet:hover { border-color: rgba(139,92,246,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.35), 0 0 30px rgba(139,92,246,0.08); }
+    .rag-card.tone-violet::before { background: linear-gradient(135deg, rgba(139,92,246,0.06) 0%, transparent 50%); }
+
+    .rag-icon {
+      width: 44px; height: 44px; border-radius: 11px;
+      background: var(--cyan-ghost);
+      border: 1px solid var(--border-cyan);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 16px;
+      line-height: 1;
+    }
+    .rag-card.tone-gold .rag-icon {
+      background: var(--gold-ghost);
+      border-color: var(--border-gold);
+    }
+    .rag-card.tone-violet .rag-icon {
+      background: rgba(139,92,246,0.1);
+      border-color: rgba(139,92,246,0.25);
+    }
+
+    .rag-card-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 16px; font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 8px; line-height: 1.3;
+      letter-spacing: -0.2px;
+    }
+    .rag-card-desc {
+      font-size: 13px; color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .rag-card-desc strong { color: var(--cyan-bright); font-weight: 600; }
+    .rag-card.tone-gold .rag-card-desc strong { color: var(--gold-bright); }
+    .rag-card.tone-violet .rag-card-desc strong { color: #A78BFA; }
+
+    .rag-card-foot {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid var(--border-base);
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      color: var(--cyan);
+    }
+    .rag-card.tone-gold .rag-card-foot { color: var(--gold); }
+    .rag-card.tone-violet .rag-card-foot { color: #A78BFA; }
+    .rag-card-foot .foot-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .rag-social {
+      max-width: 880px; margin: 60px auto 0;
+      padding: 28px 32px;
+      background: linear-gradient(135deg, rgba(6,182,212,0.05) 0%, rgba(201,168,76,0.03) 100%);
+      border: 1px solid rgba(6,182,212,0.18);
+      border-radius: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      position: relative; z-index: 1;
+    }
+    .rag-social-item { text-align: center; }
+    .rag-social-num {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(32px, 4vw, 44px);
+      font-weight: 900; letter-spacing: -1.5px;
+      color: var(--cyan);
+      line-height: 1; margin-bottom: 6px;
+      text-shadow: 0 0 24px rgba(6,182,212,0.3);
+    }
+    .rag-social-num.gold { color: var(--gold); text-shadow: 0 0 24px rgba(201,168,76,0.25); }
+    .rag-social-num.violet { color: #A78BFA; text-shadow: 0 0 24px rgba(139,92,246,0.25); }
+    .rag-social-lbl {
+      font-size: 11px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .rag-social-meta {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-base);
+      font-size: 12px; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .rag-social-meta .live-dot {
+      width: 7px; height: 7px; background: var(--green); border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    .rag-disclaimer {
+      max-width: 880px; margin: 32px auto 0;
+      padding: 18px 24px;
+      background: rgba(201,168,76,0.04);
+      border: 1px solid rgba(201,168,76,0.18);
+      border-left: 3px solid var(--gold);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      position: relative; z-index: 1;
+    }
+    .rag-disclaimer strong {
+      color: var(--gold-bright);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .rag-disclaimer a { color: var(--cyan-bright); text-decoration: none; border-bottom: 1px dotted rgba(6,182,212,0.4); }
+    .rag-disclaimer a:hover { color: var(--cyan-soft); }
+
+    @media (max-width: 1024px) {
+      .rag-grid { grid-template-columns: repeat(2, 1fr); }
+      .rag-social { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .rag-section { padding: 80px 18px; }
+      .rag-grid { grid-template-columns: 1fr; gap: 14px; }
+      .rag-social { grid-template-columns: 1fr; gap: 18px; padding: 22px 18px; }
+      .rag-social-meta { flex-direction: column; gap: 4px; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CITAS DEMO — Demostración interactiva de citaciones RAG
+       Design System 06-J · DS 06-J (Cyan + Gold)
+       Componente creado por @marketing-growth · 2026-08-01
+       Sigue convención: tokens CSS, glassmorphism, reveal pattern
+    ═══════════════════════════════════════════════════════════════ */
+    .citas-section {
+      padding: 110px 24px;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(201,168,76,0.05) 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg-deep) 0%, rgba(201,168,76,0.02) 50%, var(--bg-deep) 100%);
+      border-top: 1px solid var(--border-base);
+      border-bottom: 1px solid var(--border-base);
+      position: relative;
+      overflow: hidden;
+    }
+    .citas-section::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 50% 40% at 50% 50%, #000 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 50% 40% at 50% 50%, #000 30%, transparent 80%);
+    }
+    .citas-header { position: relative; z-index: 1; }
+    .citas-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--gold-bright);
+      margin-bottom: 22px;
+    }
+    .citas-tag::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--gold); border-radius: 50%;
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .citas-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 900; letter-spacing: -1.5px; line-height: 1.1;
+      color: var(--text-white);
+      margin-bottom: 18px;
+    }
+    .citas-title .grad-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 60%, var(--cyan) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(201,168,76,0.25));
+    }
+    .citas-subtitle {
+      font-size: 17px; color: var(--text-body);
+      max-width: 640px; line-height: 1.65; margin: 0 auto 56px;
+    }
+    .citas-subtitle strong { color: var(--gold-bright); font-weight: 700; }
+
+    .citas-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      max-width: 1180px;
+      margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+
+    /* Tabs de ejemplos (columna izquierda) */
+    .citas-tabs {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .citas-tab {
+      width: 100%;
+      text-align: left;
+      padding: 18px 20px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid var(--border-base);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-family: inherit;
+      color: inherit;
+    }
+    .citas-tab:hover {
+      border-color: rgba(201,168,76,0.3);
+      transform: translateX(4px);
+    }
+    .citas-tab.is-active {
+      background: linear-gradient(160deg, rgba(201,168,76,0.08) 0%, rgba(6,182,212,0.05) 100%);
+      border-color: var(--gold);
+      box-shadow: 0 0 30px rgba(201,168,76,0.12);
+    }
+    .citas-tab-materia {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 10px; font-weight: 800;
+      letter-spacing: 1.2px; text-transform: uppercase;
+      background: var(--cyan-ghost);
+      border: 1px solid var(--border-cyan);
+      color: var(--cyan-bright);
+      margin-bottom: 8px;
+    }
+    .citas-tab.is-active .citas-tab-materia {
+      background: var(--gold);
+      color: var(--bg-void);
+      border-color: var(--gold);
+    }
+    .citas-tab-preg {
+      font-size: 14px;
+      color: var(--text-white);
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    /* Panel de respuesta (columna derecha) */
+    .citas-panel {
+      background: linear-gradient(160deg, rgba(15,15,23,0.95) 0%, rgba(10,10,15,0.95) 100%);
+      border: 1px solid var(--border-cyan);
+      border-radius: 18px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 40px rgba(6,182,212,0.06);
+    }
+    .citas-panel::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      opacity: 0.6;
+    }
+    .citas-status {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 18px;
+    }
+    .citas-status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .citas-respuesta {
+      font-size: 16px; line-height: 1.7;
+      color: var(--text-white);
+      margin-bottom: 24px;
+    }
+    .citas-respuesta .highlight {
+      background: var(--cyan-ghost);
+      color: var(--cyan-bright);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .citas-respuesta-marker {
+      display: inline-block;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      color: var(--gold-bright);
+      background: var(--gold-ghost);
+      border: 1px solid var(--border-gold);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      margin: 0 2px;
+    }
+
+    /* Lista de citaciones */
+    .citas-fuentes {
+      padding-top: 18px;
+      border-top: 1px solid var(--border-base);
+    }
+    .citas-fuentes-label {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+    .citas-fuente-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px;
+      background: var(--cyan-ghost);
+      border: 1px solid rgba(6,182,212,0.12);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+    }
+    .citas-fuente-item:hover {
+      background: rgba(6,182,212,0.08);
+      border-color: rgba(6,182,212,0.3);
+      transform: translateX(4px);
+    }
+    .citas-fuente-idx {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 800;
+      color: var(--cyan-bright);
+      min-width: 24px;
+    }
+    .citas-fuente-nombre {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-body);
+      font-weight: 500;
+    }
+    .citas-fuente-similarity {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .citas-fuente-similarity.s-high { background: rgba(16,185,129,0.12); color: var(--green); }
+    .citas-fuente-similarity.s-med  { background: rgba(201,168,76,0.12); color: var(--gold-bright); }
+    .citas-fuente-similarity.s-low  { background: rgba(239,68,68,0.12); color: #F87171; }
+    .citas-fuente-link {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      color: var(--cyan);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .citas-fuente-link:hover {
+      background: var(--cyan-ghost);
+      color: var(--cyan-bright);
+    }
+    .citas-fuente-link svg { width: 14px; height: 14px; }
+
+    .citas-disclaimer {
+      margin-top: 18px;
+      padding: 12px 16px;
+      background: var(--gold-ghost);
+      border-left: 3px solid var(--gold);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--gold-bright);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1024px) {
+      .citas-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .citas-section { padding: 80px 18px; }
+      .citas-panel { padding: 20px; }
+      .citas-tab { padding: 14px 16px; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PRICING — Mejoras: Toggle Mensual/Anual + FAQ
+       Refactor por @marketing-growth · 2026-08-01
+    ═══════════════════════════════════════════════════════════════ */
+    .pricing-toggle {
+      display: inline-flex; align-items: center;
+      gap: 4px; padding: 4px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-base);
+      border-radius: 999px;
+      margin: 0 auto 36px;
+    }
+    .pricing-toggle-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pricing-toggle-btn.is-active {
+      background: var(--cyan);
+      color: var(--bg-void);
+      box-shadow: 0 0 16px rgba(6,182,212,0.35);
+    }
+    .pricing-toggle-btn .save-badge {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 6px;
+      background: var(--gold);
+      color: var(--bg-void);
+      border-radius: 4px;
+      font-size: 9px; font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .pricing-toggle-wrap { display: flex; justify-content: center; }
+
+    /* Enterprise card upgrade */
+    .price-card.is-enterprise {
+      border-color: var(--border-gold);
+    }
+    .price-card.is-enterprise .price-amount {
+      color: var(--gold);
+    }
+    .price-credits {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--cyan-ghost);
+      border: 1px solid var(--border-cyan);
+      border-radius: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px; font-weight: 700;
+      color: var(--cyan-bright);
+      margin-top: 12px;
+    }
+    .price-credits svg { width: 12px; height: 12px; }
+
+    /* FAQ Section */
+    .pricing-faq {
+      max-width: 760px;
+      margin: 60px auto 0;
+    }
+    .pricing-faq-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px; font-weight: 800;
+      text-align: center;
+      color: var(--text-white);
+      margin-bottom: 22px;
+    }
+    .pricing-faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-base);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+    .pricing-faq-item[open] {
+      border-color: var(--border-cyan);
+    }
+    .pricing-faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      padding: 16px 20px;
+      cursor: pointer;
+      list-style: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; font-weight: 700;
+      color: var(--text-white);
+    }
+    .pricing-faq-q::-webkit-details-marker { display: none; }
+    .pricing-faq-q::after {
+      content: '+';
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--cyan-ghost);
+      border: 1px solid var(--border-cyan);
+      border-radius: 6px;
+      color: var(--cyan);
+      font-size: 18px; font-weight: 700;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .pricing-faq-item[open] .pricing-faq-q::after {
+      transform: rotate(45deg);
+    }
+    .pricing-faq-a {
+      padding: 0 20px 18px;
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.6;
+    }
+    .pricing-faq-a a { color: var(--cyan-bright); text-decoration: none; border-bottom: 1px dotted rgba(6,182,212,0.4); }
+
+    /* Métodos de pago footer */
+    .pricing-paymethods {
+      display: flex; align-items: center; justify-content: center;
+      gap: 18px; flex-wrap: wrap;
+      margin-top: 28px;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .pricing-paymethods .pm-item {
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .pricing-paymethods .pm-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border-base);
+      border-radius: 4px;
+      font-size: 9px; font-weight: 800;
+      color: var(--text-body);
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
@@ -952,6 +1578,7 @@
       <ul class="navbar-links">
         <li><a href="#inicio" class="active">Inicio</a></li>
         <li><a href="#funciones">Funciones</a></li>
+        <li><a href="#inteligencia-legal">IA</a></li>
         <li><a href="#precios">Precios</a></li>
         <li><a href="#nosotros">Sobre nosotros</a></li>
         <li><a href="#">Blog</a></li>
@@ -968,6 +1595,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="#inicio">Inicio</a>
     <a href="#funciones">Funciones</a>
+    <a href="#inteligencia-legal">Inteligencia Legal</a>
     <a href="#precios">Precios</a>
     <a href="#nosotros">Sobre nosotros</a>
     <a href="#">Blog</a>
@@ -1378,6 +2006,194 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════
+       RAG FEATURE — Inteligencia Legal con Base Actualizada
+       Sección añadida por @marketing-growth · DS 06-J
+  ══════════════════════════════════════════════════ -->
+  <section class="rag-section" id="inteligencia-legal" aria-labelledby="rag-title">
+    <div class="container rag-header">
+      <div style="display:flex;justify-content:center;">
+        <div class="rag-tag-rag">Powered by RAG + Gemini AI</div>
+      </div>
+      <h2 class="rag-title reveal" id="rag-title" style="text-align:center;">
+        Inteligencia Legal
+        <br />
+        <span class="grad-cyan">con Base Actualizada al Día</span>
+      </h2>
+      <p class="rag-subtitle reveal reveal-delay-1" style="text-align:center;">
+        El único SaaS legal peruano con <strong>RAG (Retrieval-Augmented Generation)</strong> sobre la base legal oficial. Cada respuesta de la IA cita fuentes verificables de SPIJ, TC, SUNAT, INDECOPI, SUNARP y Poder Judicial.
+      </p>
+
+      <div class="rag-grid" role="list">
+
+        <article class="rag-card reveal" data-idx="0" role="listitem">
+          <div class="rag-icon" aria-hidden="true">🗄️</div>
+          <h3 class="rag-card-name">Base Legal Actualizada al Día</h3>
+          <p class="rag-card-desc">
+            <strong>319+ documentos oficiales</strong> indexados de SPIJ, TC, El Peruano, SUNAT, INDECOPI, SUNARP y más. CRON diario descarga normas nuevas automáticamente.
+          </p>
+          <div class="rag-card-foot"><span class="foot-dot"></span>SPIJ · TC · El Peruano</div>
+        </article>
+
+        <article class="rag-card reveal" data-idx="1" role="listitem">
+          <div class="rag-icon" aria-hidden="true">🔗</div>
+          <h3 class="rag-card-name">Citaciones Trazables</h3>
+          <p class="rag-card-desc">
+            Cada respuesta IA incluye marcadores <strong>[1], [2], [3]</strong> con enlace directo a SPIJ, TC y Poder Judicial. Las citas pueden ser auditadas en el panel de evidencia.
+          </p>
+          <div class="rag-card-foot"><span class="foot-dot"></span>Auditable por el abogado</div>
+        </article>
+
+        <article class="rag-card tone-violet reveal" data-idx="2" role="listitem">
+          <div class="rag-icon" aria-hidden="true">🛡️</div>
+          <h3 class="rag-card-name">Compliance LPDP Asistido</h3>
+          <p class="rag-card-desc">
+            <strong>4 disclaimers IA obligatorios</strong> en cada respuesta. Audit log completo con hash SHA-256. Cumplimiento Ley 29733 + D.S. 016-2024-JUS verificado en cada interacción.
+          </p>
+          <div class="rag-card-foot"><span class="foot-dot"></span>Ley 29733 · D.S. 016-2024-JUS</div>
+        </article>
+
+        <article class="rag-card reveal" data-idx="3" role="listitem">
+          <div class="rag-icon" aria-hidden="true">🔍</div>
+          <h3 class="rag-card-name">5 Fuentes Oficiales</h3>
+          <p class="rag-card-desc">
+            Búsqueda semántica en <strong>Poder Judicial (casaciones), Tribunal Constitucional, INDECOPI, SUNARP y MINJUSDH</strong>. Scoring híbrido: semántico + keywords, con citas verificadas.
+          </p>
+          <div class="rag-card-foot"><span class="foot-dot"></span>PJ · TC · INDECOPI · SUNARP · MINJUSDH</div>
+        </article>
+
+        <article class="rag-card tone-gold reveal" data-idx="4" role="listitem">
+          <div class="rag-icon" aria-hidden="true">🧠</div>
+          <h3 class="rag-card-name">Sistema Multi-Agente</h3>
+          <p class="rag-card-desc">
+            Cascada de <strong>5+ subagentes especializados</strong> (penal, civil, laboral, tributario, constitucional) que colaboran para un análisis multifacético del expediente.
+          </p>
+          <div class="rag-card-foot"><span class="foot-dot"></span>5+ abogados digitales coordinados</div>
+        </article>
+
+        <article class="rag-card tone-gold reveal" data-idx="5" role="listitem">
+          <div class="rag-icon" aria-hidden="true">🔄</div>
+          <h3 class="rag-card-name">Auto-Actualización Diaria</h3>
+          <p class="rag-card-desc">
+            <strong>CRON a las 6am PET</strong> descarga nuevas normas, jurisprudencia y resoluciones administrativas. Sin intervención manual: el corpus se mantiene vigente por sí solo.
+          </p>
+          <div class="rag-card-foot"><span class="foot-dot"></span>Diario · 06:00 PET</div>
+        </article>
+
+      </div>
+
+      <div class="rag-social" role="group" aria-label="Cobertura del RAG de LegalPro">
+        <div class="rag-social-item">
+          <div class="rag-social-num"><span id="rag-cnt-docs">0</span>+</div>
+          <div class="rag-social-lbl">Documentos indexados</div>
+        </div>
+        <div class="rag-social-item">
+          <div class="rag-social-num gold"><span id="rag-cnt-materias">0</span></div>
+          <div class="rag-social-lbl">Materias legales</div>
+        </div>
+        <div class="rag-social-item">
+          <div class="rag-social-num violet"><span id="rag-cnt-fuentes">0</span></div>
+          <div class="rag-social-lbl">Fuentes oficiales</div>
+        </div>
+        <div class="rag-social-meta">
+          <span class="live-dot" aria-hidden="true"></span>
+          Corpus actualizado al 1 de agosto de 2026 · Próxima sincronización 06:00 PET
+        </div>
+      </div>
+
+      <aside class="rag-disclaimer" role="note" aria-label="Disclaimer sobre uso de IA">
+        <strong>⚖️ Disclaimer de uso de IA</strong>
+        Las respuestas generadas por Lex.ia son <strong>asistidas por inteligencia artificial</strong> y constituyen una herramienta de apoyo para el profesional del derecho. No sustituyen el criterio, la responsabilidad ni el análisis del abogado. Toda decisión legal debe ser validada por un profesional habilitado, conforme al <a href="#" aria-label="Leer Código de Ética del CAL">Código de Ética del Colegio de Abogados de Lima</a> y la legislación vigente.         Las citaciones a normas y jurisprudencia se proporcionan con fines orientativos y deben ser verificadas en las fuentes oficiales antes de su uso procesal.
+      </aside>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       CITAS DEMO — Demostración interactiva de citaciones RAG
+       Componente creado por @marketing-growth · 2026-08-01
+       Lógica en: sections/citas-demo.js
+  ══════════════════════════════════════════════════ -->
+  <section class="citas-section" id="citas-demo" aria-labelledby="citas-title">
+    <div class="container citas-header">
+      <div style="display:flex;justify-content:center;">
+        <div class="citas-tag">Demo en Vivo · RAG con Citaciones</div>
+      </div>
+      <h2 class="citas-title reveal" id="citas-title" style="text-align:center;">
+        Así Responde <span class="grad-gold">Lex.ia</span>
+      </h2>
+      <p class="citas-subtitle reveal reveal-delay-1" style="text-align:center;">
+        Cada respuesta incluye <strong>citaciones verificables</strong> con enlaces directos a SPIJ, TC y Poder Judicial. Selecciona un caso para ver el resultado en vivo.
+      </p>
+
+      <div class="citas-grid" role="region" aria-label="Demostración de citaciones RAG">
+
+        <!-- TABS: Ejemplos seleccionables -->
+        <div class="citas-tabs reveal" role="tablist" aria-label="Ejemplos de consulta">
+          <button class="citas-tab is-active" role="tab" aria-selected="true" data-citas-idx="0">
+            <span class="citas-tab-materia">CIVIL</span>
+            <div class="citas-tab-preg">¿Cuál es el plazo para contestar una demanda civil en Perú?</div>
+          </button>
+          <button class="citas-tab" role="tab" aria-selected="false" data-citas-idx="1">
+            <span class="citas-tab-materia">PENAL</span>
+            <div class="citas-tab-preg">¿Qué es el delito de lavado de activos y cuál es su pena?</div>
+          </button>
+          <button class="citas-tab" role="tab" aria-selected="false" data-citas-idx="2">
+            <span class="citas-tab-materia">LABORAL</span>
+            <div class="citas-tab-preg">¿Cómo se calcula la CTS en Perú?</div>
+          </button>
+        </div>
+
+        <!-- PANEL: Respuesta con citaciones -->
+        <article class="citas-panel reveal reveal-delay-1" role="tabpanel" aria-live="polite" data-citas-panel>
+          <div class="citas-status">
+            <span class="citas-status-dot" aria-hidden="true"></span>
+            <span data-citas-status>Respuesta generada en 1.8s</span>
+          </div>
+
+          <p class="citas-respuesta" data-citas-respuesta>
+            <span class="citas-respuesta-marker">[1]</span> Según el <span class="highlight">Código Procesal Civil (Art. 473)</span>, el plazo para contestar una demanda es de <span class="highlight">30 días hábiles</span> contados desde la notificación válida de la demanda. <span class="citas-respuesta-marker">[2]</span>
+          </p>
+
+          <div class="citas-fuentes">
+            <div class="citas-fuentes-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="9" y1="13" x2="15" y2="13"></line>
+                <line x1="9" y1="17" x2="15" y2="17"></line>
+              </svg>
+              <span data-citas-fuentes-count>2 fuentes citadas</span>
+            </div>
+
+            <div data-citas-fuentes-list>
+              <div class="citas-fuente-item">
+                <span class="citas-fuente-idx">[1]</span>
+                <span class="citas-fuente-nombre">CPC Art. 473 — Plazo de contestación</span>
+                <span class="citas-fuente-similarity s-high">92%</span>
+                <a href="https://spij.minjus.gob.pe/spij-ext-web/#/detallenorma/H682685" target="_blank" rel="noopener noreferrer" class="citas-fuente-link" aria-label="Abrir fuente en SPIJ">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+              </div>
+              <div class="citas-fuente-item">
+                <span class="citas-fuente-idx">[2]</span>
+                <span class="citas-fuente-nombre">Casación 2461-2023 Apurímac</span>
+                <span class="citas-fuente-similarity s-med">78%</span>
+                <a href="https://www.pj.gob.pe" target="_blank" rel="noopener noreferrer" class="citas-fuente-link" aria-label="Ver casación en PJ">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="citas-disclaimer" data-citas-disclaimer>
+            ⚠️ Verifica las citas consultando directamente las fuentes oficiales.
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
        ROLES SECTION
   ══════════════════════════════════════════════════ -->
   <section class="roles-section">
@@ -1471,81 +2287,170 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════
-       PRICING
+       PRICING — Refactor por @marketing-growth · 2026-08-01
+       Mejoras: Toggle Mensual/Anual, Créditos IA, FAQ acordeón
+       Lógica en: sections/pricing.js
   ══════════════════════════════════════════════════ -->
   <section class="pricing-section" id="precios">
     <div class="container">
       <div class="section-header">
         <div class="section-tag">PRECIOS</div>
-        <h2 class="section-title reveal">Planes para <span class="gradient-text-cyan">cada despacho</span></h2>
-        <p class="section-subtitle reveal reveal-delay-1">Desde abogados independientes hasta grandes estudios jurídicos</p>
+        <h2 class="section-title reveal">Planes para <span class="gradient-text-cyan">Cada Estudio</span></h2>
+        <p class="section-subtitle reveal reveal-delay-1">Desde abogados independientes hasta fiscalías. Sin permanencia.</p>
       </div>
+
+      <!-- Toggle Mensual / Anual -->
+      <div class="pricing-toggle-wrap reveal reveal-delay-2">
+        <div class="pricing-toggle" role="tablist" aria-label="Periodicidad de facturación">
+          <button class="pricing-toggle-btn is-active" role="tab" aria-selected="true" data-billing="monthly">
+            Mensual
+          </button>
+          <button class="pricing-toggle-btn" role="tab" aria-selected="false" data-billing="annual">
+            Anual <span class="save-badge">AHORRA 20%</span>
+          </button>
+        </div>
+      </div>
+
       <div class="pricing-grid">
 
-        <!-- Gratis -->
-        <div class="price-card reveal">
-          <div class="price-plan-name">BÁSICO</div>
-          <div class="price-tagline">Para empezar a explorar</div>
-          <div class="price-amount"><span class="price-currency">S/</span>0</div>
-          <div class="price-period">para siempre gratis</div>
+        <!-- FREE -->
+        <div class="price-card reveal" data-plan="free">
+          <div class="price-plan-name">FREE</div>
+          <div class="price-tagline">Para abogados independientes que prueban LegalPro</div>
+          <div class="price-amount"><span class="price-currency">S/</span><span data-price>0</span></div>
+          <div class="price-period">/mes · para siempre gratis</div>
+          <div class="price-credits">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            <span data-credits>50 créditos IA/mes</span>
+          </div>
           <div class="price-divider"></div>
           <ul class="price-features">
-            <li><span class="price-check">✓</span> 3 expedientes activos</li>
-            <li><span class="price-check">✓</span> Análisis IA básico (5/mes)</li>
-            <li><span class="price-check">✓</span> Chat Lex.ia (10 consultas/día)</li>
-            <li><span class="price-check">✓</span> Búsqueda jurisprudencia</li>
-            <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Predictor judicial</li>
-            <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Simulador de juicios</li>
-            <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Monitor de notificaciones</li>
+            <li><span class="price-check">✓</span> 50 consultas IA/mes</li>
+            <li><span class="price-check">✓</span> 1 usuario</li>
+            <li><span class="price-check">✓</span> 5 expedientes</li>
+            <li><span class="price-check">✓</span> RAG con citaciones</li>
+            <li><span class="price-check">✓</span> Búsqueda en 5 fuentes oficiales</li>
+            <li><span class="price-check">✓</span> Soporte por email (48h)</li>
           </ul>
-          <a href="#" class="btn btn-ghost" style="width:100%;justify-content:center;">Comenzar Gratis</a>
+          <a href="#" class="btn btn-ghost" style="width:100%;justify-content:center;" data-cta>Empezar gratis</a>
         </div>
 
         <!-- PRO -->
-        <div class="price-card featured reveal reveal-delay-1">
+        <div class="price-card featured reveal reveal-delay-1" data-plan="pro">
           <div class="popular-badge">MÁS POPULAR</div>
           <div class="price-plan-name">PRO</div>
-          <div class="price-tagline">Para abogados que quieren ganar</div>
-          <div class="price-amount"><span class="price-currency">S/</span>99</div>
-          <div class="price-period">por mes · facturación mensual</div>
+          <div class="price-tagline">Para abogados y estudios pequeños</div>
+          <div class="price-amount"><span class="price-currency">S/</span><span data-price>99</span></div>
+          <div class="price-period" data-period>/mes</div>
+          <div class="price-credits">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            <span data-credits>500 créditos IA/mes</span>
+          </div>
           <div class="price-divider"></div>
           <ul class="price-features">
-            <li><span class="price-check">✓</span> Expedientes ilimitados</li>
-            <li><span class="price-check">✓</span> Análisis IA ilimitado</li>
-            <li><span class="price-check">✓</span> Predictor judicial completo</li>
-            <li><span class="price-check">✓</span> Redactor de escritos IA</li>
+            <li><span class="price-check">✓</span> 500 consultas IA/mes</li>
+            <li><span class="price-check">✓</span> 5 usuarios</li>
+            <li><span class="price-check">✓</span> 50 expedientes</li>
+            <li><span class="price-check">✓</span> RAG avanzado + hybrid scoring</li>
+            <li><span class="price-check">✓</span> Panel de expertos multi-agente</li>
             <li><span class="price-check">✓</span> Simulador de juicios</li>
-            <li><span class="price-check">✓</span> Monitor de notificaciones</li>
-            <li><span class="price-check">✓</span> Soporte prioritario</li>
+            <li><span class="price-check">✓</span> Bóveda de evidencia digital</li>
+            <li><span class="price-check">✓</span> Soporte prioritario (8h)</li>
           </ul>
-          <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;">Empezar 14 días gratis</a>
+          <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;" data-cta>Contratar PRO</a>
         </div>
 
-        <!-- Estudio -->
-        <div class="price-card enterprise reveal reveal-delay-2">
-          <div class="price-plan-name">ESTUDIO</div>
-          <div class="price-tagline">Para estudios jurídicos</div>
-          <div class="price-amount"><span class="price-currency">S/</span>299</div>
-          <div class="price-period">por mes · hasta 10 usuarios</div>
+        <!-- ENTERPRISE -->
+        <div class="price-card enterprise reveal reveal-delay-2" data-plan="enterprise">
+          <div class="price-plan-name">ENTERPRISE</div>
+          <div class="price-tagline">Para estudios grandes y fiscalías</div>
+          <div class="price-amount"><span class="price-currency">S/</span><span data-price>499</span></div>
+          <div class="price-period" data-period>/mes</div>
+          <div class="price-credits">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            <span data-credits>Consultas IA ilimitadas</span>
+          </div>
           <div class="price-divider"></div>
           <ul class="price-features">
-            <li><span class="price-check">✓</span> Todo de PRO ilimitado</li>
-            <li><span class="price-check">✓</span> Hasta 10 usuarios del estudio</li>
-            <li><span class="price-check">✓</span> Gestión de equipos</li>
-            <li><span class="price-check">✓</span> API access completo</li>
-            <li><span class="price-check">✓</span> Reportes avanzados</li>
-            <li><span class="price-check">✓</span> Gerente de cuenta dedicado</li>
-            <li><span class="price-check">✓</span> Alta disponibilidad</li>
+            <li><span class="price-check">✓</span> Consultas IA ilimitadas</li>
+            <li><span class="price-check">✓</span> 20+ usuarios</li>
+            <li><span class="price-check">✓</span> Expedientes ilimitados</li>
+            <li><span class="price-check">✓</span> RAG personalizado a tu corpus</li>
+            <li><span class="price-check">✓</span> API access</li>
+            <li><span class="price-check">✓</span> Onboarding personalizado</li>
+            <li><span class="price-check">✓</span> Account Manager dedicado</li>
+            <li><span class="price-check">✓</span> Soporte 24/7 (2h SLA)</li>
+            <li><span class="price-check">✓</span> Facturación corporativa</li>
           </ul>
-          <a href="#" class="btn btn-gold" style="width:100%;justify-content:center;">Contactar Ventas</a>
+          <a href="#" class="btn btn-gold" style="width:100%;justify-content:center;" data-cta>Contactar ventas</a>
         </div>
 
       </div>
-      <div class="price-security reveal">
-        <span>🔒 Pago seguro SSL</span>
-        <span>✓ Sin contrato mínimo</span>
-        <span>↩ Reembolso 30 días</span>
-        <span>🇵🇪 Facturación en soles</span>
+
+      <!-- Métodos de pago -->
+      <div class="pricing-paymethods reveal">
+        <span class="pm-item">💳 Stripe (internacional)</span>
+        <span class="pm-item">🇵🇪 Culqi (Yape · Plin · tarjetas)</span>
+        <span class="pm-item">📄 Factura electrónica</span>
+      </div>
+
+      <!-- FAQ acordeón -->
+      <div class="pricing-faq reveal">
+        <h3 class="pricing-faq-title">Preguntas frecuentes</h3>
+
+        <details class="pricing-faq-item">
+          <summary class="pricing-faq-q">¿Qué es un crédito IA y cómo se consume?</summary>
+          <div class="pricing-faq-a">
+            Un crédito IA se consume por cada consulta que envías a Lex.ia. Las consultas complejas (análisis de expedientes, predictores, redacción de escritos extensos) pueden consumir entre 1 y 5 créditos según la longitud. Los créditos no utilizados NO se acumulan mes a mes en el plan FREE, pero SÍ en PRO y ENTERPRISE (hasta 3 meses de rollover).
+          </div>
+        </details>
+
+        <details class="pricing-faq-item">
+          <summary class="pricing-faq-q">¿Puedo cambiar de plan en cualquier momento?</summary>
+          <div class="pricing-faq-a">
+            Sí. Puedes subir o bajar de plan cuando quieras desde tu panel. Al subir, se prorratea el cargo; al bajar, el cambio aplica al siguiente ciclo de facturación. Sin cláusulas de permanencia ni penalizaciones.
+          </div>
+        </details>
+
+        <details class="pricing-faq-item">
+          <summary class="pricing-faq-q">¿Cómo funciona la facturación en soles peruanos?</summary>
+          <div class="pricing-faq-a">
+            Emitimos <strong>factura electrónica</strong> válida para SUNAT en todos los planes de pago. Aceptamos Yape, Plin, transferencia bancaria y tarjetas vía Culqi (procesador peruano). Para pagos internacionales usamos Stripe (USD/EUR).
+          </div>
+        </details>
+
+        <details class="pricing-faq-item">
+          <summary class="pricing-faq-q">¿Las respuestas de Lex.ia constituyen asesoría legal?</summary>
+          <div class="pricing-faq-a">
+            <strong>No.</strong> Lex.ia es una herramienta de apoyo para profesionales del derecho. Cada respuesta incluye disclaimers obligatorios recordando que NO sustituye el criterio del abogado. Las citaciones a normas se proporcionan con fines orientativos y deben ser verificadas en fuentes oficiales. Ver nuestro <a href="#">código de ética y compliance</a>.
+          </div>
+        </details>
+
+        <details class="pricing-faq-item">
+          <summary class="pricing-faq-q">¿Cumple LegalPro con la Ley 29733 (LPDP)?</summary>
+          <div class="pricing-faq-a">
+            Sí. LegalPro cumple con la <strong>Ley 29733 de Protección de Datos Personales</strong> y el D.S. 016-2024-JUS. Implementamos 4 disclaimers IA obligatorios, audit log con SHA-256, consentimientos granulares por usuario y breach notification. Todos los datos se procesan en territorio peruano o con transferencia internacional garantizada (LGPD-equivalente).
+          </div>
+        </details>
+
+        <details class="pricing-faq-item">
+          <summary class="pricing-faq-q">¿Ofrecen prueba gratis o demo?</summary>
+          <div class="pricing-faq-a">
+            El plan <strong>FREE</strong> te permite probar Lex.ia indefinidamente con 50 créditos/mes. Adicionalmente, el plan <strong>PRO</strong> incluye <strong>14 días de prueba gratis</strong> con acceso completo sin tarjeta requerida. Para ENTERPRISE agendamos una demo personalizada con tu corpus.
+          </div>
+        </details>
       </div>
     </div>
   </section>
@@ -1795,6 +2700,15 @@ window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.cli
 
 <!-- Motor de scroll interactivo + video parallax -->
 <script src="scroll-engine.js" type="module"></script>
+
+<!-- Sección RAG: reveal staggered + counters -->
+<script src="sections/rag-feature.js" type="module"></script>
+
+<!-- Sección CitasDemo: tabs interactivos + reveal -->
+<script src="sections/citas-demo.js" type="module"></script>
+
+<!-- Pricing: toggle mensual/anual + FAQ acordeón -->
+<script src="sections/pricing.js" type="module"></script>
 
 </body>
 </html>

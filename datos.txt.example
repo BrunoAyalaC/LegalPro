@@ -1,0 +1,27 @@
+# ═══ PLANTILLA DE SECRETOS — NO COMMITEAR datos.txt REAL ═══
+# Este archivo es solo referencia. Copia a datos.txt y completa con valores REALES.
+# datos.txt está en .gitignore, este .example SÍ se commitea.
+
+FRONTEND_VARIABLES:
+- VITE_NODE_API_URL=https://legalpro-node-production.up.railway.app
+- VITE_DOTNET_API_URL=https://legalpro-dotnet-production.up.railway.app
+- VITE_APK_URL=https://github.com/BrunoAyalaC/Abogacia/releases/download/v1.1.0/LegalPro-v1.1.0.apk
+
+BACKEND_NODE_VARIABLES:
+- NODE_ENV=production
+- PORT=3001
+- DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DBNAME
+- JWT_SECRET=<openssl rand -base64 48>
+- JWT_EXPIRY_MINUTES=60
+- MINIMAX_API_KEY=<MiniMax API Key>
+- ALLOWED_ORIGINS=https://legalpro-frontend-production.up.railway.app
+
+BACKEND_DOTNET_VARIABLES:
+- ConnectionStrings__DefaultConnection=<mismo DATABASE_URL>
+- ALLOWED_ORIGINS=<mismo ALLOWED_ORIGINS>
+- JwtSettings__Secret=<mismo JWT_SECRET>
+
+OWNER_DASHBOARD_VARIABLES:
+- DATABASE_URL=<mismo DATABASE_URL>
+- OWNER_SECRET_KEY=<openssl rand -base64 48>
+- OWNER_DECRYPTION_SECRET=<mínimo 16 caracteres>

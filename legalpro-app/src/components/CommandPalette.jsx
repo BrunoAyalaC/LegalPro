@@ -70,7 +70,9 @@ function highlight(text, query) {
 }
 
 export default function CommandPalette() {
-  const { commandOpen, closeCommand } = useUI();
+  /* FIX P0 #8: se agrega openCommand para que Ctrl+K abra la paleta directamente
+     (antes dispatchaba 'lp:openCommand' que nadie escuchaba). */
+  const { commandOpen, openCommand, closeCommand } = useUI();
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const [query, setQuery] = useState('');
@@ -108,17 +110,17 @@ export default function CommandPalette() {
     if (e.key === 'Escape') closeCommand();
   }, [activeIdx, flatItems, navigate, closeCommand]);
 
-  /* Global Cmd+K */
+  /* Global Cmd+K — FIX P0 #8: abre/cierra directamente vía openCommand/closeCommand */
   useEffect(() => {
     const handler = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        commandOpen ? closeCommand() : document.dispatchEvent(new CustomEvent('lp:openCommand'));
+        commandOpen ? closeCommand() : openCommand();
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [commandOpen, closeCommand]);
+  }, [commandOpen, openCommand, closeCommand]);
 
   const goTo = (path) => { navigate(path); closeCommand(); };
 

@@ -1,0 +1,53 @@
+{
+  "fuente": "lpderecho.pe",
+  "metodo": "playwright-chromium",
+  "total_posts_estimado": 1000,
+  "capturados": 5,
+  "con_contenido": 1,
+  "fecha": "2026-08-07T02:44:47.279Z",
+  "posts": [
+    {
+      "url": "https://lpderecho.pe/gunther-gonzales-registro-de-personas-juridicas-civiles-de-la-sunarp-es-el-mas-burocratico-de-la-institucion",
+      "titulo": "Gunther Gonzales: «El registro de personas jurídicas civiles de la SUNARP es el más burocrático de la institución»",
+      "contenido": "El reconocido profesor Gunther Gonzales Barrón, en un post sobre el registro de los partidos políticos, cuestionó el exceso de burocracia al interior de la Superintendencia Nacional de Registros Públicos que, según sostiene, termina por vaciar de contenido el derecho fundamental de asociación. Aquí un extracto de sus reflexiones: El registro de personas jurídicas civiles de la SUNARP es de lejos el más burocrático de la institución, conforme se advierte del alto porcentaje de observaciones y tachas, muchas de ellas insólitas, en tanto el Estado, a través del registro, se entromete injustificadamente en los consejos directivos, en los comités electorales, en la asamblea de asociados, con el fin de exigir más“requisitos”, documentos adicionales, funciones específicas de cada cargo, plazos inexorables, avisos por allí y por allá, “tractos sucesivos”, prioridades inexistentes, entre otros. La SUNARP se ha convertido en un agente normativo desbocado, y si alguien lo duda, pues baste mencionar que, antes de crearse la entidad en 1994, el registro de personas jurídicas se regía por apenas 10 artículos de un reglamento de 1936; mientras que, hoy, el reglamento específico de esa materia cuenta con 105 artículos (sumadas las disposiciones adicionales), sin perjuicio de directivas, lineamientos de gerencias técnicas, precedentes o acuerdos, que nos inundan y desbordan con la falsa creencia de que un legislador (en realidad, un funcionario de mando medio), cuál big brother jurídico, puede regularlo absolutamente todo, mientras nosotros somos engranajes o robots de la maquinaria normativa. La “registralitis” implica la expansión del control registral-administrativo sobre la vida y actividades de las personas hasta el punto de quitarles iniciativa o creatividad, sin que a cambio de ello se proteja la seguridad jurídica u otros valores fundamentales del sistema. Pero este enfoque burocrático, además, resulta incompatible con el art. 2, inciso 13º de la Constitución, por cuya virtud, toda persona tiene derecho a asociarse y crear fundaciones con fines lícitos, lo que en esencia consiste en la libertad que tienen las personas para agruparse entre ellas para realizar un fin común, cuyas notas distintivas son la libertad de asociarse o no, así como la libertad de organización, esto es, la posibilidad de regular las relaciones internas en forma autónoma. Nótese la contradicción que implicaría otorgar la libertad de asociarse, pero sin posibilidad de mantener la autonomía del régimen interno por la fuerte intervención del registro. En tal caso, el derecho fundamental, en la práctica, quedaría vaciado de contenido, pues, la libertad de pertenencia a un grupo valdría de bien poco frente a la imposibilidad de decidir los asuntos internos de ese mismo colectivo. En esta misma línea interpretativa, el Tribunal Constitucional ha señalado que la libertad de asociación se rige por tres principios: autonomía de la voluntadpara pertenecer o no a un colectivo; autoorganización, que permite encauzar el cumplimiento de los fines de la asociación de la manera más conveniente a sus miembros, para lo cual el estatuto se convierte en el instrumento para regular esas relaciones; fin altruista, o desapego a la obtención de ventajas o beneficios económicos (STC N° 1027-2004-AA/TC, de 20/5/2004).",
+      "fecha": "2016-02-08T13:17:00-05:00",
+      "categorias": [
+        "Inicio",
+        "Civil"
+      ],
+      "longitud": 3319
+    },
+    {
+      "url": "https://lpderecho.pe/poder-judicial-implementara-notificaciones-electronicas-en-cinco-cortes",
+      "titulo": null,
+      "fecha": null,
+      "contenido": null,
+      "longitud": 0,
+      "error": "no-content"
+    },
+    {
+      "url": "https://lpderecho.pe/alumno-tendra-que-indemnizar-a-profesor-por-ofensas-publicadas-en-facebook",
+      "titulo": null,
+      "fecha": null,
+      "contenido": null,
+      "longitud": 0,
+      "error": "no-content"
+    },
+    {
+      "url": "https://lpderecho.pe/caso-julio-guzman-defensa-de-cesar-landa-ante-el-jurado-nacional-de-elecciones",
+      "titulo": null,
+      "fecha": null,
+      "contenido": null,
+      "longitud": 0,
+      "error": "no-content"
+    },
+    {
+      "url": "https://lpderecho.pe/mujeres-son-colocadas-en-ultimos-puestos-en-listas-para-postular-al-congreso",
+      "titulo": null,
+      "fecha": null,
+      "contenido": null,
+      "longitud": 0,
+      "error": "no-content"
+    }
+  ]
+}

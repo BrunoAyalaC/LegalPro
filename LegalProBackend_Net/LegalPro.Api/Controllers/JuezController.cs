@@ -27,7 +27,7 @@ public class JuezController : ControllerBase
     /// Estructura: vistos, considerandos (fundamentos de hecho y derecho), fallo, notifíquese.
     /// </summary>
     [HttpPost("resolucion")]
-    [EnableRateLimiting("gemini")]
+    [EnableRateLimiting("minimax")]
     public async Task<IActionResult> GenerarResolucion(
         [FromBody] GenerarResolucionJudicialCommand command,
         CancellationToken ct)
@@ -42,7 +42,7 @@ public class JuezController : ControllerBase
     /// Útil para resolver conflictos de criterios jurisprudenciales.
     /// </summary>
     [HttpPost("precedentes/comparar")]
-    [EnableRateLimiting("gemini")]
+    [EnableRateLimiting("minimax")]
     public async Task<IActionResult> CompararPrecedentes(
         [FromBody] CompararPrecedentesQuery query,
         CancellationToken ct)

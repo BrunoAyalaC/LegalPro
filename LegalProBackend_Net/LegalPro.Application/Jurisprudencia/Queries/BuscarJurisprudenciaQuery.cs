@@ -7,7 +7,7 @@ namespace LegalPro.Application.Jurisprudencia.Queries;
 
 // ═══════════════════════════════════════════════════════
 // QUERY: Buscar jurisprudencia peruana con Google Search grounding.
-// Gemini actúa como buscador legal (ILegalJurisprudenciaSearch).
+// El proveedor IA actúa como buscador legal (ILegalJurisprudenciaSearch).
 // Retorna resultados rankeados con contexto generado por IA.
 // ═══════════════════════════════════════════════════════
 
@@ -70,7 +70,7 @@ public class BuscarJurisprudenciaQueryHandler : IRequestHandler<BuscarJurisprude
         // Construir query enriquecida con filtros opcionales
         var queryEnriquecida = BuildQuery(request);
 
-        // Gemini llama a Google Search (deep search grounding)
+        // El proveedor IA invoca Google Search (deep search grounding)
         var jsonRaw = await _jurisprudenciaAI.BuscarJurisprudenciaAsync(queryEnriquecida);
 
         var resultados = ParseResultados(jsonRaw, request.TerminoBusqueda);
@@ -138,7 +138,7 @@ public class BuscarJurisprudenciaQueryHandler : IRequestHandler<BuscarJurisprude
         }
         catch
         {
-            // Si Gemini devuelve texto plano (no JSON), lo envolvemos como contexto
+            // Si el proveedor IA devuelve texto plano (no JSON), lo envolvemos como contexto
             return new BuscarJurisprudenciaResult(
                 QueryOriginal:    queryOriginal,
                 Resultados:       [],

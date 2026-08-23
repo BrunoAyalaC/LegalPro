@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
@@ -11,6 +11,8 @@ import { TIPOS_ESCRITO, MATERIAS } from '../constants';
 import { api } from '../api/client';
 import { generateLegalPDF, exportToDocx } from '../utils/documents';
 import { Copy, Check } from 'lucide-react';
+import { useSeo } from '../hooks/useSeo';
+import { getProviderLabel } from '../lib/iaProviders.js';
 
 /* ─── Constantes ─────────────────────────────────────────── */
 const CHARS_PER_PAGE = 3000;
@@ -44,6 +46,62 @@ function estimatePages(text) {
   if (!text || !text.trim()) return 0;
   const clean = text.replace(/\s+/g, ' ').trim();
   return Math.max(1, Math.ceil(clean.length / CHARS_PER_PAGE));
+}
+
+/* ─── Helper: ID seguro para claves de storage ────────────── */
+// btoa lanza InvalidCharacterError con caracteres fuera de Latin-1
+// (comillas «», emoji). Fallback: strip de no-word chars.
+const safeId = (s) => {
+  try {
+    return btoa(unescape(encodeURIComponent(String(s).slice(0, 100))));
+  } catch {
+    return String(s).slice(0, 50).replace(/\W/g, '');
+  }
+};
+
+/* ─── Persistencia de revisión — SECURITY/LPDP P1 ─────────── */
+// sessionStorage (no localStorage) + TTL 24h con envelope { v, ts, expiresAt,
+// data } — mismo patrón que ChatIA.jsx. Los comentarios de revisión y el
+// nombre del revisor son PII: expiran solos y mueren con la pestaña.
+const REVIEW_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+function reviewKey(resultado) {
+  return 'legalpro_review_' + safeId(resultado);
+}
+
+function loadReviewSafe(key) {
+  // Migración legacy: borrar cualquier resto en localStorage (PII sin TTL)
+  try {
+    if (localStorage.getItem(key)) localStorage.removeItem(key);
+  } catch { /* ignore */ }
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Soporte retro: objeto plano sin envelope (formato antiguo)
+    if (!parsed || typeof parsed !== 'object' || typeof parsed.expiresAt !== 'number') {
+      return typeof parsed === 'object' && parsed !== null ? parsed : null;
+    }
+    if (Date.now() > parsed.expiresAt) {
+      try { sessionStorage.removeItem(key); } catch { /* ignore */ }
+      return null;
+    }
+    return parsed.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function saveReviewSafe(key, review) {
+  try {
+    const payload = {
+      v: 1,
+      ts: Date.now(),
+      expiresAt: Date.now() + REVIEW_TTL_MS,
+      data: review,
+    };
+    sessionStorage.setItem(key, JSON.stringify(payload));
+  } catch { /* ignore — modo privado / quota */ }
 }
 
 /* ─── Helper: construir encabezado legal peruano ─────────── */
@@ -81,19 +139,10 @@ function buildSignatureBlock({ abogado, recurrente, colegiatura }) {
 /* COMPONENTE PRINCIPAL                                       */
 /* ═══════════════════════════════════════════════════════════ */
 export default function RedactorEscritos() {
-  useEffect(() => {
-    document.title = 'Redactor de Escritos Legales | LegalPro';
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.setAttribute('name', 'description');
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.setAttribute(
-      'content',
-      'Redactor de escritos legales con formato legal peruano. Genera demandas, contestaciones, apelaciones, casaciones y más con inteligencia artificial.'
-    );
-  }, []);
+  useSeo({
+    title: 'Redactor de Escritos Legales | LegalPro',
+    description: 'Redactor de escritos legales con formato legal peruano. Genera demandas, contestaciones, apelaciones, casaciones y más con inteligencia artificial.',
+  });
 
   /* ─── Estado del formulario ────────────────────────────── */
   const [tipoEscrito, setTipoEscrito] = useState('DEMANDA');
@@ -114,6 +163,48 @@ export default function RedactorEscritos() {
   const [pendingAction, setPendingAction] = useState(null);
   const [exportLoading, setExportLoading] = useState({ pdf: false, docx: false, copy: false });
   const [copySuccess, setCopySuccess] = useState(false);
+
+  /* ─── Flujo Senior→Junior IA (revisión) ─────────────────── */
+  const [reviewStatus, setReviewStatus] = useState('borrador'); // borrador | revisado | rechazado
+  const [reviewComment, setReviewComment] = useState('');
+  const [revisorNombre, setRevisorNombre] = useState('');
+
+  // Cargar estado de revisión desde sessionStorage (TTL 24h) al generarse un nuevo documento
+  useEffect(() => {
+    if (resultado) {
+      const saved = loadReviewSafe(reviewKey(resultado));
+      if (saved) {
+        setReviewStatus(saved.status || 'borrador');
+        setReviewComment(saved.comment || '');
+        setRevisorNombre(saved.revisor || '');
+      } else {
+        setReviewStatus('borrador');
+        setReviewComment('');
+      }
+    }
+  }, [resultado]);
+
+  // ── Cleanup del setTimeout de "copySuccess" para evitar setState tras unmount ──
+  const copyTimerRef = useRef(null);
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
+  // Guardar estado de revisión en sessionStorage con TTL 24h (LPDP)
+  function saveReview(status, comment = '') {
+    setReviewStatus(status);
+    setReviewComment(comment);
+    if (resultado) {
+      saveReviewSafe(reviewKey(resultado), {
+        status,
+        comment,
+        revisor: revisorNombre || 'Abogado Senior',
+        fecha: new Date().toISOString(),
+      });
+    }
+  }
 
   /* ─── Validación de campos ─────────────────────────────── */
   const [touched, setTouched] = useState({});
@@ -240,7 +331,7 @@ REQUISITOS DE FORMALIDAD:
         abogado: abogado || 'Abogado',
         colegiatura,
         tipoDocumento: tipoLabel,
-        numeroExpediente,
+        numExpediente,
         organizacion: recurrente || 'Recurrente',
         fecha: new Date().toLocaleDateString('es-PE', {
           day: 'numeric',
@@ -261,7 +352,8 @@ REQUISITOS DE FORMALIDAD:
     try {
       await navigator.clipboard.writeText(resultado);
       setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2500);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopySuccess(false), 2500);
     } catch {
       setExportError('Error al copiar al portapapeles.');
     } finally {
@@ -301,7 +393,7 @@ REQUISITOS DE FORMALIDAD:
         showBack
         rightAction={
           <Badge variant="ia" className="text-[10px]">
-            GEMINI 2.0
+            {getProviderLabel('minimax')}
           </Badge>
         }
       />
@@ -309,7 +401,8 @@ REQUISITOS DE FORMALIDAD:
       <main className="pb-28">
         {/* ═══ FORMULARIO ═══ */}
         <section className="p-4 space-y-4">
-          {/* Disclaimer banner informativo */}
+          {/* LPDP: Banner redactor #DC2626 rojo, dismissible=false obligatorio */}
+          <IADisclaimerBanner variant="redactor" dismissible={false} compact />
           <div className="backdrop-blur-xl bg-amber-500/8 border border-amber-500/20 rounded-xl p-3 flex items-start gap-3">
             <AppIcon name="info" size={20} className="text-amber-400 shrink-0 mt-0.5" />
             <p className="text-[11px] text-amber-200/80 leading-relaxed">
@@ -560,7 +653,7 @@ REQUISITOS DE FORMALIDAD:
             {/* Resultado generado */}
             {!loading && resultado && (
               <>
-                <IADisclaimerBanner className="mb-2" />
+                <IADisclaimerBanner variant="redactor" dismissible={false} className="mb-2" />
 
                 {/* Badge de páginas */}
                 <div className="flex items-center gap-2 flex-wrap">
@@ -582,6 +675,123 @@ REQUISITOS DE FORMALIDAD:
                   aria-label="Borrador del escrito legal"
                 >
                   {resultado}
+                </div>
+
+                {/* ═══ FLUJO SENIOR→JUNIOR: REVISIÓN ═══ */}
+                <div className="mt-6 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                      <AppIcon name="rate_review" size={14} />
+                      Revisión Senior
+                    </h3>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold ${
+                      reviewStatus === 'revisado' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                      reviewStatus === 'rechazado' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                      'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        reviewStatus === 'revisado' ? 'bg-emerald-400' :
+                        reviewStatus === 'rechazado' ? 'bg-red-400' :
+                        'bg-amber-400'
+                      }`} />
+                      {reviewStatus === 'revisado' ? 'REVISADO Y APROBADO' :
+                       reviewStatus === 'rechazado' ? 'RECHAZADO' :
+                       'BORRADOR — Pendiente de revisión'}
+                    </span>
+                  </div>
+
+                  {reviewStatus === 'borrador' && (
+                    <div className="space-y-3">
+                      <p className="text-xs text-slate-500">
+                        Este documento fue generado por IA (junior). Un abogado senior debe revisarlo antes de emitirlo como final.
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          placeholder="Nombre del revisor (opcional)"
+                          value={revisorNombre}
+                          onChange={e => setRevisorNombre(e.target.value)}
+                          className="flex-1 bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
+                        />
+                      </div>
+                      <textarea
+                        placeholder="Comentarios de revisión (opcional)"
+                        value={reviewComment}
+                        onChange={e => setReviewComment(e.target.value)}
+                        rows={2}
+                        className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => saveReview('revisado', reviewComment)}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-emerald-500 hover:bg-emerald-400 text-black flex items-center justify-center gap-1.5"
+                        >
+                          <AppIcon name="check" size={14} />
+                          Aprobar y Finalizar
+                        </button>
+                        <button
+                          onClick={() => saveReview('rechazado', reviewComment)}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 flex items-center justify-center gap-1.5"
+                        >
+                          <AppIcon name="close" size={14} />
+                          Rechazar — Solicitar Cambios
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {reviewStatus === 'revisado' && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                        <AppIcon name="verified" size={16} />
+                        <span className="font-medium">Documento aprobado y finalizado</span>
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Revisado por: <span className="text-slate-300">{revisorNombre || 'Abogado Senior'}</span>
+                      </p>
+                      {reviewComment && (
+                        <div className="bg-slate-700/30 rounded-lg p-2">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Comentario</p>
+                          <p className="text-xs text-slate-300">{reviewComment}</p>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => saveReview('borrador', '')}
+                        className="text-[11px] text-slate-500 hover:text-slate-300 underline transition-colors"
+                      >
+                        Volver a borrador
+                      </button>
+                    </div>
+                  )}
+
+                  {reviewStatus === 'rechazado' && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-red-400 text-sm">
+                        <AppIcon name="warning" size={16} />
+                        <span className="font-medium">Documento rechazado — requiere cambios</span>
+                      </div>
+                      {reviewComment && (
+                        <div className="bg-slate-700/30 rounded-lg p-2">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Motivo del rechazo</p>
+                          <p className="text-xs text-slate-300">{reviewComment}</p>
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => saveReview('borrador', '')}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all bg-amber-500 hover:bg-amber-400 text-black"
+                        >
+                          Modificar y Re-enviar a Revisión
+                        </button>
+                        <button
+                          onClick={() => saveReview('revisado', reviewComment)}
+                          className="py-2 px-4 rounded-lg text-xs font-semibold transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                        >
+                          Aprobar igual
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Error de exportación */}
@@ -660,9 +870,11 @@ REQUISITOS DE FORMALIDAD:
         </section>
       </main>
 
-      {/* ═══ MODAL DE DISCLAIMER ═══ */}
+      {/* ═══ MODAL DE DISCLAIMER LPDP redactor #DC2626 bloqueante ═══ */}
       <IADisclaimerModal
         isOpen={showDisclaimerModal}
+        variant="redactor"
+        persistent
         actionLabel={pendingAction === 'pdf' ? 'Descargar PDF' : 'Descargar DOCX'}
         onConfirm={handleDisclaimerConfirm}
         onCancel={handleDisclaimerCancel}

@@ -1,0 +1,469 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "descripcion": "Reguladores peruanos con URLs de APIs (cuando existan), siglas, ámbito.",
+  "reguladores": [
+    {
+      "id": "pj",
+      "nombre": "Poder Judicial de la República del Perú",
+      "siglas": "PJ",
+      "ambito": "Administración de justicia ordinaria",
+      "url_web": "https://www.pj.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Consulta de Expedientes Judiciales (CEJ)",
+          "url": "https://cej.pj.gob.pe/cej/",
+          "tipo": "Web scraping (no API REST oficial)",
+          "uso": "Búsqueda de expedientes por número, partes, materia"
+        },
+        {
+          "nombre": "SINOE (Notificaciones Electrónicas)",
+          "url": "https://sinoe.pj.gob.pe/",
+          "tipo": "Acceso autenticado con credenciales del PJ",
+          "uso": "Recibir notificaciones judiciales electrónicas",
+          "mock_status": "Mock-first en nuestro sistema (ver RB-016)"
+        },
+        {
+          "nombre": "Casaciones y Jurisprudencia",
+          "url": "https://www.pj.gob.pe/corte-suprema/",
+          "tipo": "Web scraping + Google Search grounding",
+          "uso": "Búsqueda de casaciones y acuerdos plenarios"
+        }
+      ]
+    },
+    {
+      "id": "tc",
+      "nombre": "Tribunal Constitucional del Perú",
+      "siglas": "TC",
+      "ambito": "Justicia constitucional",
+      "url_web": "https://www.tc.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Buscador de Sentencias del TC",
+          "url": "https://www.tc.gob.pe/jurisprudencia/",
+          "tipo": "Web",
+          "uso": "Búsqueda de sentencias del TC y precedentes vinculantes"
+        }
+      ]
+    },
+    {
+      "id": "minjus",
+      "nombre": "Ministerio de Justicia y Derechos Humanos",
+      "siglas": "MINJUS",
+      "ambito": "Política criminal, derechos humanos, SPIJ",
+      "url_web": "https://www.gob.pe/minjus",
+      "apis_publicas": [
+        {
+          "nombre": "SPIJ (Sistema Peruano de Información Jurídica)",
+          "url": "https://spij.minjus.gob.pe",
+          "tipo": "Web con búsqueda libre",
+          "uso": "Catálogo de toda la normativa peruana vigente"
+        }
+      ]
+    },
+    {
+      "id": "sunat",
+      "nombre": "Superintendencia Nacional de Aduanas y de Administración Tributaria",
+      "siglas": "SUNAT",
+      "ambito": "Tributación interna y comercio exterior",
+      "url_web": "https://www.sunat.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "API REST de SUNAT",
+          "url": "https://api.sunat.gob.pe",
+          "tipo": "REST con autenticación (cuenta propia + token)",
+          "uso": "Consulta de RUC, comprobantes, declaraciones"
+        }
+      ]
+    },
+    {
+      "id": "sunarp",
+      "nombre": "Superintendencia Nacional de los Registros Públicos",
+      "siglas": "SUNARP",
+      "ambito": "Registros públicos (propiedad, mercantil, personas, etc.)",
+      "url_web": "https://www.sunarp.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "SUNARP (oficial)",
+          "url": "https://www.sunarp.gob.pe/busq-srv-ws/",
+          "tipo": "SOAP (legacy)",
+          "uso": "Verificación de partidas registrales (sujeto a credenciales)",
+          "mock_status": "Mock-first; SOAP complejo"
+        }
+      ]
+    },
+    {
+      "id": "indecopi",
+      "nombre": "Instituto Nacional de Defensa de la Competencia y de la Protección de la Propiedad Intelectual",
+      "siglas": "INDECOPI",
+      "ambito": "Competencia, PI, consumidor, barreras burocráticas",
+      "url_web": "https://www.indecopi.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Búsqueda de marcas y patentes",
+          "url": "https://servicios.indecopi.gob.pe/",
+          "tipo": "Web + scraping permitido",
+          "uso": "Búsqueda de signos distintivos y patentes"
+        }
+      ]
+    },
+    {
+      "id": "anpd",
+      "nombre": "Autoridad Nacional de Protección de Datos Personales",
+      "siglas": "ANPDP (o APDP)",
+      "ambito": "LPDP - Ley 29733",
+      "url_web": "https://www.gob.pe/anpd",
+      "apis_publicas": [
+        {
+          "nombre": "No tiene API pública",
+          "tipo": "Solo canal de denuncias manual",
+          "uso": "Canalizar denuncias y consultas LPDP"
+        }
+      ]
+    },
+    {
+      "id": "bcrp",
+      "nombre": "Banco Central de Reserva del Perú",
+      "siglas": "BCRP",
+      "ambito": "Política monetaria, tasas de interés, tipo de cambio",
+      "url_web": "https://www.bcrp.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "API REST de Series Estadísticas",
+          "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/",
+          "tipo": "REST pública (formato JSON o CSV)",
+          "uso": "Tasa de interés legal, tipo de cambio, inflación"
+        }
+      ]
+    },
+    {
+      "id": "mtpe",
+      "nombre": "Ministerio de Trabajo y Promoción del Empleo",
+      "siglas": "MTPE",
+      "ambito": "Normativa laboral, conflictos, seguridad social",
+      "url_web": "https://www.gob.pe/mtpe",
+      "apis_publicas": [
+        {
+          "nombre": "Consulta de liquidaciones (referencial)",
+          "url": "https://www.gob.pe/mtpe",
+          "tipo": "Web + planilla electrónica",
+          "uso": "Cálculo referencial de beneficios sociales (no oficial)"
+        }
+      ]
+    },
+    {
+      "id": "sbs",
+      "nombre": "Superintendencia de Banca, Seguros y AFP",
+      "siglas": "SBS",
+      "ambito": "Sistema financiero, seguros, AFP, lavado de activos (junto con UIF)",
+      "url_web": "https://www.sbs.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Reportes de UIF",
+          "url": "https://www.sbs.gob.pe/Prevencion-Lavado-Activos/",
+          "tipo": "Web + ROS (Reportes de Operaciones Sospechosas)",
+          "uso": "Reportes de operaciones sospechosas a la UIF"
+        }
+      ]
+    },
+    {
+      "id": "osce",
+      "nombre": "Organismo Supervisor de las Contrataciones del Estado",
+      "siglas": "OSCE",
+      "ambito": "Supervisión de contrataciones públicas (Ley 30225)",
+      "url_web": "https://www.osce.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "SEACE (Sistema Electrónico de Contrataciones del Estado)",
+          "url": "https://www.seace.gob.pe",
+          "tipo": "Web autenticada",
+          "uso": "Consulta de procesos de selección, contratos y proveedores del Estado"
+        }
+      ]
+    },
+    {
+      "id": "osiptel",
+      "nombre": "Organismo Supervisor de Inversión Privada en Telecomunicaciones",
+      "siglas": "OSIPTEL",
+      "ambito": "Supervisión de telecomunicaciones (telefonía, internet, banda ancha)",
+      "url_web": "https://www.osiptel.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Checa tu línea / consultas",
+          "url": "https://www.osiptel.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consultas de servicios de telecomunicaciones y reclamos"
+        }
+      ]
+    },
+    {
+      "id": "jne",
+      "nombre": "Jurado Nacional de Elecciones",
+      "siglas": "JNE",
+      "ambito": "Justicia electoral, organizaciones políticas, propaganda electoral",
+      "url_web": "https://www.jne.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Consulta de afiliados y organizaciones políticas",
+          "url": "https://aplicaciones007.jne.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de organizaciones políticas, afiliados y hojas de vida"
+        }
+      ]
+    },
+    {
+      "id": "onpe",
+      "nombre": "Oficina Nacional de Procesos Electorales",
+      "siglas": "ONPE",
+      "ambito": "Organización y ejecución de procesos electorales",
+      "url_web": "https://www.onpe.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Resultados electorales",
+          "url": "https://www.onpe.gob.pe/resultados/",
+          "tipo": "Web",
+          "uso": "Consulta de resultados electorales oficiales"
+        }
+      ]
+    },
+    {
+      "id": "reniec",
+      "nombre": "Registro Nacional de Identificación y Estado Civil",
+      "siglas": "RENIEC",
+      "ambito": "Identidad, DNI, registro civil (nacimientos, matrimonios, defunciones)",
+      "url_web": "https://www.reniec.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Servicios de verificación de identidad",
+          "url": "https://www.reniec.gob.pe/portal/web/reniec/servicios",
+          "tipo": "REST/SOAP con convenio",
+          "uso": "Verificación de identidad de ciudadanos (sujeto a convenio institucional)"
+        }
+      ]
+    },
+    {
+      "id": "inpe",
+      "nombre": "Instituto Nacional Penitenciario",
+      "siglas": "INPE",
+      "ambito": "Sistema penitenciario, ejecución penal (D.Leg. 654)",
+      "url_web": "https://www.inpe.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Consulta de establecimientos penitenciarios",
+          "url": "https://www.inpe.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de internos y establecimientos penitenciarios"
+        }
+      ]
+    },
+    {
+      "id": "apn",
+      "nombre": "Autoridad Portuaria Nacional",
+      "siglas": "APN",
+      "ambito": "Sistema portuario nacional (Ley 27943)",
+      "url_web": "https://www.apn.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Información portuaria",
+          "url": "https://www.apn.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de servicios portuarios y normativa portuaria"
+        }
+      ]
+    },
+    {
+      "id": "dgac",
+      "nombre": "Dirección General de Aeronáutica Civil",
+      "siglas": "DGAC",
+      "ambito": "Aeronáutica civil (Ley 27261)",
+      "url_web": "https://www.gob.pe/mtc",
+      "apis_publicas": [
+        {
+          "nombre": "Servicios aeronáuticos",
+          "url": "https://www.gob.pe/mtc",
+          "tipo": "Web",
+          "uso": "Consulta de matrículas, licencias y normativa aeronáutica"
+        }
+      ]
+    },
+    {
+      "id": "produce",
+      "nombre": "Ministerio de la Producción",
+      "siglas": "PRODUCE",
+      "ambito": "Pesca, acuicultura, industria, MYPE (Ley General de Pesca)",
+      "url_web": "https://www.gob.pe/produce",
+      "apis_publicas": [
+        {
+          "nombre": "Trámites del sector producción",
+          "url": "https://www.gob.pe/produce",
+          "tipo": "Web + TUPA",
+          "uso": "Consulta de permisos de pesca, acuicultura y trámites productivos"
+        }
+      ]
+    },
+    {
+      "id": "sanipes",
+      "nombre": "Organismo Nacional de Sanidad Pesquera",
+      "siglas": "SANIPES",
+      "ambito": "Sanidad pesquera y acuícola",
+      "url_web": "https://www.sanipes.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Certificaciones sanitarias",
+          "url": "https://www.sanipes.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de certificaciones sanitarias pesqueras"
+        }
+      ]
+    },
+    {
+      "id": "ana",
+      "nombre": "Autoridad Nacional del Agua",
+      "siglas": "ANA",
+      "ambito": "Recursos hídricos (Ley 29338)",
+      "url_web": "https://www.ana.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Sistema de información de recursos hídricos",
+          "url": "https://www.ana.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de derechos de agua y disponibilidad hídrica"
+        }
+      ]
+    },
+    {
+      "id": "serfor",
+      "nombre": "Servicio Nacional Forestal y de Fauna Silvestre",
+      "siglas": "SERFOR",
+      "ambito": "Forestal y fauna silvestre (Ley 29763)",
+      "url_web": "https://www.gob.pe/serfor",
+      "apis_publicas": [
+        {
+          "nombre": "Trámites forestales",
+          "url": "https://www.gob.pe/serfor",
+          "tipo": "Web",
+          "uso": "Consulta de permisos forestales y de fauna silvestre"
+        }
+      ]
+    },
+    {
+      "id": "ipd",
+      "nombre": "Instituto Peruano del Deporte",
+      "siglas": "IPD",
+      "ambito": "Deporte y actividad física (Ley 28036)",
+      "url_web": "https://www.ipd.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Trámites deportivos",
+          "url": "https://www.ipd.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de federaciones deportivas y trámites del deporte"
+        }
+      ]
+    },
+    {
+      "id": "mincetur",
+      "nombre": "Ministerio de Comercio Exterior y Turismo",
+      "siglas": "MINCETUR",
+      "ambito": "Comercio exterior, turismo (Ley 29408)",
+      "url_web": "https://www.gob.pe/mincetur",
+      "apis_publicas": [
+        {
+          "nombre": "Trámites de turismo y comercio exterior",
+          "url": "https://www.gob.pe/mincetur",
+          "tipo": "Web",
+          "uso": "Consulta de registros turísticos y normativa de comercio exterior"
+        }
+      ]
+    },
+    {
+      "id": "mincu",
+      "nombre": "Ministerio de Cultura",
+      "siglas": "MINCU",
+      "ambito": "Patrimonio cultural (Ley 28296)",
+      "url_web": "https://www.gob.pe/cultura",
+      "apis_publicas": [
+        {
+          "nombre": "Registro de patrimonio cultural",
+          "url": "https://www.gob.pe/cultura",
+          "tipo": "Web",
+          "uso": "Consulta de bienes culturales y patrimonio de la nación"
+        }
+      ]
+    },
+    {
+      "id": "conadis",
+      "nombre": "Consejo Nacional para la Integración de la Persona con Discapacidad",
+      "siglas": "CONADIS",
+      "ambito": "Personas con discapacidad (Ley 29973)",
+      "url_web": "https://www.gob.pe/conadis",
+      "apis_publicas": [
+        {
+          "nombre": "Registro Nacional de la Persona con Discapacidad",
+          "url": "https://www.gob.pe/conadis",
+          "tipo": "Web",
+          "uso": "Consulta del registro de personas con discapacidad y trámites"
+        }
+      ]
+    },
+    {
+      "id": "digemid",
+      "nombre": "Dirección General de Medicamentos, Insumos y Drogas",
+      "siglas": "DIGEMID",
+      "ambito": "Registro sanitario de medicamentos, insumos y drogas",
+      "url_web": "https://www.digemid.minsa.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "Registro sanitario de medicamentos",
+          "url": "https://www.digemid.minsa.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de registro sanitario de medicamentos y productos farmacéuticos"
+        }
+      ]
+    },
+    {
+      "id": "ingemmet",
+      "nombre": "Instituto Geológico, Minero y Metalúrgico",
+      "siglas": "INGEMMET",
+      "ambito": "Geología, minería, metalurgia (canon minero, concesiones)",
+      "url_web": "https://www.gob.pe/ingemmet",
+      "apis_publicas": [
+        {
+          "nombre": "GEOCATMIN (Geocatastro Minero)",
+          "url": "https://geocatmin.ingemmet.gob.pe/",
+          "tipo": "Web",
+          "uso": "Consulta de concesiones mineras y cartografía geológica"
+        }
+      ]
+    },
+    {
+      "id": "afp",
+      "nombre": "Asociaciones de Fondos de Pensiones (AFP)",
+      "siglas": "AFP",
+      "ambito": "Sistema privado de pensiones (Integra, Prima, Profuturo, Habitat)",
+      "url_web": "https://www.afpintegra.pe, https://www.prima.com.pe, etc.",
+      "apis_publicas": [
+        {
+          "nombre": "Web de cada AFP",
+          "tipo": "Web autenticada",
+          "uso": "Consulta de fondos, aportes, retiros"
+        }
+      ]
+    },
+    {
+      "id": "onp",
+      "nombre": "Oficina de Normalización Previsional",
+      "siglas": "ONP",
+      "ambito": "Sistema público de pensiones (D.L. 19990)",
+      "url_web": "https://www.onp.gob.pe",
+      "apis_publicas": [
+        {
+          "nombre": "ONP en línea",
+          "url": "https://www.onp.gob.pe/servicios-en-linea",
+          "tipo": "Web autenticada",
+          "uso": "Consulta de aportes y pensión"
+        }
+      ]
+    }
+  ]
+}

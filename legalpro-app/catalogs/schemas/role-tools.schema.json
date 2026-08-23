@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Schema de Role Tools",
+  "type": "object",
+  "required": ["version", "roles", "planes"],
+  "properties": {
+    "version": { "type": "string" },
+    "descripcion": { "type": "string" },
+    "roles": {
+      "type": "object",
+      "required": ["ABOGADO", "FISCAL", "JUEZ", "CONTADOR"],
+      "properties": {
+        "ABOGADO": { "$ref": "#/$defs/Rol" },
+        "FISCAL": { "$ref": "#/$defs/Rol" },
+        "JUEZ": { "$ref": "#/$defs/Rol" },
+        "CONTADOR": { "$ref": "#/$defs/Rol" }
+      }
+    },
+    "planes": { "$ref": "#/$defs/Planes" }
+  },
+  "$defs": {
+    "Rol": {
+      "type": "object",
+      "required": ["descripcion", "plan_minimo", "herramientas"],
+      "properties": {
+        "descripcion": { "type": "string" },
+        "plan_minimo": { "enum": ["FREE", "PRO", "ENTERPRISE"] },
+        "herramientas": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Herramienta" }
+        }
+      }
+    },
+    "Herramienta": {
+      "type": "object",
+      "required": ["slug", "permiso"],
+      "properties": {
+        "slug": { "type": "string" },
+        "nombre": { "type": "string" },
+        "permiso": { "type": "array", "items": { "enum": ["READ", "WRITE", "EXECUTE"] } },
+        "endpoint": { "type": "string" },
+        "skill": { "type": "string" },
+        "agente": { "type": "string" }
+      }
+    },
+    "Planes": {
+      "type": "object",
+      "properties": {
+        "FREE": { "$ref": "#/$defs/Plan" },
+        "PRO": { "$ref": "#/$defs/Plan" },
+        "ENTERPRISE": { "$ref": "#/$defs/Plan" }
+      }
+    },
+    "Plan": {
+      "type": "object",
+      "properties": {
+        "precio_mensual_pen": { "type": "number" },
+        "max_expedientes": { "type": "integer" },
+        "max_usuarios": { "type": "integer" },
+        "max_consultas_ia_mes": { "type": "integer" }
+      }
+    }
+  }
+}

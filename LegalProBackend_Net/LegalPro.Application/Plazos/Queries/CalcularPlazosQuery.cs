@@ -5,7 +5,7 @@ namespace LegalPro.Application.Plazos.Queries;
 
 /// <summary>
 /// Calcula plazos procesales según el CPC (Código Procesal Civil) y NCPP.
-/// Lógica pura de fechas: no llama a Gemini, calcula en memoria con reglas del derecho peruano.
+/// Lógica pura de fechas: no llama al proveedor IA, calcula en memoria con reglas del derecho peruano.
 /// 
 /// Reglas aplicadas:
 ///   - Art. 147 CPC: cómputo de plazos en días hábiles procesales.

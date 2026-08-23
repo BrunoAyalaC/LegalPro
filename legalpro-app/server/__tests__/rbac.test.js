@@ -4,7 +4,16 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import jwt from 'jsonwebtoken';
-import { authMiddleware, tenantMiddleware, requireRole, requireTenant } from '../middleware/authMiddleware.js';
+// FIX P0-C: tenantMiddleware y requireTenant viven ahora en tenantMiddleware.js
+// (versión real con AsyncLocalStorage). El export lite de authMiddleware.js fue
+// renombrado a requireOrganizationLite.
+import { authMiddleware, requireRole } from '../middleware/authMiddleware.js';
+import { tenantMiddleware, requireTenant } from '../middleware/tenantMiddleware.js';
+
+// FIX TEST-REGRESSION (2026-08-22): authMiddleware ahora lee JWT_SECRET de
+// forma lazy por invocación. Los tests setean un secreto válido aquí (el body
+// del módulo corre DESPUÉS de los imports hoisted y ANTES de cada it()).
+process.env.JWT_SECRET ??= 'test-jwt-secret-para-vitest-32-chars-minimo!!';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -33,33 +42,35 @@ function mockReqResNext(overrides = {}) {
 // authMiddleware
 // ═══════════════════════════════════════════
 describe('authMiddleware', () => {
-  it('devuelve 401 si no hay header Authorization', () => {
+  // FIX P0-C-adjacent: authMiddleware es async (brute-force check antes del
+  // token) — hay que awaitarlo antes de afirmar sobre res/next.
+  it('devuelve 401 si no hay header Authorization', async () => {
     const { req, res, next } = mockReqResNext();
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.any(String) }));
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('devuelve 401 si el header no empieza con "Bearer "', () => {
+  it('devuelve 401 si el header no empieza con "Bearer "', async () => {
     const { req, res, next } = mockReqResNext({
       headers: { authorization: 'Basic abc123' },
     });
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('devuelve 401 si el token es inválido', () => {
+  it('devuelve 401 si el token es inválido', async () => {
     const { req, res, next } = mockReqResNext({
       headers: { authorization: 'Bearer invalid.token.here' },
     });
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('devuelve 403 si el token está expirado', () => {
+  it('devuelve 403 si el token está expirado', async () => {
     const token = jwt.sign(
       { sub: '1', email: 'test@test.com' },
       JWT_SECRET,
@@ -68,18 +79,18 @@ describe('authMiddleware', () => {
     const { req, res, next } = mockReqResNext({
       headers: { authorization: `Bearer ${token}` },
     });
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(res.status).toHaveBeenCalledWith(403);
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('llama a next() y agrega req.user con token válido', () => {
+  it('llama a next() y agrega req.user con token válido', async () => {
     const payload = { sub: '42', email: 'abogado@legalpro.pe', rol: 'ABOGADO' };
     const token = createToken(payload);
     const { req, res, next } = mockReqResNext({
       headers: { authorization: `Bearer ${token}` },
     });
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(next).toHaveBeenCalledOnce();
     expect(req.user).toBeDefined();
     expect(req.user.sub).toBe('42');

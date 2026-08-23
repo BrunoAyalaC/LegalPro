@@ -1,0 +1,54 @@
+---
+description: Railway CLI — solo redeploy y logs de debug (LegalPro prod). Sin sandboxes.
+globs:
+alwaysApply: false
+---
+
+# Railway ops (LegalPro)
+
+Usar **solo** para redeploy y logs. No crear sandboxes ni entornos extra (evita costo adicional).
+
+## Prerrequisitos (usuario, una vez)
+
+```powershell
+railway login
+cd c:\Users\Pc\Desktop\Abogacia
+railway link   # proyecto LegalPro
+```
+
+Opcional CI/agente: `RAILWAY_TOKEN` (Project Token en Railway dashboard).
+
+## Script del repo
+
+```powershell
+.\tools\railway\legalpro-ops.ps1 status
+.\tools\railway\legalpro-ops.ps1 logs -Service legalpro-node -Lines 100
+.\tools\railway\legalpro-ops.ps1 logs -Service legalpro-node -Follow
+.\tools\railway\legalpro-ops.ps1 redeploy -Service legalpro-frontend -Yes
+.\tools\railway\legalpro-ops.ps1 set-image -Service legalpro-frontend -Tag 6.3.7
+```
+
+## Servicios
+
+| Servicio | Imagen Docker Hub |
+|----------|-------------------|
+| legalpro-frontend | brunoayala97/legalpro-frontend |
+| legalpro-node | brunoayala97/legalpro-node |
+| legalpro-dotnet | brunoayala97/legalpro-dotnet |
+
+## Flujo tras docker push
+
+1. `docker push brunoayala97/legalpro-frontend:6.3.7`
+2. `.\tools\railway\legalpro-ops.ps1 set-image -Service legalpro-frontend -Tag 6.3.7`
+3. `.\tools\railway\legalpro-ops.ps1 logs -Service legalpro-frontend -Lines 50`
+4. `node legalpro-app/server/smoke-production.mjs`
+
+## MCP Railway (opcional)
+
+CLI 4.29 puede no incluir `railway mcp install`. Alternativa: Remote MCP en Cursor → `https://mcp.railway.com` (OAuth). Herramientas útiles: `redeploy`, `get-logs`. No usar `railway-agent` en prod salvo debug puntual.
+
+## Prohibido en este flujo
+
+- `railway sandbox fork`
+- Duplicar Postgres/staging 24/7
+- Cambiar variables de secrets sin confirmación del usuario

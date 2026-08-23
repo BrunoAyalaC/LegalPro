@@ -8,14 +8,14 @@ using LegalPro.Application.Simulacion.Queries;
 namespace LegalPro.Api.Controllers;
 
 // ═══════════════════════════════════════════════════════
-// Simulación de juicio oral interactiva multi-turn con Gemini.
+// Simulación de juicio oral interactiva multi-turn con MiniMax.
 // SRP: Controller solo delega a MediatR.
 // Tenant isolation + OWASP A01: verificado en cada handler.
 // ═══════════════════════════════════════════════════════
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[EnableRateLimiting("gemini")]
+[EnableRateLimiting("minimax")]
 public class SimulacionController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -23,7 +23,7 @@ public class SimulacionController : ControllerBase
     public SimulacionController(IMediator mediator) => _mediator = mediator;
 
     // ── POST /api/simulacion/iniciar ────────────────────────────────────────
-    // Crea la simulación, persiste en BD e invoca Gemini (FC) para
+    // Crea la simulación, persiste en BD e invoca MiniMax (FC) para
     // generar el contexto del caso + apertura del juicio oral.
     // ─────────────────────────────────────────────────────────────
     [HttpPost("iniciar")]
@@ -39,7 +39,7 @@ public class SimulacionController : ControllerBase
     }
 
     // ── POST /api/simulacion/turno ──────────────────────────────────────────
-    // Envía el argumento del usuario. Gemini evalúa + responde
+    // Envía el argumento del usuario. MiniMax evalúa + responde
     // como la parte adversarial. Retorna puntajeDelta + leyesInvocadas.
     // ─────────────────────────────────────────────────────────────
     [HttpPost("turno")]

@@ -1,0 +1,19 @@
+{
+  "id": "USR-ABOG-001",
+  "organization_id": "ORG-PRO-001",
+  "email": "juan.perez@estudio-pro.pe",
+  "email_hash": "a1b2c3d4e5f6...",
+  "password_hash": "$2b$10$...",
+  "nombres": "Juan Carlos",
+  "apellidos": "Perez Garcia",
+  "dni": "12345678",
+  "telefono": "+51999123456",
+  "rol_usuario": "ABOGADO",
+  "especialidad": "civil",
+  "is_active": true,
+  "email_verified": true,
+  "terminos_aceptados_at": "2025-06-20T14:35:00Z",
+  "privacidad_aceptados_at": "2025-06-20T14:35:30Z",
+  "marketing_aceptado": false,
+  "acepto_transferencia_internacional": true
+}

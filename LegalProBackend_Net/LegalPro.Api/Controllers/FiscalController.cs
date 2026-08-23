@@ -14,7 +14,7 @@ namespace LegalPro.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[EnableRateLimiting("gemini")]
+[EnableRateLimiting("minimax")]
 public class FiscalController : ControllerBase
 {
     private readonly IMediator _mediator;

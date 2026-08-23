@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "2.0.0",
+  "fecha": "2026-08-21",
+  "titulo": "Asignación de Skills por Subagente + Roles LDDE (Skill Access Control v2)",
+  "descripcion": "Define qué skills puede usar cada subagente del arnés Y qué rol puede desempeñar en el Loop Driven Development Engine (LDDE). Un subagente SOLO puede usar las skills listadas para él y SOLO puede actuar como auditor/refutador/optimizador/seguridad en loops de categorías donde esté autorizado. El lexia-orchestrator es el único primary y consume TODAS las skills (para re-delegar etapas). Fuente única de verdad para verifier-skills-access.mjs y verifier-ldde-loop.mjs.",
+  "regla_global": "skill: allow en opencode.json NO autoriza a un subagente a usar skills fuera de esta lista. El orquestador aplica esta matriz al delegar. REGLA v3.2: todos los agentes son mode:subagent con model:null (heredan del primary lexia-orchestrator) y permissions {task,edit,bash,webfetch}=allow — la seguridad vive en ESTA matriz + verifiers, no en permisos.",
+  "reglas_anti_robo": {
+    "regla_1_matriz_es_ley": "Un subagent solo invoca skills en skills_por_agente[agente].",
+    "regla_2_loop_rol_no_da_skill": "Ser auditor/refutador en un loop NO autoriza a ejecutar la skill del builder; solo evalúa su output.",
+    "regla_3_delegacion_obligatoria": "Si una tarea requiere skill ajena, el subagent retorna NEEDS_SKILL_DELEGATION al orquestador; jamás la invoca.",
+    "regla_4_verificacion_doble": "Orquestador valida dispatch-time; verifiers validan CI-time.",
+    "regla_5_violacion_escala": "Uso no autorizado → audit event SKILL_ACCESS_VIOLATION + reporte a @arquitecto-chief."
+  },
+  "skills_por_agente": {
+    "lexia-orchestrator": ["*"],
+    "backend-node": ["crear-endpoint", "deploy-backend", "configurar-minimax", "adaptadores-externos", "decoradores-patterns", "observadores-eventos", "protocolos-pipeline", "optimizadores-rendimiento", "enrutamiento-intenciones-chat", "rag-busqueda-semantica", "auditar-seguridad", "loop-driven-development"],
+    "backend-dotnet": ["crear-endpoint", "deploy-backend", "adaptadores-externos", "decoradores-patterns", "observadores-eventos", "protocolos-pipeline", "optimizadores-rendimiento", "loop-driven-development"],
+    "frontend": ["crear-pagina", "optimizadores-rendimiento", "enrutamiento-intenciones-chat", "loop-driven-development"],
+    "android": ["crear-pagina", "optimizadores-rendimiento"],
+    "database": ["rag-busqueda-semantica", "optimizadores-rendimiento", "loop-driven-development"],
+    "devops": ["deploy-backend", "optimizadores-rendimiento"],
+    "integraciones-peru": ["adaptadores-externos", "configurar-minimax"],
+    "prompt-engineer": ["configurar-minimax", "enrutamiento-intenciones-chat", "optimizadores-rendimiento", "rag-busqueda-semantica"],
+    "auditor-seguridad": ["auditar-seguridad"],
+    "refutador-seguridad": ["auditar-seguridad"],
+    "red-team": ["auditar-seguridad"],
+    "auditor-lpdp": ["auditar-lpdp"],
+    "refutador-lpdp": ["auditar-lpdp"],
+    "gobernanza-chief": ["auditar-lpdp"],
+    "auditor-legal": ["auditar-lpdp", "analisis-riesgos-procesales"],
+    "refutador-legal": ["auditar-lpdp", "analisis-riesgos-procesales"],
+    "auditor-performance": ["optimizadores-rendimiento"],
+    "refutador-performance": ["optimizadores-rendimiento"],
+    "auditor-multi-tenant": ["optimizadores-rendimiento"],
+    "auditor-cost-ia": ["configurar-minimax", "optimizadores-rendimiento"],
+    "ia-analista-expedientes": ["analizar-expediente", "analisis-riesgos-procesales", "enrutamiento-intenciones-chat", "rag-busqueda-semantica"],
+    "ia-buscador-jurisprudencia": ["buscar-jurisprudencia", "rag-busqueda-semantica", "enrutamiento-intenciones-chat"],
+    "ia-comparador-precendentes": ["buscar-jurisprudencia"],
+    "ia-predictor-judicial": ["buscar-jurisprudencia", "analisis-riesgos-procesales"],
+    "ia-chat-legal": ["buscar-jurisprudencia", "rag-busqueda-semantica", "enrutamiento-intenciones-chat"],
+    "ia-redactor-escritos": ["redactar-escrito-legal"],
+    "ia-generador-alegatos": ["redactar-escrito-legal"],
+    "abogado-asistente-redaccion": ["redactar-escrito-legal"],
+    "abogado-asistente-investigacion": ["buscar-jurisprudencia", "rag-busqueda-semantica"],
+    "contador-laboralista": ["liquidacion-laboral"],
+    "contador-senior-laboral": ["liquidacion-laboral"],
+    "contador-jr-forense": ["liquidacion-laboral"],
+    "contador-chief": ["liquidacion-laboral"],
+    "planner-chief": ["objetivos-y-metas"],
+    "product-owner": ["objetivos-y-metas"],
+    "arquitecto-chief": ["adaptadores-externos", "decoradores-patterns", "observadores-eventos", "protocolos-pipeline", "optimizadores-rendimiento"],
+    "arquitecto-frontend": ["crear-pagina", "optimizadores-rendimiento"],
+    "ux-ui": ["crear-pagina"],
+    "disenador-ui-senior": ["crear-pagina"],
+    "implementador-frontend": ["crear-pagina"],
+    "evaluador-frontend": ["crear-pagina", "optimizadores-rendimiento"],
+    "contrastador-a11y": ["optimizadores-rendimiento"]
+  },
+  "juniors_legales": {
+    "pattern": "abogado-jr-*",
+    "skills_permitidas": ["analizar-expediente", "buscar-jurisprudencia", "redactar-escrito-legal", "analisis-riesgos-procesales", "liquidacion-laboral"],
+    "skills_prohibidas": ["auditar-lpdp", "auditar-seguridad", "crear-endpoint", "deploy-backend", "configurar-minimax", "adaptadores-externos"]
+  },
+  "loop_roles_ldde": {
+    "descripcion": "Roles que cada agente puede desempeñar dentro de los loops LDDE (arneses/registry/ldde-loop.json). Ser rol NO otorga acceso a la skill del builder (regla_2).",
+    "builders": {
+      "descripcion": "Agentes que ejecutan skills como S1 BUILD (deben tener la skill en skills_por_agente).",
+      "agents": ["backend-node", "backend-dotnet", "frontend", "android", "database", "devops", "prompt-engineer", "ia-analista-expedientes", "ia-buscador-jurisprudencia", "ia-redactor-escritos", "contador-laboralista", "product-owner", "planner-chief", "arquitecto-chief", "integraciones-peru"]
+    },
+    "auditores": {
+      "S2": ["@auditor-seguridad", "@auditor-multi-tenant", "@auditor-legal", "@arquitecto-chief", "@auditor-performance", "@prompt-engineer", "@product-owner"],
+      "categorias_autorizadas": {
+        "creacion": ["@auditor-seguridad", "@auditor-multi-tenant"],
+        "ia-legal": ["@auditor-legal"],
+        "ia-rag": ["@auditor-legal"],
+        "auditoria": ["@arquitecto-chief"],
+        "devops": ["@auditor-seguridad"],
+        "patron-arquitectonico": ["@arquitecto-chief"],
+        "performance": ["@auditor-performance"],
+        "producto": ["@product-owner"],
+        "ia-config": ["@prompt-engineer"]
+      }
+    },
+    "refutadores": {
+      "S3": ["@refutador-seguridad", "@refutador-legal", "@refutador-arquitectura", "@refutador-performance", "@refutador-lpdp", "@red-team", "@gobernanza-chief"],
+      "categorias_autorizadas": {
+        "creacion": ["@refutador-seguridad"],
+        "ia-legal": ["@refutador-legal"],
+        "ia-rag": ["@refutador-legal"],
+        "auditoria": ["@red-team"],
+        "devops": ["@refutador-seguridad"],
+        "patron-arquitectonico": ["@refutador-arquitectura"],
+        "performance": ["@refutador-performance"],
+        "producto": ["@gobernanza-chief"],
+        "ia-config": ["@refutador-legal"]
+      }
+    },
+    "optimizadores": {
+      "S4": ["@auditor-performance", "@prompt-engineer", "@sre", "@auditor-cost-ia", "@planner-chief"],
+      "categorias_autorizadas": {
+        "creacion": ["@auditor-performance"],
+        "ia-legal": ["@prompt-engineer"],
+        "ia-rag": ["@auditor-performance"],
+        "auditoria": ["@auditor-performance"],
+        "devops": ["@sre"],
+        "patron-arquitectonico": ["@auditor-performance"],
+        "performance": ["@auditor-performance"],
+        "producto": ["@planner-chief"],
+        "ia-config": ["@auditor-cost-ia"]
+      }
+    },
+    "seguridad": {
+      "S5": ["@auditor-lpdp", "@auditor-seguridad", "@gobernanza-chief"],
+      "categorias_autorizadas": {
+        "creacion": ["@auditor-lpdp"],
+        "ia-legal": ["@auditor-lpdp"],
+        "ia-rag": ["@auditor-lpdp"],
+        "auditoria": ["@auditor-seguridad"],
+        "devops": ["@auditor-seguridad"],
+        "patron-arquitectonico": ["@auditor-seguridad"],
+        "performance": ["@auditor-seguridad"],
+        "producto": ["@gobernanza-chief"],
+        "ia-config": ["@auditor-lpdp"]
+      }
+    },
+    "gate_keepers": {
+      "S6": ["@lexia-orchestrator"],
+      "nota": "Solo el orquestador ejecuta los verifiers de gate y decide SHIP/ITERATE/ESCALATE."
+    },
+    "escalation_chiefs": {
+      "seguridad": "@arquitecto-chief",
+      "lpdp": "@gobernanza-chief",
+      "legal": "@abogado-chief",
+      "arquitectura": "@arquitecto-chief",
+      "performance": "@auditor-performance"
+    }
+  }
+}

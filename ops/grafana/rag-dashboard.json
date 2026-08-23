@@ -1,0 +1,554 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "postgres",
+          "uid": "${DS_POSTGRES}"
+        },
+        "enable": true,
+        "iconColor": "rgba(255, 96, 96, 1)",
+        "name": "Deploys / Migraciones (RAG)",
+        "rawQuery": "SELECT created_at AS time, 'rag_corpus_snapshot: ' || snapshot_name AS text FROM rag_corpus_snapshot WHERE $__timeFilter(created_at)",
+        "tagKeys": "rag_version",
+        "titleFormat": "Snapshot RAG"
+      }
+    ]
+  },
+  "description": "Dashboard operativo del sistema RAG de LegalPro. Lee directamente de rag_audit_log y de las vistas v_rag_metrics_7d / v_rag_top_low_confidence. Sincronizado con SLOs de catalogs/sla-slo.md y runbooks RB-001/RB-006/RB-012/RB-013.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": ["legalpro"],
+      "targetBlank": true,
+      "title": "Otros dashboards LegalPro",
+      "tooltip": "Dashboards relacionados (SLO global, costos IA, owner)",
+      "type": "dashboards",
+      "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Runbook SRE",
+      "tooltip": "Catálogo central de runbooks",
+      "type": "link",
+      "url": "https://github.com/legalpro/lexia/tree/main/arneses/runbooks"
+    }
+  ],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Consultas RAG / hora",
+      "type": "timeseries",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "description": "Volumen de consultas RAG por hora. Filtrable por organization_id (multi-tenant).",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, COUNT(*) AS consultas FROM rag_audit_log WHERE $__timeFilter(created_at) AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "consultas/hora", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "lineInterpolation": "linear", "lineWidth": 2, "pointSize": 4, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Latencia p50 / p95 / p99 (ms) — SLO p95 < 3000ms",
+      "type": "timeseries",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "description": "Percentiles de latencia del sistema RAG. Línea punteada naranja = SLO p95 (3000ms). Línea roja = umbral de alerta (5000ms). Ver RB-013.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, PERCENTILE_CONT(0.5)  WITHIN GROUP (ORDER BY latency_ms) AS p50, PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY latency_ms) AS p95, PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY latency_ms) AS p99 FROM rag_audit_log WHERE $__timeFilter(created_at) AND latency_ms IS NOT NULL AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max", "lastNotNull"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisLabel": "ms", "axisPlacement": "auto", "drawStyle": "line", "fillOpacity": 10, "lineInterpolation": "linear", "lineWidth": 2, "pointSize": 3, "showPoints": "auto", "spanNulls": false },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 3000 },
+              { "color": "red", "value": 5000 }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "p95" }, "properties": [{ "id": "custom.lineWidth", "value": 3 }] }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "title": "Cache Hit Rate (%)",
+      "type": "gauge",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 0, "y": 8, "w": 6, "h": 6 },
+      "description": "Porcentaje de consultas servidas desde cache (Redis o memoria). Verde >=60%, amarillo 30-60%, rojo <30%.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT ROUND(100.0 * SUM(CASE WHEN cache_hit THEN 1 ELSE 0 END)::NUMERIC / NULLIF(COUNT(*), 0), 2) AS hit_rate_pct FROM rag_audit_log WHERE $__timeFilter(created_at) AND ($__orgFilter OR '${organization_id}' = '$__all')",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "green", "value": 60 }
+            ]
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Costo IA por hora (USD)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 6, "y": 8, "w": 12, "h": 6 },
+      "description": "Costo horario agregado (USD). Cruzar con RB-012 (cost-spike).",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, SUM(costo_usd)::NUMERIC(12,6) AS costo_hora, AVG(costo_usd)::NUMERIC(10,6) AS costo_promedio FROM rag_audit_log WHERE $__timeFilter(created_at) AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true, "calcs": ["mean", "sum", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisLabel": "USD/hora", "drawStyle": "line", "fillOpacity": 25, "lineWidth": 2, "pointSize": 4, "showPoints": "auto" },
+          "unit": "currencyUSD"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Distribución de cache_layer",
+      "type": "piechart",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 18, "y": 8, "w": 6, "h": 6 },
+      "description": "De dónde vienen los hits: 'redis' (distribuido), 'memory' (fallback local), 'none' (consulta fresca). Caída de Redis => solo 'memory'/'none'.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT cache_layer, COUNT(*) AS total FROM rag_audit_log WHERE $__timeFilter(created_at) AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY cache_layer ORDER BY total DESC",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "displayLabels": ["name", "percent"],
+        "legend": { "displayMode": "list", "placement": "right", "showLegend": true },
+        "pieType": "donut",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "mappings": []
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "redis" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } }] },
+          { "matcher": { "id": "byName", "options": "memory" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "yellow" } }] },
+          { "matcher": { "id": "byName", "options": "none" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }] }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "title": "Citaciones con Baja Confianza (<60% similitud)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "postgres",
+          "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 0, "y": 14, "w": 12, "h": 8 },
+      "description": "Consultas por hora con similitud_promedio < 0.60. >10% sostenido => revisar corpus. Ver vista v_rag_top_low_confidence para drill-down por materia.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, COUNT(*) FILTER (WHERE similitud_promedio < 0.60) AS baja_confianza, COUNT(*) AS total, ROUND(100.0 * COUNT(*) FILTER (WHERE similitud_promedio < 0.60)::NUMERIC / NULLIF(COUNT(*), 0), 2) AS pct_baja FROM rag_audit_log WHERE $__timeFilter(created_at) AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "pointSize": 4, "showPoints": "auto" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "pct_baja" }, "properties": [{ "id": "unit", "value": "percent" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5 }, { "color": "red", "value": 10 }] } }] }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "title": "Top 10 Materias Consultadas (con latencia y costo)",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 12, "y": 14, "w": 12, "h": 8 },
+      "description": "Distribución de uso por materia + latencia promedio + costo promedio. Útil para priorizar inversiones de corpus y rate limits por materia.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT materia, COUNT(*) AS total, COUNT(*) FILTER (WHERE cache_hit) AS cache_hits, ROUND(100.0 * COUNT(*) FILTER (WHERE cache_hit)::NUMERIC / NULLIF(COUNT(*), 0), 2) AS hit_rate_pct, AVG(latency_ms)::INT AS latency_avg_ms, ROUND(AVG(costo_usd)::NUMERIC, 6) AS costo_promedio_usd, SUM(costo_usd)::NUMERIC(12,4) AS costo_total_usd FROM rag_audit_log WHERE $__timeFilter(created_at) AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY materia ORDER BY total DESC LIMIT 10",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "footer": { "fields": ["total", "costo_total_usd"], "reducer": ["sum"], "show": true },
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "latency_avg_ms" }, "properties": [{ "id": "unit", "value": "ms" }] },
+          { "matcher": { "id": "byName", "options": "costo_promedio_usd" }, "properties": [{ "id": "unit", "value": "currencyUSD" }] },
+          { "matcher": { "id": "byName", "options": "costo_total_usd" }, "properties": [{ "id": "unit", "value": "currencyUSD" }] },
+          { "matcher": { "id": "byName", "options": "hit_rate_pct" }, "properties": [{ "id": "unit", "value": "percent" }] },
+          { "matcher": { "id": "byName", "options": "materia" }, "properties": [{ "id": "custom.cellOptions", "value": { "type": "color-text" } }] }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "title": "Materias con baja similitud (top 24h, v_rag_top_low_confidence)",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 0, "y": 22, "w": 12, "h": 8 },
+      "description": "Solo >5 consultas/hora y pct_baja_confianza > 0. Drill-down operativo: prioriza ingesta de corpus jurídica en estas materias.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT materia, hora, total_consultas, consultas_baja_confianza, pct_baja_confianza, ROUND(similitud_promedio_hora::NUMERIC, 3) AS similitud_promedio_hora FROM v_rag_top_low_confidence WHERE $__timeFilter(hora) ORDER BY pct_baja_confianza DESC, total_consultas DESC LIMIT 25",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "pct_baja_confianza", "desc": true }]
+      },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "auto" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "pct_baja_confianza" }, "properties": [{ "id": "unit", "value": "percent" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5 }, { "color": "red", "value": 10 }] } }] },
+          { "matcher": { "id": "byName", "options": "similitud_promedio_hora" }, "properties": [{ "id": "unit", "value": "percentunit" }, { "id": "min", "value": 0 }, { "id": "max", "value": 1 }] }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "title": "Alucinaciones detectadas (últimas 24h)",
+      "type": "stat",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 12, "y": 22, "w": 6, "h": 4 },
+      "description": "Conteo absoluto de respuestas con alucinaciones_detectadas > 0. Cualquier valor > 0 en producción => alerta CRÍTICA en Sentry (rag.alucinaciones).",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT COUNT(*) AS con_alucinaciones, ROUND(100.0 * COUNT(*)::NUMERIC / NULLIF((SELECT COUNT(*) FROM rag_audit_log WHERE created_at >= NOW() - INTERVAL '24 hours'), 0), 3) AS rate_pct FROM rag_audit_log WHERE created_at >= NOW() - INTERVAL '24 hours' AND alucinaciones_detectadas > 0 AND ($__orgFilter OR '${organization_id}' = '$__all')",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "text": "OK (0 alucinaciones 24h)", "color": "green", "index": 0 } }, "type": "value" }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Retrieval latency p95 (pgvector, ms)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 18, "y": 22, "w": 6, "h": 8 },
+      "description": "Solo retrieval (pgvector), sin LLM. Umbral de alerta 1000ms p95 sostenido 5m. Si supera, revisar índices ivfflat/hnsw de rag_vectors.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY retrieval_latency_ms)::INT AS p95 FROM rag_audit_log WHERE $__timeFilter(created_at) AND retrieval_latency_ms IS NOT NULL AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY 1 ORDER BY 1",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": false, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "single", "sort": "desc" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "blue" },
+          "custom": { "axisCenteredZero": false, "axisLabel": "ms", "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 3, "showPoints": "auto" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          },
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Costo diario RAG vs. plan FREE / PRO / ENTERPRISE",
+      "type": "timeseries",
+      "datasource": {
+        "type": "postgres",
+        "uid": "${DS_POSTGRES}"
+      },
+      "gridPos": { "x": 12, "y": 26, "w": 12, "h": 4 },
+      "description": "Costo diario por tenant contra límites de plan. FREE S/50, PRO S/1000, ENTERPRISE S/5000. Ver sla-slo.md. Threshold breaches -> RB-012.",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "${DS_POSTGRES}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT DATE_TRUNC('day', created_at) AS time, organization_id, SUM(costo_usd)::NUMERIC(12,4) AS costo_diario FROM rag_audit_log WHERE $__timeFilter(created_at) AND ($__orgFilter OR '${organization_id}' = '$__all') GROUP BY 1, 2 ORDER BY 1, 2",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "right", "showLegend": true, "calcs": ["sum", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisCenteredZero": false, "axisLabel": "USD/día", "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "pointSize": 3, "showPoints": "auto", "stacking": { "group": "A", "mode": "normal" } },
+          "unit": "currencyUSD"
+        }
+      }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["legalpro", "rag", "production", "sre"],
+  "templating": {
+    "enable": true,
+    "list": [
+      {
+        "name": "DS_POSTGRES",
+        "label": "PostgreSQL Datasource",
+        "type": "datasource",
+        "query": "postgres",
+        "current": {},
+        "hide": 0,
+        "refresh": 1,
+        "skipUrlSync": false
+      },
+      {
+        "name": "organization_id",
+        "label": "Tenant (organization_id)",
+        "type": "query",
+        "datasource": { "type": "postgres", "uid": "${DS_POSTGRES}" },
+        "definition": "SELECT DISTINCT organization_id FROM rag_audit_log ORDER BY 1",
+        "query": "SELECT DISTINCT organization_id FROM rag_audit_log ORDER BY 1",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": null,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" },
+        "options": [],
+        "regex": "",
+        "sort": 1,
+        "hide": 0
+      },
+      {
+        "name": "__orgFilter",
+        "type": "textbox",
+        "label": "(interno) Filtro SQL org",
+        "description": "Macro interna. Se sustituye por IN (...) según la selección de organization_id. NO modificar.",
+        "hide": 2,
+        "current": { "text": "1=1", "value": "1=1" },
+        "query": "1=1",
+        "skipUrlSync": true
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {
+    "collapse": false,
+    "enable": true,
+    "notice": false,
+    "now": true,
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+    "status": "Stable",
+    "type": "timepicker"
+  },
+  "timezone": "browser",
+  "title": "LegalPro RAG Dashboard",
+  "uid": "legalpro-rag-v1",
+  "version": 1,
+  "weekStart": ""
+}

@@ -73,7 +73,7 @@ public class BruteForceProtectionMiddleware
             var retryAfter = (int)record.LockoutExpiry!.Value.Subtract(DateTime.UtcNow).TotalSeconds;
 
             _logger.LogWarning(
-                "[SECURITY] Brute-force lockout activo. IP={IP} Ruta={Path} " +
+                "[SECURITY] [BRUTE_FORCE_DETECTED] Brute-force lockout activo. IP={IP} Ruta={Path} " +
                 "Intentos={Count} RetryAfter={Retry}s",
                 ip, path, record.FailedCount, retryAfter);
 
@@ -141,7 +141,7 @@ public class BruteForceProtectionMiddleware
                 record.LockoutCount++;
 
                 _logger.LogWarning(
-                    "[SECURITY] IP bloqueada por brute-force. IP={IP} Ruta={Path} " +
+                    "[SECURITY] [BRUTE_FORCE_DETECTED] IP bloqueada por brute-force. IP={IP} Ruta={Path} " +
                     "Intentos={Count} LockoutExpiry={Expiry} LockoutNum={N}",
                     ip, path, record.FailedCount, record.LockoutExpiry, record.LockoutCount);
             }

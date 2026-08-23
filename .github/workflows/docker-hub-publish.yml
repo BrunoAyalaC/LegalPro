@@ -1,0 +1,255 @@
+name: Docker Hub Publish
+
+# Publica imágenes en Docker Hub (además del flujo GHCR de docker-publish.yml)
+# Requiere secrets del repo:
+#   DOCKERHUB_USERNAME — usuario de Docker Hub (brunoayalac)
+#   DOCKERHUB_TOKEN    — Access Token generado en hub.docker.com
+# Imágenes producidas:
+#   docker.io/brunoayala97/legalpro-frontend:{latest,<version>,sha-<short>}
+#   docker.io/brunoayala97/legalpro-node-api:{latest,<version>,sha-<short>}
+#   docker.io/brunoayala97/legalpro-dotnet:{latest,<version>,sha-<short>}
+#   docker.io/brunoayala97/legalpro-owner-dashboard:{latest,<version>,sha-<short>}
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:   # Permite lanzar manualmente desde GitHub UI
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: docker.io
+  OWNER: brunoayala97
+
+jobs:
+  # ──────────────────────────────────────────────────────────────
+  # 1. FRONTEND SPA (nginx:alpine)
+  # ──────────────────────────────────────────────────────────────
+  docker-frontend:
+    name: Docker Hub — Frontend SPA
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta — frontend
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/legalpro-frontend
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{version}}
+            type=sha,prefix=sha-
+          labels: |
+            org.opencontainers.image.title=LegalPro Frontend
+            org.opencontainers.image.description=SPA React+Vite servida por nginx para LegalPro (gestion legal peruana)
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Build & push — Frontend SPA
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./legalpro-app
+          file: ./legalpro-app/Dockerfile.frontend
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VITE_NODE_API_URL=${{ secrets.VITE_NODE_API_URL }}
+            VITE_DOTNET_API_URL=${{ secrets.VITE_DOTNET_API_URL }}
+            VITE_APK_URL=${{ secrets.VITE_APK_URL }}
+            VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}
+            VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+  # ──────────────────────────────────────────────────────────────
+  # 2. BACKEND NODE API (node:20-alpine)
+  # ──────────────────────────────────────────────────────────────
+  docker-node:
+    name: Docker Hub — Node API
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta — node
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/legalpro-node-api
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{version}}
+            type=sha,prefix=sha-
+          labels: |
+            org.opencontainers.image.title=LegalPro Node API
+            org.opencontainers.image.description=API Express (Node 20) de LegalPro: auth, IA, integraciones peruanas
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Build & push — Node API
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./legalpro-app/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ──────────────────────────────────────────────────────────────
+  # 3. BACKEND .NET API (aspnet:8.0)
+  # ──────────────────────────────────────────────────────────────
+  docker-dotnet:
+    name: Docker Hub — .NET API
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta — dotnet
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/legalpro-dotnet
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{version}}
+            type=sha,prefix=sha-
+          labels: |
+            org.opencontainers.image.title=LegalPro .NET API
+            org.opencontainers.image.description=API .NET 8 de LegalPro (Clean Architecture)
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Build & push — .NET API
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./LegalProBackend_Net
+          file: ./LegalProBackend_Net/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ──────────────────────────────────────────────────────────────
+  # 4. OWNER DASHBOARD (admin SaaS multi-tenant)
+  # ──────────────────────────────────────────────────────────────
+  docker-owner-dashboard:
+    name: Docker Hub — Owner Dashboard
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta — owner-dashboard
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/legalpro-owner-dashboard
+          tags: |
+            type=raw,value=latest
+            type=semver,pattern={{version}}
+            type=sha,prefix=sha-
+          labels: |
+            org.opencontainers.image.title=LegalPro Owner Dashboard
+            org.opencontainers.image.description=Dashboard de administracion SaaS multi-tenant de LegalPro
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Build & push — Owner Dashboard
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./legalpro-owner-dashboard
+          file: ./legalpro-owner-dashboard/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ──────────────────────────────────────────────────────────────
+  # RESUMEN — tabla de digests publicados
+  # ──────────────────────────────────────────────────────────────
+  publish-summary:
+    name: Resumen de publicacion
+    runs-on: ubuntu-latest
+    needs: [docker-frontend, docker-node, docker-dotnet, docker-owner-dashboard]
+    if: always()
+    steps:
+      - name: Generar resumen con digests
+        run: |
+          {
+            echo "# Docker Hub — Publicacion (${{ github.ref_name }})"
+            echo ""
+            echo "| Imagen | Digest |"
+            echo "|--------|--------|"
+            echo "| brunoayala97/legalpro-frontend | \`${{ needs.docker-frontend.outputs.digest }}\` |"
+            echo "| brunoayala97/legalpro-node-api | \`${{ needs.docker-node.outputs.digest }}\` |"
+            echo "| brunoayala97/legalpro-dotnet | \`${{ needs.docker-dotnet.outputs.digest }}\` |"
+            echo "| brunoayala97/legalpro-owner-dashboard | \`${{ needs.docker-owner-dashboard.outputs.digest }}\` |"
+            echo ""
+            echo "Pull: \`docker pull brunoayala97/<imagen>:<tag>\`"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Schema de Reguladores Perú",
+  "description": "Catálogo de reguladores y entidades públicas peruanas",
+  "type": "object",
+  "required": ["version", "reguladores"],
+  "properties": {
+    "version": { "type": "string" },
+    "reguladores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "nombre", "siglas", "sector"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "nombre": { "type": "string" },
+          "siglas": { "type": "string" },
+          "sector": { "enum": ["poder_judicial", "poder_legislativo", "poder_ejecutivo", "organismos_autonomos", "reguladores_especializados", "tribunales"] },
+          "url": { "type": "string", "format": "uri" },
+          "funciones": { "type": "array", "items": { "type": "string" } },
+          "competencias": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

@@ -8,8 +8,11 @@ namespace LegalPro.Domain.Entities;
 /// <summary>
 /// Aggregate Root: Simulación de Juicio
 /// Manages the lifecycle of a trial simulation session.
+/// Implementa ITenantEntity: la simulación pertenece a un Usuario y, por transitividad,
+/// a su Organización. OrganizationId nullable para soportar simulaciones bootstrap
+/// previas a la asignación de organización. El query filter global la aísla por tenant.
 /// </summary>
-public class Simulacion : BaseGuidEntity
+public class Simulacion : BaseGuidEntity, ITenantEntity
 {
     public Guid UsuarioId { get; private set; }
     public Usuario? Usuario { get; private set; }

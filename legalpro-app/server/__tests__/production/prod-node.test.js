@@ -241,25 +241,25 @@ describe('PROD: GET /api/organizaciones/me — organización real', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 // 5. GEMINI — endpoints reales de IA
 // ═══════════════════════════════════════════════════════════════════════════
-describe('PROD: POST /api/gemini/* — IA real de producción', () => {
-  it('sin token retorna 401 en /api/gemini/chat', async () => {
-    const res = await api('POST', '/api/gemini/chat', { mensaje: 'Test' });
+describe('PROD: POST /api/ai/* — IA real de producción', () => {
+  it('sin token retorna 401 en /api/ai/chat', async () => {
+    const res = await api('POST', '/api/ai/chat', { mensaje: 'Test' });
     expect(res.status).toBe(401);
   });
 
-  it('sin token retorna 401 en /api/gemini/redactor', async () => {
-    const res = await api('POST', '/api/gemini/redactor', { tipo: 'demanda' });
+  it('sin token retorna 401 en /api/ai/redactor', async () => {
+    const res = await api('POST', '/api/ai/redactor', { tipo: 'demanda' });
     expect(res.status).toBe(401);
   });
 
-  it('sin token retorna 401 en /api/gemini/predictor', async () => {
-    const res = await api('POST', '/api/gemini/predictor', { caso: 'Caso penal' });
+  it('sin token retorna 401 en /api/ai/predictor', async () => {
+    const res = await api('POST', '/api/ai/predictor', { caso: 'Caso penal' });
     expect(res.status).toBe(401);
   });
 
   it('chat con token real responde (IA o error controlado)', async () => {
     expect(tokens.abogado).toBeTruthy();
-    const res = await api('POST', '/api/gemini/chat', {
+    const res = await api('POST', '/api/ai/chat', {
       mensaje: '¿Qu\u00e9 es el C\u00f3digo Procesal Civil peruano?',
       sesionId: `test-prod-${Date.now()}`,
     }, tokens.abogado);
@@ -277,7 +277,7 @@ describe('PROD: POST /api/gemini/* — IA real de producción', () => {
 
   it('redactor con token real responde con escrito o error controlado', async () => {
     expect(tokens.abogado).toBeTruthy();
-    const res = await api('POST', '/api/gemini/redactor', {
+    const res = await api('POST', '/api/ai/redactor', {
       tipo: 'demanda',
       hechos: 'El demandado incumplió el contrato de arrendamiento según el CPC peruano',
       materia: 'CIVIL',

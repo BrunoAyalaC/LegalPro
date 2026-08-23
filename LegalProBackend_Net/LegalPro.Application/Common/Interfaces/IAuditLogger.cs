@@ -12,7 +12,7 @@ namespace LegalPro.Application.Common.Interfaces;
 ///   - TENANT_VIOLATION — intento de acceso cross-tenant (BOLA/IDOR)
 ///   - RATE_LIMIT_HIT
 ///   - PERMISSION_DENIED
-///   - GEMINI_REQUEST — llamadas a IA con contexto censurado
+///   - AI_REQUEST — llamadas a IA con contexto censurado
 /// </summary>
 public interface IAuditLogger
 {
@@ -23,7 +23,7 @@ public interface IAuditLogger
     Task LogLoginFailureAsync(string email, string ipAddress, string reason);
     Task LogResourceAccessAsync(Guid userId, Guid orgId, string resourceType, string resourceId, string action);
     Task LogTenantViolationAsync(Guid userId, Guid callerOrgId, string resourceType, string attemptedOrgId);
-    Task LogGeminiRequestAsync(Guid userId, Guid orgId, string feature, int inputLength);
+    Task LogAIRequestAsync(Guid userId, Guid orgId, string feature, int inputLength);
     Task LogPermissionDeniedAsync(Guid userId, string action, string resource);
 }
 

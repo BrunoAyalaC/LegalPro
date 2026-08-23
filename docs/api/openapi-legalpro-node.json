@@ -1,0 +1,169 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LegalPro Node API",
+    "version": "1.0.0",
+    "description": "API backend Node.js de LegalPro - auth, organizaciones, IA, minimax, ARCO, datos personales",
+    "contact": { "name": "LegalPro", "email": "api@legalpro.pe" }
+  },
+  "servers": [
+    { "url": "http://localhost:3001", "description": "Dev local" },
+    { "url": "https://legalpro-node.railway.app", "description": "Produccion" }
+  ],
+  "tags": [
+    { "name": "auth", "description": "Autenticacion JWT + refresh" },
+    { "name": "organizaciones", "description": "Multi-tenant CRUD" },
+    { "name": "expedientes", "description": "Expedientes judiciales" },
+    { "name": "documentos", "description": "Documentos con hash SHA-256 y firma digital" },
+    { "name": "ai", "description": "16 herramientas IA (proxy al backend .NET o MiniMax directo)" },
+    { "name": "datos-personales", "description": "ARCO LPDP" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "error": { "type": "string" },
+          "correlationId": { "type": "string", "format": "uuid" }
+        }
+      },
+      "Organizacion": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "nombre": { "type": "string" },
+          "slug": { "type": "string" },
+          "plan": { "enum": ["free", "pro", "enterprise"] },
+          "max_usuarios": { "type": "integer" },
+          "max_expedientes": { "type": "integer" },
+          "max_consultas_ia_mes": { "type": "integer" }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "nombre_completo": { "type": "string" },
+          "rol": { "enum": ["ABOGADO", "FISCAL", "JUEZ", "CONTADOR", "ADMIN"] },
+          "acepta_transferencia_internacional": { "type": "boolean" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "accessToken": { "type": "string" },
+              "refreshToken": { "type": "string" },
+              "user": { "$ref": "#/components/schemas/Usuario" }
+            }
+          }
+        }
+      },
+      "Expediente": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "organization_id": { "type": "string", "format": "uuid" },
+          "numero": { "type": "string" },
+          "titulo": { "type": "string" },
+          "materia": { "enum": ["penal", "civil", "laboral", "constitucional", "familia", "administrativo"] },
+          "estado": { "enum": ["activo", "archivado", "cerrado", "suspendido"] },
+          "partes": { "type": "object" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/health": {
+      "get": { "summary": "Health check", "tags": ["auth"], "security": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login con email y password",
+        "tags": ["auth"],
+        "security": [],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } } },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginResponse" } } } },
+          "401": { "description": "Credenciales invalidas" },
+          "429": { "description": "Demasiados intentos (brute force)" }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "summary": "Refrescar access token",
+        "tags": ["auth"],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "refreshToken": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Refresh invalido" } }
+      }
+    },
+    "/api/auth/me": {
+      "get": { "summary": "Obtener usuario actual", "tags": ["auth"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/auth/logout": {
+      "post": { "summary": "Logout (revoca refresh token)", "tags": ["auth"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/organizaciones": {
+      "get": { "summary": "Listar organizaciones del usuario", "tags": ["organizaciones"], "responses": { "200": { "description": "OK" } } },
+      "post": { "summary": "Crear organizacion", "tags": ["organizaciones"], "responses": { "201": { "description": "Creado" } } }
+    },
+    "/api/organizaciones/members": {
+      "get": { "summary": "Listar miembros de la organizacion actual", "tags": ["organizaciones"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/organizaciones/invite": {
+      "post": { "summary": "Invitar miembro", "tags": ["organizaciones"], "responses": { "201": { "description": "Invitacion creada" } } }
+    },
+    "/api/expedientes": {
+      "get": { "summary": "Listar expedientes (paginado, multi-tenant)", "tags": ["expedientes"], "parameters": [{ "name": "limit", "in": "query", "schema": { "type": "integer", "default": 50 } }, { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }, { "name": "materia", "in": "query", "schema": { "type": "string" } }, { "name": "search", "in": "query", "schema": { "type": "string" } }], "responses": { "200": { "description": "OK" } } },
+      "post": { "summary": "Crear expediente", "tags": ["expedientes"], "responses": { "201": { "description": "Creado" } } }
+    },
+    "/api/expedientes/{id}": {
+      "get": { "summary": "Obtener expediente por ID", "tags": ["expedientes"], "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }], "responses": { "200": { "description": "OK" }, "404": { "description": "No encontrado" } } }
+    },
+    "/api/documentos": {
+      "get": { "summary": "Listar documentos", "tags": ["documentos"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/documentos/upload": {
+      "post": { "summary": "Subir documento (multipart/form-data)", "tags": ["documentos"], "responses": { "201": { "description": "Subido, hash SHA-256 calculado" } } }
+    },
+    "/api/analista": {
+      "post": { "summary": "Analizar expediente con IA (FC MiniMax)", "tags": ["ai"], "responses": { "200": { "description": "OK" } }, "429": { "description": "Rate limit excedido" } }
+    },
+    "/api/jurisprudencia": {
+      "post": { "summary": "Buscar jurisprudencia", "tags": ["ai"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/redactor": {
+      "post": { "summary": "Redactar escrito legal", "tags": ["ai"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/predictor": {
+      "post": { "summary": "Predecir resultado de caso", "tags": ["ai"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/mis-datos": {
+      "get": { "summary": "Acceder a mis datos (ARCO - Acceso)", "tags": ["datos-personales"], "responses": { "200": { "description": "OK" } } },
+      "put": { "summary": "Rectificar mis datos (ARCO - Rectificacion)", "tags": ["datos-personales"], "responses": { "200": { "description": "OK" } } },
+      "delete": { "summary": "Cancelar mi cuenta (ARCO - Cancelacion)", "tags": ["datos-personales"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/mis-datos/export": {
+      "get": { "summary": "Exportar mis datos (JSON + PDF)", "tags": ["datos-personales"], "responses": { "200": { "description": "OK" } } }
+    }
+  }
+}

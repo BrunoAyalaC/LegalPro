@@ -2,26 +2,52 @@ import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
+import IADisclaimerModal from '../components/IADisclaimerModal';
 import { api } from '../api/client';
+import { useSeo } from '../hooks/useSeo';
 
 export default function PredictorJudicial() {
+  useSeo({
+    title: 'Predictor Judicial IA | LegalPro',
+    description: 'Utiliza inteligencia artificial para predecir probabilidades de éxito, evaluar riesgos procesales y analizar factores favorables y desfavorables de tus casos legales.',
+  });
+
   const [hechos, setHechos] = useState('');
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
+  const [pendingHechos, setPendingHechos] = useState('');
 
-  const handlePredecir = async () => {
-    if (!hechos.trim()) return;
+  const executePrediccion = async (textoHechos) => {
     setLoading(true);
     setError('');
     try {
-      const data = await api.consulta(hechos, 'predictor');
+      const data = await api.consulta(textoHechos, 'predictor');
       setResultado(data.resultado);
     } catch {
       setError('Error al conectar con el servidor');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePredecir = () => {
+    if (!hechos.trim()) return;
+    // LPDP: predictor es variante crítica #DC2626 no dismissible + modal bloqueante
+    setPendingHechos(hechos);
+    setShowDisclaimerModal(true);
+  };
+
+  const handleDisclaimerConfirm = async () => {
+    setShowDisclaimerModal(false);
+    await executePrediccion(pendingHechos);
+    setPendingHechos('');
+  };
+
+  const handleDisclaimerCancel = () => {
+    setShowDisclaimerModal(false);
+    setPendingHechos('');
   };
 
   const probabilidad = resultado?.probabilidadExito ?? 0;
@@ -32,6 +58,9 @@ export default function PredictorJudicial() {
       <Header title="Predictor Judicial" showBack rightAction={<span className="badge badge-primary">IA Predictiva</span>} />
 
       <div className="px-4 py-6 space-y-6">
+        {/* LPDP: Banner predictor #DC2626 rojo, dismissible=false obligatorio */}
+        <IADisclaimerBanner variant="predictor" dismissible={false} compact />
+
         {/* Input de hechos */}
         <label className="block">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 block">Hechos del Caso</span>
@@ -51,12 +80,12 @@ export default function PredictorJudicial() {
           disabled={loading || !hechos.trim()}
         >
           <AppIcon name="psychology" size={20} />
-          {loading ? ' Analizando con Gemini...' : ' Predecir Resultado'}
+          {loading ? ' Analizando con DeepSeek V4 Flash...' : ' Predecir Resultado'}
         </button>
 
         {resultado && (
           <>
-            <IADisclaimerBanner className="mb-4" compact />
+            <IADisclaimerBanner variant="predictor" dismissible={false} className="mb-4" compact />
             <div className="card text-center">
               <p className="text-xs text-slate-400 uppercase tracking-widest mb-3">Probabilidad de Éxito</p>
               <div className="relative w-32 h-32 mx-auto mb-4">
@@ -110,9 +139,9 @@ export default function PredictorJudicial() {
               <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <AppIcon name="psychology" size={20} />
-                  <span className="text-sm font-bold text-primary">Recomendación Gemini</span>
+                  <span className="text-sm font-bold text-primary">Recomendación IA</span>
                 </div>
-                <IADisclaimerBanner compact className="mb-2" />
+                <IADisclaimerBanner variant="predictor" dismissible={false} compact className="mb-2" />
                 <p className="text-xs text-slate-400 leading-relaxed">{resultado.recomendacion}</p>
               </div>
             )}
@@ -126,6 +155,16 @@ export default function PredictorJudicial() {
           </div>
         )}
       </div>
+
+      {/* Modal bloqueante LPDP predictor #DC2626 */}
+      <IADisclaimerModal
+        isOpen={showDisclaimerModal}
+        variant="predictor"
+        persistent
+        actionLabel="Aceptar y Predecir"
+        onConfirm={handleDisclaimerConfirm}
+        onCancel={handleDisclaimerCancel}
+      />
     </div>
   );
 }

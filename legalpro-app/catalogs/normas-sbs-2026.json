@@ -1,0 +1,196 @@
+{
+  "metadata": {
+    "nombre": "SBS - Resoluciones y Circulares 2026",
+    "fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+    "fuente_complementaria": "https://www.sbs.gob.pe (sala de prensa y regulador)",
+    "fecha_consulta": "2026-08-01",
+    "descripcion": "Catalogo de Resoluciones SBS y Circulares publicadas en 2026, obtenidas del Buscador Oficial de Normativa SBS. Incluye Resoluciones de Superintendencia que regulan los sistemas Financiero (SF), de Seguros (SS), Privado de Pensiones (SPP), COOPAC, AFOCAT, y temas de prevencion de lavado de activos (LA/FT). Solo se incluyen los primeros registros de la pagina 1 del buscador (10 de 65 items mostrados en la primera pagina), abarcando la primera mitad del ano (enero-julio 2026).",
+    "total_items_buscador": 65,
+    "items_en_pagina_1": 10,
+    "paginas_totales": 7,
+    "documentos_seleccionados_relevantes": 10,
+    "criterio_seleccion": "Relevancia regulatoria para sistemas financieros, seguros, pensiones, COOPAC y prevencion LA/FT."
+  },
+  "normas": [
+    {
+      "id": "SBS-RS-2026-1923",
+      "tipo": "Resolucion SBS",
+      "numero": "N 1923-2026",
+      "fecha_publicacion": "2026-07-24",
+      "fecha_emision": "2026-07-22",
+      "titulo": "Modifican el Reglamento de Infracciones y Sanciones de la SBS",
+      "sumilla": "Modifican el Reglamento de Infracciones y Sanciones de la Superintendencia de Banca, Seguros y Administradoras Privadas de Fondos de Pensiones. Esta modificacion permitira a la institucion contar con mecanismos efectivos para ejercer su potestad sancionadora y proteger a los usuarios de los sistemas supervisados.",
+      "materia": "Sanciones - Potestad sancionadora - Regulacion financiera",
+      "sistemas": ["SF", "SS"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-RS-2026-1917",
+      "tipo": "Resolucion SBS",
+      "numero": "N 01917-2026",
+      "fecha_publicacion": "2026-07-22",
+      "fecha_emision": "2026-07-21",
+      "titulo": "Modifican instrucciones del Registro de Operaciones (RO) del OCP LA/FT y prorrogan plazos",
+      "sumilla": "Se modifican las Instrucciones para el envio del Registro de Operaciones (RO) del Oficial de Cumplimiento PLAFT y prorrogan diversos plazos establecidos en la Resolucion SBS N 01139-2025, y aprueban otras disposiciones.",
+      "materia": "Prevencion de lavado de activos - UIF - PLAFT",
+      "sistemas": ["LA/FT_UIF"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-RS-2026-1881",
+      "tipo": "Resolucion SBS",
+      "numero": "N 1881-2026",
+      "fecha_publicacion": "2026-07-24",
+      "fecha_emision": "2026-07-17",
+      "titulo": "Modifican Reglamento de las Empresas Emisoras de Dinero Electronico",
+      "sumilla": "Modifican el Reglamento de las Empresas Emisoras de Dinero Electronico en el marco del sistema financiero peruano.",
+      "materia": "Dinero electronico - Empresas emisoras - Sistema financiero",
+      "sistemas": ["SF"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-RS-2026-1889",
+      "tipo": "Resolucion SBS",
+      "numero": "N 1889-2026",
+      "fecha_publicacion": "2026-07-24",
+      "fecha_emision": "2026-07-17",
+      "titulo": "Prorrogan entrada en vigencia de modificaciones al Manual de Contabilidad del Sistema Financiero",
+      "sumilla": "Prorrogan la entrada en vigencia de modificaciones a disposiciones del Manual de Contabilidad para las Empresas del Sistema Financiero.",
+      "materia": "Plan de cuentas - Contabilidad - Manual contable",
+      "sistemas": ["SF"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SBS-RS-2026-1873",
+      "tipo": "Resolucion SBS",
+      "numero": "N 01873-2026",
+      "fecha_publicacion": "2026-07-17",
+      "fecha_emision": "2026-07-16",
+      "titulo": "Modifican Reglamento General de Cooperativas de Ahorro y Credito No Autorizadas a Captar Recursos del Publico",
+      "sumilla": "Modifican el Reglamento General de las Cooperativas de Ahorro y Credito No Autorizadas a Captar Recursos del Publico, aprobado por Resolucion SBS N 480-2019 y sus modificatorias.",
+      "materia": "COOPAC - Cooperativas - Inclusion financiera",
+      "sistemas": ["COOPAC"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-RS-2026-1786",
+      "tipo": "Resolucion SBS",
+      "numero": "N 01786-2026",
+      "fecha_publicacion": "2026-07-14",
+      "fecha_emision": "2026-07-09",
+      "titulo": "Modifican Reglamento para la clasificacion de empresas del sistema financiero y de empresas de seguros",
+      "sumilla": "Modifican el Reglamento para la clasificacion de empresas del sistema financiero y de empresas de seguros, aprobado por la Resolucion SBS N 18400-2010.",
+      "materia": "Clasificacion de empresas - Riesgos - Sistema financiero",
+      "sistemas": ["SF", "SS"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-CIRC-G-233-2026",
+      "tipo": "Circular",
+      "numero": "G-233-2026",
+      "fecha_publicacion": "2026-07-09",
+      "fecha_emision": "2026-07-06",
+      "titulo": "Actualizacion del capital social minimo (julio - setiembre 2026)",
+      "sumilla": "Actualizacion del capital social minimo correspondiente al trimestre julio - setiembre de 2026.",
+      "materia": "Capital social minimo - Requisitos patrimoniales",
+      "sistemas": ["SF", "SS"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-RS-2026-1741",
+      "tipo": "Resolucion SBS",
+      "numero": "N 01741-2026",
+      "fecha_publicacion": "2026-07-02",
+      "fecha_emision": "2026-07-01",
+      "titulo": "Modifican Reglamento de Gestion de Conducta de Mercado y Reglamento de Comisiones y Gastos",
+      "sumilla": "Modifican el Reglamento de Gestion de Conducta de Mercado del Sistema Financiero y el Reglamento de Comisiones y Gastos del Sistema Financiero.",
+      "materia": "Conducta de mercado - Comisiones - Proteccion al usuario financiero",
+      "sistemas": ["SF"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-RS-2026-1747",
+      "tipo": "Resolucion SBS",
+      "numero": "N 1747-2026",
+      "fecha_publicacion": "2026-07-03",
+      "fecha_emision": "2026-07-01",
+      "titulo": "Aprueban Reglamento para la prestacion de servicios bajo el modelo Banking as a Service (BaaS)",
+      "sumilla": "Aprueban el Reglamento para la prestacion de servicios bajo el modelo de Banking as a Service - BaaS, marcando el inicio regulatorio del modelo de banca como servicio en Peru.",
+      "materia": "BaaS - Banca como servicio - Innovacion financiera - Fintech",
+      "sistemas": ["SF"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-RS-2026-1690",
+      "tipo": "Resolucion SBS",
+      "numero": "N 01690-2026",
+      "fecha_publicacion": "2026-06-26",
+      "fecha_emision": "2026-06-24",
+      "titulo": "Modifican Manuales de Contabilidad para COOPAC de Nivel 1, 2 y 3",
+      "sumilla": "Modifican los Manuales de Contabilidad para las Cooperativas de Ahorro y Credito No Autorizadas a Captar Recursos del Publico de Nivel 1, Nivel 2 y Nivel 3.",
+      "materia": "Plan de cuentas - Contabilidad - COOPAC",
+      "sistemas": ["COOPAC"],
+      "estado": "Vigente",
+      "url_fuente": "https://www.sbs.gob.pe/app/pp/INT_CN/Paginas/Busqueda/BusquedaPortal.aspx",
+      "relevancia_legalpro": "MEDIA"
+    }
+  ],
+  "novedades_sala_prensa_2026": [
+    {
+      "id": "SBS-NOTICIA-3963",
+      "fecha": "2026-07-24",
+      "titulo": "SBS modifica su Reglamento de Infracciones y Sanciones",
+      "resumen": "Esta modificacion permitira a la institucion contar con mecanismos efectivos para ejercer su potestad sancionadora y proteger a los usuarios de los sistemas supervisados.",
+      "url_fuente": "https://www.sbs.gob.pe/noticia/detallenoticia?IdNoticia=3963"
+    },
+    {
+      "id": "SBS-NOTICIA-3962",
+      "fecha": "2026-07-22",
+      "titulo": "SBS propone nuevos mecanismos de comercializacion de productos y servicios",
+      "resumen": "SBS propone que empresas supervisadas implementen nuevos mecanismos de comercializacion de productos y/o servicios financieros.",
+      "url_fuente": "https://www.sbs.gob.pe/noticia/detallenoticia?IdNoticia=3962"
+    },
+    {
+      "id": "SBS-NOTICIA-3961",
+      "fecha": "2026-07-22",
+      "titulo": "SBS propone procedimiento para que afiliados al SPP migren a comision por saldo",
+      "resumen": "SBS propone procedimiento para que afiliados al SPP migren de la comision por remuneracion a la comision por saldo.",
+      "url_fuente": "https://www.sbs.gob.pe/noticia/detallenoticia?IdNoticia=3961",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SBS-NOTICIA-3960",
+      "fecha": "2026-07-21",
+      "titulo": "SBS advierte sobre entidades informales y aplicativos de prestamos no autorizados",
+      "resumen": "SBS advierte sobre entidades que captan dinero del publico sin autorizacion y aplicativos informales que ofrecen prestamos.",
+      "url_fuente": "https://www.sbs.gob.pe/noticia/detallenoticia?IdNoticia=3960"
+    },
+    {
+      "id": "SBS-NOTICIA-3959",
+      "fecha": "2026-07-20",
+      "titulo": "SBS somete a consulta publica lineamientos para Finanzas Abiertas en Peru",
+      "resumen": "SBS somete a consulta publica adelanto de lineamientos para implementar el Sistema de Finanzas Abiertas en el Peru (Open Banking).",
+      "url_fuente": "https://www.sbs.gob.pe/noticia/detallenoticia?IdNoticia=3959",
+      "relevancia_legalpro": "ALTA"
+    }
+  ],
+  "nota_relevante": "El Buscador SBS de Normativa arroja 65 items distribuidos en 7 paginas. Solo se documentan los 10 registros de la primera pagina (julio 2026) y las 5 notas de prensa mas relevantes. Para una cobertura completa se recomienda cargar paginas adicionales (conforme a politicas de rate-limit)."
+}

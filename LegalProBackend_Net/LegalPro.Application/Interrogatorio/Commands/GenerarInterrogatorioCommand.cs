@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using System.Text.Json;
 using LegalPro.Application.Common;
 using LegalPro.Application.Common.Interfaces;
@@ -16,7 +17,10 @@ public record GenerarInterrogatorioCommand(
     string HechosClave,      // hechos clave del caso relacionados con el testigo
     string Objetivo,         // "acreditar_hechos" | "impugnar_credibilidad" | "corroborar_alibi"
     string Rol = "ABOGADO"   // "ABOGADO" | "FISCAL" | "ABOGADO_FISCAL" (combinacion)
-) : IRequest<InterrogatorioDto>;
+) : IRequest<InterrogatorioDto>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public record InterrogatorioDto(
     string Introduccion,
@@ -65,18 +69,18 @@ public class GenerarInterrogatorioValidator : AbstractValidator<GenerarInterroga
 
 public class GenerarInterrogatorioHandler : IRequestHandler<GenerarInterrogatorioCommand, InterrogatorioDto>
 {
-    private readonly ILegalInterrogatorio _gemini;
+    private readonly ILegalInterrogatorio _minimax;
 
-    public GenerarInterrogatorioHandler(ILegalInterrogatorio gemini)
+    public GenerarInterrogatorioHandler(ILegalInterrogatorio minimax)
     {
-        _gemini = gemini;
+        _minimax = minimax;
     }
 
     public async Task<InterrogatorioDto> Handle(
         GenerarInterrogatorioCommand request,
         CancellationToken cancellationToken)
     {
-        var json = await _gemini.GenerarEstrategiaInterrogatorioAsync(
+        var json = await _minimax.GenerarEstrategiaInterrogatorioAsync(
             request.NombreTestigo,
             request.TipoTestigo,
             request.HechosClave,

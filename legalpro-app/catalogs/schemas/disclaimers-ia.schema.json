@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Schema de Disclaimers IA",
+  "description": "Catálogo de disclaimers obligatorios para respuestas de IA legal",
+  "type": "object",
+  "required": ["version", "disclaimers"],
+  "properties": {
+    "version": { "type": "string" },
+    "disclaimers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "texto", "obligatorio_en"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "texto": { "type": "string" },
+          "obligatorio_en": { "type": "array", "items": { "type": "string" } },
+          "version": { "type": "string" }
+        }
+      }
+    }
+  }
+}

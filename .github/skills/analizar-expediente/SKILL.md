@@ -2,7 +2,7 @@
 
 ## Cuándo usar
 
-Cuando necesites implementar o mejorar el análisis de expedientes judiciales con Gemini IA y datos de Supabase.
+Cuando necesites implementar o mejorar el análisis de expedientes judiciales con MiniMax AI y datos de Supabase.
 
 ## Flujo
 
@@ -10,8 +10,8 @@ Cuando necesites implementar o mejorar el análisis de expedientes judiciales co
 1. Usuario selecciona expediente en app Android
 2. App envía request → Backend Railway
 3. Backend obtiene expediente + documentos de Supabase
-4. Backend envía a Gemini con Function Calling
-5. Gemini analiza y puede llamar funciones adicionales:
+4. Backend envía a MiniMax con Function Calling
+5. MiniMax analiza y puede llamar funciones adicionales:
    - buscar_jurisprudencia → precedentes relevantes
    - consultar_norma → artículos aplicables
    - predecir_resultado → probabilidad de éxito

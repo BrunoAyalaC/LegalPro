@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de Privacidad — LegalPro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            legal: {
+              bg: '#050508',
+              panel: '#080d14',
+              cyan: '#06B6D4',
+              gold: '#C9A84C',
+              glass: 'rgba(255,255,255,0.03)',
+              border: 'rgba(255,255,255,0.08)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #050508; color: #e5e7eb; font-family: 'Inter', sans-serif; }
+    .glass {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .glass-strong {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    .text-cyan-glow { color: #06B6D4; text-shadow: 0 0 20px rgba(6,182,212,0.35); }
+    .text-gold-glow { color: #C9A84C; text-shadow: 0 0 20px rgba(201,168,76,0.30); }
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .prose-legal h2 { color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; font-size: 1.25rem; }
+    .prose-legal h3 { color: #06B6D4; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.05rem; }
+    .prose-legal p { color: rgba(255,255,255,0.72); line-height: 1.75; margin-bottom: 0.75rem; }
+    .prose-legal ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    .prose-legal li { color: rgba(255,255,255,0.72); line-height: 1.7; margin-bottom: 0.35rem; }
+    .prose-legal a { color: #06B6D4; text-decoration: underline; text-underline-offset: 3px; }
+    .prose-legal a:hover { color: #22d3ee; }
+    .prose-legal strong { color: #fff; font-weight: 600; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/landing/index.html" class="flex items-center gap-3">
+        <img src="/landing/assets/img/logo-icon.jpeg" alt="LegalPro" class="w-9 h-9 rounded-lg object-contain" style="box-shadow: 0 0 18px rgba(6,182,212,0.35);" />
+        <div>
+          <div class="text-white font-display font-extrabold text-lg tracking-tight">Legal<span class="text-cyan-glow">Pro</span></div>
+          <div class="text-[10px] text-white/40 uppercase tracking-[0.15em]">Plataforma Legal IA</div>
+        </div>
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm text-white/50">
+        <a href="/terminos.html" class="hover:text-cyan-400 transition-colors">Términos</a>
+        <a href="/privacidad.html" class="text-white/80 hover:text-cyan-400 transition-colors">Privacidad</a>
+        <a href="/login" class="px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold hover:bg-cyan-500/20 transition-all">Ingresar</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero mini -->
+  <header class="pt-32 pb-12 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.08), transparent 70%);"></div>
+    <div class="max-w-3xl mx-auto text-center relative">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold-500/8 border border-gold-500/20 text-gold-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-5" style="background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.20);color:#C9A84C;">
+        <span class="w-1.5 h-1.5 rounded-full bg-gold-400 animate-pulse" style="background:#C9A84C;"></span>
+        Conforme a la Ley N.º 29733 — Perú
+      </div>
+      <h1 class="section-title text-3xl md:text-4xl text-white mb-4">Política de Privacidad</h1>
+      <p class="text-white/50 text-sm max-w-xl mx-auto">En LegalPro protegemos sus datos personales conforme a la Ley de Protección de Datos Personales del Perú (Ley N.º 29733) y su reglamento.</p>
+      <div class="mt-6 text-[11px] text-white/30">Última actualización: <span class="text-white/60">4 de mayo de 2026</span></div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="max-w-3xl mx-auto px-6 pb-24">
+    <article class="glass-strong rounded-2xl p-8 md:p-10 prose-legal">
+      <h2>1. Responsable del Tratamiento</h2>
+      <p><strong>Razón social:</strong> LegalPro S.A.C.</p>
+      <p><strong>R.U.C.:</strong> 20601234567</p>
+      <p><strong>Domicilio:</strong> Av. Javier Prado Este 123, Lima, Perú</p>
+      <p><strong>Correo electrónico:</strong> <a href="mailto:legal@legalpro.pe">legal@legalpro.pe</a></p>
+
+      <h2>2. Encargado de la Protección de Datos (DPO)</h2>
+      <p>Para ejercer sus derechos ARCO o realizar consultas sobre el tratamiento de sus datos personales, contacte a nuestro DPO:</p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:privacidad@legalpro.pe">privacidad@legalpro.pe</a></li>
+        <li><strong>Asunto recomendado:</strong> "Solicitud Derechos ARCO — [Su nombre]"</li>
+        <li><strong>Tiempo de respuesta:</strong> Hasta 20 días hábiles conforme al reglamento de la Ley N.º 29733.</li>
+      </ul>
+
+      <h2>3. Finalidades del Tratamiento</h2>
+      <p>Sus datos personales son tratados para las siguientes finalidades:</p>
+      <ul>
+        <li><strong>Gestión de cuenta y autenticación:</strong> Crear y mantener su usuario, verificar identidad y prevenir fraudes.</li>
+        <li><strong>Procesamiento de expedientes:</strong> Almacenar, analizar y organizar la información jurídica que usted ingresa en la plataforma.</li>
+        <li><strong>Mejora de modelos de IA:</strong> Utilizar datos anonimizados y agregados para entrenar y ajustar los modelos de lenguaje que potencian las herramientas de LegalPro.</li>
+        <li><strong>Facturación y cobranza:</strong> Procesar pagos, emitir comprobantes y gestionar suscripciones.</li>
+        <li><strong>Soporte y notificaciones:</strong> Responder consultas, enviar alertas del SINOE y notificar actualizaciones del servicio.</li>
+        <li><strong>Cumplimiento legal:</strong> Atender requerimientos de autoridades judiciales o administrativas competentes.</li>
+      </ul>
+
+      <h2>4. Datos Recopilados</h2>
+      <h3>4.1 Datos personales proporcionados directamente</h3>
+      <ul>
+        <li>Nombre completo</li>
+        <li>Correo electrónico</li>
+        <li>Rol profesional (abogado, juez, fiscal, contador)</li>
+        <li>Especialidad legal</li>
+        <li>Número de colegiatura (opcional)</li>
+      </ul>
+      <h3>4.2 Datos generados durante el uso del servicio</h3>
+      <ul>
+        <li>Contenido de expedientes, escritos y documentos jurídicos</li>
+        <li>Historial de chat con la IA</li>
+        <li>Resultados de predicciones, simulaciones y análisis</li>
+        <li>Registros de auditoría (IP, user agent, timestamp de acceso)</li>
+      </ul>
+      <h3>4.3 Datos sensibles</h3>
+      <p>LegalPro <strong>no solicita ni almacena intencionalmente</strong> datos sensibles según la Ley N.º 29733 (salud, origen racial, religión, ideología, etc.). Sin embargo, si el usuario ingresa voluntariamente dichos datos dentro de un expediente o chat (por ejemplo, información de salud en un caso de negligencia médica, o afiliación política en un caso administrativo), estos serán tratados con el <strong>nivel de seguridad reforzado</strong> correspondiente a datos sensibles y nunca serán utilizados para entrenar modelos de IA sin anonimización previa y consentimiento explícito.</p>
+
+      <h2>5. Derechos ARCO</h2>
+      <p>Conforme a la Ley N.º 29733, usted tiene derecho a:</p>
+      <ul>
+        <li><strong>Acceso:</strong> Conocer qué datos personales tenemos sobre usted y cómo los tratamos.</li>
+        <li><strong>Rectificación:</strong> Solicitar la corrección de datos inexactos o incompletos.</li>
+        <li><strong>Cancelación:</strong> Solicitar la eliminación de sus datos cuando ya no sean necesarios para las finalidades informadas.</li>
+        <li><strong>Oposición:</strong> Oponerse al tratamiento de sus datos para fines específicos (p. ej., marketing).</li>
+      </ul>
+      <p>Para ejercer estos derechos, envíe una solicitud al DPO con copia de su DNI. Puede también gestionar el acceso, la rectificación y la exportación de datos desde la sección <strong>"Mis Datos"</strong> dentro de su perfil en la plataforma. La cancelación total de cuenta (derecho al olvido) requiere una confirmación de doble factor por seguridad.</p>
+
+      <h2>6. Medidas de Seguridad</h2>
+      <p>LegalPro implementa las siguientes medidas técnicas y organizativas:</p>
+      <ul>
+        <li><strong>Cifrado en tránsito:</strong> TLS 1.3 para todas las comunicaciones cliente-servidor.</li>
+        <li><strong>Cifrado en reposo:</strong> Los datos almacenados en PostgreSQL se cifran a nivel de volumen y campo sensible (password_hash con bcrypt cost=12).</li>
+        <li><strong>Acceso restringido:</strong> Principio de mínimo privilegio. Solo personal autorizado con NDA firmado puede acceder a la infraestructura.</li>
+        <li><strong>Backups cifrados:</strong> Copias de seguridad diarias almacenadas en proveedores cloud con cifrado AES-256.</li>
+        <li><strong>Autenticación segura:</strong> JWT con secreto de 32+ caracteres, expiración controlada y refresh tokens revocables.</li>
+        <li><strong>Rate limiting:</strong> Protección contra fuerza bruta y abuso de APIs.</li>
+      </ul>
+
+      <h2>7. Plazo de Conservación</h2>
+      <p>Sus datos personales serán conservados mientras dure la relación contractual y su cuenta esté activa. Tras la baja del servicio:</p>
+      <ul>
+        <li>Los datos personales identificativos serán <strong>eliminados o anonimizados</strong> en un plazo máximo de 30 días.</li>
+        <li>Los datos podrán conservarse por un período adicional de <strong>2 años</strong> únicamente cuando sea necesario para el cumplimiento de obligaciones legales, fiscales o la resolución de controversias.</li>
+        <li>Pasado dicho plazo, toda la información será eliminada de forma irreversible.</li>
+      </ul>
+
+      <h2>8. Transferencia Internacional de Datos</h2>
+      <p>Para el funcionamiento de las herramientas de IA, el contenido de los chats y prompts pueden ser enviados a <strong>Google Cloud (API Gemini)</strong> con sede en Estados Unidos. Esta transferencia internacional se realiza bajo las siguientes salvaguardas:</p>
+      <ul>
+        <li>Usted otorga su <strong>consentimiento expreso</strong> al aceptar esta política de privacidad.</li>
+        <li>Google opera bajo cláusulas contractuales tipo (SCC) aprobadas por la Comisión Europea y está certificado bajo el Privacy Shield 2.0.</li>
+        <li>LegalPro no envía datos sensibles sin anonimización previa a servicios de terceros.</li>
+        <li>Los datos de expedientes completos no se comparten con terceros; solo los prompts específicos necesarios para generar una respuesta de IA.</li>
+      </ul>
+
+      <h2>9. Cookies y Tecnologías de Seguimiento</h2>
+      <p>LegalPro utiliza cookies y tecnologías similares para:</p>
+      <ul>
+        <li><strong>Cookies esenciales:</strong> Mantener su sesión de autenticación (JWT en localStorage / cookie httpOnly según configuración).</li>
+        <li><strong>Cookies de rendimiento:</strong> Medir tiempos de carga y detectar errores (sin identificación personal).</li>
+        <li><strong>Cookies de preferencias:</strong> Recordar tema oscuro, especialidad legal seleccionada y configuraciones de UI.</li>
+        <li><strong>Cookies de terceros:</strong> No utilizamos cookies de terceros para publicidad comportamental. Puede gestionar sus preferencias de cookies desde la configuración de su navegador.</li>
+      </ul>
+
+      <h2>10. Cambios a esta Política</h2>
+      <p>LegalPro podrá actualizar esta política para reflejar cambios normativos o mejoras en nuestros procesos de seguridad. Le notificaremos con 15 días de anticipación mediante correo electrónico o aviso destacado en la plataforma. Si no está de acuerdo con los cambios, puede ejercer su derecho de cancelación eliminando su cuenta.</p>
+
+      <h2>11. Contacto</h2>
+      <p>Para cualquier consulta sobre privacidad, derechos ARCO o transferencias internacionales, contacte a:</p>
+      <ul>
+        <li><strong>DPO:</strong> <a href="mailto:privacidad@legalpro.pe">privacidad@legalpro.pe</a></li>
+        <li><strong>Legal:</strong> <a href="mailto:legal@legalpro.pe">legal@legalpro.pe</a></li>
+      </ul>
+      <p class="text-white/40 text-sm mt-8">LegalPro S.A.C. — R.U.C. 20601234567 — Av. Javier Prado Este 123, Lima, Perú.</p>
+    </article>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-8 px-6 text-center">
+    <p class="text-white/25 text-xs">© 2026 LegalPro S.A.C. Todos los derechos reservados.</p>
+  </footer>
+</body>
+</html>

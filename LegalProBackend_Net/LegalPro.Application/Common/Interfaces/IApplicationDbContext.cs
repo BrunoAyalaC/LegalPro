@@ -17,5 +17,7 @@ public interface IApplicationDbContext
     DbSet<RefreshToken> RefreshTokens { get; }
     DbSet<AuditLog> AuditLogs { get; }
     DbSet<Documento> Documentos { get; }
+    DbSet<PrediccionJudicial> PrediccionesJudiciales { get; }
+    DbSet<OutboxMessage> OutboxMessages { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using Microsoft.EntityFrameworkCore;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Exceptions;
@@ -12,8 +13,9 @@ namespace LegalPro.Application.Simulacion.Queries;
 // OWASP A01: verifica UsuarioId + OrganizationId antes de retornar.
 // ═══════════════════════════════════════════════════════
 
-public class GetSimulacionBoardQuery : IRequest<SimulacionBoardDto>
+public class GetSimulacionBoardQuery : IRequest<SimulacionBoardDto>, ITenantRequest
 {
+    public Guid OrganizationId { get; set; }
     public Guid SimulacionId { get; set; }
 }
 
@@ -62,6 +64,7 @@ public class GetSimulacionBoardHandler : IRequestHandler<GetSimulacionBoardQuery
 
         // OWASP A01: tenant isolation - solo el propietario puede ver la simulación
         var sim = await _context.Simulaciones
+            .AsNoTracking()
             .Include(s => s.Eventos)
             .Where(s => s.Id == request.SimulacionId
                      && s.UsuarioId == userId

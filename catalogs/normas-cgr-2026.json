@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "nombre": "CGR - Resoluciones de Contraloria 2026 (Contraloria General de la Republica)",
+    "fuente": "https://www.gob.pe/contraloria",
+    "fuente_complementaria": "https://www.gob.pe/institucion/contraloria/normas-legales",
+    "fecha_consulta": "2026-08-01",
+    "descripcion": "Catalogo de Resoluciones de Contraloria y normas emitidas por la Contraloria General de la Republica (CGR) durante el ano 2026, obtenidas del portal gob.pe/institucion/contraloria. La CGR supervisa y verifica la correcta aplicacion de politicas publicas y uso de recursos del Estado, a traves del Sistema Nacional de Control (SNC).",
+    "total_normas_2026_documentadas": 2,
+    "periodo_cubierto": "Julio 2026"
+  },
+  "normas": [
+    {
+      "id": "CGR-RC-2026-414",
+      "tipo": "Resolucion de Contraloria",
+      "numero": "N 414-2026-CG",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Autorizan incorporacion de mayores ingresos publicos al Presupuesto Institucional del Pliego 019: Contraloria General",
+      "sumilla": "Autorizan la incorporacion de mayores ingresos publicos al Presupuesto Institucional del Pliego 019: Contraloria General de la Republica.",
+      "materia": "Presupuesto publico - Pliego 019 - Sistema Nacional de Control",
+      "url_fuente": "https://www.gob.pe/institucion/contraloria/normas-legales/8429942-414-2026-cg",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "CGR-RC-2026-399",
+      "tipo": "Resolucion de Contraloria",
+      "numero": "N 399-2026-CG",
+      "fecha_publicacion": "2026-07-26",
+      "titulo": "Dan por terminada designacion de Jefe del OCI de la Municipalidad Distrital",
+      "sumilla": "Dan por terminada la designacion del Jefe del Organo de Control Institucional (OCI) de una Municipalidad Distrital conforme al regimen de designation del SNC.",
+      "materia": "OCI - Designacion de personal - Sistema Nacional de Control",
+      "url_fuente": "https://www.gob.pe/institucion/contraloria/normas-legales/8424064-399-2026-cg",
+      "relevancia_legalpro": "BAJA"
+    }
+  ],
+  "publicaciones_relevantes_2026": [
+    {
+      "id": "CGR-BOLETIN-2026-65",
+      "tipo": "Boletin Institucional",
+      "numero": "Edicion 65",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Boletin Contraloria en Accion - Edicion 65",
+      "resumen": "Contenido destacado: Supervisamos 2016 intervenciones en rios, cuencas y quebradas, monitoreo de obras, control concurrente y otros temas del SNC.",
+      "url_fuente": "https://www.gob.pe/institucion/contraloria/informes-publicaciones/8432042-boletin-contraloria-en-accion-edicion-65",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "CGR-SANCIONES-2026",
+      "tipo": "Registro Publico",
+      "numero": "Actualizado al 2026-07-31",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Relacion de sanciones inscritas y vigentes",
+      "resumen": "Relacion de sanciones inscritas y vigentes en el ambito de la potestad sancionadora de la Contraloria General. Registro de funcionarios y servidores sancionados.",
+      "url_fuente": "https://www.gob.pe/institucion/contraloria/informes-publicaciones/2706979-relacion-de-sanciones-inscritas-y-vigentes",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "CGR-CMN-2026-001-196",
+      "tipo": "Documento de Gestion",
+      "numero": "Modificaciones 2026",
+      "fecha_publicacion": "2026-07-24",
+      "titulo": "Cuadro Multianual de Necesidades y sus modificaciones de la UE 001-196 - Ano 2026",
+      "resumen": "Modificaciones al Cuadro Multianual de Necesidades de la Unidad Ejecutora 001-196 - Ano 2026.",
+      "url_fuente": "https://www.gob.pe/institucion/contraloria/informes-publicaciones/7624339-cuadro-multianual-de-necesidades-y-sus-modificaciones-de-la-unidad-ejecutora-001-196-ano-2026",
+      "relevancia_legalpro": "BAJA"
+    }
+  ],
+  "hitos_2025_documentados_contexto": [
+    {
+      "id": "CGR-RC-2025-322",
+      "tipo": "Resolucion de Contraloria",
+      "numero": "N 322-2025-CG",
+      "fecha_publicacion": "2025-08-13",
+      "titulo": "Aprueban Plan de Gobierno Digital 2025-2027 de la CGR",
+      "materia": "Gobierno digital - Planificacion estrategica"
+    },
+    {
+      "id": "CGR-RC-2025-320",
+      "tipo": "Resolucion de Contraloria",
+      "numero": "N 320-2025-CG",
+      "fecha_publicacion": "2025-08-01",
+      "titulo": "Modifican ROF de la CGR",
+      "materia": "Organizacion institucional - ROF"
+    },
+    {
+      "id": "CGR-RC-2025-274",
+      "tipo": "Resolucion de Contraloria",
+      "numero": "N 274-2025-CG",
+      "fecha_publicacion": "2025-07-10",
+      "titulo": "Aprueban Reglamento de Organizacion y Funciones de la CGR",
+      "materia": "Organizacion institucional - ROF"
+    },
+    {
+      "id": "CGR-RC-2025-258",
+      "tipo": "Resolucion de Contraloria",
+      "numero": "N 258-2025-CG",
+      "fecha_publicacion": "2025-06-30",
+      "titulo": "Plan Estrategico Institucional 2025-2030 de la CGR",
+      "materia": "Planeamiento estrategico - PEI"
+    }
+  ],
+  "nota_relevante": "El portal gob.pe/contraloria lista las normas mas recientes en bloques de 4-5 por pagina. Se documentan 2 Resoluciones de Contraloria de julio 2026 (N 414-2026-CG y N 399-2026-CG), 3 publicaciones relevantes y se incluye como contexto las 4 Resoluciones de 2025 que definieron el marco institucional vigente. Para una cobertura completa de 2026 se requiere paginacion iterativa de '/institucion/contraloria/normas-legales'."
+}

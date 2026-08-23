@@ -160,7 +160,7 @@ export default function Descargar() {
                 color: 'rgba(255,255,255,0.35)', fontSize: 14, fontWeight: 500,
               }}>
                 <span className="material-symbols-outlined" style={{ fontSize: 18, verticalAlign: 'middle', marginRight: 6 }}>schedule</span>
-                Próximamente disponible
+                Disponible para Android 8.0+
               </div>
             )}
 

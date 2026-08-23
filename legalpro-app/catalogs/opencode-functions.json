@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "nombre": "Funciones OpenCode Go / DeepSeek V4 Flash",
+    "proveedor": "OpenCode Go",
+    "modelo": "deepseek-v4-flash-free",
+    "vision": "xiaomi/mimo-v2.5",
+    "fecha_actualizacion": "2026-08-01"
+  },
+  "capacidades": {
+    "chat_completions": true,
+    "streaming": true,
+    "embeddings": true,
+    "function_calling": true,
+    "vision_multimodal": true,
+    "razonamiento": true,
+    "contexto_tokens": 1000000,
+    "output_tokens": 384000
+  },
+  "modelos_disponibles": [
+    { "id": "deepseek-v4-flash-free", "uso": "texto principal, razonamiento, investigacion" },
+    { "id": "deepseek/deepseek-v4-pro", "uso": "razonamiento profundo (upgrade)" },
+    { "id": "xiaomi/mimo-v2.5", "uso": "vision, OCR, multimodal" },
+    { "id": "xiaomi/mimo-v2.5-pro", "uso": "vision avanzada" }
+  ]
+}

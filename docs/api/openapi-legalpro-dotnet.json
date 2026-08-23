@@ -1,0 +1,148 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LegalPro .NET API",
+    "version": "1.0.0",
+    "description": "API backend .NET 8 de LegalPro - Clean Architecture + CQRS + MediatR. 18 controllers, 40+ commands/queries, multi-tenant estricto, OpenAPI 3.0.3, Bearer JWT, multi-stack (Node proxy + Android directo).",
+    "contact": { "name": "LegalPro", "email": "api@legalpro.pe" }
+  },
+  "servers": [
+    { "url": "http://localhost:5000", "description": "Dev local" },
+    { "url": "https://legalpro-dotnet.railway.app", "description": "Produccion" }
+  ],
+  "tags": [
+    { "name": "Auth" },
+    { "name": "Expedientes" },
+    { "name": "Documentos" },
+    { "name": "Organizaciones" },
+    { "name": "IA - Analista" },
+    { "name": "IA - Redactor" },
+    { "name": "IA - Predictor" },
+    { "name": "IA - Jurisprudencia" },
+    { "name": "IA - Casos Criticos" },
+    { "name": "IA - Objeciones" },
+    { "name": "IA - Interrogatorio" },
+    { "name": "IA - Alegatos" },
+    { "name": "IA - Chat" },
+    { "name": "IA - Plazos" },
+    { "name": "IA - Resumen" },
+    { "name": "IA - Multidoc" },
+    { "name": "IA - Boveda" },
+    { "name": "IA - Simulador" },
+    { "name": "IA - Notificaciones" },
+    { "name": "Contador" },
+    { "name": "Fiscal" },
+    { "name": "Juez" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "Expediente": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "organizationId": { "type": "string", "format": "uuid" },
+          "numero": { "type": "string" },
+          "titulo": { "type": "string" },
+          "materia": { "type": "string" },
+          "estado": { "string" },
+          "partes": { "type": "object" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AnalizarExpedienteRequest": {
+        "type": "object",
+        "required": ["expedienteId", "tipoAnalisis"],
+        "properties": {
+          "expedienteId": { "type": "string", "format": "uuid" },
+          "tipoAnalisis": { "enum": ["completo", "fortalezas_debilidades", "riesgos", "estrategia", "resumen"] },
+          "rolUsuario": { "enum": ["ABOGADO", "FISCAL", "JUEZ", "CONTADOR"] }
+        }
+      },
+      "AnalizarExpedienteResponse": {
+        "type": "object",
+        "properties": {
+          "tipoAnalisis": { "type": "string" },
+          "hechosRelevantes": { "type": "array", "items": { "type": "string" } },
+          "pretensiones": { "type": "string" },
+          "pruebasOfrecidas": { "type": "array", "items": { "type": "string" } },
+          "baseLegal": { "type": "array", "items": { "type": "object" } },
+          "fortalezas": { "type": "array", "items": { "type": "string" } },
+          "debilidades": { "type": "array", "items": { "type": "string" } },
+          "riesgos": { "type": "array", "items": { "type": "string" } },
+          "estrategiaRecomendada": { "type": "string" },
+          "recomendaciones": { "type": "array", "items": { "type": "string" } },
+          "disclaimers": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/health": {
+      "get": { "summary": "Health check", "tags": ["Auth"], "security": [], "responses": { "200": { "description": "Healthy" } } }
+    },
+    "/api/auth/login": {
+      "post": { "summary": "Login", "tags": ["Auth"], "security": [], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/auth/refresh": {
+      "post": { "summary": "Refresh token", "tags": ["Auth"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/expedientes": {
+      "get": { "summary": "Listar expedientes", "tags": ["Expedientes"], "parameters": [{ "name": "page", "in": "query", "schema": { "type": "integer" } }, { "name": "pageSize", "in": "query", "schema": { "type": "integer" } }], "responses": { "200": { "description": "OK" } } },
+      "post": { "summary": "Crear expediente", "tags": ["Expedientes"], "responses": { "201": { "description": "Creado" } } }
+    },
+    "/api/expedientes/{id}": {
+      "get": { "summary": "Obtener por ID", "tags": ["Expedientes"], "responses": { "200": { "description": "OK" }, "404": { "description": "No encontrado" } } },
+      "put": { "summary": "Actualizar", "tags": ["Expedientes"], "responses": { "200": { "description": "OK" } } },
+      "delete": { "summary": "Soft-delete", "tags": ["Expedientes"], "responses": { "204": { "description": "Eliminado" } } }
+    },
+    "/api/analista": {
+      "post": { "summary": "Analizar expediente con IA", "tags": ["IA - Analista"], "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalizarExpedienteRequest" } } } }, "responses": { "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnalizarExpedienteResponse" } } } } } }
+    },
+    "/api/jurisprudencia/buscar": {
+      "post": { "summary": "Buscar jurisprudencia", "tags": ["IA - Jurisprudencia"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/redactor/generar": {
+      "post": { "summary": "Generar escrito legal", "tags": ["IA - Redactor"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/predictor": {
+      "post": { "summary": "Predecir resultado de caso", "tags": ["IA - Predictor"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/casos-criticos": {
+      "post": { "summary": "Generar casos criticos", "tags": ["IA - Casos Criticos"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/objeciones": {
+      "post": { "summary": "Sugerir objeciones", "tags": ["IA - Objeciones"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/interrogatorio": {
+      "post": { "summary": "Generar plan de interrogatorio", "tags": ["IA - Interrogatorio"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/alegatos": {
+      "post": { "summary": "Generar alegatos de clausura", "tags": ["IA - Alegatos"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/chat": {
+      "post": { "summary": "Chat legal con IA", "tags": ["IA - Chat"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/plazos": {
+      "post": { "summary": "Calcular plazos procesales", "tags": ["IA - Plazos"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/resumen": {
+      "post": { "summary": "Resumen ejecutivo del caso", "tags": ["IA - Resumen"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/multidoc": {
+      "post": { "summary": "Gestión multidocumento", "tags": ["IA - Multidoc"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/boveda": {
+      "post": { "summary": "Boveda de evidencia digital", "tags": ["IA - Boveda"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/simulacion": {
+      "post": { "summary": "Iniciar simulacion de juicio", "tags": ["IA - Simulador"], "responses": { "200": { "description": "OK" } } }
+    },
+    "/api/notificaciones": {
+      "get": { "summary": "Obtener notificaciones SINOE", "tags": ["IA - Notificaciones"], "responses": { "200": { "description": "OK" } } }
+    }
+  }
+}

@@ -1,0 +1,320 @@
+# =============================================================================
+# Prometheus alerting & recording rules — Sistema RAG de LegalPro
+# =============================================================================
+# Stack asumido (alineado con docs/MONITORING_RAG_OPS.md):
+#   * El backend Node exporta métricas vía prom-client a /metrics
+#   * Métricas con prefijo rag_ (rag_query_duration_seconds, etc.)
+#   * Alertmanager recibe estas reglas y notifica a Slack + PagerDuty
+#
+# Validación local:
+#   promtool check rules ops/prometheus/rag-rules.yml
+#
+# Cómo se carga:
+#   En prometheus.yml:
+#     rule_files:
+#       - "ops/prometheus/rag-rules.yml"
+#
+# Severidades (alineadas con sla-slo.md):
+#   critical → P0 / P1 → page on-call inmediato
+#   high     → P1       → Slack + email < 5min
+#   medium   → P2       → Slack < 30min
+#   low      → P3       → Slack digest diario
+# =============================================================================
+
+groups:
+  # ──────────────────────────────────────────────────────────────────────────
+  # 1. RECORDING RULES — métricas derivadas (pre-aggregadas)
+  # ──────────────────────────────────────────────────────────────────────────
+  # Permiten queries eficientes y consistentes en alertas/dashboards.
+  - name: rag_recording_rules
+    interval: 30s
+    rules:
+      - record: rag:query_duration_seconds:p95_5m
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le, organization_id, materia) (
+              rate(rag_query_duration_seconds_bucket[5m])
+            )
+          )
+
+      - record: rag:query_duration_seconds:p99_5m
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum by (le, organization_id, materia) (
+              rate(rag_query_duration_seconds_bucket[5m])
+            )
+          )
+
+      - record: rag:query_duration_seconds:p50_5m
+        expr: |
+          histogram_quantile(
+            0.50,
+            sum by (le, organization_id, materia) (
+              rate(rag_query_duration_seconds_bucket[5m])
+            )
+          )
+
+      - record: rag:retrieval_duration_seconds:p95_5m
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (
+              rate(rag_retrieval_duration_seconds_bucket[5m])
+            )
+          )
+
+      - record: rag:cache:hit_rate_5m
+        expr: |
+          sum by (cache_layer) (rate(rag_cache_hits_total[5m]))
+          /
+          clamp_min(
+            sum by (cache_layer) (rate(rag_cache_lookups_total[5m])),
+            1
+          )
+
+      - record: rag:cost:usd_per_hour
+        expr: sum by (provider, model) (rate(rag_cost_usd_total[1h])) * 3600
+
+      - record: rag:cost:usd_per_day
+        expr: sum by (organization_id, provider) (increase(rag_cost_usd_total[24h]))
+
+      - record: rag:citations:low_confidence_pct_1h
+        expr: |
+          100.0
+          * sum(rate(rag_citations_low_confidence_total[1h]))
+          / clamp_min(sum(rate(rag_citations_total[1h])), 1)
+
+      - record: rag:hallucinations:rate_5m
+        expr: sum(rate(rag_hallucinations_total[5m]))
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2. ALERTING RULES — Sistema RAG
+  # ──────────────────────────────────────────────────────────────────────────
+  - name: rag_alerts
+    interval: 30s
+    rules:
+
+      # ── LATENCIA ──────────────────────────────────────────────────────────
+      - alert: RAGHighLatencyP95
+        expr: rag:query_duration_seconds:p95_5m > 5
+        for: 5m
+        keep_firing_for: 10m
+        labels:
+          severity: high
+          service: rag
+          slo: "latency_p95"
+        annotations:
+          summary: "RAG p95 > 5s"
+          description: |
+            Sistema RAG con latencia degradada. p95 = {{ $value | humanizeDuration }}
+            sobre organization_id={{ $labels.organization_id }} materia={{ $labels.materia }}.
+            SLO: < 3s. Umbral crítico: > 5s.
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/arneses/runbooks/RB-013-slo-violation.md"
+          dashboard: "https://grafana.legalpro.app/d/legalpro-rag-v1"
+
+      - alert: RAGHighLatencyP99
+        expr: rag:query_duration_seconds:p99_5m > 8
+        for: 5m
+        keep_firing_for: 10m
+        labels:
+          severity: high
+          service: rag
+        annotations:
+          summary: "RAG p99 > 8s"
+          description: "p99 de RAG = {{ $value | humanizeDuration }}. Posibles timeouts en clientes Android/Web."
+
+      - alert: RAGSLOBreachP95
+        expr: rag:query_duration_seconds:p95_5m > 3
+        for: 15m
+        keep_firing_for: 30m
+        labels:
+          severity: medium
+          service: rag
+          slo: "latency_p95"
+        annotations:
+          summary: "RAG p95 > 3s (SLO breach)"
+          description: "SLO p95 < 3s no cumplido durante 15min. Aún no crítico."
+
+      # ── ERROR RATE ────────────────────────────────────────────────────────
+      - alert: RAG5xxSpike
+        expr: |
+          sum(rate(rag_query_errors_total[5m]))
+          / clamp_min(sum(rate(rag_query_total[5m])), 1)
+          > 0.01
+        for: 5m
+        keep_firing_for: 5m
+        labels:
+          severity: high
+          service: rag
+        annotations:
+          summary: "RAG error rate 5xx > 1%"
+          description: "Tasa de errores 5xx en /api/ai/* y /api/legal/* > 1% durante 5min."
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/arneses/runbooks/RB-001-5xx-spike.md"
+
+      # ── CACHE ─────────────────────────────────────────────────────────────
+      - alert: RAGLowCacheHitRate
+        expr: rag:cache:hit_rate_5m < 0.30
+        for: 15m
+        keep_firing_for: 30m
+        labels:
+          severity: medium
+          service: rag
+        annotations:
+          summary: "Cache hit rate RAG < 30%"
+          description: "Cache RAG con baja efectividad durante 15min. Objetivo >= 60%."
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/ops/grafana/README.md#cache"
+
+      - alert: RAGRedisDown
+        expr: rag_cache_redis_up == 0
+        for: 1m
+        keep_firing_for: 5m
+        labels:
+          severity: high
+          service: rag
+          component: redis
+        annotations:
+          summary: "Redis cache RAG caído"
+          description: "Fallback a memoria local activo. Capacidad limitada (LRU 100 entradas)."
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/arneses/runbooks/RB-006-pg-down.md"
+
+      # ── COSTE ─────────────────────────────────────────────────────────────
+      - alert: RAGDailyCostSpike
+        expr: rag:cost:usd_per_day > 50
+        for: 1h
+        keep_firing_for: 2h
+        labels:
+          severity: high
+          service: rag
+          domain: cost
+        annotations:
+          summary: "Costo RAG 24h > $50"
+          description: |
+            organization_id={{ $labels.organization_id }} provider={{ $labels.provider }}
+            Costo 24h = ${{ $value }}. Posible spike de uso, tenant abusivo o bug.
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/arneses/runbooks/RB-012-cost-ia-spike.md"
+
+      - alert: RAGMonthlyCostProjected
+        expr: rag:cost:usd_per_day * 30 > 405   # 1.5x plan PRO ($270)
+        for: 6h
+        keep_firing_for: 24h
+        labels:
+          severity: high
+          service: rag
+          domain: cost
+        annotations:
+          summary: "Costo RAG mensual proyectado > 1.5x plan"
+          description: "Proyección a fin de mes supera umbral. Revisar top-consumo."
+
+      - alert: RAGProviderQuotaHigh
+        expr: rag_provider_quota_pct > 90
+        for: 1h
+        keep_firing_for: 4h
+        labels:
+          severity: high
+          service: rag
+          component: provider
+        annotations:
+          summary: "Quota proveedor IA > 90%"
+          description: "provider={{ $labels.provider }} modelo={{ $labels.model }} al {{ $value }}% de cuota."
+
+      # ── CALIDAD ───────────────────────────────────────────────────────────
+      - alert: RAGLowCitationConfidence
+        expr: rag:citations:low_confidence_pct_1h > 10
+        for: 1h
+        keep_firing_for: 2h
+        labels:
+          severity: high
+          service: rag
+          domain: quality
+        annotations:
+          summary: ">10% citaciones con similitud < 60%"
+          description: |
+            Calidad RAG degradada. Revisar:
+            1. Vista v_rag_top_low_confidence por materia/hora
+            2. Última ingesta de corpus jurídico (rag_corpus_snapshot)
+            3. Cambios en el modelo de embeddings
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/docs/MONITORING_RAG_OPS.md#alertas-de-calidad"
+
+      - alert: RAGHallucinationsDetected
+        expr: rag:hallucinations:rate_5m > 0
+        for: 5m
+        keep_firing_for: 30m
+        labels:
+          severity: critical
+          service: rag
+          domain: quality
+        annotations:
+          summary: "Alucinaciones detectadas en RAG"
+          description: |
+            CRÍTICO. Rate de alucinaciones = {{ $value }}/s.
+            Acciones inmediatas:
+            1. Identificar correlation_id en rag_audit_log
+            2. Revisar manualmente la respuesta
+            3. Si supera 1% del tráfico, degradar a "modo seguro" (sin generación libre)
+            4. Post-mortem obligatorio (P0/P1)
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/docs/MONITORING_RAG_OPS.md#alucinaciones"
+
+      # ── INFRAESTRUCTURA RAG ───────────────────────────────────────────────
+      - alert: RAGPgvectorSlow
+        expr: rag:retrieval_duration_seconds:p95_5m > 1
+        for: 5m
+        keep_firing_for: 10m
+        labels:
+          severity: medium
+          service: rag
+          component: pgvector
+        annotations:
+          summary: "Queries pgvector lentas (>1s p95)"
+          description: "p95 retrieval = {{ $value | humanizeDuration }}. Revisar índices ivfflat/hnsw y tamaño del corpus."
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/arneses/runbooks/RB-006-pg-down.md"
+
+      - alert: RAGPostgresDown
+        expr: up{job="legalpro-postgres"} == 0
+        for: 1m
+        keep_firing_for: 5m
+        labels:
+          severity: critical
+          service: rag
+          component: postgres
+        annotations:
+          summary: "PostgreSQL DOWN"
+          description: "Postgres no responde al exporter. RAG + backend completo no operacionales."
+          runbook_url: "https://github.com/legalpro/lexia/blob/main/arneses/runbooks/RB-006-pg-down.md"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 3. UPSTREAM — Alertas de providers de IA (Gemini / OpenAI / minimax)
+  # ──────────────────────────────────────────────────────────────────────────
+  - name: rag_provider_alerts
+    interval: 60s
+    rules:
+      - alert: RAGProviderHighErrorRate
+        expr: |
+          sum by (provider) (rate(rag_provider_errors_total[5m]))
+          / clamp_min(sum by (provider) (rate(rag_provider_requests_total[5m])), 1)
+          > 0.05
+        for: 10m
+        keep_firing_for: 15m
+        labels:
+          severity: high
+          service: rag
+          component: provider
+        annotations:
+          summary: "Provider IA {{ $labels.provider }} con >5% errores"
+          description: "Tasa de error del proveedor = {{ $value | humanizePercentage }}. Considerar fallback a modelo alternativo."
+
+      - alert: RAGProviderTimeoutHigh
+        expr: |
+          sum by (provider) (rate(rag_provider_timeouts_total[5m]))
+          / clamp_min(sum by (provider) (rate(rag_provider_requests_total[5m])), 1)
+          > 0.02
+        for: 10m
+        keep_firing_for: 15m
+        labels:
+          severity: medium
+          service: rag
+          component: provider
+        annotations:
+          summary: "Provider IA {{ $labels.provider }} con >2% timeouts"
+          description: "Posible saturación del proveedor. Revisar concurrencia y quotas."

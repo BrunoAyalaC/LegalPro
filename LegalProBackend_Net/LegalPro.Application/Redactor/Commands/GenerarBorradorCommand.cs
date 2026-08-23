@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 
 namespace LegalPro.Application.Redactor.Commands;
@@ -8,7 +9,10 @@ public record GenerarBorradorCommand(
     string TipoEscrito,
     string DistritoJudicial,
     string HechosCausa
-) : IRequest<BorradorResult>;
+) : IRequest<BorradorResult>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public record BorradorResult(string BorradorGenerado, List<string> LeyesCitadas);
 
@@ -23,11 +27,11 @@ public class GenerarBorradorValidator : AbstractValidator<GenerarBorradorCommand
 
 public class GenerarBorradorHandler : IRequestHandler<GenerarBorradorCommand, BorradorResult>
 {
-    private readonly IGeminiService _geminiService;
+    private readonly IMinimaxService _minimaxService;
 
-    public GenerarBorradorHandler(IGeminiService geminiService)
+    public GenerarBorradorHandler(IMinimaxService minimaxService)
     {
-        _geminiService = geminiService;
+        _minimaxService = minimaxService;
     }
 
     public async Task<BorradorResult> Handle(GenerarBorradorCommand request, CancellationToken cancellationToken)
@@ -39,7 +43,7 @@ public class GenerarBorradorHandler : IRequestHandler<GenerarBorradorCommand, Bo
             hechosCausa = request.HechosCausa
         });
 
-        var resultJson = await _geminiService.DraftDocumentAsync(promptData);
+        var resultJson = await _minimaxService.DraftDocumentAsync(promptData);
         var doc = System.Text.Json.JsonDocument.Parse(resultJson);
         var root = doc.RootElement;
 

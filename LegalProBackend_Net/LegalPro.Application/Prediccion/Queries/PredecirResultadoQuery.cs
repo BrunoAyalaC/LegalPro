@@ -30,16 +30,16 @@ public class PredecirResultadoValidator : AbstractValidator<PredecirResultadoQue
 
 public class PredecirResultadoHandler : IRequestHandler<PredecirResultadoQuery, PrediccionResult>
 {
-    private readonly IGeminiService _geminiService;
+    private readonly IMinimaxService _minimaxService;
 
-    public PredecirResultadoHandler(IGeminiService geminiService)
+    public PredecirResultadoHandler(IMinimaxService minimaxService)
     {
-        _geminiService = geminiService;
+        _minimaxService = minimaxService;
     }
 
     public async Task<PrediccionResult> Handle(PredecirResultadoQuery request, CancellationToken cancellationToken)
     {
-        var resultJson = await _geminiService.PredictOutcomeAsync(
+        var resultJson = await _minimaxService.PredictOutcomeAsync(
             request.HechosCausa, request.Materia, request.JuzgadoSala, request.JuezAsignado);
 
         var doc = System.Text.Json.JsonDocument.Parse(resultJson);

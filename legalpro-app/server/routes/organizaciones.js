@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import crypto from 'crypto';
 import db, { tenantQuery } from '../db.js';
-import { authMiddleware, tenantMiddleware, requireRole } from '../middleware/authMiddleware.js';
+// FIX P0-C: tenantMiddleware REAL desde tenantMiddleware.js (activa RLS vía
+// AsyncLocalStorage); la versión lite de authMiddleware.js NO envuelve en
+// tenantContext.run(...) y dejaba las queries sin aislamiento RLS.
+import { authMiddleware, requireRole } from '../middleware/authMiddleware.js';
+import { tenantMiddleware } from '../middleware/tenantMiddleware.js';
 import { validate } from '../middleware/validate.js';
 import { idempotencyMiddleware } from '../middleware/idempotencyMiddleware.js';
 import { createOrganizacionSchema } from '../schemas/organizacionSchema.js';

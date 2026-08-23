@@ -39,7 +39,7 @@ NODE_ENV=production
 SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_KEY=eyJ...
-GEMINI_API_KEY=AIza...
+MINIMAX_API_KEY=mk-...
 JWT_SECRET=super-secret-256-bits
 ```
 
@@ -83,14 +83,14 @@ ASPNETCORE_ENVIRONMENT=Production
 ASPNETCORE_URLS=http://+:8080
 ConnectionStrings__DefaultConnection=Host=db.xxx.supabase.co;Port=5432;Database=postgres;Username=postgres;Password=xxx;SSL Mode=Require;Trust Server Certificate=True
 Jwt__Secret=same-jwt-secret
-Gemini__ApiKey=AIza...
+Minimax__ApiKey=mk-...
 ```
 
 ## Checklist Pre-Deploy
 
 - [ ] Variables de entorno configuradas en Railway Dashboard
 - [ ] SUPABASE_URL y keys correctos
-- [ ] GEMINI_API_KEY configurada
+- [ ] MINIMAX_API_KEY configurada
 - [ ] Puerto correcto (Node: PORT env, .NET: 8080)
 - [ ] Health check endpoint disponible
 - [ ] CORS configurado para Android app

@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "descripcion": "Patrón Adapter para aislar al sistema de proveedores externos. Cada proveedor tiene un adapter que cumple un contrato interno.",
+  "principio": "El sistema NO debe conocer detalles de implementación de proveedores. Solo conoce interfaces internas definidas por adaptadores.",
+  "beneficios": [
+    "Cambiar de proveedor sin cambiar código de negocio",
+    "Mockear proveedores en tests",
+    "Resiliencia ante caídas de proveedores",
+    "Versionar upgrades de proveedores"
+  ],
+  "adaptadores_implementados": {
+    "auth": {
+      "interfaz_interna": "IAuthProvider",
+      "proveedor_actual": "Supabase Auth + JWT propio",
+      "ubicacion": "legalpro-app/server/supabase.js + LegalProBackend_Net/LegalPro.Infrastructure/Services/JwtService.cs",
+      "contrato": [
+        "async function login(email, password) -> { user, accessToken, refreshToken }",
+        "async function refresh(refreshToken) -> { accessToken, refreshToken }",
+        "async function logout(userId) -> void",
+        "async function getCurrentUser(accessToken) -> { user, claims }"
+      ],
+      "fallback": "Si Supabase cae, switch a JWT propio",
+      "test_mock": "SupabaseMock que retorna usuarios fake"
+    },
+    "storage": {
+      "interfaz_interna": "IStorageProvider",
+      "proveedor_actual": "Supabase Storage",
+      "ubicacion": "LegalProBackend_Net/LegalPro.Infrastructure/Services/LocalStorageService.cs",
+      "contrato": [
+        "async upload(buffer, filename, mimeType) -> { url, hash }",
+        "async download(url) -> Buffer",
+        "async delete(url) -> void",
+        "async getSignedUrl(url, expiresIn) -> string"
+      ],
+      "fallback": "Si Supabase cae, switch a S3 / R2",
+      "test_mock": "LocalStorageMock con filesystem"
+    },
+    "database": {
+      "interfaz_interna": "IApplicationDbContext",
+      "proveedor_actual": "PostgreSQL 15 (Supabase o Railway)",
+      "ubicacion": "LegalProBackend_Net/LegalPro.Infrastructure/Persistence/ApplicationDbContext.cs",
+      "contrato": [
+        "SaveChangesAsync() -> int (rows affected)",
+        "Migraciones versionadas"
+      ],
+      "fallback": "Read replica si primary cae",
+      "test_mock": "InMemoryDbContext para tests"
+    },
+    "ai": {
+      "interfaz_interna": "IOpenCodeService",
+      "proveedor_actual": "OpenCode Go (DeepSeek V4 Flash)",
+      "ubicacion": "legalpro-app/server/utils/opencodeClient.js + visionClient.js (via providerRouter.js); .NET: LegalPro.Application/Common/Interfaces/IMinimaxService.cs",
+      "contrato": [
+        "async generateContent(prompt, systemInstruction, tools) -> { content, tokens, cost }",
+        "async functionCall(tools, messages) -> { functionCalls, content }",
+        "async embed(text) -> float[] (embeddings DeepSeek)"
+      ],
+      "fallback": "Si OpenCode cae, switch a MiniMax (fallback legacy)",
+      "test_mock": "FakeOpenCodeService en IntegrationTests"
+    },
+    "payment": {
+      "interfaz_interna": "IPaymentProvider",
+      "proveedor_actual": "Stripe (futuro)",
+      "ubicacion": "TBD",
+      "contrato": [
+        "async createCustomer(orgId, email) -> { customerId }",
+        "async createSubscription(customerId, planId) -> { subscriptionId }",
+        "async chargeCredits(orgId, amount) -> { chargeId }",
+        "async handleWebhook(payload, signature) -> { event }"
+      ],
+      "fallback": "Si Stripe cae, switch a Culqi (Peru)",
+      "test_mock": "PaymentMock"
+    },
+    "email": {
+      "interfaz_interna": "IEmailProvider",
+      "proveedor_actual": "Resend (futuro) o SendGrid",
+      "ubicacion": "TBD",
+      "contrato": [
+        "async send(to, subject, html) -> { messageId }",
+        "async sendTemplate(templateId, variables, to) -> { messageId }"
+      ],
+      "fallback": "Si proveedor cae, queue + retry",
+      "test_mock": "EmailMock que registra envios"
+    },
+    "sms": {
+      "interfaz_interna": "ISmsProvider",
+      "proveedor_actual": "TBD",
+      "uso": "Notificaciones criticas LPDP breach",
+      "contrato": [
+        "async send(to, message) -> { messageId }"
+      ]
+    },
+    "bcrp": {
+      "interfaz_interna": "IBcrpProvider",
+      "proveedor_actual": "BCRP API publica",
+      "ubicacion": "TBD",
+      "uso": "Tasa de interes legal para liquidaciones laborales",
+      "contrato": [
+        "async getTasaInteresLegal(fecha) -> { tasa, fechaVigencia }",
+        "async getTipoCambio(fecha) -> { compra, venta }"
+      ],
+      "fallback": "Cache de 24h",
+      "test_mock": "BcrpMock con datos fake"
+    },
+    "sinco": {
+      "interfaz_interna": "ISincoProvider",
+      "proveedor_actual": "SINOE mock-first",
+      "ubicacion": "TBD",
+      "uso": "Notificaciones del Poder Judicial",
+      "contrato": [
+        "async getNotificaciones(expedienteId) -> Notificacion[]",
+        "async pollNew() -> Notificacion[]"
+      ],
+      "fallback": "Polling manual cada 5 min",
+      "test_mock": "SinoeMock"
+    },
+    "spij": {
+      "interfaz_interna": "ISpijProvider",
+      "proveedor_actual": "SPIJ (MINJUS) - sin API publica",
+      "ubicacion": "TBD",
+      "uso": "Validacion de codigos y leyes",
+      "contrato": [
+        "async searchNorma(query) -> Norma[]"
+      ],
+      "fallback": "Catalogos internos (catalogs/codigos-leyes.json)"
+    }
+  },
+  "patron_adapter_uso": {
+    "dependencia_inyeccion": "Inyectar IAuthProvider en lugar de SupabaseAuth directo",
+    "test_con_mocks": "Usar mocks de los adaptadores en unit tests",
+    "circuit_breaker": "Si el proveedor cae, el adapter lo maneja",
+    "versionado": "Cambiar de proveedor = cambiar implementacion del adapter"
+  },
+  "metricas": {
+    "adaptadores_implementados": 10,
+    "adaptadores_totales": 10,
+    "cobertura_contratos": 1.0,
+    "drift_ultimo_mes": 0
+  }
+}

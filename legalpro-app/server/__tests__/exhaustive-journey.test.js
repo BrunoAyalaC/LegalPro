@@ -14,13 +14,16 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
 // ── 1. MOCKING DB (pg Pool) — Impide fugas de red y acelera la matriz
+// FIX R-01: las rutas usan `tenantQuery` además de `db.query`, por lo que
+// el mock debe exportarlo también.
+const _dbQueryMock = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 });
 vi.mock('../db.js', () => ({
   default: {
-    query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+    query: (...args) => _dbQueryMock(...args),
   },
+  tenantQuery: (...args) => _dbQueryMock(...args),
+  tenantContext: { getStore: () => undefined, run: (_ctx, fn) => fn() },
 }));
-// Backwards-compat shim para cualquier import residual
-vi.mock('../supabase.js', () => ({ default: null, supabaseAdmin: null, createUserClient: vi.fn() }));
 
 let app;
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_tests_of_at_least_32_characters!';
@@ -44,9 +47,9 @@ const ENDPOINTS = [
   { path: '/api/organizaciones/invitar', method: 'POST', requiresRole: true, allowedRoles: ['OWNER', 'ADMIN'] },
   { path: '/api/organizaciones/me/miembros/usr-123', method: 'DELETE', requiresRole: true, allowedRoles: ['OWNER', 'ADMIN'] },
   // Gemini
-  { path: '/api/gemini/chat', method: 'POST', requiresRole: false }, // usa rol interno general
-  { path: '/api/gemini/jurisprudencia', method: 'GET', requiresRole: false }, // chequeado param
-  { path: '/api/gemini/consulta', method: 'POST', requiresRole: false },
+  { path: '/api/ai/chat', method: 'POST', requiresRole: false }, // usa rol interno general
+  { path: '/api/ai/jurisprudencia', method: 'GET', requiresRole: false }, // chequeado param
+  { path: '/api/ai/consulta', method: 'POST', requiresRole: false },
 ];
 
 const PAYLOAD_SCENARIOS = [
@@ -118,7 +121,7 @@ describe('Exhaustive Matrix Engine (2500+ Escenarios)', () => {
                 // Si es un rol permitido o no requiere rol a nivel router:
                 expect(res.status, `Rol permitido dio ${res.status}`).not.toBe(401);
                 // Gemini tiene sus propios 403 internos por feature (validarPermisoIA)
-                if (!endpoint.path.includes('/api/gemini')) {
+                if (!endpoint.path.includes('/api/ai')) {
                   expect(res.status, `Rol libre dio ${res.status} HTTP: ${JSON.stringify(res.body)}`).not.toBe(403);
                 }
               }

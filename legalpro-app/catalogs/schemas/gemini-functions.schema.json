@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Schema de MiniMax AI Functions",
+  "type": "object",
+  "required": ["version", "funciones"],
+  "properties": {
+    "version": { "type": "string" },
+    "sdk_recomendado": { "type": "string" },
+    "modo_default": { "type": "string" },
+    "consentimiento_transferencia_internacional_requerido": { "type": "boolean" },
+    "funciones": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Funcion" }
+    }
+  },
+  "$defs": {
+    "Funcion": {
+      "type": "object",
+      "required": ["nombre", "descripcion", "modo_fc", "parametros_json_schema"],
+      "properties": {
+        "nombre": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "modo_fc": { "enum": ["AUTO", "ANY", "NONE"] },
+        "parametros_json_schema": { "type": "object" },
+        "agente": { "type": "string" },
+        "consentimiento_internacional": { "type": "boolean" },
+        "coste_estimado_usd": { "type": "number" },
+        "disclaimer_obligatorio": { "type": "boolean" }
+      }
+    }
+  }
+}

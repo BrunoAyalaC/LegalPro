@@ -1,0 +1,243 @@
+{
+  "metadata": {
+    "nombre": "Normativa Reciente MINSA - Ministerio de Salud del Perú",
+    "fuente_principal": "https://www.gob.pe/minsa",
+    "fuentes_secundarias": [
+      "https://www.gob.pe/institucion/minsa/normas-legales",
+      "https://www.gob.pe/institucion/minsa/informes-publicaciones"
+    ],
+    "fecha_consulta": "2026-08-01",
+    "fecha_actualizacion": "2026-08-01",
+    "version": "1.0",
+    "autor": "lexia-orchestrator + integraciones-peru",
+    "descripcion": "Catálogo de resoluciones y normativa reciente del Ministerio de Salud (MINSA). Incluye normativa de SISCO, salud ocupacional, prevención y promoción de la salud.",
+    "total_documentos": 14,
+    "relevancia_legalpro": "MEDIA - Especialmente relevante para SISCO, responsabilidad médica, conflictos con establecimientos de salud, SERUMS",
+    "ente_rector": "MINSA - Ministerio de Salud",
+    "normas_relevantes_peruanas": [
+      "Ley N° 26842 - Ley General de Salud",
+      "Ley N° 29414 - Ley que establece los derechos de las personas usuarias de los servicios de salud",
+      "Ley N° 30024 - Ley que crea el Registro Nacional de Historias Clínicas Electrónicas",
+      "Ley N° 29783 - Ley de Seguridad y Salud en el Trabajo",
+      "D.S. N° 027-2015-SA - Reglamento de la Ley N° 29414",
+      "D.S. N° 005-2020-SA - Reglamento del SISCO"
+    ],
+    "notas": "Se incluyen las 5 normas recientes y 2 informes destacados, además de las 5 noticias más relevantes de julio 2026. Hay cambios importantes: juramentación de nuevo Ministro Luis Williams Dyer Fernández (28 julio 2026)."
+  },
+  "normativa_relevante_destacada": [
+    {
+      "id": "MINSA-NORMA-CREACION",
+      "tipo": "Ley de Creación",
+      "titulo": "Ley de creación del Ministerio de Salud",
+      "sumilla": "Ley de creación del Ministerio de Salud como ente rector del Sector Salud peruano.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/normas-legales/395244",
+      "relevancia_legalpro": "BAJA - Norma fundacional"
+    }
+  ],
+  "normas": [
+    {
+      "id": "MINSA-RD-830-2026-OGGRH",
+      "tipo": "Resolución Directoral",
+      "numero": "N° 830-2026-OGGRH-MINSA",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Modificar relación nominal de personal apto",
+      "sumilla": "Modificar la relación nominal consolidada a nivel nacional por unidad ejecutora del personal apto en el SERUMS.",
+      "materia": "Recursos Humanos - SERUMS",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/normas-legales/8430791-830-2026-oggrh-minsa",
+      "relevancia_legalpro": "MEDIA - SERUMS 2026"
+    },
+    {
+      "id": "MINSA-RM-660-2026",
+      "tipo": "Resolución Ministerial",
+      "numero": "N° 660-2026-MINSA",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Aceptar renuncia de Secretario General",
+      "sumilla": "Aceptar la renuncia formulada por el señor JULIO CÉSAR NIÑO BAZALAR en el cargo de Secretario General, dándosele las gracias por los servicios prestados.",
+      "materia": "Recursos Humanos - Cese",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/normas-legales/8427759-660-2026-minsa",
+      "relevancia_legalpro": "MEDIA - Cese cargo alto nivel"
+    },
+    {
+      "id": "MINSA-RD-237-2026-OGA",
+      "tipo": "Resolución Directoral",
+      "numero": "N° 237-2026-OGA-MINSA",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Aprobar renovación de afectación en uso (efficacia anticipada 01/12/2022)",
+      "sumilla": "Aprobar con eficacia anticipada al 01 de diciembre de 2022, la renovación de la afectación en uso, de bienes inmuebles de la institución.",
+      "materia": "Patrimonio - Bienes estatales",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/normas-legales/8432646-237-2026-oga-minsa",
+      "relevancia_legalpro": "MEDIA - Gestión patrimonial"
+    },
+    {
+      "id": "MINSA-RD-242-2026-OGA",
+      "tipo": "Resolución Directoral",
+      "numero": "N° 242-2026-OGA-MINSA",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Aprobar afectación de 4 bienes (efficacia anticipada 01/07/2022)",
+      "sumilla": "Aprobar con eficacia anticipada al 01 de julio de 2022, la renovación de la afectación en uso, de cuatro bienes inmuebles de la institución.",
+      "materia": "Patrimonio - Bienes",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/normas-legales/8432689-242-2026-oga-minsa",
+      "relevancia_legalpro": "MEDIA - Gestión patrimonial"
+    },
+    {
+      "id": "MINSA-RD-240-2026-OGA",
+      "tipo": "Resolución Directoral",
+      "numero": "N° 240-2026-OGA-MINSA",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Aprobar afectación de 6 bienes (efficacia anticipada 07/12/2022)",
+      "sumilla": "Aprobar con eficacia anticipada al 07 de diciembre de 2022, la renovación de la afectación en uso, de seis bienes inmuebles de la institución.",
+      "materia": "Patrimonio - Bienes",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/normas-legales/8432681-240-2026-oga-minsa",
+      "relevancia_legalpro": "MEDIA - Gestión patrimonial"
+    }
+  ],
+  "informes_destacados_2026": [
+    {
+      "id": "MINSA-COMPROMISO-INTEGRIDAD",
+      "tipo": "Compromiso Institucional",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Ministro Luis Williams Dyer Fernández suscribe Compromiso de Integridad Institucional",
+      "sumilla": "La suscripción del Compromiso de Integridad Institucional asegura el liderazgo y la voluntad explícita del nuevo ministro en materia de integridad pública.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/informes-publicaciones/8432602-ministro-de-salud-luis-williams-dyer-fernandez-suscribe-compromiso-de-integridad-institucional",
+      "relevancia_legalpro": "MEDIA - Governance integridad"
+    },
+    {
+      "id": "MINSA-SALA-EMERGENCIAS-30JUL",
+      "tipo": "Reporte Técnico",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Sala de emergencias y desastres en salud - 24 al 30 julio 2026",
+      "sumilla": "Análisis de daños a la salud por eventos de emergencias y desastres, así como de la respuesta del sector salud. Reporte semanal crítico.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/informes-publicaciones/8429377-sala-de-emergencias-y-desastres-en-salud-del-24-al-30-de-julio-del-2026",
+      "relevancia_legalpro": "ALTA - Reporte desastres salud"
+    },
+    {
+      "id": "MINSA-CONVENIO-COLECTIVO-2026",
+      "tipo": "Convenio Colectivo",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Convenio Colectivo Sector Salud 2026-2027",
+      "sumilla": "Convenio Colectivo en el Nivel Descentralizado, Ámbito Sectorial del Sector Salud 2026-2027, suscrito entre la representación empleadora y las organizaciones sindicales del Sector Salud.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/informes-publicaciones/8427360-convenio-colectivo-en-el-nivel-descentralizado-ambito-sectorial-del-sector-salud-2026-2027-suscrito-entre-la-representacion-empleadora-y-las-organizaciones-sindicales-del-sector-salud",
+      "relevancia_legalpro": "CRÍTICA - Relaciones laborales salud"
+    },
+    {
+      "id": "MINSA-RECOMED-CONTROL-2016-I",
+      "tipo": "Reporte de Control",
+      "titulo": "Recomendaciones de Informes de Control I Semestre 2016",
+      "sumilla": "Recomendaciones de Informes de Control I Semestre 2016 (Directiva N° 006-2016-CG/GPROD) - Reporte histórico.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/informes-publicaciones/8301441-recomedaciones-de-informes-de-control-i-semestre-2016",
+      "relevancia_legalpro": "BAJA - Reporte histórico"
+    }
+  ],
+  "noticias_destacadas_2026": [
+    {
+      "id": "MINSA-NEWS-MINISTRO",
+      "tipo": "Noticia Política",
+      "fecha_publicacion": "2026-07-28",
+      "titulo": "Luis Dyer Fernández juró como nuevo ministro de Salud",
+      "sumilla": "Luis Williams Dyer Fernández juramentó como nuevo Ministro de Salud del Perú el 28 de julio de 2026. Reemplaza al ministro saliente.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/noticias/1423610-luis-dyer-fernandez-juro-como-nuevo-ministro-de-salud",
+      "relevancia_legalpro": "ALTA - Cambio de autoridad"
+    },
+    {
+      "id": "MINSA-NEWS-OTITIS",
+      "tipo": "Noticia de Salud",
+      "fecha_publicacion": "2026-08-01",
+      "titulo": "Minsa brinda recomendaciones para prevenir la otitis y cuidar la salud auditiva de los niños",
+      "sumilla": "Recomendaciones del MINSA para prevenir la otitis y cuidar la salud auditiva de los niños en el Perú. Campaña de salud pública.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/noticias/1425089-minsa-brinda-recomendaciones-para-prevenir-la-otitis-y-cuidar-la-salud-auditiva-de-los-ninos",
+      "relevancia_legalpro": "MEDIA - Salud infantil"
+    },
+    {
+      "id": "MINSA-NEWS-DENGUE-LAMBAYEQUE",
+      "tipo": "Alerta Epidemiológica",
+      "fecha_publicacion": "2026-08-01",
+      "titulo": "Intensifican acciones de control larvario para evitar casos de dengue en Lambayeque",
+      "sumilla": "Intensifican acciones de control larvario para evitar ciudadanos afectados por dengue en Lambayeque. Lucha contra dengue - zoonótica.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/noticias/1425088-intensifican-acciones-de-control-larvario-para-evitar-ciudadanos-afectados-por-dengue-en-lambayeque",
+      "relevancia_legalpro": "MEDIA - Control vectorial"
+    },
+    {
+      "id": "MINSA-NEWS-HOSPITAL-LOAYZA",
+      "tipo": "Noticia de Gestión",
+      "fecha_publicacion": "2026-08-01",
+      "titulo": "Hospital Nacional Arzobispo Loayza fortalecerá la gestión operativa y de infraestructura",
+      "sumilla": "Minsa: Hospital Nacional Arzobispo Loayza fortalecerá la gestión operativa y de infraestructura para mejorar la atención de sus pacientes.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/noticias/1425065-minsa-hospital-nacional-arzobispo-loayza-fortalecera-la-gestion-operativa-y-de-infraestructura-para-mejorar-la-atencion-de-sus-pacientes",
+      "relevancia_legalpro": "MEDIA - Gestión hospitalaria"
+    },
+    {
+      "id": "MINSA-NEWS-HOSPITAL-DOS-DE-MAYO",
+      "tipo": "Noticia de Gestión",
+      "fecha_publicacion": "2026-08-01",
+      "titulo": "Minsa anuncia acciones para reducir tiempos de espera, comprar suministros y mejorar infraestructura en Hospital Dos de Mayo",
+      "sumilla": "Minsa anuncia acciones para reducir tiempos de espera, comprar suministros y mejorar infraestructura en el Hospital Dos de Mayo.",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/noticias/1425053-minsa-anuncia-acciones-para-reducir-tiempos-de-espera-comprar-suministros-y-mejorar-infraestructura-en-el-hospital-dos-de-mayo",
+      "relevancia_legalpro": "MEDIA - Gestión hospitalaria"
+    }
+  ],
+  "campanas_destacadas_2026": [
+    {
+      "id": "MINSA-CAMP-VRS",
+      "titulo": "Campaña Nacional de Inmunización contra el Virus Respiratorio Sincitial (VRS)",
+      "fecha_publicacion": "2026-07-08",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/campa%C3%B1as/143511-campana-nacional-de-inmunizacion-contra-el-virus-respiratorio-sincitial-vrs",
+      "relevancia_legalpro": "MEDIA - Inmunización"
+    },
+    {
+      "id": "MINSA-CAMP-SARAMPION",
+      "titulo": "Vacúnate contra el sarampión",
+      "fecha_publicacion": "2026-07-08",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/campa%C3%B1as/141967-vacunate-contra-el-sarampion",
+      "relevancia_legalpro": "MEDIA - Vacunación"
+    },
+    {
+      "id": "MINSA-CAMP-SERUMS-II",
+      "titulo": "Guía completa de la Evaluación para el SERUMS 2026 – II",
+      "fecha_publicacion": "2026-07-24",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/campa%C3%B1as/75053-guia-completa-de-la-evaluacion-para-el-serums-2026-ii",
+      "relevancia_legalpro": "ALTA - SERUMS II"
+    },
+    {
+      "id": "MINSA-CAMP-HIPERTENSION",
+      "titulo": "Campaña para la prevención de la hipertensión arterial",
+      "fecha_publicacion": "2026-07-24",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/campa%C3%B1as/74795-campana-para-la-prevencion-de-la-hipertension-arterial",
+      "relevancia_legalpro": "MEDIA - Prevención"
+    },
+    {
+      "id": "MINSA-CAMP-METALES-PESADOS",
+      "titulo": "Prevención ante el riesgo de exposición al mercurio y metales pesados",
+      "fecha_publicacion": "2026-07-24",
+      "url_fuente": "https://www.gob.pe/institucion/minsa/campa%C3%B1as/39165-campana-de-prevencion-ante-el-riesgo-de-exposicion-al-mercurio-y-metales-pesados",
+      "relevancia_legalpro": "ALTA - Salud ocupacional metales"
+    }
+  ],
+  "agregados_estadisticos": {
+    "total_normas_plataforma": "múltiples",
+    "entidades_relacionadas": [
+      "INEN - Instituto Nacional de Enfermedades Neoplásicas",
+      "INS - Instituto Nacional de Salud",
+      "SIS - Seguro Integral de Salud",
+      "SUSALUD - Superintendencia Nacional de Salud",
+      "FISSAL - Fondo Intangible Solidario de Salud",
+      "CENARES - Centro Nacional de Abastecimiento de Recursos Estratégicos en Salud"
+    ],
+    "sistemas_clave": [
+      "Minsa Digital - minsadigital.minsa.gob.pe",
+      "ENCAPS - Sistema de inscripción SERUMS",
+      "SIS Consulta en Línea",
+      "REUNIS - Estadísticas MINSA",
+      "RENOXI - Registro Nacional de Oxígeno",
+      "RENIPRESS - Registro Nacional de IPRESS",
+      "gSense - Ecosistema de Atención y Gestión Digital de Salud",
+      "Sala Situacional DGE - CDC Perú"
+    ],
+    "cambio_relevante_ministerial": {
+      "evento": "Juramentación nuevo Ministro",
+      "nombre": "Luis Williams Dyer Fernández",
+      "fecha": "2026-07-28",
+      "saliente": "Julio César Niño Bazalar (Secretario General cesado)"
+    },
+    "caso_hospitalario_destacado": "Primera craneotomía exitosa en Hospital Santa Rosa de Pueblo Libre (1 agosto 2026)"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "metadata": {
+    "nombre": "Jurisprudencia Constitucional del Perú - Actualizado al 01/08/2026",
+    "fuente_principal": "https://www.tc.gob.pe",
+    "fecha_actualizacion": "2026-08-01",
+    "version": "1.0",
+    "descripcion": "Sentencias y resoluciones relevantes del Tribunal Constitucional del Perú",
+    "total_documentos": 8
+  },
+  "jurisprudencia": [
+    {
+      "id": "TC-2026-HC-HUMALA",
+      "tipo": "Habeas Corpus",
+      "expediente": "Exp. N° 05436-2014-PHC/TC y acumulados",
+      "fecha_sentencia": "2026-07-31",
+      "caso": "Ollanta Humala Tasso - Lavado de Activos",
+      "sumilla": "Declara FUNDADA la demanda de habeas corpus. Ordena la NULIDAD del proceso penal por lavado de activos por violación del derecho al plazo razonable y debido proceso.",
+      "materia": "Penal - Constitucional",
+      "precedente_vinculante": false,
+      "palabras_clave": ["habeas corpus", "lavado de activos", "plazo razonable", "nulidad procesal", "Ollanta Humala"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "ALTA - Caso penal emblemático 2026",
+      "notas": "Repercusión nacional. Caso de alto impacto político y jurídico."
+    },
+    {
+      "id": "TC-2026-SENASA-PLAGUICIDAS",
+      "tipo": "Proceso de Amparo",
+      "fecha_sentencia": "2026-07-24",
+      "caso": "Suspensión de venta de plaguicidas",
+      "sumilla": "El TC ordena a SENASA suspender la venta de plaguicidas que contengan sustancias activas destinadas a la producción de alimentos de consumo interno, por afectación al derecho a la salud y ambiente sano.",
+      "materia": "Constitucional - Ambiental - Salud",
+      "precedente_vinculante": false,
+      "palabras_clave": ["derecho a la salud", "ambiente", "plaguicidas", "SENASA", "alimentos", "amparo"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "ALTA - Tutela de derechos colectivos"
+    },
+    {
+      "id": "TC-2026-PROTESTA",
+      "tipo": "Acción de Inconstitucionalidad",
+      "fecha_sentencia": "2026-07-22",
+      "caso": "Derecho a la protesta",
+      "sumilla": "El TC declara INCONSTITUCIONAL la norma que modificaba el derecho fundamental a la protesta, ratificándolo como derecho constitucional protegido.",
+      "materia": "Constitucional - Derechos Fundamentales",
+      "precedente_vinculante": true,
+      "palabras_clave": ["derecho a la protesta", "inconstitucionalidad", "derechos fundamentales", "libertad de expresión"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "ALTA - Precedente vinculante",
+      "notas": "Aplicable a casos de detención en protestas sociales."
+    },
+    {
+      "id": "TC-2014-HACINAMIENTO",
+      "tipo": "Proceso de Habeas Corpus",
+      "expediente": "Exp. N° 05436-2014-PHC/TC",
+      "fecha_sentencia": "2014-actualizado-2026",
+      "caso": "Estado de cosas inconstitucional - Sistema penitenciario",
+      "sumilla": "El TC declara estado de cosas inconstitucional respecto del hacinamiento de los establecimientos penitenciarios y las severas deficiencias en infraestructura, salud, seguridad y servicios básicos.",
+      "materia": "Penal - Constitucional",
+      "precedente_vinculante": true,
+      "palabras_clave": ["hacinamiento", "penitenciario", "estado de cosas inconstitucional", "derechos humanos", "salud penitenciaria"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "CRÍTICA - Base del D.Leg. 1619",
+      "notas": "Vigente. Plazo declarado por el TC hasta 31/12/2025 (declarado en D.Leg. 1619)."
+    },
+    {
+      "id": "TC-SALA1-INFORMES",
+      "tipo": "Actividad Jurisdiccional",
+      "fecha": "2026-07-31",
+      "caso": "Sala Primera del TC - Audiencia Pública",
+      "sumilla": "Sala Primera escuchó informes orales y dejó al voto 60 procesos constitucionales durante audiencia pública.",
+      "materia": "Constitucional - Procesal",
+      "palabras_clave": ["Sala Primera", "informes orales", "audiencia pública", "60 procesos"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "MEDIA - Información procesal"
+    },
+    {
+      "id": "TC-SALA2-CALENDARIO",
+      "tipo": "Actividad Jurisdiccional",
+      "fecha": "2026-07-30",
+      "caso": "Sala Segunda del TC - Próxima audiencia",
+      "sumilla": "Sala Segunda verá 60 causas el miércoles 5 de agosto de 2026.",
+      "materia": "Constitucional - Procesal",
+      "palabras_clave": ["Sala Segunda", "calendario", "60 causas"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "BAJA - Información de calendario"
+    },
+    {
+      "id": "TC-PRESIDENTE",
+      "tipo": "Información Institucional",
+      "fecha": "2026-07-29",
+      "caso": "Presidente del TC - Helder Domínguez",
+      "sumilla": "Presidente del TC Helder Domínguez Haro preside el tribunal desde 2025.",
+      "materia": "Institucional",
+      "palabras_clave": ["Helder Domínguez", "presidente TC", "institucional"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "BAJA - Información institucional"
+    },
+    {
+      "id": "TC-CEC-LIBRO",
+      "tipo": "Publicación Académica",
+      "fecha": "2026-07-22",
+      "caso": "Libro 'Historia del Tribunal Constitucional'",
+      "sumilla": "En conversatorio fue presentado el libro sobre la historia del TC en el marco de los 30 años de su funcionamiento (1996-2026).",
+      "materia": "Académica",
+      "palabras_clave": ["historia", "30 años", "conversatorio", "CEC"],
+      "url_fuente": "https://www.tc.gob.pe",
+      "relevancia_legalpro": "MEDIA - Doctrina constitucional"
+    }
+  ]
+}

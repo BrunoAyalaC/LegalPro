@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "descripcion": "Golden set de prompts para evals IA (regression testing)",
+  "uso": "Ejecutar en `nightly-ia-evals.yml` (cron 02:00 UTC) para detectar regresiones",
+  "casos": [
+    {
+      "id": "EVAL-001",
+      "herramienta": "analizar_expediente",
+      "input": {
+        "expediente_id": "test-penal-001",
+        "tipo_analisis": "completo",
+        "rol_usuario": "ABOGADO"
+      },
+      "expected_keywords": ["tipicidad", "prueba", "plazo", "estrategia"],
+      "expected_citas": ["CP art. 106", "NCPP art. 159"],
+      "expected_disclaimers": ["disclaimer_lopj_290", "disclaimer_cpp_ix"]
+    },
+    {
+      "id": "EVAL-002",
+      "herramienta": "redactar_escrito",
+      "subtipo": "demanda",
+      "input": {
+        "tipo_escrito": "demanda",
+        "expediente_id": "test-civil-001",
+        "hechos": "Incumplimiento de contrato de compraventa",
+        "fundamentos": "CC art. 1350, CC art. 1969"
+      },
+      "expected_format": "PJ peruano",
+      "expected_citas": ["CC art. 1350", "CC art. 1969"],
+      "expected_disclaimers": ["disclaimer_redactor"]
+    },
+    {
+      "id": "EVAL-003",
+      "herramienta": "calcular_plazos",
+      "input": {
+        "acto_procesal": "Apelación de sentencia civil",
+        "fecha_inicio": "2026-03-15",
+        "tipo_plazo": "habiles"
+      },
+      "expected_result": {
+        "dias": 5,
+        "tipo": "habiles",
+        "fecha_vencimiento": "2026-03-20"
+      }
+    },
+    {
+      "id": "EVAL-004",
+      "herramienta": "predecir_resultado",
+      "input": {
+        "expediente_id": "test-civil-001",
+        "materia": "civil"
+      },
+      "expected_disclaimers": ["disclaimer_predictor"]
+    },
+    {
+      "id": "EVAL-005",
+      "herramienta": "liquidar_laboral",
+      "subtipo": "cts",
+      "input": {
+        "tipo_liquidacion": "cts",
+        "fecha_inicio": "2024-01-01",
+        "fecha_fin": "2024-12-31",
+        "remuneracion": 5000,
+        "sistema_pension": "AFP"
+      },
+      "expected_formula": "1/6 * mejor_remuneracion * meses_completos",
+      "expected_afp": "10% del aporte"
+    }
+  ]
+}

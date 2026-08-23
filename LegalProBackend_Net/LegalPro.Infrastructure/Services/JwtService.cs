@@ -98,44 +98,4 @@ public class JwtService : IJwtService
         var bytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(64);
         return Convert.ToBase64String(bytes);
     }
-
-    /// <summary>
-    /// Válida un AccessToken vencido y extrae el UserId del claim 'sub'.
-    /// NO valida expiración ni firma para soportar el flujo de refresh.
-    /// Retorna null si el token no es parseable o no tiene claim 'sub'.
-    /// </summary>
-    public int? GetUserIdFromExpiredToken(string token)
-    {
-        try
-        {
-            var secret = _configuration["JWT_SECRET"]
-                         ?? _configuration["JwtSettings:Secret"]
-                         ?? throw new InvalidOperationException("JWT_SECRET no configurado.");
-
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
-                ValidateIssuer = true,
-                ValidIssuer = ValidIssuer,
-                ValidateAudience = true,
-                ValidAudience = ValidAudience,
-                // IMPORTANTE: no validar expiración para poder extraer claims de token vencido
-                ValidateLifetime = false,
-            };
-
-            var principal = new JwtSecurityTokenHandler()
-                .ValidateToken(token, tokenValidationParameters, out _);
-
-            var sub = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-                      ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            return int.TryParse(sub, out var id) ? id : null;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "No se pudo extraer UserId del token vencido.");
-            return null;
-        }
-    }
 }

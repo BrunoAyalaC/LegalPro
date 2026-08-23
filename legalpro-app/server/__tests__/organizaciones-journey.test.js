@@ -7,13 +7,16 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
 // Mock pg Pool (db.js) — previene conexión real a PostgreSQL en tests
+// FIX R-01: las rutas usan `tenantQuery` además de `db.query`, por lo que
+// el mock debe exportarlo también.
+const _dbQueryMock = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 });
 vi.mock('../db.js', () => ({
   default: {
-    query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+    query: (...args) => _dbQueryMock(...args),
   },
+  tenantQuery: (...args) => _dbQueryMock(...args),
+  tenantContext: { getStore: () => undefined, run: (_ctx, fn) => fn() },
 }));
-// Backwards-compat shim
-vi.mock('../supabase.js', () => ({ default: null, supabaseAdmin: null, createUserClient: vi.fn() }));
 
 let app;
 const JWT_SECRET = process.env.JWT_SECRET || 'TestSmokeKey_MustBe32CharsLongForValidation!';
@@ -116,38 +119,38 @@ describe('Journey: Multi-tenant — Aislamiento de datos', () => {
 // JOURNEY 4: Gemini API — Guards de autenticación
 // ═══════════════════════════════════════════════════════════════════════
 describe('Journey: Gemini API — Require Auth', () => {
-  it('401 — POST /api/gemini/chat sin token', async () => {
+  it('401 — POST /api/ai/chat sin token', async () => {
     const res = await request(app)
-      .post('/api/gemini/chat')
+      .post('/api/ai/chat')
       .send({ mensaje: 'Hola IA', sesionId: null });
     expect(res.status).toBe(401);
   });
 
-  it('401 — POST /api/gemini/redactor sin token', async () => {
+  it('401 — POST /api/ai/redactor sin token', async () => {
     const res = await request(app)
-      .post('/api/gemini/redactor')
+      .post('/api/ai/redactor')
       .send({ tipo: 'demanda', hechos: 'Los hechos del caso...' });
     expect(res.status).toBe(401);
   });
 
-  it('401 — POST /api/gemini/predictor sin token', async () => {
+  it('401 — POST /api/ai/predictor sin token', async () => {
     const res = await request(app)
-      .post('/api/gemini/predictor')
+      .post('/api/ai/predictor')
       .send({ caso: 'Caso penal', materia: 'PENAL' });
     expect(res.status).toBe(401);
   });
 
-  it('401 — POST /api/gemini/alegatos sin token', async () => {
+  it('401 — POST /api/ai/alegatos sin token', async () => {
     const res = await request(app)
-      .post('/api/gemini/alegatos')
+      .post('/api/ai/alegatos')
       .send({ expedienteId: 1 });
     expect(res.status).toBe(401);
   });
 
-  it('no 401 — POST /api/gemini/chat con token válido', async () => {
+  it('no 401 — POST /api/ai/chat con token válido', async () => {
     const token = makeToken({ id: 9 });
     const res = await request(app)
-      .post('/api/gemini/chat')
+      .post('/api/ai/chat')
       .set('Authorization', `Bearer ${token}`)
       .send({ mensaje: 'Hola IA', sesionId: 'test-sesion' });
     // Con API key falsa y Supabase mock, puede retornar 500, 400 o 403

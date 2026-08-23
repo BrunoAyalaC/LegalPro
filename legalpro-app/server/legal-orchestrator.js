@@ -3,42 +3,137 @@
 // Generado por @arquitecto-chief + @abogado-chief
 // Patron: abogado-senior -> abogado-jr-* especialistas -> consolidacion -> usuario
 
-import { GoogleGenAI } from '@google/genai';
+import { createAiAdapter } from './utils/providerRouter.js';
 import { legalRouter } from './legal-router.js';
-import Cache from './cache-redis.js';
-const cache = Cache;
-import { logAudit } from '../utils/audit.js';
+import { get, set } from './cache.js';
+import { logAudit } from './utils/audit.js';
+import { sanitizarPrompt, envolverContenidoUsuario } from './middleware/promptSanitizer.js';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const GEMINI_MODEL = 'gemini-2.5-flash-lite'; // Gemini 3.5 Flash Lite
-const API_KEY = process.env.GEMINI_API_KEY;
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const CATALOGOS_PATH = path.resolve(__dirname, '../catalogs');
 
-// System instruction base (compartido por todos los abogados)
-const BASE_LEGAL_INSTRUCTION = `Eres parte del sistema LegalPro / LexIA Peru, un asistente juridico especializado en el ordenamiento peruano.
+function cargarCatalogo(nombre) {
+  try {
+    const content = fs.readFileSync(path.join(CATALOGOS_PATH, nombre), 'utf-8');
+    return JSON.parse(content);
+  } catch (err) {
+    console.warn(`[orchestrator] No se pudo cargar catálogo: ${nombre}`, err.message);
+    return null;
+  }
+}
 
-REGLAS DURAS:
-1. Cita SIEMPRE la base legal (CC, CP, CPC, NCPP, LPDP, etc.) con articulo.
-2. NUNCA inventes jurisprudencia. Si no conoces, di "consultar fuentes oficiales".
-3. SIEMPRE incluye los 4 disclaimers obligatorios al final:
-   - "Esto NO constituye asesoria legal"
-   - "Consulta con un abogado colegiado"
-   - "Verifica la vigencia de las normas citadas"
-   - "La IA puede cometer errores"
-4. Considera el LPDP 29733 (consentimientos, ARCO, transferencia internacional).
-5. Si la consulta es cross-rama, escala al senior correspondiente.
-6. Output en espanol Peru (es-PE).
-7. Estructura: HECHOS, BASE LEGAL, ANALISIS, CONCLUSION, DISCLAIMERS.
+// Cargar catálogos al inicio
+const CODIGOS_LEYES = cargarCatalogo('codigos-leyes.json');
+const TIPOS_PENALES = cargarCatalogo('tipos-penales-peru.json');
+const PLAZOS_PROCESALES = cargarCatalogo('plazos-procesales.json');
+const DISCLAIMERS = cargarCatalogo('disclaimers-ia.json');
 
-CATALOGOS DISPONIBLES (single source of truth):
-- catalogs/codigos-leyes.json (20 codigos y leyes)
-- catalogs/tipos-penales-peru.json (25 tipos penales)
-- catalogs/plazos-procesales.json (17 plazos)
-- catalogs/delitos-economicos.json
-- catalogs/reguladores-peru.json
-- catalogs/disclaimers-ia.json
+const OPENCODE_MODEL = process.env.OPENCODE_MODEL || 'deepseek-v4-flash-free';
 
-SIEMPRE valida tus respuestas contra los catalogos antes de responder.`;
+// Lazy initialization del proveedor IA activo (OPENCODE-FIRST: DeepSeek V4 Flash
+// por defecto, MiniMax como fallback vía providerRouter).
+let _ai = null;
+function getAi() {
+  if (!_ai) _ai = createAiAdapter();
+  return _ai;
+}
+
+/**
+ * Formatea los catálogos cargados para inyectarlos en el system prompt
+ */
+function formatCatalogsForPrompt() {
+  let result = '\n\n=== CATÁLOGOS VERIFICADOS POR ABOGADOS PERUANOS ===\n\n';
+
+  result += '📚 CÓDIGOS Y LEYES VIGENTES:\n';
+  if (CODIGOS_LEYES && CODIGOS_LEYES.normas) {
+    result += CODIGOS_LEYES.normas.map(n =>
+      `- ${n.nombre} (${n.numero}) [${n.tipo}]\n  Artículos clave: ${n.articulos_mas_citados.join(', ')}\n  SPIJ: ${n.url_spij}`
+    ).join('\n') + '\n';
+  } else {
+    result += '  [No disponible - usar conocimiento interno]\n';
+  }
+
+  result += '\n⚖️ TIPOS PENALES (Código Penal):\n';
+  if (TIPOS_PENALES && TIPOS_PENALES.tipos) {
+    result += TIPOS_PENALES.tipos.map(t =>
+      `- ${t.nombre} (Art. ${t.articulo_cp} CP): Pena ${t.pena_minima} - ${t.pena_maxima}, Bien jurídico: ${t.bien_juridico}`
+    ).join('\n') + '\n';
+  } else {
+    result += '  [No disponible - usar conocimiento interno]\n';
+  }
+
+  result += '\n📅 PLAZOS PROCESALES:\n';
+  if (PLAZOS_PROCESALES && PLAZOS_PROCESALES.plazos) {
+    result += PLAZOS_PROCESALES.plazos.map(p =>
+      `- ${p.acto}: ${p.dias} ${p.tipo || 'días'} (${p.codigo} art. ${p.articulo})`
+    ).join('\n') + '\n';
+  } else {
+    result += '  [No disponible - usar conocimiento interno]\n';
+  }
+
+  return result;
+}
+
+// System instruction base construida dinámicamente con los catálogos
+const BASE_LEGAL_INSTRUCTION = buildBaseLegalInstruction();
+
+function buildBaseLegalInstruction() {
+  const catalogsSection = formatCatalogsForPrompt();
+
+  return `Eres parte del sistema LegalPro / LexIA Peru — asistente legal peruano.
+
+TIENES 3 FUENTES DE CONOCIMIENTO:
+1. TU CONOCIMIENTO INTERNO: Todo tu training en derecho peruano.
+2. CATÁLOGOS VERIFICADOS (abajo): Leyes actualizadas por abogados peruanos.
+3. BÚSQUEDA INTERNA: Conocimiento entrenado hasta la fecha de corte.
+
+REGLAS:
+1. Prioridad: Catálogo > Web > Conocimiento interno
+2. Si una ley NO está en el catálogo pero la conoces, USALA igual.
+3. Si es una ley muy reciente (últimos meses), búscala en web.
+4. Cita SIEMPRE con artículo específico (ej: "LPCL Art. 34", no **LPCL Art. 34**).
+5. NUNCA inventes jurisprudencia.
+6. Incluye SIEMPRE los 4 disclaimers obligatorios al final del mensaje, separados por líneas.
+7. Considera el LPDP 29733.
+8. Output en español Perú (es-PE), CLARO y DIRECTO.
+
+FORMATO OBLIGATORIO (SIN markdown, SIN asteriscos, SIN numerales):
+- NO uses ##, **, *, -, >>> ni ningún formato markdown.
+- Usa texto plano con mayúsculas para títulos: "RESUMEN EJECUTIVO:" en lugar de "## Resumen Ejecutivo".
+- Usa sangría con espacios para subsecciones en lugar de - o *.
+- Separa secciones con una línea en blanco.
+- Las leyes se escriben como: LPCL Art. 34 (sin negrita ni asteriscos).
+- Los disclaimers al final, uno por línea, sin formato.
+
+ESTRUCTURA:
+RESUMEN EJECUTIVO:
+[texto]
+
+BASE LEGAL:
+LPCL Art. 34 — Descripción del artículo
+DS 003-97-TR Art. 3 — Descripción
+
+ANÁLISIS:
+[texto]
+
+RIESGOS:
+[texto]
+
+RECOMENDACIÓN:
+[texto]
+
+DISCLAIMERS:
+Esto NO constituye asesoría legal.
+Consulte con un abogado colegiado.
+Verifique la vigencia de las normas citadas.
+La IA puede cometer errores.
+
+${catalogsSection}`;
+}
 
 // Cache TTL: 24h (las consultas legales no cambian frecuentemente)
 const CACHE_TTL = 24 * 60 * 60;
@@ -60,7 +155,10 @@ INSTRUCCIONES ADICIONALES:
 - Solo responde aspectos de tu especialidad.
 - Si la consulta NO es de tu especialidad, responde: "{specialty}_NOT_APPLICABLE".
 - Cita SIEMPRE las normas de tu area con articulos especificos.
-- Si hay conflicto con otra rama del derecho, mencionalo.`;
+- Usa los CATÁLOGOS VERIFICADOS provistos arriba como referencia prioritaria para tu especialidad.
+- Consulta el catálogo de plazos procesales si la consulta involucra plazos o términos.
+- Si hay conflicto con otra rama del derecho, mencionalo.
+- Incluye los disclaimers obligatorios del catálogo de disclaimers.`;
 }
 
 /**
@@ -95,7 +193,7 @@ const SPECIALTY_TO_AGENT = {
 };
 
 /**
- * Llama a un agente jr-especialista via Gemini
+ * Llama a un agente jr-especialista via el proveedor IA (MiniMax/OpenCode)
  */
 async function callSpecialist(specialty, query, context = {}) {
   const agentName = SPECIALTY_TO_AGENT[specialty];
@@ -105,26 +203,32 @@ async function callSpecialist(specialty, query, context = {}) {
 
   // Verificar cache
   const cacheKey = `legal:${specialty}:${hashKey({ q: query, c: context })}`;
-  const cached = await cache.get(cacheKey);
+  const cached = await get(cacheKey);
   if (cached) {
     return { specialty, agent: agentName, ...cached, cached: true };
   }
 
+  // Sanitizar PII antes de enviar a MiniMax (Ley 29733 LPDP)
+  const { sanitizado: querySanitizada } = sanitizarPrompt(query, 'consulta');
+  const safeQuery = envolverContenidoUsuario(querySanitizada, 'CONSULTA_USUARIO');
+  const { sanitizado: contextSanitized } = sanitizarPrompt(JSON.stringify(context), 'expediente');
+  const safeContext = envolverContenidoUsuario(contextSanitized, 'CONTEXTO');
+
   try {
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
+    const response = await getAi().models.generateContent({
+      model: OPENCODE_MODEL,
       contents: [{
         role: 'user',
-        parts: [{ text: `Consulta del usuario: ${query}\n\nContexto adicional: ${JSON.stringify(context)}` }]
+        parts: [{ text: `${safeQuery}\n\nContexto adicional: ${safeContext}` }]
       }],
       config: {
         systemInstruction: getSystemInstructionForSpecialty(specialty),
         temperature: 0.2,
-        maxOutputTokens: 2048
+        maxOutputTokens: 2048,
       }
     });
 
-    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = response.text || '';
     const applicable = !text.includes(`${specialty.toUpperCase()}_NOT_APPLICABLE`);
 
     const result = {
@@ -140,7 +244,7 @@ async function callSpecialist(specialty, query, context = {}) {
 
     // Guardar en cache solo si es aplicable
     if (applicable) {
-      await cache.set(cacheKey, result, CACHE_TTL);
+      await set(cacheKey, result, CACHE_TTL);
     }
 
     return result;
@@ -170,11 +274,17 @@ ${r.content}
 ---
 `).join('\n');
 
+  // Sanitizar PII antes de consolidar (Ley 29733 LPDP)
+  const { sanitizado: qSanitizada } = sanitizarPrompt(query, 'consulta');
+  const safeQuery = envolverContenidoUsuario(qSanitizada, 'CONSULTA_USUARIO');
+  const { sanitizado: cSanitized } = sanitizarPrompt(JSON.stringify(context), 'expediente');
+  const safeContext = envolverContenidoUsuario(cSanitized, 'CONTEXTO');
+
   const consolidationPrompt = `Eres un abogado senior con 10+ anos de experiencia en ${seniorSpecialty} en el ordenamiento peruano.
 
-Consulta original del usuario: "${query}"
+Consulta original del usuario: "${safeQuery}"
 
-Contexto: ${JSON.stringify(context)}
+Contexto: ${safeContext}
 
 Respuestas de tus especialistas juniors:
 ${consolidatedContext}
@@ -191,8 +301,8 @@ TU TAREA:
 NO alucines. Si una respuesta es debil, mencionalo honestamente.`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
+    const response = await getAi().models.generateContent({
+      model: OPENCODE_MODEL,
       contents: [{
         role: 'user',
         parts: [{ text: consolidationPrompt }]
@@ -200,11 +310,11 @@ NO alucines. Si una respuesta es debil, mencionalo honestamente.`;
       config: {
         systemInstruction: BASE_LEGAL_INSTRUCTION,
         temperature: 0.15,
-        maxOutputTokens: 4096
+        maxOutputTokens: 4096,
       }
     });
 
-    const finalResponse = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const finalResponse = response.text || '';
 
     return {
       success: true,
@@ -244,7 +354,7 @@ export async function processLegalQuery(query, context = {}, options = {}) {
   // Verificar cache de respuesta completa
   const fullCacheKey = `legal-full:${hashKey({ q: query, c: context })}`;
   if (!skipCache) {
-    const cached = await cache.get(fullCacheKey);
+    const cached = await get(fullCacheKey);
     if (cached) {
       await logAudit('LEGAL_QUERY_CACHED', {
         severity: 'INFO',
@@ -300,7 +410,7 @@ export async function processLegalQuery(query, context = {}, options = {}) {
 
   // Guardar en cache
   if (consolidated.success) {
-    await cache.set(fullCacheKey, consolidated, CACHE_TTL);
+    await set(fullCacheKey, consolidated, CACHE_TTL);
   }
 
   return {

@@ -9,7 +9,7 @@ namespace LegalPro.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[EnableRateLimiting("gemini")]
+[EnableRateLimiting("minimax")]
 public class ObjecionesController : ControllerBase
 {
     private readonly IMediator _mediator;

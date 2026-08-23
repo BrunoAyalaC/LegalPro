@@ -10,7 +10,7 @@ namespace LegalPro.Infrastructure.Services;
 // SRP: SimulationService ONLY orchestrates.
 // OCP: Uses Simulacion.Crear() factory method — adding new
 //      creation rules modifies the entity, not this service.
-// DIP: Depends on ISimulationAI, not concrete GeminiService.
+// DIP: Depends on ISimulationAI, not a concrete IA service implementation.
 // ═══════════════════════════════════════════════════════
 public class SimulationService : ISimulationService
 {
@@ -75,6 +75,7 @@ public class SimulationService : ISimulationService
     public async Task<Simulacion?> ObtenerSimulacionActivaObtenerAsync(Guid usuarioId)
     {
         return await _context.Simulaciones
+            .AsNoTracking()
             .Include(s => s.Eventos)
             .FirstOrDefaultAsync(s => s.UsuarioId == usuarioId && !s.EstaFinalizada);
     }

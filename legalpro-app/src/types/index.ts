@@ -37,7 +37,7 @@ export interface TenantContextType extends TenantState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<LoginResult>;
+  login: (email: string, password: string, remember?: boolean) => Promise<LoginResult>;
   logout: () => void;
   refreshToken: () => Promise<void>;
 }

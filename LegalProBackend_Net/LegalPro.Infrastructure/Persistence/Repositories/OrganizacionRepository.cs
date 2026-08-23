@@ -32,6 +32,7 @@ public class OrganizacionRepository : IOrganizacionRepository
     /// <inheritdoc/>
     public async Task<Organizacion?> GetBySlugAsync(string slug, CancellationToken ct)
         => await _context.Organizaciones
+            .AsNoTracking()
             .FirstOrDefaultAsync(o => o.Slug == slug.ToLowerInvariant(), ct);
 
     /// <inheritdoc/>

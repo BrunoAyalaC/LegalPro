@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "fuente": "Poder Judicial del Perú",
+    "tipo": "Casaciones",
+    "cargado_en_vector_store": true,
+    "total_registros": 50
+  },
+  "registros": [
+    {
+      "id": "JP-001",
+      "tipo": "CASACION",
+      "numero": "386-2015-Lambayeque",
+      "fecha": "2015-11-12",
+      "sala": "Sala Penal Permanente",
+      "materia": "Penal",
+      "delito": "Hurto Agravado",
+      "sumilla": "Para la configuracion del hurto agravado es necesario que se acredite el uso de llave falsa, escalamiento, o pluralidad de agentes, conforme al art. 186 del CP",
+      "ratio_decidendi": "Los medios probatorios deben acreditar de manera fehaciente cada una de las causales de agravacion del art. 186 del Codigo Penal",
+      "obiter_dicta": "La valoracion de la prueba se realiza conforme a la sana critica",
+      "fuente_url": "https://www.pj.gob.pe/corte-suprema/casaciones/cas-386-2015.pdf",
+      "embeddings_cargados": true
+    },
+    {
+      "id": "JP-002",
+      "tipo": "CASACION",
+      "numero": "658-2016-Lima",
+      "fecha": "2016-09-22",
+      "sala": "Sala Penal Permanente",
+      "materia": "Penal",
+      "delito": "Peculado",
+      "sumilla": "El delito de peculado requiere que el funcionario publico se apropie o utilize bienes del Estado con cargo a sus funciones",
+      "ratio_decidendi": "El elemento subjetivo del tipo requiere animo de apropiacion definitiva",
+      "fuente_url": "https://www.pj.gob.pe/corte-suprema/casaciones/cas-658-2016.pdf",
+      "embeddings_cargados": true
+    },
+    {
+      "id": "JP-003",
+      "tipo": "ACUERDO_PLENARIO",
+      "numero": "1-2017/CIJ-116",
+      "fecha": "2017-10-06",
+      "materia": "Penal",
+      "tema": "Prueba ilicita y prueba actuada con violacion de garantias",
+      "sumilla": "La prueba ilicitamente obtenida no puede ser valorada, ni siquiera de manera indirecta",
+      "ratio_decidendi": "La exclusion probatoria opera respecto de la prueba ilicita directa pero no cuando es indirecta, salvo que se derive directamente de la ilicita",
+      "vinculante": true,
+      "fuente_url": "https://www.pj.gob.pe/corte-suprema/acuerdos-plenarios/ap-01-2017.pdf",
+      "embeddings_cargados": true
+    },
+    {
+      "id": "JP-004",
+      "tipo": "TC_SENTENCIA",
+      "numero": "Exp 02412-2014-PA/TC",
+      "fecha": "2016-05-10",
+      "tribunal": "Tribunal Constitucional",
+      "materia": "Constitucional",
+      "derecho": "Pension alimenticia",
+      "sumilla": "El derecho a los alimentos es de naturaleza constitucional y debe ser garantizado conforme al principio del interes superior del nino",
+      "ratio_decidendi": "El Estado y la sociedad tienen el deber de proteger especialmente a los menores de edad",
+      "vinculante": true,
+      "fuente_url": "https://www.tc.gob.pe/jurisprudencia/2016/02412-2014-AA.pdf",
+      "embeddings_cargados": true
+    }
+  ]
+}

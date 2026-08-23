@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!-- legalpro-owner-dashboard/public/owner-dashboard.html -->
+<!-- Dashboard del owner con tabla de tenants + graficos + acciones -->
+
+<html lang="es-PE">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LegalPro · Owner Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f1f5f9; --muted: #94a3b8;
+      --primary: #3b82f6; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --purple: #8b5cf6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    h1 { margin-bottom: 8px; font-size: 28px; }
+    .subtitle { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+    .actions-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+    .actions-bar .btn { padding: 8px 18px; font-size: 14px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+    .kpi-label { color: var(--muted); font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
+    .kpi-value { font-size: 32px; font-weight: 700; }
+    .section { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 24px; width: 100%; max-width: 1200px; }
+    .section-title { font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section-title::before { content: ''; width: 4px; height: 20px; background: var(--primary); border-radius: 2px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 12px 8px; color: var(--muted); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 12px 8px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    tr:hover { background: rgba(255,255,255,0.02); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .badge.free { background: rgba(148,163,184,0.2); color: var(--muted); }
+    .badge.pro { background: rgba(59,130,246,0.2); color: var(--primary); }
+    .badge.enterprise { background: rgba(139,92,246,0.2); color: var(--purple); }
+    .badge-suspended { background: rgba(239,68,68,0.2); color: var(--danger); }
+    .badge-active { background: rgba(16,185,129,0.2); color: var(--success); }
+    .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-size: 13px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:hover { background: var(--border); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-danger { color: var(--danger); border-color: var(--danger); }
+    .btn-danger:hover { background: rgba(239,68,68,0.15); }
+    .btn-success { color: var(--success); border-color: var(--success); }
+    .btn-success:hover { background: rgba(16,185,129,0.15); }
+    .btn-warning { color: var(--warning); border-color: var(--warning); }
+    .btn-warning:hover { background: rgba(245,158,11,0.15); }
+    .btn-refund { color: #a78bfa; border-color: #a78bfa; }
+    .btn-refund:hover { background: rgba(167,139,250,0.15); }
+    .chart-container { height: 280px; position: relative; width: 100%; max-width: 1200px; margin-bottom: 24px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+    .login-form { max-width: 420px; width: 100%; margin: 80px auto; background: var(--card); padding: 40px; border-radius: 12px; border: 1px solid var(--border); }
+    .login-form input { width: 100%; padding: 12px; margin: 8px 0; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 14px; }
+    .login-form input:focus { border-color: var(--primary); outline: none; }
+    .login-form button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 16px; font-size: 15px; font-weight: 600; }
+    .login-form button:hover { background: #2563eb; }
+    .login-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { color: var(--danger); margin-top: 8px; font-size: 14px; }
+    .hidden { display: none !important; }
+    .loading-text { color: var(--muted); font-style: italic; padding: 20px; text-align: center; }
+    .mono { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 13px; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 32px; max-width: 480px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal h2 { margin-bottom: 16px; font-size: 20px; }
+    .modal label { display: block; margin-top: 14px; margin-bottom: 4px; color: var(--muted); font-size: 13px; }
+    .modal input, .modal select, .modal textarea { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 14px; }
+    .modal input:focus, .modal select:focus { border-color: var(--primary); outline: none; }
+    .modal textarea { resize: vertical; min-height: 60px; font-family: inherit; }
+    .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
+    .modal-actions .btn { padding: 10px 24px; }
+    .modal-error { color: var(--danger); margin-top: 8px; font-size: 13px; }
+    .modelo-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .modelo-card .name { font-weight: 600; }
+    .modelo-card .stats { color: var(--muted); font-size: 13px; }
+    .modelo-card .cost { font-weight: 700; color: #a78bfa; }
+    #dashboard-view { width: 100%; max-width: 1200px; }
+  </style>
+</head>
+<body>
+  <!-- LOGIN VIEW -->
+  <div id="login-view" class="login-form">
+    <h1>Owner Dashboard</h1>
+    <p class="subtitle">Acceso restringido al administrador del SaaS</p>
+    <input type="password" id="owner-key" placeholder="OWNER_SECRET_KEY" autocomplete="off">
+    <input type="password" id="decrypt-phrase" placeholder="Frase de descifrado E2EE" autocomplete="off">
+    <button id="login-btn">Ingresar</button>
+    <div id="login-error" class="error"></div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="dashboard-view" class="hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <div>
+        <h1>Owner Dashboard</h1>
+        <p class="subtitle" style="margin-bottom:0;">Multi-tenant KPIs · Costo IA · Acciones del owner</p>
+      </div>
+      <div class="actions-bar" style="margin-bottom:0;">
+        <button id="btn-refresh" class="btn btn-sm">🔄 Actualizar</button>
+        <button id="btn-logout" class="btn btn-sm btn-danger">🚪 Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpi-grid"></div>
+
+    <!-- Chart -->
+    <div class="chart-container" id="chart-30d">
+      <div class="section-title" style="margin-bottom:12px;">Consumo de Tokens IA (últimos 30 días)</div>
+      <canvas id="canvas-30d"></canvas>
+    </div>
+
+    <!-- Tenants Table -->
+    <div class="section">
+      <div class="section-title">Tenants</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Nombre</th><th>Plan</th><th>Estado</th><th>Usuarios</th><th>Expedientes</th><th>Uso IA (mes)</th><th>Acciones</th></tr></thead>
+          <tbody id="tenants-tbody"><tr><td colspan="7" class="loading-text">Cargando tenants...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Model Usage -->
+    <div class="section">
+      <div class="section-title">Consumo por Modelo</div>
+      <div id="modelo-uso"><p class="loading-text">Cargando consumo por modelo...</p></div>
+    </div>
+
+    <!-- Audit Log -->
+    <div class="section">
+      <div class="section-title">Audit Log Reciente</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Fecha</th><th>Evento</th><th>Severidad</th><th>IP</th><th>Payload</th></tr></thead>
+          <tbody id="audit-tbody"><tr><td colspan="5" class="loading-text">Cargando auditoría...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="subtitle" id="last-update-text" style="text-align:center; margin-top:8px;"></p>
+  </div>
+
+  <!-- MODAL: Change Plan -->
+  <div id="modal-change-plan" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>Cambiar Plan</h2>
+      <div id="modal-cp-tenant-name" style="color:var(--muted); margin-bottom:12px;"></div>
+      <label for="modal-cp-plan">Plan</label>
+      <select id="modal-cp-plan">
+        <option value="free">Free</option>
+        <option value="pro">Pro</option>
+        <option value="enterprise">Enterprise</option>
+      </select>
+      <label for="modal-cp-max-users">Máx. Usuarios</label>
+      <input type="number" id="modal-cp-max-users" min="1" step="1">
+      <label for="modal-cp-max-exp">Máx. Expedientes</label>
+      <input type="number" id="modal-cp-max-exp" min="1" step="1">
+      <label for="modal-cp-max-ia">Máx. Consultas IA / mes</label>
+      <input type="number" id="modal-cp-max-ia" min="1" step="1">
+      <div id="modal-cp-error" class="modal-error"></div>
+      <div class="modal-actions">
+        <button class="btn" id="modal-cp-cancel">Cancelar</button>
+        <button class="btn btn-success" id="modal-cp-confirm">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Refund -->
+  <div id="modal-refund" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>Realizar Reembolso</h2>
+      <div id="modal-ref-tenant-name" style="color:var(--muted); margin-bottom:12px;"></div>
+      <label for="modal-ref-monto">Monto (USD)</label>
+      <input type="number" id="modal-ref-monto" min="0.01" step="0.01" placeholder="0.00">
+      <label for="modal-ref-motivo">Motivo</label>
+      <textarea id="modal-ref-motivo" placeholder="Describa el motivo del reembolso"></textarea>
+      <div id="modal-ref-error" class="modal-error"></div>
+      <div class="modal-actions">
+        <button class="btn" id="modal-ref-cancel">Cancelar</button>
+        <button class="btn btn-danger" id="modal-ref-confirm">Confirmar Reembolso</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -56,18 +56,18 @@ public class SugerirObjecionValidator : AbstractValidator<SugerirObjecionCommand
 
 public class SugerirObjecionHandler : IRequestHandler<SugerirObjecionCommand, ObjecionDto>
 {
-    private readonly ILegalObjeciones _gemini;
+    private readonly ILegalObjeciones _minimax;
 
-    public SugerirObjecionHandler(ILegalObjeciones gemini)
+    public SugerirObjecionHandler(ILegalObjeciones minimax)
     {
-        _gemini = gemini;
+        _minimax = minimax;
     }
 
     public async Task<ObjecionDto> Handle(
         SugerirObjecionCommand request,
         CancellationToken cancellationToken)
     {
-        var json = await _gemini.SugerirObjecionAsync(
+        var json = await _minimax.SugerirObjecionAsync(
             request.FragmentoAdversarial,
             request.RamaDerecho,
             request.EtapaJuicio,

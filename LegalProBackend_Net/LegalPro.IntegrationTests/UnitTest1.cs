@@ -1,8 +1,10 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using LegalPro.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using LegalPro.Domain.Entities;
 
 // Forzar ejecución secuencial de test classes — múltiples WebApplicationFactory
 // simultáneas conflictúan con el estado global de Serilog y ASP.NET Core.
@@ -11,9 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace LegalPro.IntegrationTests;
 
 // ═══════════════════════════════════════════════════════════════════════
-// TESTS DE INTEGRACIÓN — Sin dependencias externas (PostgreSQL / Gemini real).
+// TESTS DE INTEGRACIÓN — Sin dependencias externas (PostgreSQL / MiniMax real).
 // Levantan la app ASP.NET Core completa con WebApplicationFactory<Program>
-// usando EF Core InMemory, autenticación fake y Gemini fake.
+// usando EF Core InMemory, autenticación fake y MiniMax fake.
 // ═══════════════════════════════════════════════════════════════════════
 
 /// <summary>Tests del Health Check — siempre corren.</summary>
@@ -116,15 +118,15 @@ public class AuthControllerTests : IClassFixture<LegalProWebApplicationFactory>
 }
 
 /// <summary>
-/// Tests de los endpoints Gemini usando FakeGeminiService — corren SIEMPRE
+/// Tests de los endpoints IA usando FakeMinimaxService — corren SIEMPRE
 /// en CI/CD sin depender de la API real ni de PostgreSQL.
 /// </summary>
-public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
+public class IAEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
 {
     private readonly HttpClient _client;
     private readonly LegalProWebApplicationFactory _factory;
 
-    public GeminiEndpointsTests(LegalProWebApplicationFactory factory)
+    public IAEndpointsTests(LegalProWebApplicationFactory factory)
     {
         _factory = factory;
         _client = factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
@@ -182,14 +184,14 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
         });
 
         response.IsSuccessStatusCode.Should().BeTrue(
-            $"Gemini Chat falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+            $"MiniMax Chat falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
 
         var body = await response.Content.ReadAsStringAsync();
         body.Should().NotBeNullOrEmpty();
     }
 
     [Fact]
-    public async Task Analista_Con_FakeGemini_Analiza_Expediente()
+    public async Task Analista_Con_FakeMinimax_Analiza_Expediente()
     {
         var response = await _client.PostAsJsonAsync("/api/analista/analizar", new
         {
@@ -205,11 +207,11 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
             $"Analista falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
 
         var body = await response.Content.ReadAsStringAsync();
-        body.Should().Contain("resumenGeneral", "FakeGemini debe devolver JSON con resumenGeneral");
+        body.Should().Contain("resumenGeneral", "FakeMinimax debe devolver JSON con resumenGeneral");
     }
 
     [Fact]
-    public async Task Predictor_Con_FakeGemini_Predice_Resultado()
+    public async Task Predictor_Con_FakeMinimax_Predice_Resultado()
     {
         var response = await _client.PostAsJsonAsync("/api/predictor/predecir", new
         {
@@ -227,7 +229,7 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Redactor_Con_FakeGemini_Genera_Borrador()
+    public async Task Redactor_Con_FakeMinimax_Genera_Borrador()
     {
         var response = await _client.PostAsJsonAsync("/api/redactor/generar", new
         {
@@ -244,16 +246,15 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
         body.Should().NotBeNullOrEmpty();
     }
 
-    // ── Tests opcionales con Gemini REAL (se saltan si no hay API key) ──
+    // ── Tests opcionales con MiniMax REAL (se saltan si no hay API key) ──
 
-    private static bool TieneGeminiKey =>
-        Environment.GetEnvironmentVariable("GEMINI_API_KEY") is { Length: > 30 } key
-        && key.StartsWith("AIzaSy");
+    private static bool TieneMinimaxKey =>
+        Environment.GetEnvironmentVariable("MINIMAX_API_KEY") is { Length: > 30 };
 
-    [Fact(Skip = "Requiere GEMINI_API_KEY real; usar Chat_Con_FakeGemini_Retorna_Respuesta para CI/CD")]
-    public async Task Chat_Con_Gemini_Real_Retorna_Respuesta_Legal()
+    [Fact(Skip = "Requiere MINIMAX_API_KEY real; usar Chat_Con_FakeMinimax_Retorna_Respuesta para CI/CD")]
+    public async Task Chat_Con_Minimax_Real_Retorna_Respuesta_Legal()
     {
-        if (!TieneGeminiKey) return;
+        if (!TieneMinimaxKey) return;
 
         var response = await _client.PostAsJsonAsync("/api/chat/enviar", new
         {
@@ -262,16 +263,16 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
         });
 
         response.IsSuccessStatusCode.Should().BeTrue(
-            $"Gemini Chat falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
+            $"MiniMax Chat falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
 
         var body = await response.Content.ReadAsStringAsync();
         body.Should().NotBeNullOrEmpty();
     }
 
-    [Fact(Skip = "Requiere GEMINI_API_KEY real")]
-    public async Task Analista_Con_Gemini_Real_Analiza_Expediente()
+    [Fact(Skip = "Requiere MINIMAX_API_KEY real")]
+    public async Task Analista_Con_Minimax_Real_Analiza_Expediente()
     {
-        if (!TieneGeminiKey) return;
+        if (!TieneMinimaxKey) return;
 
         var response = await _client.PostAsJsonAsync("/api/analista/analizar", new
         {
@@ -287,13 +288,13 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
             $"Analista falló con {response.StatusCode}: {await response.Content.ReadAsStringAsync()}");
 
         var body = await response.Content.ReadAsStringAsync();
-        body.Should().Contain("resumenGeneral", "Gemini debe devolver JSON con resumenGeneral");
+        body.Should().Contain("resumenGeneral", "MiniMax debe devolver JSON con resumenGeneral");
     }
 
-    [Fact(Skip = "Requiere GEMINI_API_KEY real")]
-    public async Task Predictor_Con_Gemini_Real_Predice_Resultado()
+    [Fact(Skip = "Requiere MINIMAX_API_KEY real")]
+    public async Task Predictor_Con_Minimax_Real_Predice_Resultado()
     {
-        if (!TieneGeminiKey) return;
+        if (!TieneMinimaxKey) return;
 
         var response = await _client.PostAsJsonAsync("/api/predictor/predecir", new
         {
@@ -310,10 +311,10 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
         body.Should().Contain("probabilidadExito");
     }
 
-    [Fact(Skip = "Requiere GEMINI_API_KEY real")]
-    public async Task Redactor_Con_Gemini_Real_Genera_Borrador()
+    [Fact(Skip = "Requiere MINIMAX_API_KEY real")]
+    public async Task Redactor_Con_Minimax_Real_Genera_Borrador()
     {
-        if (!TieneGeminiKey) return;
+        if (!TieneMinimaxKey) return;
 
         var response = await _client.PostAsJsonAsync("/api/redactor/generar", new
         {
@@ -328,6 +329,46 @@ public class GeminiEndpointsTests : IClassFixture<LegalProWebApplicationFactory>
 
         var body = await response.Content.ReadAsStringAsync();
         body.Should().NotBeNullOrEmpty();
+    }
+}
+
+public class SoftDeleteIntegrationTests
+{
+    private class TestTenantProvider : LegalPro.Application.Common.Interfaces.ITenantProvider
+    {
+        public Guid? TenantId { get; set; }
+    }
+
+    [Fact]
+    public async Task DbContext_DeberiaFiltrarExpedientesConSoftDelete()
+    {
+        // Arrange
+        var options = new Microsoft.EntityFrameworkCore.DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+
+        var tenantId = Guid.NewGuid();
+        var tenantProvider = new TestTenantProvider { TenantId = tenantId };
+
+        using (var context = new ApplicationDbContext(options, tenantProvider))
+        {
+            var usuarioId = Guid.NewGuid();
+            var activo = Expediente.Crear("EXP-ACT", "Activo", LegalPro.Domain.Enums.TipoRamaProcesal.Penal, usuarioId, tenantId);
+            var eliminado = Expediente.Crear("EXP-DEL", "Eliminado", LegalPro.Domain.Enums.TipoRamaProcesal.Penal, usuarioId, tenantId);
+            eliminado.Eliminar();
+
+            context.Expedientes.AddRange(activo, eliminado);
+            await context.SaveChangesAsync();
+        }
+
+        // Act & Assert
+        using (var context = new ApplicationDbContext(options, tenantProvider))
+        {
+            var result = await context.Expedientes.ToListAsync();
+
+            result.Should().ContainSingle();
+            result[0].Numero.Should().Be("EXP-ACT");
+        }
     }
 }
 

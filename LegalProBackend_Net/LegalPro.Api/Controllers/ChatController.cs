@@ -8,7 +8,7 @@ using LegalPro.Application.Chat.Queries;
 namespace LegalPro.Api.Controllers;
 
 // ═══════════════════════════════════════════════════════
-// Chat legal multi-turn con Gemini.
+// Chat legal multi-turn con MiniMax M3.
 // POST /enviar  → envía historial + mensaje, retorna respuesta IA + SesionId.
 // GET  /historial?sesionId=X → recupera mensajes guardados de una sesión.
 // GET  /sesiones → lista las sesiones del usuario (para reanudar chats).
@@ -16,7 +16,7 @@ namespace LegalPro.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[EnableRateLimiting("gemini")]
+[EnableRateLimiting("minimax")]
 public class ChatController : ControllerBase
 {
     private readonly IMediator _mediator;

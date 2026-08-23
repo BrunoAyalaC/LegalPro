@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using Microsoft.EntityFrameworkCore;
 using LegalPro.Application.Common.Interfaces;
 
@@ -10,8 +11,9 @@ namespace LegalPro.Application.Chat.Queries;
 /// Cada sesión agrupa varios mensajes bajo un mismo SesionId.
 /// Permite al cliente mostrar el historial de conversaciones para reanudarlas.
 /// </summary>
-public class GetSesionesChatQuery : IRequest<SesionesChatDto>
+public class GetSesionesChatQuery : IRequest<SesionesChatDto>, ITenantRequest
 {
+    public Guid OrganizationId { get; set; }
     public int Limit { get; set; } = 10;
 }
 
@@ -52,6 +54,7 @@ public class GetSesionesChatHandler : IRequestHandler<GetSesionesChatQuery, Sesi
         var orgId = _currentUser.OrganizationId;
 
         var query = _db.MensajesChat
+            .AsNoTracking()
             .Where(m => m.UsuarioId == userId);
 
         if (orgId.HasValue)

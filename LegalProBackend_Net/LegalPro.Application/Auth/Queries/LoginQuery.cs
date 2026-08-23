@@ -47,8 +47,14 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, string>
 
     public async Task<string> Handle(LoginQuery request, CancellationToken cancellationToken)
     {
-        var usuario = await _context.Usuarios.FirstOrDefaultAsync(
-            u => u.Email == request.Email.Trim().ToLowerInvariant(), cancellationToken);
+        // HOTFIX P0-A 2026-08-21: login es flujo anónimo PRE-tenant (sin JWT → TenantId null
+        // → filtro global deny-all devolvía 0 filas → AuthenticationFailedException siempre).
+        // IgnoreQueryFilters es seguro aquí: la autorización real es BCrypt.Verify + el JWT
+        // se emite DESPUÉS de validar credenciales. No hay riesgo cross-tenant pre-auth.
+        var usuario = await _context.Usuarios
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(
+                u => u.Email == request.Email.Trim().ToLowerInvariant(), cancellationToken);
 
         if (usuario == null)
             throw new AuthenticationFailedException();

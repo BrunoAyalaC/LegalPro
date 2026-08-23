@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -5,11 +6,13 @@ import {
   BarChart3, FileEdit, Scale, TrendingUp, BookOpen,
   Mic2, HelpCircle, Hand, Bell, GitCompare, Shield,
   FileStack, FileSearch, Wrench, Sliders,
-  UserCircle, LogOut, ChevronLeft, ChevronRight,
-  Building2
+  UserCircle, Coins, ChevronLeft, ChevronRight, ExternalLink, Calendar, CalendarDays,
+  Calculator,
+  Users, Building2, LogOut,
 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
 import { useUI } from '../context/UIContext';
+import { fixUtf8Mojibake } from '../utils/utf8';
 
 const logoImg = '/landing/assets/img/logo-icon.jpeg';
 
@@ -26,6 +29,7 @@ const NAV_SECTIONS = [
     label: 'Herramientas IA',
     items: [
       { to: '/analista',      icon: BarChart3,   label: 'Analista de Expedientes' },
+      { to: '/panel-expertos',icon: Users,        label: 'Panel de Expertos', badge: 'PRO' },
       { to: '/redactor',      icon: FileEdit,    label: 'Redactor Legal' },
       { to: '/simulador',     icon: Scale,       label: 'Simulador de Juicios' },
       { to: '/predictor',     icon: TrendingUp,  label: 'Predictor Judicial' },
@@ -42,7 +46,17 @@ const NAV_SECTIONS = [
       { to: '/comparador',        icon: GitCompare,  label: 'Comparador' },
       { to: '/boveda',            icon: Shield,      label: 'Bóveda Evidencia' },
       { to: '/multidoc',          icon: FileStack,   label: 'Gestión Multidoc' },
+      { to: '/calculadora-plazos', icon: Calendar,    label: 'Plazos Procesales', badge: 'NUEVO' },
+      { to: '/calendario-vencimientos', icon: CalendarDays, label: 'Calendario Vencimientos', badge: 'NUEVO' },
+      { to: '/calendario-plazos', icon: CalendarDays, label: 'Calendario Plazos', badge: 'NUEVO' },
+      { to: '/clientes',               icon: Users,        label: 'Clientes', badge: 'CRM' },
       { to: '/resumen-ejecutivo', icon: FileSearch,  label: 'Resumen Ejecutivo' },
+    ],
+  },
+  {
+    label: 'Legal Tools',
+    items: [
+      { to: '/contador', icon: Calculator, label: 'Contador Laboral', badge: 'NUEVO' },
     ],
   },
   {
@@ -50,13 +64,13 @@ const NAV_SECTIONS = [
     items: [
       { to: '/herramientas',        icon: Wrench,      label: 'Más Herramientas' },
       { to: '/config-especialidad', icon: Sliders,     label: 'Especialidad Legal' },
-      { to: '/organizacion/miembros', icon: Building2, label: 'Mi Organización' },
+      { to: '/creditos',            icon: Coins,       label: 'Mis Créditos', badge: 'Gemas' },
       { to: '/perfil',              icon: UserCircle,  label: 'Mi Perfil' },
     ],
   },
 ];
 
-export default function Sidebar() {
+const Sidebar = memo(function Sidebar() {
   const { usuario, organizacion, logout } = useTenant();
   const navigate = useNavigate();
   const { sidebarCollapsed, toggleSidebar } = useUI();
@@ -74,7 +88,7 @@ export default function Sidebar() {
       {/* ── Logo ── */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-white/8 shrink-0">
         <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-white/10">
-          <img src={logoImg} alt="LegalPro" className="w-full h-full object-cover" />
+          <img src={logoImg} alt="LegalPro" loading="lazy" className="w-full h-full object-cover" />
         </div>
         <AnimatePresence>
           {!sidebarCollapsed && (
@@ -111,7 +125,7 @@ export default function Sidebar() {
           >
             <Building2 size={14} className="text-blue-400 shrink-0" />
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-white truncate">{organizacion.nombre}</p>
+              <p className="text-[11px] font-bold text-white truncate">{fixUtf8Mojibake(organizacion.nombre)}</p>
               <p className="text-xs text-slate-400 capitalize">{organizacion.plan}</p>
             </div>
           </motion.div>
@@ -152,7 +166,7 @@ export default function Sidebar() {
                 className="flex-1 min-w-0"
               >
                 <p className="text-[12px] font-bold text-white truncate">
-                  {usuario?.nombreCompleto || usuario?.nombre || 'Usuario'}
+                  {fixUtf8Mojibake(usuario?.nombreCompleto || usuario?.nombre || 'Usuario')}
                 </p>
                 <p className="text-xs text-slate-400 capitalize">
                   {usuario?.rol?.toLowerCase() || 'abogado'}
@@ -178,17 +192,23 @@ export default function Sidebar() {
       </div>
     </motion.aside>
   );
-}
+});
+
+export default Sidebar;
 
 function SidebarLink({ item, collapsed }) {
   const { icon: Icon, to, label, badge } = item;
   return (
-    <NavLink to={to} className={({ isActive }) => `
-      group relative flex items-center gap-3 py-2 px-3 rounded-xl text-sm
-      transition-all duration-200 font-medium
-      ${isActive ? 'bg-blue-500/15 text-blue-400 border border-blue-500/25' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
-      ${collapsed ? 'justify-center px-2' : ''}
-    `}>
+    <NavLink
+      to={to}
+      data-tour={to.replace('/', '')}
+      className={({ isActive }) => `
+        group relative flex items-center gap-3 py-2 px-3 rounded-xl text-sm
+        transition-all duration-200 font-medium
+        ${isActive ? 'bg-blue-500/15 text-blue-400 border border-blue-500/25' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
+        ${collapsed ? 'justify-center px-2' : ''}
+      `}
+    >
       {({ isActive }) => (
         <>
           <Icon size={18} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300'}`} />

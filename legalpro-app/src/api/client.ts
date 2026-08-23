@@ -27,13 +27,21 @@ export const IA_ACTIVE_PROVIDER_ID = 'opencode';
 // tenga que importar de dos sitios.
 export { getProviderLabel, getActiveProviders, IA_PROVIDERS } from '../lib/iaProviders.js';
 
-// ═══ Token storage (httpOnly cookie via backend, no localStorage) ═══
+// ═══ Token storage — SECURITY P0 FIX 2026-08-21 ═══
+// CUMPLIMIENTO: catalogs/security-policy.md — NUNCA persistir JWT/secrets en
+// localStorage/sessionStorage (XSS exfiltrable). El backend setea httpOnly
+// cookie (SameSite=Lax, Secure, path=/api) y el frontend mantiene SOLO
+// referencia en memoria. F5 requiere revalidar vía /api/auth/me (cookie
+// viajará con withCredentials:true). La variable en memoria NO sobrevive a
+// refresh, pero la cookie sí — el boot rehidrata desde el servidor.
 let ACCESS_TOKEN: string | null = null;
 let REFRESH_TOKEN: string | null = null;
 
-export function setTokens(access: string, refresh: string) {
-  ACCESS_TOKEN = access;
-  REFRESH_TOKEN = refresh;
+export function setTokens(access: string, refresh: string, _remember = false) {
+  ACCESS_TOKEN = access || null;
+  REFRESH_TOKEN = refresh || null;
+  // NUNCA persistir en localStorage/sessionStorage — ver security-policy.md
+  // _remember se ignora pero se mantiene por compatibilidad de firma
 }
 
 export function clearTokens() {
@@ -50,6 +58,16 @@ export const getToken = getAccessToken;
 
 export function getRefreshToken() {
   return REFRESH_TOKEN;
+}
+
+/**
+ * @deprecated SECURITY P0 — Eliminado. No restaurar desde storage.
+ * Se mantiene como no-op para compatibilidad (retorna null siempre).
+ * El boot ahora depende exclusivamente de httpOnly cookie → /api/auth/me.
+ */
+export function restoreTokenFromStorage(): string | null {
+  if (ACCESS_TOKEN) return ACCESS_TOKEN;
+  return null;
 }
 
 // ═══ Correlation ID (genera uno si no existe) ═══
@@ -146,6 +164,8 @@ export interface User {
 export interface LoginPayload {
   email: string;
   password: string;
+  /** @deprecated SECURITY P0 — ignorado. Sesión solo httpOnly cookie + memoria. */
+  remember?: boolean;
 }
 
 export interface LoginResponse {
@@ -195,7 +215,8 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
     } as LoginResponse;
   }
   if (!data.token) throw new Error(data.error || 'Credenciales inválidas');
-  setTokens(data.token, '');
+  // SECURITY P0 FIX 2026-08-21: solo memoria + httpOnly cookie. NO localStorage.
+  setTokens(data.token, data.refreshToken ?? '');
   return data;
 }
 
@@ -236,12 +257,32 @@ export interface SessionData {
   } | null;
 }
 export async function getSessionFromCookie(): Promise<SessionData | null> {
+  // SECURITY P0 FIX 2026-08-21: rehidratación SOLO vía httpOnly cookie.
+  // No se inspecciona storage. withCredentials envía la cookie automáticamente.
+  // El interceptor adjunta Bearer si ACCESS_TOKEN ya está en memoria (post-login).
+  // El backend puede refrescar el token en la cookie y devolverlo en el payload.
   try {
     const response = await nodeClient.get('/api/auth/me');
-    const d = response.data;
-    if (d?.token) {
-      setTokens(d.token, '');
-      return d as SessionData;
+    const d = response.data as SessionData & { success?: boolean; data?: SessionData };
+    // Shape dual: { token, ... } o { success, data: { token,... } }
+    const session: SessionData | null = (d as any)?.token
+      ? (d as SessionData)
+      : (d as any)?.data?.token
+        ? ((d as any).data as SessionData)
+        : (d as any)?.success === false
+          ? null
+          : (d as SessionData);
+    if (session?.token) {
+      setTokens(session.token, '');
+      return session;
+    }
+    // Si el endpoint devuelve shape { success, data } sin token suelto, pero data existe
+    if ((d as any)?.data && typeof (d as any).data === 'object') {
+      const maybe = (d as any).data as SessionData;
+      if (maybe?.token) {
+        setTokens(maybe.token, '');
+        return maybe;
+      }
     }
     return null;
   } catch {
@@ -731,11 +772,17 @@ export async function getReporte(expedienteId: string, formato: 'json' | 'pdf' |
 //   - login(email, password): acepta dos strings en vez de payload objeto
 //   - me(): alias para getCurrentUser
 export const api = {
-  login: (email: string, password: string) => login({ email, password }),
+  // Acepta ambas firmas: api.login('email','pass') (legacy) o
+  // api.login({ email, password, remember }) (payload objeto con "Recordarme").
+  login: (emailOrPayload: string | LoginPayload, password?: string) =>
+    typeof emailOrPayload === 'string'
+      ? login({ email: emailOrPayload, password: password ?? '' })
+      : login(emailOrPayload),
   logout,
   me: getCurrentUser,
   setTokens,
   clearTokens,
+  restoreTokenFromStorage,
   getCurrentUser,
   getSessionFromCookie,
   listarExpedientes,

@@ -1,0 +1,41 @@
+{
+  "id": "EXP-PEN-001",
+  "numero_expediente": "01234-2026",
+  "materia": "penal",
+  "tipo_proceso": "NCPP",
+  "instancia": "JUZGADO",
+  "partes": {
+    "demandante": null,
+    "demandado": {
+      "nombre": "[NOMBRE_ACUSADO]",
+      "dni": "[DNI_ACUSADO]",
+      "calidad": "acusado"
+    },
+    "fiscal": {
+      "nombre": "[NOMBRE_FISCAL]",
+      "despacho": "2da Fiscalía Penal de Lima"
+    },
+    "juez": {
+      "nombre": "[NOMBRE_JUEZ]",
+      "juzgado": "3er Juzgado Penal Unipersonal"
+    },
+    "agraviado": {
+      "nombre": "[NOMBRE_AGRAVIADO]",
+      "dni": "[DNI_AGRAVIADO]"
+    }
+  },
+  "hechos": "El día 15-02-2026, en circunstancias que se investigan, el acusado habría agredido físicamente al agraviado en el interior de un establecimiento comercial, causándole lesiones que requirieron 10 días de asistencia médica según el certificado médico legal N° 12345-L.",
+  "pretensiones": {
+    "fiscal": "Pena privativa de libertad no menor de 4 años por el delito de lesiones graves (CP art. 124)"
+  },
+  "pruebas_ofrecidas": [
+    "Certificado médico legal N° 12345-L",
+    "Declaración del agraviado",
+    "Declaración de dos testigos",
+    "Acta de intervención policial"
+  ],
+  "calificacion_juridica": "Lesiones graves (CP art. 124)",
+  "estado": "EN_TRAMITE",
+  "fecha_inicio": "2026-02-16",
+  "abogado_responsable": "USER-ABOG-001"
+}

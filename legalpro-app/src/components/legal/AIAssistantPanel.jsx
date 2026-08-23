@@ -1,6 +1,7 @@
 /**
- * AIAssistantPanel — Panel embebido del asistente Gemini.
+ * AIAssistantPanel — Panel embebido del asistente IA (DeepSeek V4 Flash vía OpenCode Go).
  * Features: chat mini, últimas consultas, typewriter en respuesta, CTA a chat completo.
+ * FIX LPDP-2: muestra badge del proveedor IA activo en el header y por mensaje.
  * Sintaxis moderna: motion/react animate con spring
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -11,6 +12,16 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
+import CitacionesPanel from './CitacionesPanel';
+import RAGStatus from './RAGStatus';
+import ProviderBadge from './ProviderBadge';
+import { getProviderLabel } from '../../lib/iaProviders.js';
+
+/* ── Proveedor IA por defecto (FIX LPDP-2, Art. 21 LPDP) ───
+   OPENCODE-FIRST: DeepSeek V4 Flash vía OpenCode Go es el proveedor
+   principal. El mapeo completo de proveedores vive centralizado en
+   src/lib/iaProviders.js (single source of truth). */
+const DEFAULT_PROVIDER = 'opencode';
 
 /* ── Hook typewriter ─────────────────────────────────────── */
 function useTypewriter(text, speed = 18) {
@@ -39,6 +50,9 @@ export default function AIAssistantPanel({ expediente, className = '' }) {
   const [loading, setLoading]     = useState(false);
   const [messages, setMessages]   = useState([]);
   const [copied, setCopied]       = useState(null);
+  const [activeProvider, setActiveProvider] = useState(DEFAULT_PROVIDER);
+  const [activeProviderLabel, setActiveProviderLabel] = useState(getProviderLabel(DEFAULT_PROVIDER));
+  const [activeModel, setActiveModel] = useState(null);
   const inputRef                  = useRef(null);
   const bottomRef                 = useRef(null);
 
@@ -61,13 +75,51 @@ export default function AIAssistantPanel({ expediente, className = '' }) {
       }));
       const data = await api.chat(text, historial, expediente?.id ?? null);
       const aiText = data?.respuesta ?? data?.texto ?? data?.resultado ?? (typeof data === 'string' ? data : JSON.stringify(data));
-      setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', content: aiText }]);
-    } catch {
-      setMessages(prev => [...prev, { id: Date.now() + 1, role: 'ai', content: 'No se pudo obtener respuesta. Intenta de nuevo.' }]);
+
+      // FIX LPDP-2: extraer proveedor del response para etiquetar este mensaje
+      const providerId = data?.provider || DEFAULT_PROVIDER;
+      const providerLabel = data?.provider_label || getProviderLabel(providerId);
+      const providerModel = data?.model || null;
+      setActiveProvider(providerId);
+      setActiveProviderLabel(providerLabel);
+      if (providerModel) setActiveModel(providerModel);
+
+      // FIX RAG-1: extraer contexto RAG (citaciones, fuentes, métricas) del payload.
+      // El backend expone estos campos vía `withRagContext` cuando ENABLE_RAG=true.
+      // Si el RAG no se usó o no encontró chunks, los campos vendrán ausentes.
+      const ragContext = {
+        chunks_usados: data?.rag_chunks ?? 0,
+        similitud_promedio: data?.rag_similitud_promedio ?? null,
+        rag_usado: Boolean(data?.rag_usado),
+        citaciones: Array.isArray(data?.citaciones) ? data.citaciones : [],
+        fuentes: Array.isArray(data?.fuentes_consultadas) ? data.fuentes_consultadas : [],
+        fecha_consulta: data?.rag_fecha_consulta ?? null,
+      };
+
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        role: 'ai',
+        content: aiText,
+        provider: providerId,
+        providerLabel,
+        model: providerModel,
+        rag: ragContext,
+      }]);
+    } catch (err) {
+      const msg = err?.response?.data?.error || 'No se pudo obtener respuesta. Intenta de nuevo.';
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        role: 'ai',
+        content: msg,
+        provider: activeProvider,
+        providerLabel: activeProviderLabel,
+        model: activeModel,
+        rag: null,
+      }]);
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages, expediente]);
+  }, [input, loading, messages, expediente, activeProvider, activeProviderLabel, activeModel]);
 
   const handleKey = useCallback((e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
@@ -96,9 +148,13 @@ export default function AIAssistantPanel({ expediente, className = '' }) {
           <div className="p-1.5 bg-violet-500/20 rounded-xl border border-violet-500/30">
             <Sparkles className="w-4 h-4 text-violet-400" />
           </div>
-          <div>
+          <div className="flex flex-col gap-0.5">
             <h3 className="text-sm font-bold text-white">Asistente Legal IA</h3>
-            <p className="text-xs text-slate-400 leading-none mt-0.5">Powered by Gemini</p>
+            {/* FIX LPDP-2: badge dinámico del proveedor activo (Art. 21 LPDP) */}
+            <ProviderBadge
+              providerId={activeProvider}
+              model={activeModel}
+            />
           </div>
         </div>
         <motion.span
@@ -262,6 +318,40 @@ function MsgBubble({ msg, onCopy, copied }) {
           ? 'bg-white/5 border border-white/10 text-slate-200 rounded-bl-md'
           : 'bg-blue-600 text-white rounded-br-md'}`}>
         {text}
+
+        {/* FIX RAG-1: Indicador de estado RAG y citaciones verificables.
+            Solo se renderiza para mensajes IA. CitacionesPanel hace
+            early-return si no hay citaciones o `rag_usado` es false. */}
+        {isAI && (
+          <div className="mt-2 space-y-1">
+            <RAGStatus
+              ragContext={msg.rag ? {
+                chunks_usados: msg.rag.chunks_usados,
+                similitud_promedio: msg.rag.similitud_promedio,
+                necesita_revision_humana: msg.rag.rag_usado && msg.rag.similitud_promedio != null && msg.rag.similitud_promedio < 0.65,
+              } : null}
+            />
+            {msg.rag && (
+              <CitacionesPanel
+                citaciones={msg.rag.citaciones}
+                fuentes={msg.rag.fuentes}
+                ragUsado={msg.rag.rag_usado}
+                similitudPromedio={msg.rag.similitud_promedio}
+                idPrefix={`cit-${msg.id}`}
+              />
+            )}
+          </div>
+        )}
+
+        {/* FIX LPDP-2: Badge del proveedor IA por mensaje (Art. 21 LPDP) */}
+        {isAI && (
+          <div className="mt-2 pt-2 border-t border-white/8">
+            <ProviderBadge
+              providerId={msg.provider}
+              model={msg.model}
+            />
+          </div>
+        )}
 
         {/* Copy button (solo IA) */}
         {isAI && msg.content && (

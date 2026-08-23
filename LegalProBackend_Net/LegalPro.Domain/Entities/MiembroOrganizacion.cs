@@ -9,11 +9,20 @@ namespace LegalPro.Domain.Entities;
 /// Entidad de membresía: representa la pertenencia de un Usuario a una Organizacion
 /// con un rol específico (Owner, Admin, Member, Viewer).
 /// Es el join entity del aggregate multi-tenant.
+///
+/// Implementa ITenantEntity: MiembroOrganizacion pertenece intrínsecamente a un tenant
+/// (la FK OrganizacionId ya lo identifica). Se expone OrganizationId como shadow property
+/// mapeada a la misma columna 'organizacion_id' para activar el query filter global del
+/// DbContext. Esto evita duplicación de columnas y mantiene una sola fuente de verdad.
 /// </summary>
-public class MiembroOrganizacion : BaseGuidEntity
+public class MiembroOrganizacion : BaseGuidEntity, ITenantEntity
 {
     public Guid OrganizacionId { get; private set; }
     public Organizacion? Organizacion { get; private set; }
+
+    // Mapeado via shadow property en MiembroOrganizacionConfiguration a la columna
+    // 'organizacion_id'. Permite implementar ITenantEntity sin duplicar la FK.
+    public Guid? OrganizationId => OrganizacionId;
 
     public Guid UsuarioId { get; private set; }
     public Usuario? Usuario { get; private set; }

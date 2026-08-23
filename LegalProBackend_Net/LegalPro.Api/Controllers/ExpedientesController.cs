@@ -132,11 +132,11 @@ public class ExpedientesController : ControllerBase
     }
 
     // ── GET /api/expedientes/{id}/resumen-ia ─────────────────────────────
-    // Genera resumen ejecutivo del caso con Gemini (FC forzado).
+    // Genera resumen ejecutivo del caso con MiniMax M3 (FC forzado).
     // Incluye fortalezas, debilidades, acciones inmediatas y riesgo general.
     // ────────────────────────────────────────────────────────────────
     [HttpGet("{id:guid}/resumen-ia")]
-    [EnableRateLimiting("gemini")]
+    [EnableRateLimiting("minimax")]
     public async Task<IActionResult> ResumenIa(Guid id, CancellationToken ct)
     {
         var result = await _mediator.Send(new GenerarResumenCasoQuery(id), ct);

@@ -1,0 +1,155 @@
+{
+  "metadata": {
+    "nombre": "Tribunal Fiscal - Boletines de Jurisprudencia 2026 y Produccion Jurisprudencial",
+    "fuente": "https://www.mef.gob.pe/es/tribunal-fiscal",
+    "fuente_complementaria": "Boletines de Jurisprudencia 2026 (PDF mensuales) y Acuerdo de Sala Plena",
+    "fecha_consulta": "2026-08-01",
+    "descripcion": "Catalogo de los Boletines de Jurisprudencia Fiscal del Tribunal Fiscal correspondientes al ano 2026 (publicados mensualmente en PDF), junto con Acuerdos de Sala Plena y Resoluciones de Observancia Obligatoria relevantes. El Tribunal Fiscal es el organo resolutivo del MEF encargado de resolver controversias tributarias en ultima instancia administrativa.",
+    "total_boletines_2026": 6,
+    "periodo_cubierto": "Enero - Junio 2026",
+    "limitacion": "Los boletines son PDFs descargables; este catalogo registra su existencia, enlace de descarga y principales areas tematicas. Para la lectura profunda de las RTF individuales se debe descargar cada PDF desde la URL indicada."
+  },
+  "boletines_jurisprudencia_2026": [
+    {
+      "id": "TF-BOLETIN-2026-06",
+      "mes": "Junio 2026",
+      "tamano_kb": 359,
+      "tipo": "Boletin Mensual de Jurisprudencia Fiscal",
+      "materias_probables": ["IGV", "IR", "ISC", "Procedimiento tributario", "Infracciones tributarias", "Fiscalizacion"],
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-05",
+      "mes": "Mayo 2026",
+      "tamano_kb": 320,
+      "tipo": "Boletin Mensual de Jurisprudencia Fiscal",
+      "materias_probables": ["IGV", "IR", "Reintegros", "Cobranza coactiva", "Prescripcion"],
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-04",
+      "mes": "Abril 2026",
+      "tamano_kb": 330,
+      "tipo": "Boletin Mensual de Jurisprudencia Fiscal",
+      "materias_probables": ["Tributacion municipal", "Arbitrios", "Predial", "Alcabala"],
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-03",
+      "mes": "Marzo 2026",
+      "tamano_kb": 416,
+      "tipo": "Boletin Mensual de Jurisprudencia Fiscal",
+      "materias_probables": ["Aduanas", "Valoracion", "Sanciones aduaneras", "Comercio exterior"],
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-02",
+      "mes": "Febrero 2026",
+      "tamano_kb": 384,
+      "tipo": "Boletin Mensual de Jurisprudencia Fiscal",
+      "materias_probables": ["IR 2da categoria", "IR 3ra categoria", "IR 4ta y 5ta categoria", "No domiciliados"],
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-01",
+      "mes": "Enero 2026",
+      "tamano_kb": 381,
+      "tipo": "Boletin Mensual de Jurisprudencia Fiscal",
+      "materias_probables": ["Codigo Tributario", "Notificaciones", "Medios probatorios", "Reposicion"],
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    }
+  ],
+  "acuerdos_y_resoluciones_observancia_obligatoria": {
+    "nota": "El Tribunal Fiscal mantiene una compilacion de Acuerdos de Sala Plena y Resoluciones de Observancia Obligatoria desde 1980. Las URL directas a jurisprudencia en 2026 no fueron accesibles desde este entorno (404), por lo que se recomienda la descarga directa del compendio PDF disponible en la pagina de jurisprudencia del TF.",
+    "url_compilacion_general": "https://www.mef.gob.pe/es/tribunal-fiscal",
+    "instrumentos_emitidos_relevantes_2026": [
+      {
+        "id": "TF-2026-PAGALO-PE",
+        "tipo": "Plataforma PAGALO.PE",
+        "descripcion": "Implementacion de la plataforma PAGALO.PE del Banco de la Nacion para el servicio de expedicion de copias de folios de expedientes del Tribunal Fiscal.",
+        "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal"
+      }
+    ]
+  },
+  "estadisticas_tribunal_fiscal": {
+    "pasivo_expedientes_al": "30/11/2025",
+    "ingreso_expedientes_al": "30/11/2025",
+    "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal",
+    "relevancia_legalpro": "MEDIA"
+  },
+  "normas": [
+    {
+      "id": "TF-BOLETIN-2026-06",
+      "tipo": "Boletin de Jurisprudencia Fiscal",
+      "numero": "Edicion Junio 2026",
+      "fecha_publicacion": "2026-07",
+      "titulo": "Boletin Mensual de Jurisprudencia Fiscal - Junio 2026",
+      "sumilla": "Compendio de las Resoluciones del Tribunal Fiscal (RTF) mas relevantes del mes de junio 2026, organizadas por materia tributaria y aduanera. Incluye criterio vigente y precedentes reiterados.",
+      "materia": "Jurisprudencia tributaria y aduanera - Criterio del TF",
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-05",
+      "tipo": "Boletin de Jurisprudencia Fiscal",
+      "numero": "Edicion Mayo 2026",
+      "fecha_publicacion": "2026-06",
+      "titulo": "Boletin Mensual de Jurisprudencia Fiscal - Mayo 2026",
+      "sumilla": "Compendio mensual de RTF de mayo 2026. Cubre IGV, IR, reintegros, cobranza coactiva, prescripcion y otros temas.",
+      "materia": "Jurisprudencia tributaria",
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-04",
+      "tipo": "Boletin de Jurisprudencia Fiscal",
+      "numero": "Edicion Abril 2026",
+      "fecha_publicacion": "2026-05",
+      "titulo": "Boletin Mensual de Jurisprudencia Fiscal - Abril 2026",
+      "sumilla": "Compendio mensual de RTF de abril 2026 con enfasis en tributacion municipal (arbitrios, predial, alcabala).",
+      "materia": "Tributacion municipal",
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-03",
+      "tipo": "Boletin de Jurisprudencia Fiscal",
+      "numero": "Edicion Marzo 2026",
+      "fecha_publicacion": "2026-04",
+      "titulo": "Boletin Mensual de Jurisprudencia Fiscal - Marzo 2026",
+      "sumilla": "Compendio mensual de RTF de marzo 2026. Cubre aduanas, valoracion OMC, sanciones aduaneras y comercio exterior.",
+      "materia": "Aduanas - Valoracion - Comercio exterior",
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-02",
+      "tipo": "Boletin de Jurisprudencia Fiscal",
+      "numero": "Edicion Febrero 2026",
+      "fecha_publicacion": "2026-03",
+      "titulo": "Boletin Mensual de Jurisprudencia Fiscal - Febrero 2026",
+      "sumilla": "Compendio mensual de RTF de febrero 2026 con enfasis en Impuesto a la Renta (2da, 3ra, 4ta y 5ta categoria) y no domiciliados.",
+      "materia": "Impuesto a la Renta - No domiciliados",
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "TF-BOLETIN-2026-01",
+      "tipo": "Boletin de Jurisprudencia Fiscal",
+      "numero": "Edicion Enero 2026",
+      "fecha_publicacion": "2026-02",
+      "titulo": "Boletin Mensual de Jurisprudencia Fiscal - Enero 2026",
+      "sumilla": "Compendio mensual de RTF de enero 2026. Cubre Codigo Tributario, notificaciones, medios probatorios, reposicion y nulidades.",
+      "materia": "Codigo Tributario - Procedimiento tributario",
+      "url_fuente": "https://www.mef.gob.pe/es/tribunal-fiscal/boletines-de-jurisprudencia",
+      "relevancia_legalpro": "ALTA"
+    }
+  ],
+  "nota_relevante": "La pagina principal del Tribunal Fiscal fue accesible via Playwright (webfetch devolvio output vacio por bloqueo de renderizado JS). Los boletines mensuales de 2026 estan disponibles como PDFs descargables desde la seccion 'BOLETINES DE JURISPRUDENCIA DEL TRIBUNAL FISCAL' de la pagina principal. Para una ingesta automatizada al sistema RAG, descargar los PDFs y aplicar OCR / extraccion de texto estructurado."
+}

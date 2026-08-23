@@ -1,0 +1,789 @@
+{
+  "metadata": {
+    "nombre": "Directivas, Lineamientos y Reglamentos de la SUNARP - Julio 2026",
+    "fuente": "https://www.sunarp.gob.pe",
+    "fuente_alternativa": "https://www.gob.pe/institucion/sunarp/normas-legales",
+    "compendio_principal": "https://www.gob.pe/institucion/sunarp/colecciones/58576-documentos-normativos-de-la-sunarp",
+    "fecha_consulta": "2026-08-01",
+    "version": "1.0",
+    "descripcion": "Inventario de documentos normativos de la SUNARP actualizado al 01/08/2026, incluyendo: (i) compendios principales (Manuales, Directivas, Lineamientos, Reglamentos, Otros), (ii) normativa reciente julio 2026 (resoluciones de superintendencia, jefaturales, gerencia general), (iii) precedentes administrativos del Tribunal Registral. Datos del nuevo Superintendente Nacional designado en julio 2026.",
+    "total_documentos": 28,
+    "metodo_extraccion": "webfetch a www.gob.pe/institucion/sunarp (normas-legales, colecciones de Directivas, Lineamientos)",
+    "total_normas_historicas_sunarp": 70156,
+    "total_documentos_normativos": {
+      "directivas": 116,
+      "lineamientos": 16,
+      "reglamentos": 25,
+      "manuales": 2,
+      "otros_documentos": 2
+    },
+    "panorama_gestion": {
+      "superintendente_nacional": "Never Patrik Miranda Aburto (designado 18/07/2026)",
+      "sede_central": "Av. Primavera N 1878 - Santiago de Surco - Lima",
+      "telefono": "(01) 208-3100",
+      "linea_gratuita": "0800-27164"
+    },
+    "urls_oficiales": {
+      "portada": "https://www.sunarp.gob.pe",
+      "normas_legales": "https://www.gob.pe/institucion/sunarp/normas-legales",
+      "documentos_normativos": "https://www.gob.pe/institucion/sunarp/colecciones/58576-documentos-normativos-de-la-sunarp",
+      "directivas": "https://www.gob.pe/institucion/sunarp/colecciones/58571-directivas-de-la-sunarp",
+      "lineamientos": "https://www.gob.pe/institucion/sunarp/colecciones/58572-lineamientos-de-la-sunarp",
+      "reglamentos": "https://www.gob.pe/institucion/sunarp/colecciones/59368-reglamentos-de-la-sunarp",
+      "manuales": "https://www.gob.pe/institucion/sunarp/colecciones/78979-manuales-sunarp",
+      "tribunal_registral": "https://resolucionestribunal.sunarp.gob.pe/sir-tribunal-publico/",
+      "sprl": "https://sprl.sunarp.gob.pe/",
+      "casilla_electronica": "https://casilla.sunarp.gob.pe/casillaelectronica/"
+    }
+  },
+  "compendios_documentos_normativos": {
+    "descripcion": "La SUNARP agrupa sus documentos normativos en 5 compendios principales",
+    "compendios": [
+      {
+        "id": "SUNARP-COMP-001",
+        "nombre": "Manuales - SUNARP",
+        "cantidad": 2,
+        "url": "https://www.gob.pe/institucion/sunarp/colecciones/78979-manuales-sunarp",
+        "descripcion": "Manuales operativos de la SUNARP."
+      },
+      {
+        "id": "SUNARP-COMP-002",
+        "nombre": "Directivas de la Sunarp",
+        "cantidad": 116,
+        "url": "https://www.gob.pe/institucion/sunarp/colecciones/58571-directivas-de-la-sunarp",
+        "descripcion": "Directivas emitidas por la SUNARP (normas de caracter interno que regulan procedimientos administrativos y registrales)."
+      },
+      {
+        "id": "SUNARP-COMP-003",
+        "nombre": "Lineamientos de la Sunarp",
+        "cantidad": 16,
+        "url": "https://www.gob.pe/institucion/sunarp/colecciones/58572-lineamientos-de-la-sunarp",
+        "descripcion": "Lineamientos emitidos por la SUNARP para orientar la aplicacion de normas registrales."
+      },
+      {
+        "id": "SUNARP-COMP-004",
+        "nombre": "Reglamentos de la Sunarp",
+        "cantidad": 25,
+        "url": "https://www.gob.pe/institucion/sunarp/colecciones/59368-reglamentos-de-la-sunarp",
+        "descripcion": "Reglamentos emitidos por la SUNARP. Incluye el Texto Unico Ordenado del Reglamento General de los Registros Publicos (R.N. 126-2012-SUNARP/SN)."
+      },
+      {
+        "id": "SUNARP-COMP-005",
+        "nombre": "Otros documentos - SUNARP",
+        "cantidad": 2,
+        "url": "https://www.gob.pe/institucion/sunarp/colecciones/78980-otros-documentos-sunarp",
+        "descripcion": "Otros documentos institucionales emitidos por la SUNARP."
+      }
+    ],
+    "norma_destacada": {
+      "id": "SUNARP-TUO-RG-REG-PUB",
+      "tipo": "TUO - Reglamento General de Registros Publicos",
+      "numero": "Resolucion N 126-2012-SUNARP/SN",
+      "titulo": "Texto Unico Ordenado del Reglamento General de los Registros Publicos",
+      "descripcion": "Norma marco que regula la organizacion y funcionamiento de los registros publicos a cargo de la SUNARP.",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/1649022-126-2012-sunarp-sn",
+      "relevancia_legalpro": "ALTA - Norma fundamental del sistema registral peruano."
+    }
+  },
+  "directivas_destacadas": {
+    "descripcion": "Principales directivas de la SUNARP (ordenadas por fecha, mas recientes primero)",
+    "directivas": [
+      {
+        "id": "SUNARP-DI-2026-076",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 00076-2026-SUNARP/GG",
+        "fecha_publicacion": "2026-05-22",
+        "titulo": "Derogar la Directiva N DI-001-2024-OCOII",
+        "sumilla": "Derogar la Directiva N DI-001-2024-OCOII denominada 'Directiva para la publicacion, actualizacion y supervision de ...'.",
+        "materia": "Derogacion de Directiva",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8176070-00076-2026-sunarp-gg",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-DI-2026-036",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 00036-2026-SUNARP/GG",
+        "fecha_publicacion": "2026-02-27",
+        "titulo": "Derogar la Directiva DI-001-2024-SUNARP-OPPM",
+        "sumilla": "Derogar la Directiva DI-001-2024-SUNARP-OPPM denominada 'Directiva para la aprobacion de los documentos normativos'.",
+        "materia": "Derogacion de Directiva",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7798850-00036-2026-sunarp-gg",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-DI-2026-011",
+        "tipo": "Resolucion Jefatural",
+        "numero": "N. 00011-2026-SUNARP/OA",
+        "fecha_publicacion": "2026-01-28",
+        "titulo": "Aprobar Directiva DI-001-2026-SUNARP-OA/UT Caja Chica",
+        "sumilla": "Aprobar la Directiva DI-001-2026-SUNARP-OA/UT 'Directiva que norma la administracion del Fondo de Caja Chica de la ...'.",
+        "materia": "Directiva - Caja Chica",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7670765-00011-2026-sunarp-oa",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-DI-2025-194",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 00194-2025-SUNARP/GG",
+        "fecha_publicacion": "2025-10-27",
+        "titulo": "Derogar la Directiva N DI-005-2021-OGRH V.02",
+        "sumilla": "Derogar la Directiva N DI-005-2021-OGRH, Version: V.02, 'Directiva que regula la administracion de legajos de los ...'.",
+        "materia": "Derogacion de Directiva",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7333226-00194-2025-sunarp-gg",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-DI-2025-177",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 177-2025-SUNARP/GG",
+        "fecha_publicacion": "2025-10-03",
+        "titulo": "Derogar la Directiva N 004-2011-SUNARP/GG metodologia de software",
+        "sumilla": "Derogar la Directiva N 004-2011-SUNARP/GG 'Directiva sobre metodologia de desarrollo de software', aprobada por la ....",
+        "materia": "Derogacion de Directiva",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7257271-177-2025-sunarp-gg",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-DI-2025-154",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 154-2025-SUNARP/GG",
+        "fecha_publicacion": "2025-09-08",
+        "titulo": "Derogar la Directiva N 002-2015-SUNARP/SN lineamientos de conversion",
+        "sumilla": "Derogar la Directiva N 002-2015-SUNARP/SN, 'Directiva que establece lineamientos para la conversion de Oficina ...'.",
+        "materia": "Derogacion de Directiva",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7133360-154-2025-sunarp-gg",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-DI-2025-090",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 090-2025-SUNARP/GG",
+        "fecha_publicacion": "2025-06-03",
+        "titulo": "Aprobar Directiva DI-001-2025-SUNARP-GG foliacion de documentos",
+        "sumilla": "Aprobar la Directiva DI-001-2025-SUNARP-GG, 'Directiva para la foliacion de documentos de archivo en la Sunarp'.",
+        "materia": "Aprobacion - Foliacion de archivos",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6832582-090-2025-sunarp-gg",
+        "relevancia_legalpro": "ALTA - Regula foliacion de documentos."
+      },
+      {
+        "id": "SUNARP-DI-2025-071",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 071-2025-SUNARP/GG",
+        "fecha_publicacion": "2025-04-28",
+        "titulo": "Aprobar Directiva para prevenir hostigamiento sexual",
+        "sumilla": "Aprobar la 'Directiva para prevenir, investigar y sancionar el hostigamiento sexual en la Superintendencia Nacional ...'.",
+        "materia": "Directiva - Hostigamiento Sexual",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6720389-071-2025-sunarp-gg",
+        "relevancia_legalpro": "ALTA - Regula prevencion de acoso sexual en SUNARP."
+      },
+      {
+        "id": "SUNARP-DI-2025-022",
+        "tipo": "Resolucion de Superintendencia Nacional",
+        "numero": "N. 022-2025-SUNARP/SN",
+        "fecha_publicacion": "2025-02-03",
+        "titulo": "Aprobar Directiva DI-002-2025-SUNARP-DTR Digitalizacion de Documentos",
+        "sumilla": "Aprobar la Directiva DI-002-2025-SUNARP-DTR, 'Directiva que regula la digitalizacion de los documentos que forman ...'.",
+        "materia": "Directiva - Digitalizacion de Documentos",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6427450-022-2025-sunarp-sn",
+        "relevancia_legalpro": "ALTA - Regula digitalizacion de documentos registrales."
+      },
+      {
+        "id": "SUNARP-DI-2025-013",
+        "tipo": "Resolucion de Superintendencia Nacional",
+        "numero": "N. 013-2025-SUNARP/SN",
+        "fecha_publicacion": "2025-01-22",
+        "titulo": "Aprobar Directiva DI-001-2025-SUNARP-DTR Acceso al Sistema Informativo de Garantias",
+        "sumilla": "Aprobar la Directiva DI-001-2025-SUNARP-DTR, 'Directiva que regula el acceso al Sistema Informativo de Garantias ...'.",
+        "materia": "Directiva - Sistema Informativo de Garantias",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6400970-013-2025-sunarp-sn",
+        "relevancia_legalpro": "ALTA - Regula acceso al Sistema Informativo de Garantias Mobiliarias."
+      },
+      {
+        "id": "SUNARP-DI-2024-118",
+        "tipo": "Resolucion de Superintendencia Nacional",
+        "numero": "N. 118-2024-SUNARP/SN",
+        "fecha_publicacion": "2024-08-22",
+        "titulo": "Aprobar Directiva DI-001-2024-SUNARP-DTR Presentacion Electronica",
+        "sumilla": "Aprobar la Directiva DI-001-2024-SUNARP-DTR, 'Directiva que regula la presentacion electronica, tramite e inscripcion ...'.",
+        "materia": "Directiva - Tramite Electronico",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/5907177-118-2024-sunarp-sn",
+        "relevancia_legalpro": "ALTA - Regula tramite electronico en registros."
+      }
+    ]
+  },
+  "lineamientos_destacados": {
+    "descripcion": "Lineamientos de la SUNARP (16 en total)",
+    "lineamientos": [
+      {
+        "id": "SUNARP-LIN-2026-036",
+        "tipo": "Resolucion Jefatural",
+        "numero": "N. 00036-2026-SUNARP/OGRH",
+        "fecha_publicacion": "2026-04-10",
+        "titulo": "Lineamientos para la gestion de descansos medicos y subsidios",
+        "sumilla": "Aprobar el Documento Normativo denominado 'Lineamientos para la gestion de los descansos medicos y subsidios en la ...'.",
+        "materia": "Lineamiento - Descansos medicos y subsidios",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7999469-00036-2026-sunarp-ogrh",
+        "relevancia_legalpro": "ALTA - Regula licencias y subsidios en SUNARP."
+      },
+      {
+        "id": "SUNARP-LIN-2026-042",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 00042-2026-SUNARP/GG",
+        "fecha_publicacion": "2026-03-12",
+        "titulo": "Lineamiento para gestion y publicacion de contenidos en Sede Digital",
+        "sumilla": "Aprobar el Lineamiento para la gestion y publicacion de contenidos en la Sede Digital de la Superintendencia ...'.",
+        "materia": "Lineamiento - Sede Digital",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7858542-00042-2026-sunarp-gg",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-LIN-2025-161",
+        "tipo": "Resolucion de Superintendencia Nacional",
+        "numero": "N. 161-2025-SUNARP/SN",
+        "fecha_publicacion": "2025-10-21",
+        "titulo": "Lineamiento para la actualizacion de oficio de la Base Grafica Registral",
+        "sumilla": "Aprobar el 'Lineamiento para la atencion de la actualizacion de oficio de la Base Grafica Registral' cuyo texto y ...",
+        "materia": "Lineamiento - Base Grafica Registral",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7320799-161-2025-sunarp-sn",
+        "relevancia_legalpro": "ALTA - Regula actualizacion de base grafica registral (cartografia)."
+      },
+      {
+        "id": "SUNARP-LIN-2024-091",
+        "tipo": "Resolucion de Superintendencia Nacional",
+        "numero": "N. 091-2024-SUNARP/SN",
+        "fecha_publicacion": "2024-06-26",
+        "titulo": "Servicio 'Agenda tu reunion'",
+        "sumilla": "Aprobar el servicio denominado 'Agenda tu reunion', que forma parte de las funciones incorporados al Siguelo Plus, ...",
+        "materia": "Lineamiento - Atencion al ciudadano",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/5704504-091-2024-sunarp-sn",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-LIN-2022-049",
+        "tipo": "Resolucion de Superintendencia Nacional",
+        "numero": "N. 049-2022-SUNARP-SN",
+        "fecha_publicacion": "2022-04-12",
+        "titulo": "Programa Expoferia Registral Sunarp",
+        "sumilla": "Instituir a nivel nacional el nuevo programa de inclusion registral denominado 'Expoferia Registral Sunarp'. Aprobar ...",
+        "materia": "Lineamiento - Inclusion registral",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/2907527-049-2022-sunarp-sn",
+        "relevancia_legalpro": "MEDIA"
+      }
+    ]
+  },
+  "normas_recientes_julio_2026": {
+    "descripcion": "Resoluciones de la SUNARP publicadas en la ultima semana de julio 2026",
+    "normas": [
+      {
+        "id": "SUNARP-NR-2026-121-SN",
+        "tipo": "Resolucion de la Superintendencia Nacional",
+        "numero": "N. 00121-2026-SUNARP/SN",
+        "fecha_publicacion": "2026-07-31",
+        "titulo": "Aprobar supresion de Oficina Desconcentrada del Centro Cultural en Huaraz",
+        "sumilla": "Aprobar la supresion de la Oficina Desconcentrada del Centro Cultural en el distrito de Huaraz, provincia de Huaraz, departamento de Ancash, bajo la jurisdiccion de la Zona Registral N VII.",
+        "materia": "Reorganizacion institucional - Zona Registral VII",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8432288-00121-2026-sunarp-sn",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10385974/8432288-resolucion-de-la-superintendencia-nacional-de-los-registros-publicos-n-00121-2026-sunarp-sn.pdf",
+        "relevancia_legalpro": "MEDIA - Reorganizacion institucional SUNARP."
+      },
+      {
+        "id": "SUNARP-NR-2026-120-SN",
+        "tipo": "Resolucion de la Superintendencia Nacional",
+        "numero": "N. 00120-2026-SUNARP/SN",
+        "fecha_publicacion": "2026-07-31",
+        "titulo": "Modificar numeral 1.1 del articulo 1 de Resolucion N 002-2026-SUNARP/SN",
+        "sumilla": "Modificar el numeral 1.1 del articulo 1 de la Resolucion N 002-2026-SUNARP/SN del 7 de enero de 2026, incorporando el literal e) sobre delegacion.",
+        "materia": "Delegacion de facultades",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8430395-00120-2026-sunarp-sn",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10382890/8430395-resolucion-de-la-superintendencia-nacional-de-los-registros-publicos-n-00120-2026-sunarp-sn.pdf",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-NR-2026-068-OA",
+        "tipo": "Resolucion Jefatural",
+        "numero": "N. 00068-2026-SUNARP/OA",
+        "fecha_publicacion": "2026-07-31",
+        "titulo": "Aprobar donacion a Asociacion INADEJ",
+        "sumilla": "Aprobar la donacion, a favor de la Asociacion Integracion Nacional de la Juventud (INADEJ), de noventa y uno (91) bienes muebles patrimoniales dados de baja.",
+        "materia": "Donacion de bienes",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8430350-00068-2026-sunarp-oa",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10382832/8430350-resolucion-jefatural-n-00068-2026-sunarp-oa.pdf",
+        "relevancia_legalpro": "BAJA"
+      },
+      {
+        "id": "SUNARP-NR-2026-061-ZRIII",
+        "tipo": "Resolucion Jefatural",
+        "numero": "N. 061-2026-SUNARP/ZRIII/JEF",
+        "fecha_publicacion": "2026-07-31",
+        "titulo": "Cierre temporal de Oficina Receptora de Nueva Cajamarca",
+        "sumilla": "Disponer, el cierre temporal de la Oficina Receptora de Nueva Cajamarca, por el dia 31 de julio 2026, suspendiendose los servicios registrales y administrativos.",
+        "materia": "Cierre temporal de oficina",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8432289-061-2026-sunarp-zriii-jef",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10385976/8432289-resolucion-jefatural-n-061-2026-sunarp_zriii_jef.pdf",
+        "relevancia_legalpro": "MEDIA - Suspende servicios en zona registral."
+      },
+      {
+        "id": "SUNARP-NR-2026-078-ZRI",
+        "tipo": "Resolucion Jefatural",
+        "numero": "N. 00078-2026-SUNARP/ZRI/JEF",
+        "fecha_publicacion": "2026-07-30",
+        "titulo": "Encargar funciones de Jefe de Unidad de Administracion ZRI",
+        "sumilla": "Encargar las funciones de Jefe de la Unidad de Administracion de la Zona Registral N I al servidor Mario Diaz Lopez, por el periodo del 30 de julio al 02 de agosto.",
+        "materia": "Encargatura de funciones",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8424279-00078-2026-sunarp-zri-jef",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10374589/8424279-resolucion-jefatural-no-00078-2026-sunarp-zri-jef.pdf",
+        "relevancia_legalpro": "BAJA"
+      },
+      {
+        "id": "SUNARP-NR-2026-074-ZRXII",
+        "tipo": "Resolucion Jefatural",
+        "numero": "N. 074-2026-SUNARP/ZRXII/JEF",
+        "fecha_publicacion": "2026-07-30",
+        "titulo": "Designar Secretaria Tecnica Suplente de los PAD-ZRXII",
+        "sumilla": "Designar en adicion a sus funciones a la servidora Ana Rosario Vasquez Cardenas como Secretaria Tecnica Suplente de los Procedimientos Administrativos Disciplinarios de la Zona Registral N XII.",
+        "materia": "Procedimiento Administrativo Disciplinario",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8428491-074-2026-sunarp-zrxii-jef",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10380523/8428491-resolucion-jefatural-no-074-2026-sunarp-zrxii-jef.pdf",
+        "relevancia_legalpro": "BAJA"
+      },
+      {
+        "id": "SUNARP-NR-2026-118-SN",
+        "tipo": "Resolucion de la Superintendencia Nacional",
+        "numero": "N. 118-2026-SUNARP/SN",
+        "fecha_publicacion": "2026-07-24",
+        "titulo": "Aceptar renuncia de servidor de la SUNARP",
+        "sumilla": "Aceptar con eficacia anticipada, la renuncia formulada por el servidor Victor Moises Portal.",
+        "materia": "Recursos Humanos - SUNARP",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8420918-118-2026-sunarp-sn",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10367993/8420918-resolucion-de-la-superintendencia-nacional-de-los-registros-publicos-n-00118-2026-sunarp-sn.pdf",
+        "relevancia_legalpro": "BAJA"
+      },
+      {
+        "id": "SUNARP-NR-2026-102-GG",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 00102-2026-SUNARP/GG",
+        "fecha_publicacion": "2026-07-24",
+        "titulo": "Convocar Concurso Publico de Meritos SUNARP",
+        "sumilla": "Autorizar la convocatoria a Concurso Publico de Meritos para cubrir por suplencia la siguiente plaza.",
+        "materia": "Concurso Publico - CAS",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8420911-00102-2026-sunarp-gg",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10367970/8420911-resolucion-de-la-gerencia-general-de-la-sunarp-n-00102-2026-sunarp-gg.pdf",
+        "relevancia_legalpro": "MEDIA"
+      },
+      {
+        "id": "SUNARP-NR-2025-228-GG",
+        "tipo": "Resolucion de la Gerencia General",
+        "numero": "N. 228-2025-SUNARP/GG",
+        "fecha_publicacion": "2025-12-23",
+        "titulo": "Actualizacion del monto de los derechos registrales",
+        "sumilla": "Aprobar la actualizacion del monto de los derechos registrales de la Superintendencia Nacional.",
+        "materia": "Derechos Registrales - Tarifas",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7551838-228-2025-sunarp-gg",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/9198766/7551838-resolucion-de-la-gerencia-general-de-la-sunarp-n-228-2025-sunarp-gg.pdf",
+        "relevancia_legalpro": "ALTA - Modifica tarifas de servicios registrales."
+      },
+      {
+        "id": "SUNARP-NR-2026-059-ZRXI",
+        "tipo": "Resolucion de la Unidad Registral",
+        "numero": "N. 059-2026-SUNARP-ZRNXI/UREG",
+        "fecha_publicacion": "2026-05-21",
+        "titulo": "Prorrogar vigencia de asiento de presentacion en Registro de Predios",
+        "sumilla": "Prorrogar la vigencia del asiento de presentacion de los titulos del Registro de Predios de la Zona Registral N XI.",
+        "materia": "Procedimiento registral - Plazos",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8171244-059-2026-sunarp-zrnxi-ureg",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10020891/8171244-resolucion-n-059-2026-sunarp-zrxi-ureg.pdf",
+        "relevancia_legalpro": "ALTA - Prorroga plazos registrales en Registro de Predios."
+      },
+      {
+        "id": "SUNARP-NR-2026-170-ZRXII",
+        "tipo": "Resolucion de la Unidad de Administracion",
+        "numero": "N. 170-2026-SUNARP/ZRXII/UA",
+        "fecha_publicacion": "2026-07-31",
+        "titulo": "Aprobar transferencia de bienes muebles a 3 Brigada",
+        "sumilla": "Aprobar la transferencia de los bienes muebles cuyas caracteristicas y valores se detallan en el Anexo, a favor de la 3 Brigada.",
+        "materia": "Transferencia de bienes",
+        "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8430713-170-2026-sunarp-zrxii-ua",
+        "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10383314/8430713-resolucion-de-la-unidad-de-administracion-no-170-2026-sunarp-zrxii-ua.pdf",
+        "relevancia_legalpro": "BAJA"
+      }
+    ]
+  },
+  "precedentes_y_jurisprudencia_registral": {
+    "descripcion": "Acceso al Tribunal Registral y jurisprudencia relevante",
+    "urls": {
+      "tribunal_registral": "https://www.gob.pe/11330-tribunal-registral",
+      "modulo_consulta_resoluciones": "https://resolucionestribunal.sunarp.gob.pe/sir-tribunal-publico/",
+      "compendio_resoluciones": "https://www.gob.pe/institucion/sunarp/colecciones/18891-resoluciones-del-tribunal-registral"
+    },
+    "nota": "El Tribunal Registral emite precedentes administrativos de observancia obligatoria para las zonas registrales a nivel nacional. Los precedentes se obtienen consultando el modulo SIR-Tribunal-Publico."
+  },
+  "estadisticas": {
+    "total_normas_historicas_sunarp": 70156,
+    "documentos_julio_2026_extraidos": 30,
+    "directivas_vigentes": 116,
+    "lineamientos_vigentes": 16,
+    "reglamentos_vigentes": 25,
+    "compendios_principales": 5,
+    "tipo_norma_frecuente": {
+      "Resolucion de la Unidad Registral": "Mayoritaria - prorroga de plazos, oposiciones, cierre de partidas",
+      "Resolucion de la Gerencia General": "Directivas, lineamientos, designaciones",
+      "Resolucion de la Superintendencia Nacional": "Normas marco, precedentes",
+      "Resolucion Jefatural": "Cierre de oficinas, designaciones, donaciones"
+    }
+  },
+  "limitaciones": {
+    "muestra": "Solo se incluyen 30 documentos representativos; SUNARP tiene 70,156 normas historicas en total",
+    "cobertura_temporal": "Cobertura completa del 24-31 julio 2026; periodo anterior es parcial",
+    "procedencia": "Mayoria de normas son de gestion interna (designaciones, transferencias) y no precedentes administrativos",
+    "precedentes": "Los precedentes del Tribunal Registral requieren consulta directa al modulo SIR-Tribunal-Publico; no se encuentran en busqueda de normas-legales"
+  },
+  "normas": [
+    {
+      "id": "SUNARP-TUO-RG-REG-PUB",
+      "tipo": "TUO - Reglamento General",
+      "numero": "R.N. 126-2012-SUNARP/SN",
+      "fecha_publicacion": "2012-07-04",
+      "entidad": "SUNARP",
+      "titulo": "Texto Unico Ordenado del Reglamento General de los Registros Publicos",
+      "sumilla": "Norma marco que regula la organizacion y funcionamiento del sistema de registros publicos a cargo de la SUNARP.",
+      "materia": "Reglamento General - Registros Publicos",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/1649022-126-2012-sunarp-sn",
+      "relevancia_legalpro": "ALTA - Norma fundamental del sistema registral peruano."
+    },
+    {
+      "id": "SUNARP-NR-2026-121-SN",
+      "tipo": "Resolucion de la Superintendencia Nacional",
+      "numero": "N. 00121-2026-SUNARP/SN",
+      "fecha_publicacion": "2026-07-31",
+      "entidad": "SUNARP",
+      "titulo": "Supresion de Oficina Desconcentrada del Centro Cultural en Huaraz",
+      "sumilla": "Aprobar la supresion de la Oficina Desconcentrada del Centro Cultural en el distrito de Huaraz, provincia de Huaraz, departamento de Ancash, bajo la jurisdiccion de la Zona Registral N VII.",
+      "materia": "Reorganizacion institucional - Zona Registral VII",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8432288-00121-2026-sunarp-sn",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10385974/8432288-resolucion-de-la-superintendencia-nacional-de-los-registros-publicos-n-00121-2026-sunarp-sn.pdf",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-NR-2026-120-SN",
+      "tipo": "Resolucion de la Superintendencia Nacional",
+      "numero": "N. 00120-2026-SUNARP/SN",
+      "fecha_publicacion": "2026-07-31",
+      "entidad": "SUNARP",
+      "titulo": "Modificar numeral 1.1 del articulo 1 de Resolucion N 002-2026-SUNARP/SN",
+      "sumilla": "Modificar el numeral 1.1 del articulo 1 de la Resolucion N 002-2026-SUNARP/SN del 7 de enero de 2026, incorporando el literal e) sobre delegacion.",
+      "materia": "Delegacion de facultades",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8430395-00120-2026-sunarp-sn",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10382890/8430395-resolucion-de-la-superintendencia-nacional-de-los-registros-publicos-n-00120-2026-sunarp-sn.pdf",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-NR-2026-068-OA",
+      "tipo": "Resolucion Jefatural",
+      "numero": "N. 00068-2026-SUNARP/OA",
+      "fecha_publicacion": "2026-07-31",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar donacion a Asociacion INADEJ",
+      "sumilla": "Aprobar la donacion, a favor de la Asociacion Integracion Nacional de la Juventud (INADEJ), de noventa y uno (91) bienes muebles patrimoniales dados de baja.",
+      "materia": "Donacion de bienes",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8430350-00068-2026-sunarp-oa",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10382832/8430350-resolucion-jefatural-n-00068-2026-sunarp-oa.pdf",
+      "relevancia_legalpro": "BAJA"
+    },
+    {
+      "id": "SUNARP-NR-2026-061-ZRIII",
+      "tipo": "Resolucion Jefatural",
+      "numero": "N. 061-2026-SUNARP/ZRIII/JEF",
+      "fecha_publicacion": "2026-07-31",
+      "entidad": "SUNARP",
+      "titulo": "Cierre temporal de Oficina Receptora de Nueva Cajamarca",
+      "sumilla": "Disponer, el cierre temporal de la Oficina Receptora de Nueva Cajamarca, por el dia 31 de julio 2026, suspendiendose los servicios registrales y administrativos.",
+      "materia": "Cierre temporal de oficina",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8432289-061-2026-sunarp-zriii-jef",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10385976/8432289-resolucion-jefatural-n-061-2026-sunarp_zriii_jef.pdf",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-NR-2026-078-ZRI",
+      "tipo": "Resolucion Jefatural",
+      "numero": "N. 00078-2026-SUNARP/ZRI/JEF",
+      "fecha_publicacion": "2026-07-30",
+      "entidad": "SUNARP",
+      "titulo": "Encargar funciones de Jefe de Unidad de Administracion ZRI",
+      "sumilla": "Encargar las funciones de Jefe de la Unidad de Administracion de la Zona Registral N I al servidor Mario Diaz Lopez, por el periodo del 30 de julio al 02 de agosto.",
+      "materia": "Encargatura de funciones",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8424279-00078-2026-sunarp-zri-jef",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10374589/8424279-resolucion-jefatural-no-00078-2026-sunarp-zri-jef.pdf",
+      "relevancia_legalpro": "BAJA"
+    },
+    {
+      "id": "SUNARP-NR-2026-074-ZRXII",
+      "tipo": "Resolucion Jefatural",
+      "numero": "N. 074-2026-SUNARP/ZRXII/JEF",
+      "fecha_publicacion": "2026-07-30",
+      "entidad": "SUNARP",
+      "titulo": "Designar Secretaria Tecnica Suplente de los PAD-ZRXII",
+      "sumilla": "Designar en adicion a sus funciones a la servidora Ana Rosario Vasquez Cardenas como Secretaria Tecnica Suplente de los Procedimientos Administrativos Disciplinarios de la Zona Registral N XII.",
+      "materia": "Procedimiento Administrativo Disciplinario",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8428491-074-2026-sunarp-zrxii-jef",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10380523/8428491-resolucion-jefatural-no-074-2026-sunarp-zrxii-jef.pdf",
+      "relevancia_legalpro": "BAJA"
+    },
+    {
+      "id": "SUNARP-NR-2026-118-SN",
+      "tipo": "Resolucion de la Superintendencia Nacional",
+      "numero": "N. 118-2026-SUNARP/SN",
+      "fecha_publicacion": "2026-07-24",
+      "entidad": "SUNARP",
+      "titulo": "Aceptar renuncia de servidor de la SUNARP",
+      "sumilla": "Aceptar con eficacia anticipada, la renuncia formulada por el servidor Victor Moises Portal.",
+      "materia": "Recursos Humanos - SUNARP",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8420918-118-2026-sunarp-sn",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10367993/8420918-resolucion-de-la-superintendencia-nacional-de-los-registros-publicos-n-00118-2026-sunarp-sn.pdf",
+      "relevancia_legalpro": "BAJA"
+    },
+    {
+      "id": "SUNARP-NR-2026-102-GG",
+      "tipo": "Resolucion de la Gerencia General",
+      "numero": "N. 00102-2026-SUNARP/GG",
+      "fecha_publicacion": "2026-07-24",
+      "entidad": "SUNARP",
+      "titulo": "Convocar Concurso Publico de Meritos SUNARP",
+      "sumilla": "Autorizar la convocatoria a Concurso Publico de Meritos para cubrir por suplencia la siguiente plaza.",
+      "materia": "Concurso Publico - CAS",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8420911-00102-2026-sunarp-gg",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10367970/8420911-resolucion-de-la-gerencia-general-de-la-sunarp-n-00102-2026-sunarp-gg.pdf",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-NR-2026-036-OGRH",
+      "tipo": "Resolucion Jefatural",
+      "numero": "N. 00036-2026-SUNARP/OGRH",
+      "fecha_publicacion": "2026-04-10",
+      "entidad": "SUNARP",
+      "titulo": "Lineamientos para la gestion de descansos medicos y subsidios",
+      "sumilla": "Aprobar el Documento Normativo 'Lineamientos para la gestion de los descansos medicos y subsidios'.",
+      "materia": "Lineamiento - Descansos medicos y subsidios",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7999469-00036-2026-sunarp-ogrh",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SUNARP-DI-2026-076",
+      "tipo": "Resolucion de la Gerencia General",
+      "numero": "N. 00076-2026-SUNARP/GG",
+      "fecha_publicacion": "2026-05-22",
+      "entidad": "SUNARP",
+      "titulo": "Derogar la Directiva N DI-001-2024-OCOII",
+      "sumilla": "Derogar la Directiva N DI-001-2024-OCOII 'Directiva para la publicacion, actualizacion y supervision'.",
+      "materia": "Derogacion de Directiva",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8176070-00076-2026-sunarp-gg",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-DI-2026-036",
+      "tipo": "Resolucion de la Gerencia General",
+      "numero": "N. 00036-2026-SUNARP/GG",
+      "fecha_publicacion": "2026-02-27",
+      "entidad": "SUNARP",
+      "titulo": "Derogar la Directiva DI-001-2024-SUNARP-OPPM",
+      "sumilla": "Derogar la Directiva DI-001-2024-SUNARP-OPPM 'Directiva para la aprobacion de los documentos normativos'.",
+      "materia": "Derogacion de Directiva",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7798850-00036-2026-sunarp-gg",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-DI-2026-011",
+      "tipo": "Resolucion Jefatural",
+      "numero": "N. 00011-2026-SUNARP/OA",
+      "fecha_publicacion": "2026-01-28",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar Directiva DI-001-2026-SUNARP-OA/UT Caja Chica",
+      "sumilla": "Aprobar la Directiva DI-001-2026-SUNARP-OA/UT 'Directiva que norma la administracion del Fondo de Caja Chica'.",
+      "materia": "Directiva - Caja Chica",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7670765-00011-2026-sunarp-oa",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-DI-2025-090",
+      "tipo": "Resolucion de la Gerencia General",
+      "numero": "N. 090-2025-SUNARP/GG",
+      "fecha_publicacion": "2025-06-03",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar Directiva DI-001-2025-SUNARP-GG foliacion de documentos",
+      "sumilla": "Aprobar la Directiva DI-001-2025-SUNARP-GG 'Directiva para la foliacion de documentos de archivo en la Sunarp'.",
+      "materia": "Directiva - Foliacion de archivos",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6832582-090-2025-sunarp-gg",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SUNARP-DI-2025-071",
+      "tipo": "Resolucion de la Gerencia General",
+      "numero": "N. 071-2025-SUNARP/GG",
+      "fecha_publicacion": "2025-04-28",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar Directiva para prevenir hostigamiento sexual",
+      "sumilla": "Aprobar la 'Directiva para prevenir, investigar y sancionar el hostigamiento sexual en la SUNARP'.",
+      "materia": "Directiva - Hostigamiento Sexual",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6720389-071-2025-sunarp-gg",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SUNARP-DI-2025-022",
+      "tipo": "Resolucion de Superintendencia Nacional",
+      "numero": "N. 022-2025-SUNARP/SN",
+      "fecha_publicacion": "2025-02-03",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar Directiva DI-002-2025-SUNARP-DTR Digitalizacion de Documentos",
+      "sumilla": "Aprobar la Directiva DI-002-2025-SUNARP-DTR 'Directiva que regula la digitalizacion de los documentos que forman parte de los expedientes registrales'.",
+      "materia": "Directiva - Digitalizacion de Documentos",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6427450-022-2025-sunarp-sn",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SUNARP-DI-2025-013",
+      "tipo": "Resolucion de Superintendencia Nacional",
+      "numero": "N. 013-2025-SUNARP/SN",
+      "fecha_publicacion": "2025-01-22",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar Directiva DI-001-2025-SUNARP-DTR Acceso al Sistema Informativo de Garantias",
+      "sumilla": "Aprobar la Directiva DI-001-2025-SUNARP-DTR 'Directiva que regula el acceso al Sistema Informativo de Garantias Mobiliarias'.",
+      "materia": "Directiva - Garantias Mobiliarias",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/6400970-013-2025-sunarp-sn",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SUNARP-DI-2024-118",
+      "tipo": "Resolucion de Superintendencia Nacional",
+      "numero": "N. 118-2024-SUNARP/SN",
+      "fecha_publicacion": "2024-08-22",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar Directiva DI-001-2024-SUNARP-DTR Presentacion Electronica",
+      "sumilla": "Aprobar la Directiva DI-001-2024-SUNARP-DTR 'Directiva que regula la presentacion electronica, tramite e inscripcion de titulos'.",
+      "materia": "Directiva - Tramite Electronico",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/5907177-118-2024-sunarp-sn",
+      "relevancia_legalpro": "ALTA"
+    },
+    {
+      "id": "SUNARP-NR-2025-228-GG",
+      "tipo": "Resolucion de la Gerencia General",
+      "numero": "N. 228-2025-SUNARP/GG",
+      "fecha_publicacion": "2025-12-23",
+      "entidad": "SUNARP",
+      "titulo": "Actualizacion del monto de los derechos registrales",
+      "sumilla": "Aprobar la actualizacion del monto de los derechos registrales de la SUNARP.",
+      "materia": "Derechos Registrales - Tarifas",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7551838-228-2025-sunarp-gg",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/9198766/7551838-resolucion-de-la-gerencia-general-de-la-sunarp-n-228-2025-sunarp-gg.pdf",
+      "relevancia_legalpro": "ALTA - Modifica tarifas de servicios registrales."
+    },
+    {
+      "id": "SUNARP-LIN-2025-161",
+      "tipo": "Resolucion de Superintendencia Nacional",
+      "numero": "N. 161-2025-SUNARP/SN",
+      "fecha_publicacion": "2025-10-21",
+      "entidad": "SUNARP",
+      "titulo": "Lineamiento para la actualizacion de oficio de la Base Grafica Registral",
+      "sumilla": "Aprobar el 'Lineamiento para la atencion de la actualizacion de oficio de la Base Grafica Registral'.",
+      "materia": "Lineamiento - Base Grafica Registral",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7320799-161-2025-sunarp-sn",
+      "relevancia_legalpro": "ALTA - Regula actualizacion de cartografia registral."
+    },
+    {
+      "id": "SUNARP-NR-2026-059-ZRXI",
+      "tipo": "Resolucion de la Unidad Registral",
+      "numero": "N. 059-2026-SUNARP-ZRNXI/UREG",
+      "fecha_publicacion": "2026-05-21",
+      "entidad": "SUNARP",
+      "titulo": "Prorrogar vigencia de asiento de presentacion en Registro de Predios",
+      "sumilla": "Prorrogar la vigencia del asiento de presentacion de los titulos del Registro de Predios de la Zona Registral N XI.",
+      "materia": "Procedimiento registral - Plazos",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8171244-059-2026-sunarp-zrnxi-ureg",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10020891/8171244-resolucion-n-059-2026-sunarp-zrxi-ureg.pdf",
+      "relevancia_legalpro": "ALTA - Prorroga plazos registrales en Registro de Predios."
+    },
+    {
+      "id": "SUNARP-NR-2026-170-ZRXII",
+      "tipo": "Resolucion de la Unidad de Administracion",
+      "numero": "N. 170-2026-SUNARP/ZRXII/UA",
+      "fecha_publicacion": "2026-07-31",
+      "entidad": "SUNARP",
+      "titulo": "Aprobar transferencia de bienes muebles a 3ra Brigada",
+      "sumilla": "Aprobar la transferencia de los bienes muebles cuyas caracteristicas y valores se detallan en el Anexo, a favor de la 3ra Brigada.",
+      "materia": "Transferencia de bienes",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/8430713-170-2026-sunarp-zrxii-ua",
+      "url_pdf": "https://cdn.www.gob.pe/uploads/document/file/10383314/8430713-resolucion-de-la-unidad-de-administracion-no-170-2026-sunarp-zrxii-ua.pdf",
+      "relevancia_legalpro": "BAJA"
+    },
+    {
+      "id": "SUNARP-LIN-2026-042",
+      "tipo": "Resolucion de la Gerencia General",
+      "numero": "N. 00042-2026-SUNARP/GG",
+      "fecha_publicacion": "2026-03-12",
+      "entidad": "SUNARP",
+      "titulo": "Lineamiento para gestion y publicacion de contenidos en Sede Digital",
+      "sumilla": "Aprobar el Lineamiento para la gestion y publicacion de contenidos en la Sede Digital de la SUNARP.",
+      "materia": "Lineamiento - Sede Digital",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/normas-legales/7858542-00042-2026-sunarp-gg",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "SUNARP-NR-EVENTO-2026",
+      "tipo": "Noticia",
+      "numero": "N/A",
+      "fecha_publicacion": "2026-07-30",
+      "entidad": "SUNARP",
+      "titulo": "Sunarp reduce costos y tiempos en modificacion de reglamentos internos",
+      "sumilla": "Sunarp reduce costos y tiempos en modificacion de reglamentos internos para beneficio de ciudadanos.",
+      "materia": "Simplificacion administrativa",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/noticias/1424053-sunarp-reduce-costos-y-tiempos-en-modificacion-de-reglamentos-internos-para-beneficio-de-ciudadanos",
+      "relevancia_legalpro": "MEDIA - Politica institucional de simplificacion."
+    },
+    {
+      "id": "SUNARP-NR-DESIGNACION-2026",
+      "tipo": "Noticia",
+      "numero": "N/A",
+      "fecha_publicacion": "2026-07-18",
+      "entidad": "SUNARP",
+      "titulo": "Designan a Never Patrik Miranda Aburto como Superintendente Nacional",
+      "sumilla": "Designacion de Never Patrik Miranda Aburto como Superintendente Nacional de los Registros Publicos.",
+      "materia": "Designacion alto funcionario - SUNARP",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/noticias/1420585-designan-a-never-patrik-miranda-aburto-como-superintendente-nacional-de-los-registros-publicos",
+      "relevancia_legalpro": "ALTA - Nueva autoridad en SUNARP."
+    },
+    {
+      "id": "SUNARP-NR-CONVENIO-2026",
+      "tipo": "Convenio",
+      "numero": "N/A",
+      "fecha_publicacion": "2026-07-24",
+      "entidad": "SUNARP - Programa PAIS",
+      "titulo": "Sunarp y programa PAIS se unen para facilitar acceso a servicios registrales en comunidades rurales",
+      "sumilla": "Convenio entre Sunarp y el Programa Nacional PAIS para facilitar el acceso a servicios registrales en comunidades rurales.",
+      "materia": "Convenio interinstitucional - Inclusion registral",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/noticias/1423102-sunarp-y-programa-pais-se-unen-para-facilitar-el-acceso-a-servicios-registrales-en-comunidades-rurales",
+      "relevancia_legalpro": "MEDIA - Inclusion registral rural."
+    },
+    {
+      "id": "SUNARP-NR-CONOCE-AQUI-2026",
+      "tipo": "Servicio",
+      "numero": "N/A",
+      "fecha_publicacion": "2026-07-21",
+      "entidad": "SUNARP",
+      "titulo": "Sunarp: Servicio gratuito 'Conoce Aqui' supera los 24 millones de visualizaciones",
+      "sumilla": "El servicio gratuito 'Conoce Aqui' de la SUNARP ya supera los 24 millones de visualizaciones de partidas registrales.",
+      "materia": "Servicio gratuito - Publicidad registral",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/noticias/1421486-sunarp-servicio-gratuito-conoce-aqui-ya-supera-los-24-millones-de-visualizaciones-de-partidas",
+      "relevancia_legalpro": "MEDIA - Servicio gratuito para ciudadania."
+    },
+    {
+      "id": "SUNARP-NR-INSCRIPCIONES-2026",
+      "tipo": "Noticia",
+      "numero": "N/A",
+      "fecha_publicacion": "2026-07-13",
+      "entidad": "SUNARP",
+      "titulo": "Inscripcion de titulos aumento mas del 10% en el primer semestre",
+      "sumilla": "En mas del 10% aumento la inscripcion de titulos en los cuatro registros durante el primer semestre.",
+      "materia": "Estadistica registral",
+      "url_fuente": "https://www.gob.pe/institucion/sunarp/noticias/1417918-sunarp-en-mas-de-10-aumento-la-inscripcion-de-titulos-en-los-cuatro-registros-durante-el-primer-semestre",
+      "relevancia_legalpro": "MEDIA"
+    }
+  ]
+}

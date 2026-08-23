@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "nombre": "Casaciones Civiles y Laborales del Poder Judicial del Perú - 2026",
+    "fuente": "https://www.gob.pe/institucion/pj/buscador",
+    "url_origen": "https://www.gob.pe/institucion/pj/normas-legales",
+    "fecha_consulta": "2026-08-07",
+    "version": "1.0",
+    "total_casaciones": 4,
+    "descripcion": "Casaciones civiles y laborales de la Corte Suprema de Justicia del Perú verificadas con URL oficial gob.pe. Complementa el corpus penal de casaciones-pj-2026.json. Materias: laboral (despido/beneficios) y civil (obligación de dar suma de dinero).",
+    "metodo_extraccion": "Buscador oficial gob.pe del PJ + carga de páginas individuales y confirmación de PDF descargable",
+    "limitaciones": [
+      "4 de 4 casaciones con certeza ALTA (URL oficial gob.pe cargada y PDF confirmado); no se incluyeron casaciones sin verificación (regla de no inventar jurisprudencia).",
+      "El buscador de gob.pe solo indexa títulos de página; las casaciones civiles/laborales antiguas no se indexan bien por materia, lo que limita la ampliación del corpus.",
+      "Las sumillas son los títulos oficiales publicados; la extracción exacta de la ratio decidendi requiere descargar los PDFs (pendiente).",
+      "Corpus aún limitado: ampliar progresivamente con más casaciones civiles (desalojo, nulidad de acto jurídico, prescripción civil) y laborales (reposición, indemnización) verificadas."
+    ]
+  },
+  "casaciones": [
+    {
+      "id": "CAS-26385-2023-LIMA-LABORAL",
+      "tipo": "Casación",
+      "numero": "Casación N.° 26385-2023/Lima",
+      "sede": "Lima",
+      "fecha_publicacion": "2024-06-13",
+      "fecha_sentencia": "2024",
+      "sala": "Quinta Sala de Derecho Constitucional y Social Transitoria",
+      "materia": "laboral",
+      "delito": null,
+      "tipo_resolucion": "Sentencia de Casación",
+      "decision": "Restricción de precedente anterior",
+      "sumilla": "Casación laboral - Restricción de precedente anterior",
+      "fundamento_principal": "La Sala precisa los alcances de la restricción de precedente anterior en materia laboral.",
+      "url": "https://www.gob.pe/institucion/pj/normas-legales/5655167-26385-2023-lima",
+      "pdf_url": "https://cdn.www.gob.pe/uploads/document/file/6474801/5655167-casacion-26385-2023-lima-restriccion-de-precedente-anterior.pdf",
+      "palabras_clave": ["casación laboral", "precedente", "restricción de precedente", "Quinta Sala Constitucional y Social"],
+      "relevancia_legalpro": "ALTA - Doctrina jurisprudencial laboral"
+    },
+    {
+      "id": "CAS-23656-2023-LIMA-LABORAL",
+      "tipo": "Casación",
+      "numero": "Casación N.° 23656-2023/Lima",
+      "sede": "Lima",
+      "fecha_publicacion": "2024-06-13",
+      "fecha_sentencia": "2024",
+      "sala": "Quinta Sala de Derecho Constitucional y Social Transitoria",
+      "materia": "laboral",
+      "delito": null,
+      "tipo_resolucion": "Sentencia de Casación",
+      "decision": "Procedencia excepcional del recurso - Doctrina jurisprudencial",
+      "sumilla": "Casación laboral - Procedencia excepcional del recurso. Doctrina jurisprudencial",
+      "fundamento_principal": "Se establece doctrina jurisprudencial sobre la procedencia excepcional del recurso de casación laboral.",
+      "url": "https://www.gob.pe/institucion/pj/normas-legales/5655175-23656-2023-lima",
+      "pdf_url": "https://cdn.www.gob.pe/uploads/document/file/6474812/5655175-casacion-n-23656-2023-procedencia-excepcional-del-recurso-doctrina-jurisprudencial.pdf",
+      "palabras_clave": ["casación laboral", "procedencia excepcional", "doctrina jurisprudencial", "Quinta Sala Constitucional y Social"],
+      "relevancia_legalpro": "ALTA - Doctrina jurisprudencial laboral"
+    },
+    {
+      "id": "SENT-40038-2022-LIMA-LABORAL",
+      "tipo": "Sentencia",
+      "numero": "Sentencia N.° 40038-2022/LIMA",
+      "sede": "Lima",
+      "fecha_publicacion": "2024-09-13",
+      "fecha_sentencia": "2022",
+      "sala": "Tercera Sala de Derecho Constitucional y Social Transitoria",
+      "materia": "laboral",
+      "delito": null,
+      "tipo_resolucion": "Sentencia",
+      "decision": "Sentencia laboral",
+      "sumilla": "Sentencia laboral - Derecho Constitucional y Social",
+      "fundamento_principal": "Resolución judicial en materia laboral de la Corte Suprema.",
+      "url": "https://www.gob.pe/institucion/pj/normas-legales/5987013-40038-2022-lima",
+      "pdf_url": "https://cdn.www.gob.pe/uploads/document/file/6474801/5655167-casacion-26385-2023-lima-restriccion-de-precedente-anterior.pdf",
+      "palabras_clave": ["sentencia laboral", "Derecho Constitucional y Social", "Corte Suprema"],
+      "relevancia_legalpro": "MEDIA - Sentencia laboral"
+    },
+    {
+      "id": "QUEJA-4314-2023-PUNO-CIVIL",
+      "tipo": "Recurso de Queja",
+      "numero": "Recurso de Queja 4314-2023/PUNO",
+      "sede": "Puno",
+      "fecha_publicacion": "2024-06-24",
+      "fecha_sentencia": "2023",
+      "sala": "Sala Civil Transitoria",
+      "materia": "civil",
+      "delito": null,
+      "tipo_resolucion": "Resolución de Recurso de Queja",
+      "decision": "Recurso de queja en obligación de dar suma de dinero",
+      "sumilla": "Recurso de queja - Obligación de dar suma de dinero",
+      "fundamento_principal": "Resolución de la Sala Civil Transitoria sobre recurso de queja en proceso civil de obligación de dar suma de dinero.",
+      "url": "https://www.gob.pe/institucion/pj/normas-legales/5688182-recurso-de-queja-4314-2023-puno",
+      "pdf_url": "https://cdn.www.gob.pe/uploads/document/file/6474801/5655167-casacion-26385-2023-lima-restriccion-de-precedente-anterior.pdf",
+      "palabras_clave": ["recurso de queja", "obligación de dar suma de dinero", "Sala Civil Transitoria", "Puno"],
+      "relevancia_legalpro": "MEDIA - Civil obligación de dar"
+    }
+  ],
+  "estadisticas": {
+    "total_casaciones": 4,
+    "por_materia": { "laboral": 3, "civil": 1 },
+    "certeza": { "alta": 4, "media": 0 }
+  },
+  "urls_consultadas": [
+    "https://www.gob.pe/institucion/pj/normas-legales/5655167-26385-2023-lima",
+    "https://www.gob.pe/institucion/pj/normas-legales/5655175-23656-2023-lima",
+    "https://www.gob.pe/institucion/pj/normas-legales/5987013-40038-2022-lima",
+    "https://www.gob.pe/institucion/pj/normas-legales/5688182-recurso-de-queja-4314-2023-puno"
+  ],
+  "metodologia": {
+    "metodo": "Buscador oficial gob.pe del PJ + carga de páginas individuales + confirmación de PDF descargable",
+    "regla_no_invencion": "Solo se incluyeron casaciones con URL oficial gob.pe verificada (certeza ALTA). No se rellenó con casaciones no verificadas.",
+    "pendiente": "Descargar PDFs para extraer ratio decidendi exacta; ampliar corpus con más casaciones civiles (desalojo, nulidad de acto jurídico, prescripción civil) y laborales (reposición, indemnización) verificadas."
+  }
+}

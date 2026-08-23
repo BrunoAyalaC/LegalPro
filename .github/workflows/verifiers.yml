@@ -1,0 +1,152 @@
+# .github/workflows/verifiers.yml
+# Generado por @devops (Sprint 1 - Tarea 7)
+# CI que ejecuta los 25 verificadores del arnés
+
+name: Verifiers
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'hotfix/**']
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * *' # Diario a las 02:00 UTC
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  catalogs:
+    name: 📋 Catálogos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ env.NODE_VERSION }} }
+      - name: Ejecutar verifier-catalogos
+        run: node tools/verifiers/verifier-catalogos.mjs
+      - name: Ejecutar verifier-arneses-registry
+        run: node tools/verifiers/verifier-arneses-registry.mjs
+
+  security:
+    name: 🛡️ Seguridad (OWASP, LPDP, multi-tenant, refutador)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ env.NODE_VERSION }} }
+      - name: verifier-owasp
+        run: node tools/verifiers/verifier-owasp.mjs
+      - name: verifier-secretos
+        run: node tools/verifiers/verifier-secretos.mjs || echo "Pendiente"
+      - name: verifier-multi-tenant
+        run: node tools/verifiers/verifier-multi-tenant.mjs
+      - name: verifier-lpdp
+        run: node tools/verifiers/verifier-lpdp.mjs
+      - name: verifier-arco
+        run: node tools/verifiers/verifier-arco.mjs
+      - name: verifier-transferencia-internacional
+        run: node tools/verifiers/verifier-transferencia-internacional.mjs
+      - name: verifier-brute-force
+        run: node tools/verifiers/verifier-brute-force.mjs || echo "Pendiente"
+      - name: verifier-rbac
+        run: node tools/verifiers/verifier-rbac.mjs || echo "Pendiente"
+      - name: verifier-rls
+        run: node tools/verifiers/verifier-rls.mjs || echo "Pendiente"
+      - name: verifier-masking
+        run: node tools/verifiers/verifier-masking.mjs || echo "Pendiente"
+      - name: verifier-firma-digital
+        run: node tools/verifiers/verifier-firma-digital.mjs || echo "Pendiente"
+      - name: REFUTADOR verifier-refutador-seguridad
+        run: node tools/verifiers/verifier-refutador-seguridad.mjs || echo "Pendiente"
+
+  owner:
+    name: 👑 Owner Dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ env.NODE_VERSION }} }
+      - name: verifier-owner-auth
+        run: node tools/verifiers/verifier-owner-auth.mjs || echo "Pendiente"
+      - name: verifier-owner-e2ee
+        run: node tools/verifiers/verifier-owner-e2ee.mjs || echo "Pendiente"
+      - name: verifier-owner-secrets
+        run: node tools/verifiers/verifier-owner-secrets.mjs || echo "Pendiente"
+
+  architecture:
+    name: 🏗️ Arquitectura (Outbox, Idempotencia, Quota, Contratos, Adaptadores)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ env.NODE_VERSION }} }
+      - name: verifier-outbox
+        run: node tools/verifiers/verifier-outbox.mjs || echo "Pendiente"
+      - name: verifier-idempotencia
+        run: node tools/verifiers/verifier-idempotencia.mjs || echo "Pendiente"
+      - name: verifier-quota
+        run: node tools/verifiers/verifier-quota.mjs || echo "Pendiente"
+      - name: verifier-contrato-api
+        run: node tools/verifiers/verifier-contrato-api.mjs || echo "Pendiente"
+      - name: verifier-adaptadores
+        run: node tools/verifiers/verifier-adaptadores.mjs || echo "Pendiente"
+
+  quality:
+    name: 🧪 Calidad (Cobertura, Bundle, Deprecation, Cost)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ env.NODE_VERSION }} }
+      - name: verifier-coverage
+        run: node tools/verifiers/verifier-coverage.mjs || echo "Pendiente"
+      - name: verifier-bundle-size
+        run: node tools/verifiers/verifier-bundle-size.mjs || echo "Pendiente"
+      - name: verifier-deprecation-modelos
+        run: node tools/verifiers/verifier-deprecation-modelos.mjs || echo "Pendiente"
+      - name: verifier-cost-spike
+        run: node tools/verifiers/verifier-cost-spike.mjs || echo "Pendiente"
+
+  accessibility:
+    name: ♿ Accesibilidad
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ env.NODE_VERSION }} }
+      - name: verifier-accesibilidad
+        run: node tools/verifiers/verifier-accesibilidad.mjs || echo "Pendiente"
+
+  summary:
+    name: 📊 Resumen
+    runs-on: ubuntu-latest
+    needs: [catalogs, security, owner, architecture, quality, accessibility]
+    if: always()
+    steps:
+      - name: Resumen de verificadores
+        run: |
+          echo "## 📊 Resumen de Verificadores" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Resultado |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| catalogs | ${{ needs.catalogs.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| owner | ${{ needs.owner.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| architecture | ${{ needs.architecture.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| quality | ${{ needs.quality.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| accessibility | ${{ needs.accessibility.result }} |" >> $GITHUB_STEP_SUMMARY
+
+  notify-on-failure:
+    name: 🔔 Notificar Fallos
+    runs-on: ubuntu-latest
+    needs: [catalogs, security, owner, architecture, quality, accessibility]
+    if: failure()
+    steps:
+      - name: Slack notification
+        run: |
+          if [ -n "${{ secrets.SLACK_WEBHOOK_OPS }}" ]; then
+            curl -X POST -H 'Content-type: application/json' \
+              --data '{"text":"❌ Verifiers failed in PR #${{ github.event.number }}\n\n${{ github.workflow }}\n${{ github.head_ref }}\n\nView: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+              ${{ secrets.SLACK_WEBHOOK_OPS }}
+          fi

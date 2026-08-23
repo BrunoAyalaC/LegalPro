@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.2.0",
+  "descripcion": "Mapa de la jerarquía piramidal de especialistas legales y contables. Reemplaza la estructura plana por una pirámide con 4 niveles de expertise y 5 mega-áreas. Actualizado con el arnés ampliado de 139 agentes (137 del arnés + 2 built-in).",
+  "principios": {
+    "piramide": "Los casos complejos suben en la pirámide; los simples se resuelven en el nivel junior",
+    "consulta_automatica": "Un agente junior consulta automáticamente al senior si su confianza < 0.8",
+    "aprobacion_chief": "El chief aprueba solo casos irreversibles o cross-rama",
+    "trazabilidad_total": "Cada nivel emite su audit_log con correlation_id",
+    "LPDP_gradual": "Junior ve PII sanitizada; Senior ve agregada; Chief no ve PII"
+  },
+  "niveles": {
+    "chief": {
+      "descripcion": "Master / estratega con 15+ años",
+      "temperatura_default": 0.1,
+      "autonomia": "Total. Veto técnico. Aprueba casos complejos. Coordina senior.",
+      "LPDP_acceso_PII": false,
+      "responsabilidades": [
+        "Aprobar casos irreversibles",
+        "Coordinar cross-rama",
+        "Veto técnico final",
+        "Firma de releases legales (catálogos)",
+        "Mentorear seniors"
+      ]
+    },
+    "senior": {
+      "descripcion": "Experto con 8-12 años, coordina juniors de su mega-área",
+      "temperatura_default": 0.15,
+      "autonomia": "Alta en su mega-área. Escala a chief si cross-rama o complejo.",
+      "LPDP_acceso_PII": "agregada (no PII en claro)",
+      "responsabilidades": [
+        "Resolver casos complejos de su mega-área",
+        "Coordinar 3-4 juniors",
+        "Validar outputs de juniors",
+        "Proponer catálogos y reglas",
+        "Aprobar estrategias procesales"
+      ]
+    },
+    "junior": {
+      "descripcion": "Especialista puro con 3-5 años",
+      "temperatura_default": 0.2,
+      "autonomia": "Limitada a su especialidad. Consulta al senior si confianza < 0.8.",
+      "LPDP_acceso_PII": "sanitizada",
+      "responsabilidades": [
+        "Ejecutar tareas de su especialidad",
+        "Consultar catálogos",
+        "Validar citas contra catálogos",
+        "Escalar al senior si hay ambigüedad"
+      ]
+    },
+    "assistant": {
+      "descripcion": "Recién egresado, solo asiste",
+      "temperatura_default": 0.3,
+      "autonomia": "Muy limitada. Solo tareas mecánicas.",
+      "LPDP_acceso_PII": "nunca",
+      "responsabilidades": [
+        "Búsqueda de jurisprudencia",
+        "Cálculos mecánicos (CTS, liquidaciones)",
+        "Redacción de borradores"
+      ]
+    }
+  },
+  "mega_areas": {
+    "civil_privado": {
+      "descripcion": "Derecho privado: civil, familia, comercial, concursal, compliance, propiedad intelectual",
+      "chief": "abogado-chief",
+      "seniors": [
+        "abogado-senior-civil",
+        "abogado-senior-empresarial"
+      ],
+      "juniors": [
+        "abogado-jr-civil",
+        "abogado-jr-familia",
+        "abogado-jr-comercial",
+        "abogado-jr-concursal",
+        "abogado-jr-compliance",
+        "abogado-jr-propiedad-intelectual",
+        "abogado-jr-notarial",
+        "abogado-jr-consumidor",
+        "abogado-jr-arbitraje",
+        "abogado-jr-bancario",
+        "abogado-jr-competencia",
+        "abogado-jr-seguros",
+        "abogado-jr-cooperativo",
+        "abogado-jr-ciberespacio",
+        "abogado-jr-cultura",
+        "abogado-jr-maritimo",
+        "abogado-jr-aeronautico",
+        "abogado-jr-agrario",
+        "abogado-jr-ejecucion",
+        "abogado-jr-registral"
+      ],
+      "assistants": [
+        "abogado-asistente-redaccion",
+        "abogado-asistente-investigacion"
+      ]
+    },
+    "penal_constitucional": {
+      "descripcion": "Penal sustantivo, procesal penal, constitucional, TC",
+      "chief": "abogado-chief",
+      "seniors": [
+        "abogado-senior-penal",
+        "abogado-senior-constitucional"
+      ],
+      "juniors": [
+        "abogado-jr-penal",
+        "abogado-jr-penal-economico",
+        "abogado-jr-procesal-penal",
+        "abogado-jr-crimen-organizado",
+        "abogado-jr-trabajo-forzoso",
+        "abogado-jr-amparo",
+        "abogado-jr-genero",
+        "abogado-jr-penitenciario",
+        "abogado-jr-militar",
+        "abogado-jr-electoral",
+        "abogado-jr-internacional",
+        "abogado-jr-ia-tecnologia"
+      ],
+      "assistants": [
+        "abogado-asistente-redaccion"
+      ]
+    },
+    "publico_regulatorio": {
+      "descripcion": "Derecho público: administrativo, tributario, disciplinario, minero, ambiental",
+      "chief": "abogado-chief",
+      "seniors": [
+        "abogado-senior-publico",
+        "abogado-senior-tributario"
+      ],
+      "juniors": [
+        "abogado-jr-administrativo",
+        "abogado-jr-tributario",
+        "abogado-jr-ambiental",
+        "abogado-jr-mineria-energia",
+        "abogado-jr-sanitario",
+        "abogado-jr-educacion",
+        "abogado-jr-aduanero",
+        "abogado-jr-contrataciones",
+        "abogado-jr-telecomunicaciones",
+        "abogado-jr-municipal",
+        "abogado-jr-datos-personales",
+        "abogado-jr-aguas",
+        "abogado-jr-forestal",
+        "abogado-jr-pesca",
+        "abogado-jr-policial",
+        "abogado-jr-deporte",
+        "abogado-jr-turismo",
+        "abogado-jr-transparencia",
+        "abogado-jr-pueblos-indigenas",
+        "abogado-jr-energetico",
+        "abogado-jr-contencioso-administrativo",
+        "abogado-jr-tributario-municipal"
+      ],
+      "assistants": []
+    },
+    "trabajo_social": {
+      "descripcion": "Laboral individual, colectivo, seguridad social, migratorio",
+      "chief": "abogado-chief",
+      "seniors": [
+        "abogado-senior-laboral"
+      ],
+      "juniors": [
+        "abogado-jr-laboral-colectivo",
+        "abogado-jr-laboral-individual",
+        "abogado-jr-procesal-laboral",
+        "abogado-jr-seguridad-social",
+        "abogado-jr-migratorio",
+        "abogado-jr-extranjeria",
+        "abogado-jr-previsional",
+        "abogado-jr-adulto-mayor",
+        "abogado-jr-discapacidad",
+        "abogado-jr-sst"
+      ],
+      "assistants": [
+        "contador-asistente-laboral"
+      ]
+    },
+    "contable_auditoria": {
+      "descripcion": "Tributario, laboral, auditoría forense, compliance",
+      "chief": "contador-chief",
+      "seniors": [
+        "contador-senior-tributario",
+        "contador-senior-laboral"
+      ],
+      "juniors": [
+        "contador-jr-forense"
+      ],
+      "assistants": [
+        "contador-asistente-laboral",
+        "contador-asistente-forense"
+      ]
+    }
+  },
+  "agentes_creados": {
+    "chief": [
+      "abogado-chief",
+      "contador-chief"
+    ],
+    "senior": [
+      "abogado-senior-civil",
+      "abogado-senior-penal",
+      "abogado-senior-constitucional",
+      "abogado-senior-publico",
+      "abogado-senior-laboral",
+      "abogado-senior-empresarial",
+      "abogado-senior-tributario",
+      "contador-senior-tributario",
+      "contador-senior-laboral"
+    ],
+    "assistant_creados": [
+      "abogado-asistente-redaccion",
+      "abogado-asistente-investigacion",
+      "contador-asistente-forense",
+      "contador-asistente-laboral"
+    ],
+    "junior_creados": [
+      "abogado-jr-familia",
+      "abogado-jr-penal-economico",
+      "abogado-jr-propiedad-intelectual",
+      "abogado-jr-ambiental",
+      "abogado-jr-administrativo",
+      "abogado-jr-tributario",
+      "abogado-jr-concursal",
+      "abogado-jr-mineria-energia",
+      "abogado-jr-sanitario",
+      "abogado-jr-educacion",
+      "abogado-jr-compliance",
+      "abogado-jr-laboral-colectivo",
+      "abogado-jr-seguridad-social",
+      "abogado-jr-migratorio",
+      "contador-jr-forense",
+      "abogado-jr-aduanero",
+      "abogado-jr-bancario",
+      "abogado-jr-competencia",
+      "abogado-jr-contrataciones",
+      "abogado-jr-electoral",
+      "abogado-jr-penitenciario",
+      "abogado-jr-genero",
+      "abogado-jr-extranjeria",
+      "abogado-jr-previsional",
+      "abogado-jr-maritimo",
+      "abogado-jr-aeronautico",
+      "abogado-jr-agrario",
+      "abogado-jr-pesca",
+      "abogado-jr-aguas",
+      "abogado-jr-forestal",
+      "abogado-jr-datos-personales",
+      "abogado-jr-internacional",
+      "abogado-jr-municipal",
+      "abogado-jr-ejecucion",
+      "abogado-jr-seguros",
+      "abogado-jr-ciberespacio",
+      "abogado-jr-deporte",
+      "abogado-jr-turismo",
+      "abogado-jr-militar",
+      "abogado-jr-policial",
+      "abogado-jr-cooperativo",
+      "abogado-jr-adulto-mayor",
+      "abogado-jr-cultura",
+      "abogado-jr-discapacidad",
+      "abogado-jr-telecomunicaciones",
+      "abogado-jr-amparo",
+      "abogado-jr-arbitraje",
+      "abogado-jr-civil",
+      "abogado-jr-comercial",
+      "abogado-jr-consumidor",
+      "abogado-jr-crimen-organizado",
+      "abogado-jr-notarial",
+      "abogado-jr-penal",
+      "abogado-jr-procesal-penal",
+      "abogado-jr-trabajo-forzoso",
+      "abogado-jr-laboral-individual",
+      "abogado-jr-procesal-laboral",
+      "abogado-jr-transparencia",
+      "abogado-jr-pueblos-indigenas",
+      "abogado-jr-energetico",
+      "abogado-jr-sst",
+      "abogado-jr-contencioso-administrativo",
+      "abogado-jr-tributario-municipal",
+      "abogado-jr-registral",
+      "abogado-jr-ia-tecnologia"
+    ],
+    "junior_pendientes": []
+  },
+  "reglas_delegacion": {
+    "junior_a_senior": "Si el junior no encuentra respuesta o tiene confianza < 0.8",
+    "senior_a_chief": "Si el caso es cross-rama o irreversible (suspensión, despido, patrimonio > $1M)",
+    "cualquier_a_chief": "Si el usuario pide revisión explícita o hay cambio regulatorio reciente",
+    "delegacion_automatica": "El sistema mantiene contexto completo cuando delega (no se pierde info)"
+  },
+  "ejemplo_flujo_delegacion": [
+    "Usuario: 'Necesito liquidar a un trabajador con 5 años de servicio, despedido por causa justa'",
+    "1. @contador-asistente-laboral (assistant) calcula CTS base",
+    "2. @abogado-jr-laboral-colectivo (junior) valida despido con causa justa",
+    "3. @abogado-senior-laboral (senior) valida estrategia",
+    "4. Si laudos contradictorios: @abogado-chief (chief) decide"
+  ]
+}

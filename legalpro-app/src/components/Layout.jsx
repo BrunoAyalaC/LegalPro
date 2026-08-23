@@ -9,6 +9,7 @@ import OnboardingTour from './onboarding/OnboardingTour';
 import { useUI } from '../context/UIContext';
 import { useTenant } from '../context/TenantContext';
 import fondoImg from '../assets/backgrounds/fondo.jpeg';
+import fondoWebp from '../assets/backgrounds/fondo.webp';
 
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
@@ -21,12 +22,25 @@ export default function Layout() {
   const { sidebarCollapsed } = useUI();
   const { usuario } = useTenant();
   const userRole = usuario?.rol ?? 'ABOGADO';
+  const isChatRoute = location.pathname === '/chat-ia';
 
   return (
-    <div className="min-h-screen bg-[#0F172A]">
-      {/* ─── GLOBAL BACKGROUND ─── */}
+    <div className="min-h-dvh bg-[#0F172A]">
+      {/* ─── SKIP-LINK (accesibilidad: navegación por teclado) ─── */}
+      <a href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999]
+                   focus:px-4 focus:py-3 focus:bg-blue-600 focus:text-white focus:rounded-xl
+                   focus:text-sm focus:font-bold focus:shadow-2xl focus:outline-none
+                   transition-none">
+        Saltar al contenido principal
+      </a>
+
+      {/* ─── GLOBAL BACKGROUND — WebP con fallback JPEG, lazy ─── */}
       <div className="fixed inset-0 z-[-1] pointer-events-none">
-        <img src={fondoImg} alt="" className="w-full h-full object-cover opacity-30" />
+        <picture>
+          <source srcSet={fondoWebp} type="image/webp" />
+          <img src={fondoImg} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-30" />
+        </picture>
         <div className="absolute inset-0 bg-linear-to-b from-[#0f172a]/90 via-[#0f172a]/95 to-[#0b0e14]" />
       </div>
 
@@ -35,8 +49,8 @@ export default function Layout() {
 
       {/* ─── CONTENIDO PRINCIPAL ─── */}
       <div
-        className={`flex flex-col min-h-screen transition-all duration-300 ${
-          sidebarCollapsed ? 'lg:pl-[72px]' : 'lg:pl-[256px]'
+        className={`layout-main-shell flex flex-col min-h-dvh min-w-0 transition-all duration-300 ${
+          sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'
         }`}
       >
         {/* TopBar */}
@@ -44,12 +58,18 @@ export default function Layout() {
 
         {/* Page content */}
         <motion.main
+          id="main-content"
           key={location.pathname}
           variants={pageVariants}
           initial="initial"
           animate="animate"
           exit="exit"
-          className="flex-1 overflow-auto"
+          className={`flex-1 min-h-0 ${
+            isChatRoute
+              ? 'flex flex-col overflow-hidden pb-0'
+              : 'overflow-auto pb-24 lg:pb-0'
+          }`}
+          tabIndex={-1}
         >
           <Outlet />
         </motion.main>

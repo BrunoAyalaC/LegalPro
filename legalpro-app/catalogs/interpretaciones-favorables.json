@@ -1,0 +1,1299 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.1.0",
+  "descripcion": "Catálogo de interpretaciones legales a favor del cliente/usuario (el abogado que defiende al justiciable, no a la contraparte). Cada entrada documenta un principio jurídico pro-usuario, su base legal verificable (SPIJ), cómo aplicarlo en la práctica forense, un ejemplo concreto y los límites en los que NO aplica. Fuente única de verdad para que la IA del sistema sugiera la mejor interpretación pro-cliente sin inventar citas.",
+  "fuente_oficial": "https://spij.minjus.gob.pe",
+  "nota_rag_2026_08_12": "Corpus RAG no consultable desde este entorno local: tools/rag/junior-rag-wrapper.mjs requiere DATABASE_URL (retrieve.mjs) e ioredis (redis-cache.mjs), no configurados aquí. Este catálogo se construyó con conocimiento de la normativa peruana vigente y verificación contra los catálogos locales (codigos-leyes.json, plazos-procesales.json, disclaimers-ia.json, casaciones-pj-2026.json, sentencias-tc-completas-2026.json). Toda cita de artículo debe confirmarse contra SPIJ antes de usarse en escrito.",
+  "changelog_1_0_0": "Creación inicial (abogado-asistente-investigacion): 33 interpretaciones favorables en 6 materias litigiosas (laboral, tributario, consumidor, penal, procesal-civil, constitucional). Cada entrada marca necesita_revision_humana: true conforme GOV-08 / IA-02 / LEGAL-05. Sin jurisprudencia inventada: las referencias jurisprudenciales remiten a catálogos verificados existentes.",
+  "reglas_uso": {
+    "rol": "Defensa del cliente (el usuario es el abogado patrocinante, nunca la contraparte)",
+    "fail_closed": "Si el artículo citado no se confirma en SPIJ, NO se usa en el escrito (LEGAL-01 / IA-03)",
+    "norma_vigente": "Verificar vigencia antes de citar; normas derogadas (ej. Ley 28237 → Ley 31307) se citan solo con nota de transición",
+    "disclaimer": "Todo output que use estas interpretaciones lleva los 4 disclaimers IA del wrapper RAG + necesita_revision_humana: true",
+    "etica": "Las interpretaciones pro-cliente deben ser fundadas y de buena fe (CPC art. 132); no constituyen defensas temerarias ni alegaciones falsas"
+  },
+  "interpretaciones": [
+    {
+      "id": "LAB-01",
+      "materia": "laboral",
+      "principio": "Principio pro operario / interpretación más favorable al trabajador",
+      "descripcion": "En caso de duda insalvable sobre el sentido de una norma, contrato o regla laboral, se interpreta a favor del trabajador. Es el principio protector del Derecho del Trabajo y sustenta todas las demás interpretaciones pro-laboral.",
+      "base_legal": "Constitución Política del Perú art. 26 inc. 3",
+      "articulo": "Art. 26.3 Const.: 'En la relación laboral se respetan los siguientes principios: ... 3. Interpretación favorable al trabajador en caso de duda insalvable.'",
+      "como_aplicarlo": [
+        "Identificar la duda interpretativa real (ambigüedad de la norma o del contrato de trabajo) y alegarla expresamente como 'duda insalvable'.",
+        "Citar Const. art. 26.3 como cláusula de cierre ante la interpretación restrictiva del empleador.",
+        "En la demanda, plantear la interpretación más favorable al trabajador como pretensión principal y la contraria como supletoria.",
+        "Reforzar con doctrina laboralista y, si existe, jurisprudencia verificada del catálogo casaciones-civiles-laborales-2026.json."
+      ],
+      "ejemplo_practico": "Un contrato de trabajo establece bonificación 'sujeta a disponibilidad'. El empleador la suspende. El abogado del trabajador sostiene que la cláusula es ambigua y que, conforme al art. 26.3 Const., debe interpretarse como beneficio consolidado adquirido, no como facultad discrecional del empleador.",
+      "limites": "NO aplica cuando la norma es clara y no existe duda insalvable; no permite desconocer la ley imperativa ni crear derechos donde la norma no los otorga. No se usa para reescribir contratos cuando la voluntad de las partes es inequívoca.",
+      "tags": [
+        "pro operario",
+        "interpretación favorable",
+        "duda insalvable",
+        "principio protector"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "LAB-02",
+      "materia": "laboral",
+      "principio": "Carga de la prueba invertida en el proceso laboral (NLPT)",
+      "descripcion": "En el proceso laboral peruano corresponde al demandado (empleador) acreditar la existencia de la causa justa de despido, el pago de remuneraciones y beneficios, y la condición de empleador. El trabajador solo acredita la prestación de servicios.",
+      "base_legal": "Ley 29497 (NLPT) art. 23.1 y 23.2",
+      "articulo": "Art. 23.1 Ley 29497: corresponde al demandado acreditar la existencia de la causa justa de despido, el pago de la remuneración y de los beneficios laborales, la condición de empleador y el término del vínculo laboral, entre otros.",
+      "como_aplicarlo": [
+        "En la demanda, bastará con acreditar la relación de trabajo (o la presunción de ella); el empleador deberá probar los hechos impeditivos, modificatorios o extintivos.",
+        "Ante despido, exigir al empleador la prueba de la causa justa: no basta su alegación; debe presentar la carta de despido, el procedimiento y los hechos que la sustentan.",
+        "Si el empleador no acredita el pago de CTS, gratificaciones o vacaciones, solicitar la condena por los conceptos no probados (consecuencia de la inversión probatoria).",
+        "Usar la presunción de laboralidad (art. 23.3 Ley 29497): acreditada la prestación personal, se presume la existencia de relación laboral."
+      ],
+      "ejemplo_practico": "Trabajador demanda reposición e indemnización. El empleador afirma que el despido fue por causa justa pero no aporta la carta ni el procedimiento interno. Conforme al art. 23.1 Ley 29497, la carga era del empleador: el juez declara el despido injustificado.",
+      "limites": "NO elimina la carga del trabajador de acreditar los hechos que configuran su pretensión (inicio de la relación, existencia del vínculo, fechas). No aplica en contra de quien niega la relación sin haber prestado servicios efectivos.",
+      "tags": [
+        "carga de la prueba",
+        "inversión",
+        "NLPT",
+        "29497",
+        "despido",
+        "prueba"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "LAB-03",
+      "materia": "laboral",
+      "principio": "Nulidad de despido vs. despido arbitrario (mayor protección)",
+      "descripcion": "Distinguir la nulidad de despido (causas de discriminación y violación de derechos fundamentales, LPCL art. 29) del despido arbitrario (sin causa justa, LPCL art. 34). La nulidad otorga reposición plena; el arbitrario, opción entre reposición o indemnización según el caso.",
+      "base_legal": "TUO LPCL (D.S. 003-97-TR) arts. 29 y 34; Constitución art. 2 inc. 2 (igualdad y no discriminación)",
+      "articulo": "Art. 29 LPCL (despido nulo: afiliación sindical, discriminación, embarazo, ejercicio de derechos); Art. 34 LPCL (despido arbitrario: sin causa justa, genera indemnización).",
+      "como_aplicarlo": [
+        "Evaluar si el despido encaja en las causales taxativas de nulidad del art. 29 (despido nulo), pues la reposición es el efecto directo.",
+        "Si hay indicios de discriminación, invocar la nulidad y solicitar reposición + remuneraciones dejadas de percibir.",
+        "Si el despido es arbitrario (sin causa justa), elegir entre reposición o indemnización según el interés del cliente (estabilidad vs. capitalización).",
+        "Acompañar indicios de móvil discriminatorio (fotos, correos, testigos) para sostener la nulidad, dado el estándar indiciario en materia de discriminación."
+      ],
+      "ejemplo_practico": "Trabajadora cesada días después de comunicar su embarazo. El abogado invoca despido nulo (LPCL art. 29.b) por discriminación por estado de gestación y pide reposición, en lugar de conformarse con la indemnización del despido arbitrario.",
+      "limites": "La nulidad exige causal taxativa del art. 29; no todo despido injustificado es nulo. La reposición por despido arbitrario puede estar limitada por jurisprudencia (régimen privado: en general corresponde indemnización, salvo protección constitucional). Verificar precedentes en casaciones-civiles-laborales-2026.json.",
+      "tags": [
+        "despido nulo",
+        "despido arbitrario",
+        "reposición",
+        "indemnización",
+        "LPCL 29",
+        "LPCL 34"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "LAB-04",
+      "materia": "laboral",
+      "principio": "Reposición vs. indemnización (elección estratégica pro-trabajador)",
+      "descripcion": "En el despido incausado, el trabajador protegido por la Constitución puede optar por la reposición (restitución del puesto) o la indemnización, según qué beneficie más al cliente: continuidad laboral o compensación económica.",
+      "base_legal": "Constitución art. 2 inc. 2 y 139.3 (tutela jurisdiccional efectiva); TUO LPCL art. 34; doctrina constitucional de la reposición",
+      "articulo": "Art. 34 LPCL (indemnización por despido arbitrario: 1.5 remuneraciones por año, tope 12); sentencias del TC sobre reposición en despido que vulnera derechos fundamentales.",
+      "como_aplicarlo": [
+        "Analizar si el cliente es trabajador de protección reforzada (despido vulneratorio de derechos fundamentales, estabilidad) que habilita reposición vía proceso constitucional.",
+        "Comparar el costo-beneficio: reposición (recupera empleo y antigüedad, pero litigio más largo) vs. indemnización (cobro rápido, LPCL art. 34).",
+        "Si el empleador ya no es viable o el clima laboral es hostil, recomendar indemnización; si el cliente valora estabilidad y carrera, pedir reposición.",
+        "En la demanda, pedir pretensión principal (reposición) y alternativa (indemnización) para no perder el proceso por elección errónea."
+      ],
+      "ejemplo_practico": "Gerente despedido sin causa tras 10 años. Su abogado evalúa: (a) reponerlo para conservar antigüedad y beneficios, o (b) cobrar 12 remuneraciones de tope indemnizatorio. Ante la inestabilidad de la empresa, opta por indemnización + CTS impaga, asegurando cobro rápido.",
+      "limites": "NO cabe reposición automática en todo despido arbitrario del régimen privado: en general la ley otorga indemnización; la reposición procede ante despido nulo o vulneratorio de derechos fundamentales. La elección es estratégica y debe documentarse con el cliente.",
+      "tags": [
+        "reposición",
+        "indemnización",
+        "despido",
+        "estabilidad laboral",
+        "estrategia"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "LAB-05",
+      "materia": "laboral",
+      "principio": "CTS y gratificaciones como beneficios irrenunciables",
+      "descripcion": "La CTS (D.L. 650) y las gratificaciones (Ley 27735) son derechos laborales irrenunciables de carácter alimentario. El trabajador no puede renunciar a ellos ni el empleador condicionarlos, descontarlos o sustituirlos por pactos en contrario.",
+      "base_legal": "Constitución art. 26 inc. 2 (irrenunciabilidad de derechos laborales); D.L. 650 (CTS) art. 1; Ley 27735 (gratificaciones) arts. 1-5",
+      "articulo": "Const. art. 26.2: 'Los derechos laborales son irrenunciables'; D.L. 650 art. 1: la CTS es un beneficio social del trabajador sujeto a régimen especial de protección.",
+      "como_aplicarlo": [
+        "Reclamar el pago íntegro de CTS semestral (mayo y noviembre) y gratificaciones (julio y diciembre) sin admitir descuentos ni 'acuerdos' de renuncia.",
+        "Invocar la irrenunciabilidad (Const. art. 26.2) frente a cláusulas de desafectación o recibos de finiquito que pretendan extinguir estos beneficios.",
+        "Exigir el depósito de la CTS en la institución financiera elegida por el trabajador; la no depositada genera intereses y puede configurar infracción administrativa (SUNAFIL).",
+        "En caso de cese, reclamar la CTS trunca y gratificación trunca proporcional, conforme a las reglas de cómputo de cada norma."
+      ],
+      "ejemplo_practico": "Al cese, el empleador entrega un finiquito 'cancelatorio de todo beneficio' por un monto menor al de la CTS acumulada. El abogado impugna el finiquito por irrenunciabilidad y cobra la diferencia con intereses legales laborales, pese al documento firmado.",
+      "limites": "NO aplica para beneficios no consolidados o pactados libremente fuera del mínimo legal (ej. bonificaciones voluntarias que no forman parte de la CTS). La irrenunciabilidad protege el mínimo legal, no impide pactos que mejoren condiciones. Verificar cálculo exacto según D.L. 650 y Ley 27735.",
+      "tags": [
+        "CTS",
+        "gratificaciones",
+        "irrenunciable",
+        "finiquito",
+        "beneficios laborales",
+        "D.L. 650",
+        "Ley 27735"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "LAB-06",
+      "materia": "laboral",
+      "principio": "Primacía de la realidad",
+      "descripcion": "En caso de discordancia entre lo que ocurre en la práctica y lo que reflejan los documentos o contratos, prevalece lo que ocurre en la realidad. Permite desenmascarar contratos civiles, locación de servicios o tercerización que encubren una relación laboral.",
+      "base_legal": "Constitución art. 26.3 (interpretación pro trabajador); TUO LPCL art. 4; doctrina laboralista consolidada",
+      "articulo": "Art. 4 LPCL: los contratos de trabajo se presumen de duración indeterminada; primacía de la realidad como principio rector de la contratación laboral.",
+      "como_aplicarlo": [
+        "Recolectar indicios de subordinación: horario, exclusividad, órdenes directas, herramientas del empleador, remuneración periódica, control y fiscalización.",
+        "Demandar el reconocimiento de la relación laboral y los beneficios derivados (CTS, gratificaciones, vacaciones, indemnización por despido), aunque exista contrato civil de por medio.",
+        "Acreditar la continuidad y la dependencia con correos, testigos, registros de asistencia y pagos recurrentes.",
+        "En tercerizaciones ilegales o intermediación fraudulenta, invocar la desnaturalización y la responsabilidad solidaria del usuario de los servicios."
+      ],
+      "ejemplo_practico": "Profesional 'contratado' por años con contratos de locación de servicios sucesivos, con horario fijo y oficina del empleador. Su abogado demuestra subordinación real y obtiene el reconocimiento de relación laboral a plazo indeterminado con todos los beneficios laborales impagos.",
+      "limites": "NO se presume la relación laboral por el solo hecho de prestar servicios si estos son autónomos, independientes o sin subordinación. La prueba de la subordinación es esencial; los contratos civiles legítimos no se desnaturalizan por el simple hecho de existir.",
+      "tags": [
+        "primacía de la realidad",
+        "subordinación",
+        "contrato civil",
+        "desnaturalización",
+        "tercerización"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "TRIB-01",
+      "materia": "tributario",
+      "principio": "Interpretación más favorable al contribuyente / in dubio pro contribuyente",
+      "descripcion": "Ante duda razonable en la aplicación de la norma tributaria, la interpretación debe favorecer al contribuyente. La norma tributaria que establece cargas debe interpretarse restrictivamente; el art. 74 Const. exige reserva de ley y prohíbe la analogía para crear tributos.",
+      "base_legal": "Constitución art. 74; TUO Código Tributario (D.S. 133-2013-EF) Norma VIII y Norma IX",
+      "articulo": "Art. 74 Const. (reserva de ley en materia tributaria, no confiscatoriedad); CT Norma VIII (métodos de interpretación); Norma IX (prohibición de analogía para crear tributos o exoneraciones).",
+      "como_aplicarlo": [
+        "Ante una norma tributaria ambigua que grava o sanciona, sostener la interpretación restrictiva más favorable al contribuyente.",
+        "Invocar la reserva de ley (art. 74 Const.) cuando la Administración pretenda aplicar un tributo o sanción sin norma con rango de ley.",
+        "Argumentar que en la vía interpretativa no se puede crear tributos ni extender supuestos (CT Norma IX).",
+        "Reforzar con acuerdos del Tribunal Fiscal o jurisprudencia verificada del catálogo resoluciones-tribunal-fiscal-2026.json."
+      ],
+      "ejemplo_practico": "SUNAT interpreta una partida del IGV como gravada con base en una circular. El contribuyente alega que la norma legal no la grava expresamente y que, conforme al art. 74 Const. y la Norma IX del CT, no cabe interpretación extensiva en contra del contribuyente.",
+      "limites": "NO justifica desconocer obligaciones tributarias claras ni evadir tributos creados legalmente. El 'in dubio' requiere duda real y razonable; no procede cuando el texto legal es inequívoco. No es excusa para planificación tributaria agresiva o fraude a la ley.",
+      "tags": [
+        "in dubio pro contribuyente",
+        "reserva de ley",
+        "interpretación restrictiva",
+        "art. 74",
+        "Código Tributario"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "TRIB-02",
+      "materia": "tributario",
+      "principio": "Principio de no confiscatoriedad",
+      "descripcion": "El tributo y sus sanciones no pueden ser confiscatorios: deben respetar la capacidad contributiva y la propiedad (art. 2.16 Const.). Un tributo que absorbe la totalidad o una porción irrazonable de la riqueza del contribuyente es inconstitucional.",
+      "base_legal": "Constitución arts. 2.16 y 74; jurisprudencia del Tribunal Constitucional sobre límite a la potestad tributaria",
+      "articulo": "Art. 74 Const. último párrafo: 'No surten efecto las normas tributarias dictadas en violación de lo que establece el presente artículo'; art. 2.16 Const. (derecho a la propiedad).",
+      "como_aplicarlo": [
+        "Cuestionar tributos, multas o intereses que, sumados, exceden irrazonablemente la capacidad contributiva o confiscan la totalidad del patrimonio.",
+        "En vía de acción de inconstitucionalidad (a cargo de los legitimados) o como defensa de fondo en la vía contenciosa y en procedimientos administrativos.",
+        "Acompañar análisis económico: proporción tributo/renta o tributo/patrimonio que demuestre el carácter confiscatorio.",
+        "Citar la doctrina del TC sobre el 'límite razonable' de la presión tributaria."
+      ],
+      "ejemplo_practico": "Multa e intereses moratorios acumulados que superan 10 veces el tributo omitido por una microempresa. El abogado alega confiscatoriedad y falta de proporcionalidad de la sanción, solicitando la reducción o inaplicación de los intereses capitalizados en exceso.",
+      "limites": "NO es argumento para eliminar tributos legítimos ni sanciones razonables: el principio solo opera cuando la carga es manifiestamente irrazonable o desproporcionada. Los intereses moratorios, por sí solos, no son confiscatorios si tienen función compensatoria.",
+      "tags": [
+        "no confiscatoriedad",
+        "capacidad contributiva",
+        "proporcionalidad",
+        "art. 74",
+        "propiedad"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "TRIB-03",
+      "materia": "tributario",
+      "principio": "Presunción de veracidad de las declaraciones juradas",
+      "descripcion": "Las declaraciones juradas del contribuyente se presumen veraces y correctas. La Administración debe desvirtuarlas con prueba suficiente (base cierta); no puede presumir la existencia de hechos gravados sin sustento.",
+      "base_legal": "TUO Código Tributario (D.S. 133-2013-EF) art. 62-A",
+      "articulo": "Art. 62-A CT: las declaraciones juradas se presumen veraces y correctas, y surten efecto salvo que la Administración pruebe lo contrario.",
+      "como_aplicarlo": [
+        "Frente a una fiscalización, sostener que la DDJJ goza de presunción de veracidad y que SUNAT debe aportar prueba concreta de la omisión o inexactitud.",
+        "Exigir que la determinación sobre base cierta se sustente en hechos probados, no en presunciones no desvirtuadas.",
+        "Si SUNAT usa base presunta (CT arts. 64-67), verificar que se cumplieron los presupuestos legales (no haber presentado DDJJ, no exhibir libros, etc.).",
+        "En el descargo, confrontar cada reparo con la documentación que sustenta la DDJJ original."
+      ],
+      "ejemplo_practico": "SUNAT repara renta omitida con base en 'indicios de capacidad económica' sin prueba directa. El abogado invoca la presunción de veracidad de la DDJJ (art. 62-A CT) y la necesidad de base cierta, logrando que el reparo se desvirtúe por falta de prueba.",
+      "limites": "La presunción es relativa (iuris tantum): cae cuando SUNAT acredita fehacientemente la inexactitud. NO protege DDJJ falsas o fraudulentas. Si el contribuyente no exhibió libros, SUNAT puede válidamente usar base presunta.",
+      "tags": [
+        "presunción de veracidad",
+        "declaración jurada",
+        "base cierta",
+        "fiscalización",
+        "art. 62-A CT"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "TRIB-04",
+      "materia": "tributario",
+      "principio": "Silencio administrativo y cómputo de plazos en favor del contribuyente",
+      "descripcion": "En los procedimientos tributarios, si la Administración no resuelve dentro del plazo, el contribuyente puede considerar denegado su recurso (silencio negativo) e impugnar en la vía siguiente; en procedimientos no tributarios regidos por la Ley 27444 puede operar el silencio positivo.",
+      "base_legal": "TUO Código Tributario (D.S. 133-2013-EF) art. 163; TUO Ley 27444 art. 199",
+      "articulo": "Art. 163 CT (vencido el plazo sin notificar resolución, el recurso se considera denegado); art. 199 Ley 27444 (silencio positivo en procedimientos administrativos generales, salvo excepciones).",
+      "como_aplicarlo": [
+        "Si SUNAT no resuelve la reclamación en el plazo legal, interponer apelación ante el Tribunal Fiscal invocando el silencio negativo (art. 163 CT) y adjuntando la constancia de no resolución.",
+        "En materia tributaria NUNCA alegar silencio positivo para recursos: la regla es silencio negativo (límite clave).",
+        "Usar el silencio negativo para acelerar el acceso a la vía impugnativa y evitar la paralización indefinida del procedimiento.",
+        "Verificar plazos exactos en plazos-procesales.json (reclamación 20 días hábiles, apelación 15 días hábiles)."
+      ],
+      "ejemplo_practico": "El contribuyente presenta reclamación y SUNAT no la resuelve dentro de los 9 meses del plazo legal (CT art. 142). Su abogado interpone apelación ante el Tribunal Fiscal amparado en el silencio negativo del art. 163 CT, evitando esperar indefinidamente.",
+      "limites": "CRÍTICO: en materia tributaria rige el SILENCIO NEGATIVO para recursos impugnativos (art. 163 CT); el silencio positivo de la Ley 27444 (art. 199) tiene excepciones y no aplica a los procedimientos tributarios sancionadores ni de determinación. Verificar el régimen de cada procedimiento antes de invocar silencio positivo.",
+      "tags": [
+        "silencio administrativo",
+        "silencio negativo",
+        "silencio positivo",
+        "plazos",
+        "art. 163 CT"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "TRIB-05",
+      "materia": "tributario",
+      "principio": "El Fisco debe probar la deuda (carga de la prueba)",
+      "descripcion": "En el procedimiento y el proceso contencioso tributario, corresponde a la Administración Tributaria acreditar los hechos que sustentan la determinación y las infracciones. La duda sobre los hechos se resuelve a favor del contribuyente, especialmente en materia sancionadora (presunción de inocencia).",
+      "base_legal": "TUO Código Tributario arts. 165 y 166; Constitución art. 2.24.e (presunción de inocencia en lo sancionador); TUO Ley 27444 art. 235 (carga de la prueba de la administración)",
+      "articulo": "Art. 165 CT (medios probatorios y carga de la prueba en el procedimiento tributario); art. 166 CT; Ley 27444 art. 235.1: corresponde a la entidad probar los hechos que sustentan su decisión.",
+      "como_aplicarlo": [
+        "En el descargo de una resolución de determinación o sanción, exigir que SUNAT pruebe los hechos constitutivos de la obligación o infracción.",
+        "Sostener que las resoluciones administrativas gozan de presunción de legalidad pero esta es iuris tantum y no exime de probar los hechos.",
+        "En sanciones, invocar la presunción de inocencia (art. 2.24.e Const.) y exigir prueba plena de la conducta infractora.",
+        "En el contencioso tributario, impugnar las resoluciones que se sustentan en meras afirmaciones o presunciones no acreditadas."
+      ],
+      "ejemplo_practico": "SUNAT sanciona a una empresa por 'no emitir comprobantes' basándose solo en un acta sin evidencia objetiva. El abogado invoca la carga probatoria de la Administración (Ley 27444 art. 235) y la presunción de inocencia, logrando la nulidad de la sanción por falta de prueba.",
+      "limites": "NO impide que la Administración use presunciones legales cuando se dan sus presupuestos (base presunta, art. 64 CT). La presunción de legalidad del acto administrativo invierte la carga de impugnación: el contribuyente debe desvirtuar los actos emitidos conforme a ley.",
+      "tags": [
+        "carga de la prueba",
+        "Fisco",
+        "presunción de inocencia",
+        "sanciones",
+        "art. 165 CT"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "TRIB-06",
+      "materia": "tributario",
+      "principio": "Prescripción a favor del contribuyente",
+      "descripcion": "La acción de la Administración para determinar la deuda tributaria, exigir su pago y aplicar sanciones prescribe (regla general: 4 años). Transcurrido el plazo sin que se produzcan las causales de interrupción o suspensión, la deuda no puede cobrarse ni sancionarse.",
+      "base_legal": "TUO Código Tributario (D.S. 133-2013-EF) arts. 43, 44, 45, 46 y 47",
+      "articulo": "Art. 43 CT (prescripción: 4 años, ampliable a 6 o 10 en supuestos de no declaración o pérdida de documentos); art. 45 CT (declaración de oficio o a pedido de parte); arts. 46-47 (interrupción y suspensión).",
+      "como_aplicarlo": [
+        "Verificar la fecha en que se produjo la obligación y si la Administración actuó dentro del plazo de 4 años (o los plazos ampliados).",
+        "Revisar si ocurrieron causales de interrupción (reconocimiento de deuda, notificación de la orden de pago) o suspensión (fiscalización, reclamo) que amplíen el plazo.",
+        "Invocar la prescripción como defensa previa en el procedimiento de cobranza coactiva y en el contencioso.",
+        "Solicitar la declaración de prescripción de oficio (art. 45 CT) y, en su defecto, plantearla expresamente con la prueba de la inacción de SUNAT."
+      ],
+      "ejemplo_practico": "SUNAT pretende cobrar una deuda de IGV de 2019 recién en 2026, sin interrupción válida. El abogado invoca la prescripción del art. 43 CT (4 años) y solicita la inaplicación de la cobranza coactiva, liberando al contribuyente de la deuda y las sanciones.",
+      "limites": "La prescripción se interrumpe y suspende en los casos del CT (arts. 46-47); en no declarantes el plazo puede ser 6 o 10 años. NO opera frente a tributos no prescritos o si el contribuyente reconoció la deuda. Verificar cada supuesto con exactitud.",
+      "tags": [
+        "prescripción",
+        "deuda tributaria",
+        "cobranza coactiva",
+        "art. 43 CT",
+        "plazos"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "TRIB-07",
+      "materia": "tributario",
+      "principio": "Error inducido por la Administración (eximente de sanción)",
+      "descripcion": "El contribuyente no es sancionable cuando su conducta se ajustó a la interpretación o información emitida por la propia Administración Tributaria. Si SUNAT indujo al error mediante criterios publicados, informes o respuestas, no procede sanción.",
+      "base_legal": "TUO Código Tributario (D.S. 133-2013-EF) art. 170",
+      "articulo": "Art. 170 CT: no es sancionable la conducta del deudor que haya actuado amparado en la interpretación o criterio de la Administración Tributaria.",
+      "como_aplicarlo": [
+        "Recolectar la comunicación, informe, criterio publicado o respuesta de SUNAT que sustentó la conducta del contribuyente.",
+        "Alegar el error inducido como eximente de responsabilidad al descargar una sanción por infracción derivada de dicho criterio.",
+        "En la reclamación, invocar el art. 170 CT y adjuntar la prueba documental del criterio de la Administración.",
+        "Si el criterio de SUNAT luego cambia, sostener la aplicación irretroactiva y la confianza legítima del contribuyente."
+      ],
+      "ejemplo_practico": "SUNAT publica un criterio interpretativo sobre la exoneración de un servicio y el contribuyente lo aplica. Años después SUNAT cambia de criterio y sanciona. El abogado invoca el art. 170 CT (error inducido) y obtiene el levantamiento de la sanción.",
+      "limites": "NO exime si el contribuyente actuó contra norma clara o con dolo; el error inducido requiere que el contribuyente se haya amparado efectivamente en un criterio o información de la Administración. No cubre interpretaciones particulares no respaldadas por SUNAT.",
+      "tags": [
+        "error inducido",
+        "confianza legítima",
+        "eximente",
+        "sanciones",
+        "art. 170 CT"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONS-01",
+      "materia": "consumidor",
+      "principio": "Inversión de la carga de la prueba en defensa del consumidor",
+      "descripcion": "En los procedimientos por infracciones a las normas de protección al consumidor, corresponde al proveedor la carga de la prueba sobre la idoneidad del producto o servicio y la causa justificada de la falla, no al consumidor.",
+      "base_legal": "Ley 29571 (Código de Protección y Defensa del Consumidor) art. 148",
+      "articulo": "Art. 148 Ley 29571: en los procedimientos por infracciones, corresponde al proveedor la carga de la prueba de la causa justificada y de la idoneidad del bien o servicio.",
+      "como_aplicarlo": [
+        "En el reclamo ante INDECOPI, el consumidor solo debe acreditar la relación de consumo y la falla o deficiencia; el proveedor debe probar la idoneidad y la causa justificada.",
+        "Frente a la falta de prueba del proveedor, solicitar la presunción de no idoneidad y la sanción.",
+        "Exigir la entrega de información y documentación interna del proveedor cuando sea necesaria para acreditar el defecto.",
+        "En la vía civil (indemnización), combinar con la teoría del riesgo y el deber de idoneidad del art. 18 Ley 29571."
+      ],
+      "ejemplo_practico": "Consumidor denuncia que un electrodoméstico se incendió en el primer uso. INDECOPI presume la no idoneidad: el proveedor debe probar el correcto funcionamiento y el uso indebido. Su abogado solo presenta la boleta y la denuncia; el peso probatorio recae en la empresa.",
+      "limites": "NO elimina la carga del consumidor de acreditar la relación de consumo y el hecho generador (compra, servicio, falla). No aplica en reclamos donde el consumidor alega hechos que solo él conoce. Verificar el art. 148 con los supuestos específicos.",
+      "tags": [
+        "carga de la prueba",
+        "consumidor",
+        "INDECOPI",
+        "no idoneidad",
+        "art. 148"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONS-02",
+      "materia": "consumidor",
+      "principio": "Interpretación más favorable al consumidor",
+      "descripcion": "Las cláusulas, condiciones y contratos de consumo se interpretan del modo más favorable al consumidor. En caso de duda insalvable, prevalece la interpretación que favorece al consumidor y no al proveedor.",
+      "base_legal": "Ley 29571 (Código de Protección y Defensa del Consumidor) art. 46",
+      "articulo": "Art. 46 Ley 29571: las cláusulas de los contratos de consumo se interpretan del modo más favorable al consumidor; en caso de duda insalvable se estará a la interpretación más favorable.",
+      "como_aplicarlo": [
+        "Impugnar cláusulas ambiguas de contratos de adhesión, letra pequeña o condiciones generales, solicitando su interpretación pro consumidor.",
+        "Pedir la nulidad o inaplicación de cláusulas abusivas (art. 50 Ley 29571) que limiten derechos del consumidor.",
+        "En reclamos ante INDECOPI, sustentar que la duda sobre el alcance del beneficio o promoción se resuelve a favor del consumidor.",
+        "Usar el principio junto con las normas de idoneidad y la prohibición de publicidad engañosa."
+      ],
+      "ejemplo_practico": "Banco ofrece 'tarjeta sin costo de mantenimiento' y luego cobra comisiones con base en una cláusula genérica. El abogado del consumidor invoca el art. 46 Ley 29571 y obtiene la devolución de los cobros indebidos por interpretación favorable.",
+      "limites": "NO permite desconocer obligaciones claras del consumidor ni reescribir contratos cuando no hay duda genuina. No aplica a relaciones no reguladas por la Ley 29571 (consumidores son destinatarios finales).",
+      "tags": [
+        "interpretación favorable",
+        "consumidor",
+        "cláusulas abusivas",
+        "art. 46",
+        "contrato de adhesión"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONS-03",
+      "materia": "consumidor",
+      "principio": "Garantías implícitas y responsabilidad por idoneidad",
+      "descripcion": "Todo bien o servicio debe ser idóneo: adecuado a los fines y usos previsibles. El proveedor responde por la falta de idoneidad, incluso sin garantía expresa, durante un plazo razonable; las garantías legales mínimas no pueden excluirse por pacto.",
+      "base_legal": "Ley 29571 (Código de Protección y Defensa del Consumidor) arts. 18, 20, 21 y 23",
+      "articulo": "Art. 18 Ley 29571 (obligación de idoneidad); art. 20 (responsabilidad del proveedor); art. 21 (responsabilidad civil por defectos); art. 23 (garantías).",
+      "como_aplicarlo": [
+        "Reclamar la reparación, reposición o devolución del precio por falta de idoneidad, sin necesidad de garantía expresa del proveedor.",
+        "Invocar la garantía mínima legal aun cuando el fabricante declare 'sin garantía' (la exclusión es ineficaz).",
+        "En defectos ocultos o vicios redhibitorios, exigir la responsabilidad del proveedor y, si procede, la indemnización de daños (art. 21).",
+        "Documentar la falla con peritaje, fotos o informes técnicos para reforzar la no idoneidad."
+      ],
+      "ejemplo_practico": "Comprador adquiere un celular que falla a los 3 meses; el proveedor alega que la garantía era solo de 30 días. El abogado invoca la garantía implícita de idoneidad (art. 23 Ley 29571) y obtiene el cambio o la devolución del precio, pues la garantía mínima es irrenunciable.",
+      "limites": "La responsabilidad no alcanza el mal uso, desgaste normal o fuerza mayor (art. 19 Ley 29571). El plazo razonable para reclamar idoneidad depende de la naturaleza del bien; no es indefinido. Verificar supuestos de exclusión de responsabilidad del proveedor.",
+      "tags": [
+        "garantía implícita",
+        "idoneidad",
+        "productos defectuosos",
+        "art. 18",
+        "art. 23",
+        "devolución"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONS-04",
+      "materia": "consumidor",
+      "principio": "Publicidad engañosa y veracidad publicitaria",
+      "descripcion": "La publicidad debe ser veraz y no inducir a error. El anuncio de características, beneficios o condiciones que no se cumplen constituye publicidad engañosa y faculta al consumidor a exigir lo ofrecido y a denunciar la infracción.",
+      "base_legal": "Ley 29571 (Código de Protección y Defensa del Consumidor) arts. 57, 58 y 59; Decreto Legislativo 1044 (Ley de Represión de la Competencia Desleal)",
+      "articulo": "Arts. 57-59 Ley 29571 (principio de veracidad publicitaria, prohibición de publicidad engañosa); D.L. 1044 arts. 6-7 (actos de engaño).",
+      "como_aplicarlo": [
+        "Recolectar el anuncio (captura, video, volante, pantalla) y confrontarlo con el producto o servicio efectivamente recibido.",
+        "Denunciar ante INDECOPI por publicidad engañosa y exigir el cumplimiento de lo ofrecido (fuerza vinculante de la oferta).",
+        "En la vía civil, usar el engaño publicitario como sustento de nulidad del contrato o de indemnización de daños.",
+        "Alegar que la 'letra pequeña' no puede desvirtuar la impresión principal del anuncio."
+      ],
+      "ejemplo_practico": "Gimnasio publicita 'inscripción gratis todo el año' y a los 2 meses cobra membresía adicional. El abogado denuncia publicidad engañosa ante INDECOPI y exige el cumplimiento de la oferta, obteniendo la devolución de los cobros.",
+      "limites": "NO toda exageración publicitaria (puffing) es engañosa: debe existir información falsa o que induzca a error a un consumidor razonable. La publicidad comparativa objetiva es legítima si es veraz. Verificar si la promesa publicitaria es parte esencial del anuncio.",
+      "tags": [
+        "publicidad engañosa",
+        "veracidad publicitaria",
+        "INDECOPI",
+        "oferta vinculante",
+        "D.L. 1044"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONS-05",
+      "materia": "consumidor",
+      "principio": "Derecho de retracto en ventas a distancia",
+      "descripcion": "El consumidor puede retractarse de la compra de bienes o servicios realizada fuera del establecimiento del proveedor (venta telefónica, catálogo, internet, domicilio) dentro del plazo legal, sin penalidad ni justificación.",
+      "base_legal": "Ley 29571 (Código de Protección y Defensa del Consumidor) art. 17",
+      "articulo": "Art. 17 Ley 29571: derecho de retracto en ventas a distancia o fuera del establecimiento, dentro del plazo de siete (7) días calendario, con devolución del precio pagado.",
+      "como_aplicarlo": [
+        "Verificar si la compra se realizó a distancia o fuera del establecimiento (internet, teléfono, catálogo, domicilio).",
+        "Ejercer el retracto por escrito dentro de los 7 días calendario, exigiendo la devolución íntegra del precio.",
+        "Si el proveedor se niega, denunciar ante INDECOPI por incumplimiento del derecho de retracto.",
+        "Asegurar el acuse de recibo de la comunicación de retracto (carta notarial, correo con confirmación)."
+      ],
+      "ejemplo_practico": "Consumidor compra por internet una membresía de S/ 2,000 y al recibirla descubre condiciones no deseadas. Al día siguiente notifica su retracto. El proveedor se niega. Su abogado invoca el art. 17 Ley 29571 y obtiene la devolución del precio.",
+      "limites": "NO aplica a todos los bienes: están excluidos los productos personalizados, perecederos, de higiene íntima sellados, servicios ejecutados con consentimiento, entre otros del art. 17.4 Ley 29571. El plazo de 7 días calendario es perentorio; retracto fuera de plazo no procede.",
+      "tags": [
+        "retracto",
+        "venta a distancia",
+        "comercio electrónico",
+        "art. 17",
+        "devolución"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-01",
+      "materia": "penal",
+      "principio": "Presunción de inocencia",
+      "descripcion": "Toda persona imputada es considerada inocente y debe ser tratada como tal mientras no se demuestre legalmente su culpabilidad en sentencia firme. La carga de la prueba de la culpabilidad recae en el Ministerio Público.",
+      "base_legal": "Constitución art. 2.24.e; NCPP (D.L. 957) art. II del Título Preliminar",
+      "articulo": "Art. 2.24.e Const. (presunción de inocencia); NCPP art. II: 'Toda persona imputada de la comisión de un hecho punible es considerada inocente y debe ser tratada como tal, mientras no sea demostrada legalmente su culpabilidad.'",
+      "como_aplicarlo": [
+        "Exigir prueba suficiente y de cargo de la Fiscalía en todas las etapas: no basta la sospecha para condenar.",
+        "Impugnar la prisión preventiva cuando la Fiscalía no sustente peligro procesal con prueba, pues la medida excepcional no puede fundarse en la sola imputación.",
+        "En el juicio, exigir que la condena se base en prueba actuada en audiencia, no en el expediente fiscal.",
+        "Pedir la absolución cuando la prueba de cargo no destruye la presunción de inocencia (NCPP art. 159.3: duda razonable a favor del imputado)."
+      ],
+      "ejemplo_practico": "Imputado por hurto agravado sin testigos ni cámaras; la única prueba es la declaración del agraviado. El abogado sostiene que la prueba de cargo no supera el estándar de certeza y solicita la absolución por insuficiencia probatoria (in dubio pro reo).",
+      "limites": "NO impide la investigación ni las medidas coercitivas legalmente procedentes; la presunción es iuris tantum y cede ante prueba de cargo suficiente. No exime de la defensa material ni de asistir a las audiencias.",
+      "tags": [
+        "presunción de inocencia",
+        "carga de la prueba",
+        "absolución",
+        "NCPP art. II",
+        "estándar probatorio"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-02",
+      "materia": "penal",
+      "principio": "In dubio pro reo",
+      "descripcion": "La duda razonable sobre la culpabilidad se resuelve a favor del imputado. Si el juez no alcanza la certeza de la responsabilidad penal, debe absolver.",
+      "base_legal": "NCPP (D.L. 957) art. 159.3; Constitución art. 2.24.e",
+      "articulo": "Art. 159.3 NCPP: 'La duda razonable se resuelve a favor del imputado.'",
+      "como_aplicarlo": [
+        "Al concluir el juicio, si la prueba de cargo es insuficiente o contradictoria, solicitar la absolución invocando la duda razonable.",
+        "Destacar contradicciones, vacíos probatorios y la falta de corroboración en los alegatos finales.",
+        "En la apelación de sentencia condenatoria, argumentar que la valoración probatoria no alcanzó el estándar de más allá de toda duda razonable.",
+        "Solicitar la aplicación del art. 159.3 NCPP como regla de juicio al momento de deliberar."
+      ],
+      "ejemplo_practico": "Dos testigos se contradicen sobre la participación del acusado y no hay prueba técnica. El abogado en su alegato final invoca el in dubio pro reo y el juez absuelve por insuficiencia probatoria.",
+      "limites": "NO es una regla para ignorar prueba sólida: la duda debe ser razonable y derivar de la insuficiencia o contradicción probatoria real. No ampara la impunidad frente a prueba de cargo suficiente y concordante.",
+      "tags": [
+        "in dubio pro reo",
+        "duda razonable",
+        "absolución",
+        "NCPP 159",
+        "estándar probatorio"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-03",
+      "materia": "penal",
+      "principio": "Legalidad penal (nullum crimen, nulla poena sine lege)",
+      "descripcion": "Nadie puede ser procesado ni sancionado por un hecho no previsto como delito con anterioridad a su comisión, ni con pena no establecida previamente por ley. La ley penal se aplica solo a conductas típicas, antijurídicas y culpables.",
+      "base_legal": "Constitución art. 2.24.d; Código Penal (D.L. 635) art. II del Título Preliminar",
+      "articulo": "Art. 2.24.d Const. (principio de legalidad penal); CP art. II TP: 'Nadie será sancionado por un acto no previsto como delito por la ley vigente al momento de su comisión, ni sometido a pena o medida de seguridad que no se encuentren establecidas en ella.'",
+      "como_aplicarlo": [
+        "Cuestionar acusaciones por conductas atípicas o no previstas como delito al momento de los hechos (irretroactividad).",
+        "Solicitar el sobreseimiento o la absolución cuando el hecho no encaja en el tipo penal imputado.",
+        "Impugnar la aplicación retroactiva de leyes penales desfavorables (la ley más favorable sí se aplica retroactivamente).",
+        "Cuestionar tipos penales abiertos o interpretaciones extensivas de la Fiscalía que creen supuestos no previstos."
+      ],
+      "ejemplo_practico": "Fiscal imputa 'apropiación ilícita' a quien recibió dinero por un contrato civil que no le imponía destino específico. El abogado demuestra la atipicidad: la conducta no encaja en el tipo del art. 190 CP y solicita el sobreseimiento por legalidad penal.",
+      "limites": "NO impide la persecución de conductas típicas, aunque el autor las disfrace formalmente (el juez verifica la realidad, no las etiquetas). La legalidad no protege el error de derecho inexcusable ni la simulación de contratos para evadir el tipo penal.",
+      "tags": [
+        "legalidad penal",
+        "nullum crimen",
+        "tipicidad",
+        "atipicidad",
+        "irretroactividad",
+        "CP art. II"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-04",
+      "materia": "penal",
+      "principio": "Plazo razonable del proceso penal",
+      "descripcion": "Controlar el vencimiento de los plazos de la investigación preparatoria (120 días naturales comunes, 240 complejos; prórrogas arts. 342-343 NCPP) y, vencido sin requerimiento fiscal, instar el sobreseimiento (NCPP art. 344.2.b) o la cesación de la prisión preventiva (arts. 283 y 343.3 NCPP).",
+      "base_legal": "Constitución art. 139.4; NCPP (D.L. 957) arts. 342 y 343; jurisprudencia del TC sobre plazo razonable",
+      "articulo": "Art. 139.4 Const. (principio de la administración de justicia: plazo razonable); NCPP art. 342 (plazo de investigación preparatoria) y 343 (prórroga).",
+      "como_aplicarlo": [
+        "Verificar la fecha de inicio de la investigación preparatoria y el plazo aplicable (art. 342: 120 días naturales comunes; 240 complejos; prórrogas).",
+        "Si vence el plazo sin requerimiento fiscal, presentar escrito instando el sobreseimiento conforme al art. 344.2.b NCPP.",
+        "Si el imputado está privado de libertad, solicitar la cesación de la prisión preventiva por exceso de plazo (arts. 283 y 343.3 NCPP)."
+      ],
+      "ejemplo_practico": "Investigado con prisión preventiva de 18 meses; la Fiscalía no presenta acusación ni justifica la complejidad. El abogado solicita la cesación de la prisión preventiva por exceso del plazo razonable, con respaldo de la jurisprudencia del TC sobre nulidad por dilación.",
+      "limites": "La dilación imputable a la propia defensa (continuas postergaciones, incidentes dilatorios) no se computa a favor del imputado. En casos complejos el plazo puede prorrogarse legalmente. El plazo razonable no es sinónimo de absolución automática.",
+      "tags": [
+        "plazo razonable",
+        "debido proceso",
+        "prisión preventiva",
+        "NCPP 342",
+        "cesación"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-05",
+      "materia": "penal",
+      "principio": "Derecho a la defensa y defensa técnica efectiva",
+      "descripcion": "El imputado tiene derecho irrestricto a la defensa, a la asistencia de abogado desde la primera diligencia, a conocer la imputación, a aportar prueba y a interrogar a los testigos. Su indefensión invalida los actos procesales.",
+      "base_legal": "Constitución art. 139.14; NCPP (D.L. 957) arts. 1, 71, 72, 75 y 76",
+      "articulo": "Art. 139.14 Const. (derecho de defensa); NCPP art. 71 (derechos del imputado); art. 72 (derechos de la defensa); art. 75 (defensa material).",
+      "como_aplicarlo": [
+        "Exigir que toda diligencia cuente con la presencia del abogado defensor y que el imputado conozca con precisión los cargos.",
+        "Solicitar la nulidad de actos procesales practicados sin defensa técnica o con indefensión material (NCPP art. 150).",
+        "Ejercer el derecho a ofrecer y actuar prueba de descargo en todas las etapas.",
+        "Impugnar declaraciones obtenidas sin abogado o bajo coacción (nulidad de prueba ilícita, NCPP art. VIII TP)."
+      ],
+      "ejemplo_practico": "El imputado declara sin abogado en la primera intervención policial y la Fiscalía sustenta la acusación en esa declaración. El abogado solicita la nulidad de la declaración por violación del derecho a la defensa, eliminando la prueba clave de cargo.",
+      "limites": "NO cabe invocar indefensión cuando el imputado renunció voluntariamente al abogado o cuando la omisión no causó perjuicio real. La nulidad requiere afectación material al derecho de defensa, no simples formalidades.",
+      "tags": [
+        "derecho a la defensa",
+        "defensa técnica",
+        "nulidad",
+        "NCPP 71",
+        "indefensión"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-06",
+      "materia": "penal",
+      "principio": "Prohibición de analogía desfavorable y favor libertatis",
+      "descripcion": "Está prohibida la analogía para calificar un hecho como delito, establecer penas o medidas de seguridad. En materia de restricción de derechos y libertades, la interpretación debe ser restrictiva (favor libertatis).",
+      "base_legal": "Constitución art. 2.24.d; Código Penal (D.L. 635) art. III del Título Preliminar",
+      "articulo": "CP art. III TP: 'No es admisible la analogía para calificar el hecho como delito o falta, definir un estado de peligrosidad o determinar la pena o medida de seguridad.'",
+      "como_aplicarlo": [
+        "Impugnar acusaciones que extiendan el tipo penal por analogía a supuestos no previstos.",
+        "Solicitar interpretación restrictiva de las normas que restringen la libertad (medidas coercitivas, prisión preventiva).",
+        "En la prisión preventiva, exigir la interpretación restrictiva de sus presupuestos (NCPP art. 268) y la aplicación del favor libertatis ante la duda.",
+        "Cuestionar la imposición de medidas de seguridad sin base legal expresa."
+      ],
+      "ejemplo_practico": "La Fiscalía imputa 'trata de personas' a un caso que solo encajaría, en todo caso, en un delito menor no previsto en la ley aplicable. El abogado invoca la prohibición de analogía desfavorable y el favor libertatis, obteniendo la desvinculación del tipo agravado.",
+      "limites": "La analogía prohibida es la desfavorable al reo; la interpretación extensiva dentro del sentido posible del tipo es admisible. NO impide la interpretación sistemática ni la aplicación de la norma más favorable en la sucesión de leyes (CP art. 6).",
+      "tags": [
+        "analogía",
+        "favor libertatis",
+        "tipicidad",
+        "prisión preventiva",
+        "CP art. III",
+        "interpretación restrictiva"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CIV-01",
+      "materia": "procesal-civil",
+      "principio": "Tutela jurisdiccional efectiva",
+      "descripcion": "Toda persona tiene derecho a la tutela jurisdiccional efectiva: acceso a la justicia, debido proceso, obtención de una resolución fundada en derecho y efectividad de lo resuelto. Es el principio rector del proceso civil.",
+      "base_legal": "Constitución art. 139.3; CPC (D.S. 017-93-JUS) art. I del Título Preliminar",
+      "articulo": "Art. 139.3 Const.; CPC art. I: 'Toda persona tiene derecho a la tutela jurisdiccional efectiva para el ejercicio o defensa de sus derechos o intereses, con sujeción a un debido proceso.'",
+      "como_aplicarlo": [
+        "Ante denegatorias de admisión injustificadas, impugnar invocando el derecho de acceso a la justicia.",
+        "Exigir resoluciones debidamente motivadas (motivación como contenido del debido proceso).",
+        "Solicitar medidas cautelares para asegurar la efectividad de la sentencia cuando exista verosimilitud y peligro en la demora.",
+        "Impugnar la inejecución de sentencias firmes invocando la tutela efectiva en su dimensión de cumplimiento."
+      ],
+      "ejemplo_practico": "El juzgado declara inadmisible una demanda por una exigencia formal no prevista. El abogado apela invocando la tutela jurisdiccional efectiva y el acceso a la justicia, logrando que se admita la demanda y se subsane la interpretación formalista.",
+      "limites": "NO garantiza obtener una sentencia favorable, solo un proceso y una resolución fundada. La tutela efectiva no justifica la inobservancia de requisitos de admisibilidad y presupuestos procesales legítimos.",
+      "tags": [
+        "tutela jurisdiccional efectiva",
+        "debido proceso",
+        "acceso a la justicia",
+        "motivación",
+        "CPC art. I"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CIV-02",
+      "materia": "procesal-civil",
+      "principio": "Interpretación de contratos a favor del deudor",
+      "descripcion": "En caso de duda sobre el sentido de las cláusulas de un contrato, el juez debe interpretarlas en el sentido más favorable al deudor, quien no redactó el contrato ni impuso las condiciones.",
+      "base_legal": "Código Civil (D.L. 295) art. 1401",
+      "articulo": "Art. 1401 CC: 'Si los términos de un contrato son susceptibles de dos o más interpretaciones, se entenderán en el sentido más favorable al deudor.'",
+      "como_aplicarlo": [
+        "Cuando el contrato fue redactado por el acreedor, sostener que las cláusulas ambiguas se interpretan a favor del deudor (art. 1401 CC).",
+        "Combinar con la regla contra proferentem (el redactor responde por la ambigüedad) y la buena fe contractual (CC art. 1362).",
+        "Ofrecer como argumento principal la interpretación favorable y, en subsidio, la interpretación sistemática del contrato.",
+        "En contratos de adhesión, reforzar con la normativa de protección al consumidor si el deudor es consumidor."
+      ],
+      "ejemplo_practico": "Contrato de préstamo redactado por el banco con cláusula ambigua sobre intereses moratorios. El deudor demanda la inaplicación del cobro excesivo; el abogado invoca el art. 1401 CC para que la duda se resuelva a favor del deudor.",
+      "limites": "NO aplica cuando la cláusula es clara y no hay ambigüedad: el juez no puede reescribir el contrato. La regla favorece al deudor solo en caso de duda genuina; no anula cláusulas válidas ni exime de obligaciones inequívocas.",
+      "tags": [
+        "interpretación de contratos",
+        "favor debitoris",
+        "art. 1401 CC",
+        "contra proferentem",
+        "deudor"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CIV-03",
+      "materia": "procesal-civil",
+      "principio": "Buena fe (contractual y procesal)",
+      "descripcion": "Los contratos deben negociarse, celebrarse y ejecutarse según las reglas de la buena fe. En el proceso, las partes deben actuar con lealtad y probidad; la conducta contraria a la buena fe procesal no puede aprovechar a quien la ejerce.",
+      "base_legal": "Código Civil art. 1362; CPC arts. 109 y 132",
+      "articulo": "Art. 1362 CC (buena fe contractual); CPC art. 109 (conducta procesal de las partes); art. 132 (buena fe procesal).",
+      "como_aplicarlo": [
+        "Invocar la buena fe objetiva para impedir que la contraparte se beneficie de su propio dolo, fraude o conducta contradictoria (venire contra factum proprium).",
+        "Solicitar la aplicación de la regla de conducta procesal del CPC art. 109 cuando la contraparte obstruye el proceso.",
+        "Usar la buena fe como criterio interpretativo del contrato y de las cargas de las partes.",
+        "Alegar la violación del deber de lealtad para desvirtuar pretensiones temerarias o maliciosas."
+      ],
+      "ejemplo_practico": "El vendedor ejecuta un contrato de compraventa exigiendo un precio mayor al pactado, contradiciendo su propia conducta de años aceptando pagos. El abogado del comprador invoca la buena fe (CC art. 1362) y el venire contra factum proprium para frenar la pretensión.",
+      "limites": "NO sustituye las normas imperativas ni permite ignorar obligaciones claras. La buena fe no se presume contra la ley: las partes deben cumplir lo pactado y probar las alegaciones de mala fe. No es un cheque en blanco para desconocer la verdad material del proceso.",
+      "tags": [
+        "buena fe",
+        "CC 1362",
+        "CPC 132",
+        "venire contra factum proprium",
+        "lealtad procesal"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CIV-04",
+      "materia": "procesal-civil",
+      "principio": "Abuso del derecho",
+      "descripcion": "La ley no ampara el ejercicio ni la omisión abusivos de un derecho. El titular que ejerce su derecho con la intención de dañar, sin interés legítimo o de manera desproporcionada, responde por los daños causados y su pretensión puede ser desestimada.",
+      "base_legal": "Código Civil (D.L. 295) art. II del Título Preliminar y art. 924",
+      "articulo": "CC art. II TP: 'La ley no ampara el ejercicio ni la omisión abusivos de un derecho'; art. 924 CC (abuso del derecho en derechos reales).",
+      "como_aplicarlo": [
+        "Ante el ejercicio abusivo de derechos por la contraparte (desistimientos maliciosos, medidas cautelares injustificadas, oposición sin interés), pedir el rechazo o la indemnización.",
+        "Invocar el art. II TP CC como defensa cuando la contraparte pretende usar un derecho formal para causar un daño desproporcionado.",
+        "Solicitar indemnización por daños causados por el abuso del derecho (art. 1971 CC).",
+        "En medidas cautelares, impugnar las que se usan con fines meramente dilatorios o de presión indebida."
+      ],
+      "ejemplo_practico": "Acreedor ejecuta la venta judicial de un inmueble por una deuda ínfima, en forma desproporcionada y con evidente intención de dañar. El abogado del deudor alega abuso del derecho (art. II TP CC) y logra limitar la ejecución a la parte razonable de la deuda.",
+      "limites": "NO se presume el abuso: debe probarse la intención de dañar, la ausencia de interés legítimo o la desproporción manifiesta. El ejercicio regular de un derecho, aun cuando perjudique a otro, no es abusivo si existe interés serio y legítimo.",
+      "tags": [
+        "abuso del derecho",
+        "CC art. II",
+        "art. 924",
+        "indemnización",
+        "ejercicio regular"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CIV-05",
+      "materia": "procesal-civil",
+      "principio": "Proporcionalidad y razonabilidad de las medidas cautelares",
+      "descripcion": "Las medidas cautelares deben ser proporcionales a la pretensión y no exceder lo necesario para asegurar la efectividad de la sentencia. El solicitante responde por los daños derivados de medidas excesivas o injustificadas.",
+      "base_legal": "Código Procesal Civil arts. 611, 612, 613 y 617-618",
+      "articulo": "CPC art. 611 (procedencia: verosimilitud, peligro en la demora, razonabilidad); art. 612 (requisitos/contenido); art. 613 (contracautela); arts. 617-618 (variación y levantamiento).",
+      "como_aplicarlo": [
+        "Impugnar medidas cautelares desproporcionadas solicitando su variación o levantamiento (CPC art. 613).",
+        "Ofrecer contracautela suficiente para obtener medidas que aseguren la pretensión sin perjudicar excesivamente a la contraparte.",
+        "Solicitar la indemnización por daños cuando la contraparte obtuvo una medida injustificada y causó perjuicio.",
+        "Verificar que la medida solicitada sea idónea, necesaria y proporcional, y sustentar los tres presupuestos del art. 611 CPC."
+      ],
+      "ejemplo_practico": "La contraparte obtiene un embargo de todo el patrimonio de una empresa por una deuda discutible de menor cuantía. El abogado solicita la variación de la medida por desproporción (CPC arts. 613 y 611) y obtiene su reducción a la cuantía razonable.",
+      "limites": "NO impide medidas cautelares legítimas con contracautela suficiente. La proporcionalidad no se mide solo por el monto, sino por el riesgo de frustración de la sentencia; en fraudes o insolvencia, medidas amplias pueden ser razonables.",
+      "tags": [
+        "medidas cautelares",
+        "proporcionalidad",
+        "embargo",
+        "contracautela",
+        "CPC 611"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONST-01",
+      "materia": "constitucional",
+      "principio": "Favor libertatis (protección de la libertad personal)",
+      "descripcion": "Toda restricción a la libertad personal debe interpretarse restrictivamente y la duda debe resolverse a favor de la libertad. La privación de libertad es excepcional, subsidiaria y proporcional.",
+      "base_legal": "Constitución art. 2.24; Nuevo Código Procesal Constitucional (Ley 31307)",
+      "articulo": "Art. 2.24 Const. (derecho a la libertad y seguridad personales); Ley 31307 arts. 1-2 (procesos constitucionales y protección de derechos fundamentales).",
+      "como_aplicarlo": [
+        "En habeas corpus, alegar la interpretación restrictiva de cualquier restricción a la libertad y pedir la libertad ante la duda.",
+        "Cuestionar detenciones o prisiones preventivas desproporcionadas o sin base legal suficiente.",
+        "Invocar el favor libertatis en la etapa de medidas coercitivas y en la revisión de medidas vigentes.",
+        "En caso de detención ilegal, solicitar la libertad inmediata y la indemnización si corresponde."
+      ],
+      "ejemplo_practico": "Una orden de detención se sustenta en una interpretación extensiva de un supuesto de flagrancia. El abogado interpone habeas corpus invocando el favor libertatis y la interpretación restrictiva de las excepciones a la libertad, logrando la libertad del detenido.",
+      "limites": "NO ampara la libertad de quien está legalmente detenido o condenado por sentencia firme. El favor libertatis no desconoce la prisión preventiva legalmente dictada cuando concurren sus presupuestos (NCPP art. 268).",
+      "tags": [
+        "favor libertatis",
+        "libertad personal",
+        "habeas corpus",
+        "interpretación restrictiva",
+        "art. 2.24"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONST-02",
+      "materia": "constitucional",
+      "principio": "Interpretación conforme a la Constitución",
+      "descripcion": "Las normas y actos se interpretan del modo que mejor se adecúe a la Constitución y a los derechos fundamentales. Ante varias lecturas posibles, debe preferirse la que preserva la constitucionalidad (interpretación conforme) y la que favorece al titular del derecho (pro homine).",
+      "base_legal": "Constitución arts. 51 y 138; Nuevo Código Procesal Constitucional (Ley 31307) art. 1",
+      "articulo": "Art. 51 Const. (jerarquía normativa); art. 138 Const. (los jueces prefieren la norma constitucional); Ley 31307 art. 1 (fines de los procesos constitucionales).",
+      "como_aplicarlo": [
+        "Cuando una norma legal admite dos lecturas, sostener la lectura conforme a la Constitución y a los derechos fundamentales.",
+        "Invocar la preferencia constitucional del art. 138 Const. ante normas legales que la contravienen en su aplicación concreta.",
+        "En procesos constitucionales, plantear la interpretación pro homine y pro derechos fundamentales.",
+        "Impugnar actos administrativos o judiciales que apliquen una lectura inconstitucional de la norma."
+      ],
+      "ejemplo_practico": "Una ordenanza municipal restringe el comercio ambulatorio. Su aplicación se niega a un vendedor alegando prohibición absoluta. El abogado invoca la interpretación conforme (la ordenanza permite regular, no prohibir) y el art. 138 Const., logrando la protección del derecho al trabajo.",
+      "limites": "NO permite desconocer textos normativos inequívocos ni reinterpretar contra la letra clara de la ley. La interpretación conforme no es una vía para crear derechos no previstos ni para inaplicar normas sin control judicial pertinente.",
+      "tags": [
+        "interpretación conforme",
+        "pro homine",
+        "art. 138",
+        "jerarquía normativa",
+        "derechos fundamentales"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONST-03",
+      "materia": "constitucional",
+      "principio": "Principios de razonabilidad y proporcionalidad",
+      "descripcion": "Toda restricción a derechos fundamentales debe superar el test de proporcionalidad: ser idónea, necesaria y proporcional en sentido estricto. Una medida irrazonable o desproporcionada vulnera los derechos fundamentales.",
+      "base_legal": "Constitución art. 200 (límites a los derechos); doctrina del Tribunal Constitucional sobre el test de proporcionalidad",
+      "articulo": "Art. 200 Const. (garantías constitucionales y límites al ejercicio de derechos); jurisprudencia verificada del TC en sentencias-tc-completas-2026.json y jurisprudencia-tc-2026.json.",
+      "como_aplicarlo": [
+        "Impugnar toda medida restrictiva (administrativa, judicial o normativa) que no supere los tres subprincipios: idoneidad, necesidad y proporcionalidad en sentido estricto.",
+        "Plantear el test en el escrito: ¿la medida persigue un fin constitucional? ¿es idónea? ¿existe una medida menos gravosa? ¿el sacrificio es desproporcionado al beneficio?",
+        "Usar la razonabilidad para cuestionar sanciones o restricciones manifiestamente excesivas.",
+        "Acompañar jurisprudencia del TC (test de proporcionalidad) verificada en los catálogos de sentencias del TC."
+      ],
+      "ejemplo_practico": "Una sanción administrativa de clausura definitiva por una falta leve. El abogado aplica el test de proporcionalidad: la medida no es necesaria (hay sanciones menos gravosas) ni proporcional, logrando la reducción o nulidad de la sanción.",
+      "limites": "NO sustituye el juicio político o de oportunidad del legislador: solo se examina la razonabilidad, no la conveniencia. Una medida proporcional no puede impugnarse solo por ser gravosa; debe demostrarse la desproporción o la falta de necesidad.",
+      "tags": [
+        "proporcionalidad",
+        "razonabilidad",
+        "test de proporcionalidad",
+        "sanciones",
+        "derechos fundamentales"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONST-04",
+      "materia": "constitucional",
+      "principio": "Pro homine (protección más amplia de los derechos)",
+      "descripcion": "Cuando una misma situación está regulada por varias normas (nacionales o internacionales), debe aplicarse la que otorgue mayor protección al titular del derecho. La interpretación de los derechos fundamentales debe ser la más favorable a su ejercicio.",
+      "base_legal": "Constitución art. 55 y Cuarta Disposición Final y Transitoria (tratados de derechos humanos); Convención Americana sobre Derechos Humanos",
+      "articulo": "Art. 55 Const. (tratados son parte del derecho nacional); Cuarta D.F.T. Const. (interpretación conforme a la CADH); CADH art. 29 (normas de interpretación pro persona).",
+      "como_aplicarlo": [
+        "Cuando el derecho tenga protección reforzada en un tratado de derechos humanos, invocar la norma más favorable al justiciable.",
+        "Usar el principio pro homine para ampliar la protección en procesos constitucionales y ordinarios.",
+        "Citar la CADH (art. 25: protección judicial) cuando la protección interna sea insuficiente.",
+        "Alegar la obligación del Estado de adoptar la interpretación más amplia de los derechos y la más restringida de sus limitaciones."
+      ],
+      "ejemplo_practico": "Un trabajador despedido por represalia sindical. La protección interna le ofrece solo indemnización, pero la protección constitucional y convencional (libertad sindical, art. 28 Const. y Convenio 87 OIT) exige reposición. El abogado invoca el principio pro homine y obtiene la reposición.",
+      "limites": "NO permite elegir arbitrariamente entre normas de distinto rango ni desconocer el orden interno: opera ante duda o concurrencia de estándares. No faculta a imponer obligaciones al Estado fuera de los tratados ratificados.",
+      "tags": [
+        "pro homine",
+        "derechos humanos",
+        "CADH",
+        "tratados",
+        "interpretación favorable"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "CONST-05",
+      "materia": "constitucional",
+      "principio": "Debido proceso y tutela procesal efectiva (procesos constitucionales)",
+      "descripcion": "El debido proceso incluye el acceso a la justicia constitucional, la motivación de las resoluciones, el juez natural, la pluralidad de instancias y la defensa. Su vulneración habilita los procesos constitucionales (amparo, habeas corpus, habeas data, cumplimiento).",
+      "base_legal": "Constitución art. 139; Nuevo Código Procesal Constitucional (Ley 31307) arts. 1-2; Ley 28237 (histórica, derogada)",
+      "articulo": "Art. 139 Const. (principios y derechos de la función jurisdiccional); Ley 31307 art. 2 (procesos constitucionales). NOTA DE VIGENCIA: la Ley 28237 fue derogada por la Ley 31307; el plazo de amparo cambió de 60 a 30 días hábiles.",
+      "como_aplicarlo": [
+        "Interponer amparo por violación del debido proceso y derechos fundamentales (Ley 31307), respetando el plazo de 30 días hábiles.",
+        "Impugnar resoluciones judiciales o administrativas inmotivadas invocando la garantía de motivación.",
+        "En procesos laborales previsionales u otros de protección reforzada, considerar el amparo cuando la vía ordinaria no es idónea.",
+        "Verificar plazos en plazos-procesales.json (amparo 30 días hábiles Ley 31307; habeas corpus sin plazo) para no caducar la acción."
+      ],
+      "ejemplo_practico": "Una resolución administrativa de SUNARP afecta derechos del administrado sin motivación suficiente. El abogado interpone amparo dentro de los 30 días hábiles (Ley 31307 art. 45) invocando el debido proceso, y obtiene la nulidad de la resolución inmotivada.",
+      "limites": "El amparo es subsidiario: no procede cuando existe vía ordinaria igualmente satisfactoria (salvo procesos de protección reforzada). El plazo de 30 días hábiles es de caducidad; el habeas corpus no tiene plazo. La indebida elección de vía puede costar el proceso.",
+      "tags": [
+        "debido proceso",
+        "amparo",
+        "motivación",
+        "Ley 31307",
+        "plazo 30 días",
+        "juez natural"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-01",
+      "materia": "penal-procesal",
+      "principio": "Control de plazos de la investigación preparatoria",
+      "descripcion": "Control de plazos de la investigación preparatoria. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 342 y 343",
+      "articulo": "NCPP art. 342: la investigación preparatoria tiene plazo de 120 días naturales (común) prorrogable por 60; 240 días (compleja). Art. 343: prórrogas.",
+      "como_aplicarlo": [
+        "Verificar la fecha de formalización de la investigación y el plazo aplicable.",
+        "Controlar que no se exceda el plazo sin requerimiento fiscal.",
+        "Vencido el plazo, solicitar al juez el control del plazo y el sobreseimiento (art. 344.2.b)."
+      ],
+      "ejemplo_practico": "Imputado con investigación preparatoria de 150 días sin prórroga válida en caso común (120+60). El abogado solicita el control del plazo y que se declare vencido, instando el sobreseimiento.",
+      "limites": "Los plazos se suspenden por diligencias complejas debidamente autorizadas. No aplica si hubo prórroga válida.",
+      "tags": [
+        "plazos",
+        "investigación preparatoria",
+        "342",
+        "343",
+        "control"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-02",
+      "materia": "penal-procesal",
+      "principio": "Sobreseimiento por insuficiencia probatoria",
+      "descripcion": "Sobreseimiento por insuficiencia probatoria. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 344, 345 y 346",
+      "articulo": "NCPP art. 344.2.b: el fiscal solicita el sobreseimiento cuando el hecho no constituye delito o no hay elementos suficientes para acusar.",
+      "como_aplicarlo": [
+        "Analizar si la acusación carece de elementos objetivos razonables.",
+        "Solicitar el sobreseimiento cuando no existe base probatoria suficiente.",
+        "Acompañar la solicitud con análisis de la prueba actuada y su insuficiencia."
+      ],
+      "ejemplo_practico": "Acusación sustentada solo en la declaración del agraviado sin corroboración periférica. El abogado solicita el sobreseimiento por insuficiencia probatoria.",
+      "limites": "No aplica si existen elementos mínimos que sustenten la acusación (estándar de sospecha suficiente).",
+      "tags": [
+        "sobreseimiento",
+        "344",
+        "insuficiencia probatoria"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-03",
+      "materia": "penal-procesal",
+      "principio": "Prisión preventiva es excepcional",
+      "descripcion": "Prisión preventiva es excepcional. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP art. 268",
+      "articulo": "NCPP art. 268: la prisión preventiva procede solo si se acreditan 3 presupuestos: (a) fumus comissi delicti, (b) prognosis de pena mayor a 4 años, (c) peligro procesal (fuga u obstaculización).",
+      "como_aplicarlo": [
+        "Rebatir cada presupuesto que no se acredite con elementos objetivos.",
+        "Solicitar comparecencia con restricciones si no concurren todos los presupuestos.",
+        "Citar Acuerdo Plenario 1-2005/CJ-116 sobre los presupuestos."
+      ],
+      "ejemplo_practico": "Fiscal pide prisión preventiva sin acreditar peligro de fuga (imputado con arraigo laboral y familiar). El abogado solicita comparecencia con restricciones.",
+      "limites": "Los 3 presupuestos deben concurrir; la prognosis de pena menor a 4 años excluye la medida.",
+      "tags": [
+        "prisión preventiva",
+        "268",
+        "excepcional",
+        "comparecencia"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-04",
+      "materia": "penal-procesal",
+      "principio": "Cesación de la prisión preventiva",
+      "descripcion": "Cesación de la prisión preventiva. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 283 y 272",
+      "articulo": "NCPP art. 283: la prisión preventiva cesa cuando desaparecen los presupuestos que la motivaron o el plazo se excede. Art. 272: plazos máximos (9 meses ordinaria; 18 graves; 36 crimen organizado).",
+      "como_aplicarlo": [
+        "Solicitar la cesación cuando varíen las condiciones (arraigo, conducta procesal).",
+        "Invocar el exceso del plazo máximo del art. 272.",
+        "Ofrecer nuevas garantías que desvirtúen el peligro procesal."
+      ],
+      "ejemplo_practico": "Imputado con 10 meses de prisión preventiva en caso ordinario (máx 9). El abogado solicita la cesación por exceso de plazo.",
+      "limites": "La cesación no procede si persisten los presupuestos y el plazo no se excede.",
+      "tags": [
+        "cesación",
+        "283",
+        "272",
+        "prisión preventiva",
+        "plazo"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-05",
+      "materia": "penal-procesal",
+      "principio": "Comparecencia con restricciones como regla general",
+      "descripcion": "Comparecencia con restricciones como regla general. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP art. 287",
+      "articulo": "NCPP art. 287: la comparecencia simple o con restricciones es la regla; la prisión preventiva es la excepción.",
+      "como_aplicarlo": [
+        "Argumentar que la comparecencia es la regla y la prisión la excepción.",
+        "Proponer restricciones razonables (firmar, no ausentarse, etc.) que aseguren el proceso sin privación de libertad.",
+        "Citar el principio de proporcionalidad y favor libertatis."
+      ],
+      "ejemplo_practico": "Fiscal solicita prisión preventiva; el abogado ofrece comparecencia con restricciones (firma periódica, arraigo laboral).",
+      "limites": "No aplica si los presupuestos del art. 268 se acreditan plenamente.",
+      "tags": [
+        "comparecencia",
+        "287",
+        "restricciones",
+        "regla general"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-06",
+      "materia": "penal-procesal",
+      "principio": "Control de la acusación fiscal",
+      "descripcion": "Control de la acusación fiscal. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 350 y 352",
+      "articulo": "NCPP art. 350.1.b: el imputado puede deducir excepciones, cuestionamientos y defectos de la acusación. Art. 352: audiencia preliminar de control.",
+      "como_aplicarlo": [
+        "Impugnar la acusación cuando adolezca de defectos formales o falta de imputación concreta.",
+        "Deducir excepciones (improcedencia de acción, cosa juzgada, etc.).",
+        "Ofrecer medios de prueba en la etapa intermedia."
+      ],
+      "ejemplo_practico": "Acusación genérica que no precisa la modalidad del delito ni los hechos atribuidos. El abogado objeta la acusación por falta de imputación concreta.",
+      "limites": "El control no sustituye el mérito de la prueba; solo la suficiencia de la imputación.",
+      "tags": [
+        "acusación",
+        "350",
+        "352",
+        "control",
+        "etapa intermedia"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-07",
+      "materia": "penal-procesal",
+      "principio": "Excepción de improcedencia de acción",
+      "descripcion": "Excepción de improcedencia de acción. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP art. 5.1.a y 350.1.b",
+      "articulo": "NCPP art. 5.1.a: la improcedencia de acción procede cuando el hecho no constituye delito o la acción penal está prescrita o extinguida.",
+      "como_aplicarlo": [
+        "Deducir la excepción antes de la audiencia de control de acusación.",
+        "Acreditar la prescripción de la acción penal si corresponde.",
+        "Acreditar la atipicidad del hecho si no configura delito."
+      ],
+      "ejemplo_practico": "Denuncia por un hecho que constituye falta civil, no delito. El abogado deduce la excepción de improcedencia de acción.",
+      "limites": "La excepción no procede si el hecho prima facie configura delito.",
+      "tags": [
+        "excepción",
+        "improcedencia",
+        "5.1.a",
+        "prescripción"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-08",
+      "materia": "penal-procesal",
+      "principio": "Exclusión de la prueba ilícita",
+      "descripcion": "Exclusión de la prueba ilícita. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP art. VIII.2 Título Preliminar y art. 155.2",
+      "articulo": "NCPP art. VIII.2 TP: la prueba obtenida con violación de derechos fundamentales no produce efecto alguno. Art. 155.2: carece de efecto la prueba ilícita.",
+      "como_aplicarlo": [
+        "Solicitar la exclusión de la prueba obtenida con violación de derechos fundamentales.",
+        "Acreditar la ilicitud del medio (intervención ilegal, coacción, etc.).",
+        "Citar la doctrina del fruto del árbol envenenado (fruits of the poisonous tree)."
+      ],
+      "ejemplo_practico": "Escucha telefónica sin autorización judicial. El abogado solicita la exclusión de la prueba ilícita y de sus derivados.",
+      "limites": "La exclusión no procede si la prueba se obtuvo lícitamente o por fuente independiente.",
+      "tags": [
+        "prueba ilícita",
+        "exclusión",
+        "VIII.2",
+        "155.2"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-09",
+      "materia": "penal-procesal",
+      "principio": "Derecho a no autoincriminarse",
+      "descripcion": "Derecho a no autoincriminarse. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 71.2.c, 72 y 75 + Const. art. 2.24.h",
+      "articulo": "NCPP art. 71.2.c: el imputado tiene derecho a no autoincriminarse. Art. 75: derecho a abstenerse de declarar.",
+      "como_aplicarlo": [
+        "Informar al imputado de su derecho a no declarar y a no autoincriminarse.",
+        "Impugnar declaraciones obtenidas con coacción o sin asistencia legal.",
+        "Excluir cualquier declaración que viole este derecho."
+      ],
+      "ejemplo_practico": "Declaración del imputado obtenida sin abogado defensor. El abogado solicita su exclusión por violación al derecho de defensa y no autoincriminación.",
+      "limites": "El derecho no exime de la entrega de documentos que la ley exige.",
+      "tags": [
+        "autoincriminación",
+        "defensa",
+        "71",
+        "72",
+        "75"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-10",
+      "materia": "penal-procesal",
+      "principio": "Principio de contradicción en el juicio oral",
+      "descripcion": "Principio de contradicción en el juicio oral. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 356, 375 y 376",
+      "articulo": "NCPP art. 356: el juicio se rige por los principios de oralidad, publicidad, contradicción, inmediación y continuidad. Arts. 375-376: examen directo y contraexamen.",
+      "como_aplicarlo": [
+        "Ejercer el contraexamen de los testigos de la fiscalía.",
+        "Cuestionar la credibilidad de la prueba testimonial.",
+        "Solicitar la nulidad de actuaciones que no respeten la contradicción."
+      ],
+      "ejemplo_practico": "Testigo de la fiscalía no sometido a contraexamen. El abogado solicita que se preserve su derecho a interrogar.",
+      "limites": "La contradicción tiene límites procesales razonables.",
+      "tags": [
+        "contradicción",
+        "juicio oral",
+        "356",
+        "375",
+        "376"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-11",
+      "materia": "penal-procesal",
+      "principio": "Presunción de inocencia e in dubio pro reo en el juicio",
+      "descripcion": "Presunción de inocencia e in dubio pro reo en el juicio. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP art. II Título Preliminar y art. 159.3",
+      "articulo": "NCPP art. II TP: toda persona es considerada inocente mientras no se pruebe su culpabilidad. Art. 159.3: la duda razonable favorece al imputado.",
+      "como_aplicarlo": [
+        "Solicitar la absolución cuando la prueba de cargo no supere la duda razonable.",
+        "Impugnar sentencias condenatorias fundadas solo en presunciones.",
+        "Citar la presunción de inocencia en la etapa recursiva."
+      ],
+      "ejemplo_practico": "Condena basada en indicios débiles sin prueba directa. El abogado apela invocando in dubio pro reo.",
+      "limites": "La duda debe ser razonable; no cualquier duda especulativa.",
+      "tags": [
+        "inocencia",
+        "in dubio pro reo",
+        "II TP",
+        "159.3"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-12",
+      "materia": "penal-procesal",
+      "principio": "Apelación de sentencia penal",
+      "descripcion": "Apelación de sentencia penal. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP art. 405",
+      "articulo": "NCPP art. 405: la apelación contra sentencias se interpone en 5 días hábiles; contra autos en 3 días.",
+      "como_aplicarlo": [
+        "Interponer la apelación dentro del plazo (5 días hábiles para sentencias).",
+        "Fundamentar los agravios con precisión.",
+        "Ofrecer prueba nueva si corresponde (nulidad o error en valoración)."
+      ],
+      "ejemplo_practico": "Sentencia condenatoria. El abogado apela dentro de los 5 días hábiles alegando indebida valoración de la prueba.",
+      "limites": "El plazo es perentorio: 5 días hábiles (sentencias) y 3 (autos).",
+      "tags": [
+        "apelación",
+        "405",
+        "sentencia",
+        "plazo"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-13",
+      "materia": "penal-procesal",
+      "principio": "Casación penal y motivos taxativos",
+      "descripcion": "Casación penal y motivos taxativos. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 414, 417 y 429",
+      "articulo": "NCPP art. 414: la casación procede contra sentencias en 10 días hábiles. Art. 429: motivos taxativos (garantía, norma jurídica, doctrina jurisprudencial).",
+      "como_aplicarlo": [
+        "Verificar que el caso encaje en los motivos taxativos del art. 429.",
+        "Interponer la casación dentro de los 10 días hábiles.",
+        "Desarrollar la doctrina jurisprudencial propuesta."
+      ],
+      "ejemplo_practico": "Sentencia que aplica erróneamente una norma. El abogado interpone casación invocando el motivo de infracción normativa.",
+      "limites": "La casación no es una tercera instancia; solo procede por los motivos taxativos.",
+      "tags": [
+        "casación",
+        "414",
+        "429",
+        "motivos"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-14",
+      "materia": "penal-procesal",
+      "principio": "Recurso de queja",
+      "descripcion": "Recurso de queja. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 435 y 436",
+      "articulo": "NCPP art. 435: el recurso de queja procede contra la denegación de apelación o casación. Art. 436: trámite.",
+      "como_aplicarlo": [
+        "Interponer la queja cuando se deniegue indebidamente la apelación o casación.",
+        "Fundamentar la procedencia del recurso denegado.",
+        "Solicitar que el superior conozca el recurso denegado."
+      ],
+      "ejemplo_practico": "El juez deniega la apelación. El abogado interpone queja ante la Sala Superior.",
+      "limites": "La queja no sustituye el recurso denegado; solo revisa la denegatoria.",
+      "tags": [
+        "queja",
+        "435",
+        "436",
+        "recurso"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-15",
+      "materia": "penal-procesal",
+      "principio": "Redención de pena por trabajo o estudio",
+      "descripcion": "Redención de pena por trabajo o estudio. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "D.Leg. 654 arts. 44-46",
+      "articulo": "D.Leg. 654 art. 44: por cada 2 días de trabajo o estudio se redime 1 día de pena (hasta el límite legal).",
+      "como_aplicarlo": [
+        "Acreditar el trabajo o estudio del interno.",
+        "Solicitar la redención de pena ante el juez de ejecución.",
+        "Calcular correctamente los días redimidos."
+      ],
+      "ejemplo_practico": "Interno que trabaja 200 días. El abogado solicita la redención de 100 días de pena.",
+      "limites": "La redención no procede para todos los delitos (excluidos los graves con ciertos límites).",
+      "tags": [
+        "redención",
+        "654",
+        "trabajo",
+        "estudio",
+        "ejecución"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-16",
+      "materia": "penal-procesal",
+      "principio": "Semilibertad y libertad condicional",
+      "descripcion": "Semilibertad y libertad condicional. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "D.Leg. 654 arts. 48, 50 y 51 + CP arts. 52-53",
+      "articulo": "D.Leg. 654 art. 48: la semilibertad procede cuando el interno ha cumplido la tercera parte de la pena. Arts. 50-51: libertad condicional.",
+      "como_aplicarlo": [
+        "Verificar que el interno cumplió la fracción de pena requerida.",
+        "Solicitar la semilibertad o libertad condicional ante el juez de ejecución.",
+        "Acreditar buena conducta y el plan de reinserción."
+      ],
+      "ejemplo_practico": "Interno con pena de 6 años que cumplió 2 años (tercera parte). El abogado solicita la semilibertad.",
+      "limites": "No procede para delitos graves específicos (art. 51 regula exclusiones).",
+      "tags": [
+        "semilibertad",
+        "libertad condicional",
+        "654",
+        "ejecución"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-17",
+      "materia": "penal-procesal",
+      "principio": "Habeas corpus contra detención arbitraria",
+      "descripcion": "Habeas corpus contra detención arbitraria. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "Const. art. 200.1 + Ley 31307",
+      "articulo": "Const. art. 200.1: el habeas corpus procede ante detención arbitraria, vulneración del derecho a la libertad individual o del debido proceso.",
+      "como_aplicarlo": [
+        "Identificar la detención arbitraria (exceso de plazo, falta de flagrancia, etc.).",
+        "Interponer el habeas corpus sin necesidad de agotar vías previas.",
+        "Solicitar la libertad inmediata o la corrección de la situación."
+      ],
+      "ejemplo_practico": "Detención preliminar sin los presupuestos legales. El abogado interpone habeas corpus y obtiene la libertad.",
+      "limites": "El habeas corpus no sustituye la defensa penal ordinaria.",
+      "tags": [
+        "habeas corpus",
+        "detención",
+        "200.1",
+        "31307"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-18",
+      "materia": "penal-procesal",
+      "principio": "Ne bis in idem (prohibición de doble juzgamiento)",
+      "descripcion": "Ne bis in idem (prohibición de doble juzgamiento). Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "Const. art. 139.13 + NCPP art. 5.1.c + CP art. 78",
+      "articulo": "Const. art. 139.13: nadie puede ser privado del derecho a la defensa ni juzgado dos veces por el mismo hecho. NCPP art. 5.1.c: excepción de cosa juzgada.",
+      "como_aplicarlo": [
+        "Deducir la excepción de cosa juzgada si el hecho ya fue juzgado.",
+        "Acreditar la triple identidad: sujeto, hecho y fundamento.",
+        "Impugnar el nuevo proceso por violación al ne bis in idem."
+      ],
+      "ejemplo_practico": "Persona absuelta por un hecho que luego se vuelve a perseguir. El abogado deduce la excepción de cosa juzgada.",
+      "limites": "No aplica cuando el primer proceso terminó por razones formales sin pronunciamiento de fondo.",
+      "tags": [
+        "ne bis in idem",
+        "cosa juzgada",
+        "139.13",
+        "5.1.c"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-19",
+      "materia": "penal-procesal",
+      "principio": "Plazo razonable y derecho a ser juzgado sin dilaciones",
+      "descripcion": "Plazo razonable y derecho a ser juzgado sin dilaciones. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "Const. arts. 139.3 y 2.24.d + NCPP art. I TP",
+      "articulo": "Const. art. 139.3: derecho a la tutela jurisdiccional efectiva y al plazo razonable. NCPP art. I TP: la justicia penal se imparte con celeridad.",
+      "como_aplicarlo": [
+        "Invocar el plazo razonable cuando la investigación o el proceso se dilata indebidamente.",
+        "Solicitar la cesación de la prisión preventiva por exceso de plazo.",
+        "Interponer queja por dilación indebida."
+      ],
+      "ejemplo_practico": "Proceso penal de 5 años sin sentencia por causas imputables al sistema. El abogado invoca la vulneración del plazo razonable.",
+      "limites": "La complejidad del caso puede justificar plazos mayores.",
+      "tags": [
+        "plazo razonable",
+        "dilación",
+        "139.3",
+        "celeridad"
+      ],
+      "necesita_revision_humana": true
+    },
+    {
+      "id": "PEN-P-20",
+      "materia": "penal-procesal",
+      "principio": "Nulidad de actos procesales sin defensa",
+      "descripcion": "Nulidad de actos procesales sin defensa. Interpretación favorable a la defensa en el proceso penal peruano.",
+      "base_legal": "NCPP arts. 71, 72, 150 y 155",
+      "articulo": "NCPP art. 71: derechos del imputado. Art. 150: nulidad de la prueba. Art. 155: nulidad de actuaciones que violen derechos fundamentales.",
+      "como_aplicarlo": [
+        "Solicitar la nulidad de actuaciones realizadas sin defensa técnica.",
+        "Impugnar actos que violen el derecho a la defensa.",
+        "Solicitar la reposición del procedimiento al estado anterior."
+      ],
+      "ejemplo_practico": "Declaración del imputado sin abogado defensor. El abogado solicita la nulidad de esa actuación.",
+      "limites": "La nulidad no procede por defectos formales subsanables.",
+      "tags": [
+        "nulidad",
+        "defensa",
+        "71",
+        "150",
+        "155"
+      ],
+      "necesita_revision_humana": true
+    }
+  ],
+  "estadisticas": {
+    "total_interpretaciones": 54,
+    "materias": 6,
+    "por_materia": {
+      "laboral": 6,
+      "tributario": 7,
+      "consumidor": 5,
+      "penal": 6,
+      "procesal-civil": 5,
+      "constitucional": 5
+    },
+    "todas_marcan_necesita_revision_humana": true
+  },
+  "changelog_1_1_0": "Añadidas 20 interpretaciones penal-procesales (PEN-P-01..20) + aplicadas 4 correcciones del abogado-senior-penal (C-1 TRIB-04, C-2 PEN-04, C-3 CIV-04, C-4 CIV-05)."
+}

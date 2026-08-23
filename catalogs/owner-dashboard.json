@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "descripcion": "Catálogo único del Owner Dashboard. Centraliza variables, planes, KPIs, eventos y acciones del SaaS Admin.",
+  "aplicacion": "legalpro-owner-dashboard/",
+  "puerto": 3005,
+  "stack": "Node 20 + Express 5 + PostgreSQL + E2EE (PBKDF2 100k + AES-256-GCM)",
+
+  "autenticacion": {
+    "tipo": "Bearer Token + Frase de descifrado E2EE",
+    "header": "Authorization: Bearer <OWNER_SECRET_KEY>",
+    "campos_login": {
+      "owner_key": "OWNER_SECRET_KEY (server-side, en variable de entorno)",
+      "decrypt_phrase": "Frase de descifrado local (nunca se envía al servidor, solo se usa en el navegador del owner con Web Crypto API)"
+    },
+    "nivel_seguridad": "ALTO",
+    "consideraciones": [
+      "OWNER_SECRET_KEY debe >= 32 chars",
+      "OWNER_DECRYPTION_SECRET debe ser aleatorio y nunca commiteado",
+      "Frase de descifrado NUNCA se transmite (E2EE real)",
+      "Sesion se almacena en sessionStorage (se limpia al cerrar tab)"
+    ],
+    "mejoras_recomendadas": [
+      "Migrar de Bearer token a JWT con expiracion",
+      "Implementar MFA con TOTP",
+      "Rate limit por IP",
+      "Audit log de cada login con IP + timestamp"
+    ]
+  },
+
+  "variables_entorno": [
+    {
+      "nombre": "OWNER_SECRET_KEY",
+      "proposito": "Server-side token del owner",
+      "requerida": true,
+      "secret": true,
+      "validacion": ">= 32 chars, base64",
+      "ejemplo_enmascarado": "LegalProOwnerSecret2026_***"
+    },
+    {
+      "nombre": "OWNER_DECRYPTION_SECRET",
+      "proposito": "Frase para cifrado E2EE (server cifra, owner descifra en navegador)",
+      "requerida": true,
+      "secret": true,
+      "validacion": ">= 16 chars",
+      "ejemplo_enmascarado": "LegalProOwnerDecryptionPassword***"
+    },
+    {
+      "nombre": "DATABASE_URL",
+      "proposito": "Connection string PostgreSQL",
+      "requerida": true,
+      "secret": true,
+      "validacion": "postgresql://"
+    },
+    {
+      "nombre": "PORT",
+      "proposito": "Puerto del dashboard",
+      "requerida": false,
+      "default": "3005",
+      "secret": false
+    }
+  ],
+
+  "kpis_monitoreados": [
+    {
+      "id": "kpi-costo-total",
+      "nombre": "Costo Total Acumulado (USD)",
+      "tabla_origen": "consumo_tokens_ia",
+      "campo": "SUM(costo_usd)",
+      "monedas_soportadas": ["USD", "PEN"],
+      "impuesto_calculado": true,
+      "alerta_spike": "> $500/mes"
+    },
+    {
+      "id": "kpi-peticiones-totales",
+      "nombre": "Total de Peticiones IA",
+      "tabla_origen": "consumo_tokens_ia",
+      "campo": "COUNT(*)"
+    },
+    {
+      "id": "kpi-costo-mes",
+      "nombre": "Costo del Mes Actual (USD)",
+      "tabla_origen": "consumo_tokens_ia",
+      "filtro": "created_at >= DATE_TRUNC('month', CURRENT_DATE)"
+    },
+    {
+      "id": "kpi-tokens-mes",
+      "nombre": "Tokens Consumidos este Mes",
+      "tabla_origen": "consumo_tokens_ia",
+      "campo": "SUM(total_tokens)",
+      "filtro": "mes actual"
+    },
+    {
+      "id": "kpi-consumo-tenants",
+      "nombre": "Consumo por Organización (Tenant)",
+      "tabla_origen": "organizaciones LEFT JOIN consumo_tokens_ia",
+      "orden": "DESC por costo_total_usd",
+      "uso": "Identificar top-N tenants que consumen más"
+    },
+    {
+      "id": "kpi-consumo-diario",
+      "nombre": "Consumo Diario (últimos 30 días)",
+      "tabla_origen": "consumo_tokens_ia",
+      "campo": "DATE(created_at) + SUM(total_tokens) + SUM(costo_usd) + COUNT(*)",
+      "uso": "Detectar anomalías o picos"
+    },
+    {
+      "id": "kpi-consumo-modelos",
+      "nombre": "Consumo por Modelo IA",
+      "tabla_origen": "consumo_tokens_ia",
+      "campo": "modelo + SUM + COUNT",
+      "uso": "Optimizar uso de modelos (Pro vs Flash vs Flash Lite)"
+    }
+  ],
+
+  "acciones_owner": [
+    {
+      "id": "OWNER_ACTION_SUSPEND_TENANT",
+      "severidad": "HIGH",
+      "requiere_2fa": true,
+      "requiere_segundo_owner": true,
+      "cooling_period_dias": 7,
+      "notificacion_previa_dias": 7,
+      "audit_event": "OWNER_ACTION",
+      "rollback_permitido": true
+    },
+    {
+      "id": "OWNER_ACTION_REACTIVATE_TENANT",
+      "severidad": "MEDIUM",
+      "requiere_2fa": false,
+      "audit_event": "OWNER_ACTION",
+      "rollback_permitido": true
+    },
+    {
+      "id": "OWNER_ACTION_CHANGE_PLAN",
+      "severidad": "MEDIUM",
+      "requiere_2fa": true,
+      "audit_event": "OWNER_ACTION",
+      "validacion": "Tenant debe consentir cambio si downgrade"
+    },
+    {
+      "id": "OWNER_ACTION_DELETE_TENANT",
+      "severidad": "CRITICAL",
+      "requiere_2fa": true,
+      "requiere_segundo_owner": true,
+      "requiere_aprobacion_legal": true,
+      "audit_event": "OWNER_ACTION",
+      "soft_delete": true,
+      "retention_dias": 1825,
+      "rollback_permitido": false
+    },
+    {
+      "id": "OWNER_ACTION_REFUND",
+      "severidad": "HIGH",
+      "requiere_2fa": true,
+      "audit_event": "OWNER_ACTION",
+      "monto_maximo_sin_2do_owner": 100
+    },
+    {
+      "id": "OWNER_ACTION_VIEW_PII",
+      "severidad": "CRITICAL",
+      "requiere_2fa": true,
+      "requiere_aprobacion_legal": true,
+      "audit_event": "OWNER_ACTION",
+      "motivo_obligatorio": true,
+      "alerta": "Slack #lpdp + email CISO"
+    }
+  ],
+
+  "alertas": [
+    {
+      "id": "OWNER_ALERT_COST_SPIKE",
+      "condicion": "costo_mes_actual > 2 * promedio_3_meses",
+      "severidad": "HIGH",
+      "canal": "Slack #ops + email",
+      "responsable": "@PlataformaFinanzas"
+    },
+    {
+      "id": "OWNER_ALERT_QUOTA_EXCEEDED",
+      "condicion": "tenant.costo_mes > tenant.plan.max_costo_mes",
+      "severidad": "MEDIUM",
+      "canal": "Slack #ops",
+      "responsable": "@PlataformaFinanzas"
+    },
+    {
+      "id": "OWNER_ALERT_BREACH",
+      "condicion": "tenant reporta breach o verifier detecta",
+      "severidad": "CRITICAL",
+      "canal": "Slack #lpdp + email CISO + ANPDP en <=5dias",
+      "responsable": "@GobernanzaChief + @AuditorLPDP"
+    },
+    {
+      "id": "OWNER_ALERT_SUSPICIOUS_TENANT",
+      "condicion": "consumo anómalo (> 5x del promedio del plan)",
+      "severidad": "HIGH",
+      "canal": "Slack #security + bloquear automáticamente",
+      "responsable": "@OwnerAdmin + @AuditorSeguridad"
+    }
+  ],
+
+  "currency_support": {
+    "monedas": ["USD", "PEN"],
+    "tipo_cambio": "BCRP API (https://estadisticas.bcrp.gob.pe/estadisticas/series/api/)",
+    "cache_ttl_segundos": 3600,
+    "impuesto_default": "IGV 18% (Perú)",
+    "configuracion": "Selector en UI del owner"
+  },
+
+  "criptografia": {
+    "algoritmo_cifrado": "AES-256-GCM",
+    "algoritmo_kdf": "PBKDF2 con SHA-256",
+    "iteraciones_pbkdf2": 100000,
+    "iv_length_bytes": 12,
+    "salt_length_bytes": 16,
+    "tag_length_bits": 128,
+    "key_length_bits": 256,
+    "implementacion": {
+      "backend": "Node crypto (nativo)",
+      "frontend": "Web Crypto API (SubtleCrypto)"
+    },
+    "compatibilidad": "Probada con `crypto.test.js` (3 casos)",
+    "estandar": "NIST SP 800-38D, NIST SP 800-132"
+  },
+
+  "compliance": {
+    "LPDP": {
+      "datos_accesibles_owner": "Solo agregados (costos, KPIs)",
+      "PII_accesible_owner": "NO directamente - requiere proceso legal",
+      "consentimientos_obligatorios": ["marketing", "transferencia_internacional"],
+      "ARCO_aplicable_a_owner": "Owner NO procesa ARCO - delega a soporte@legalpro.pe"
+    },
+    "OWASP": {
+      "A01_Broken_Access_Control": "Solo el owner autenticado ve datos",
+      "A02_Cryptographic_Failures": "E2EE + PBKDF2 fuerte",
+      "A03_Injection": "Queries parametrizadas con pg",
+      "A07_Auth_Failures": "Token bearer + frase E2EE",
+      "A09_Logging_Failures": "Serilog/console + audit (futuro)"
+    },
+    "auditoria_externa": "Pendiente: pentest anual, SOC 2 Type II"
+  }
+}

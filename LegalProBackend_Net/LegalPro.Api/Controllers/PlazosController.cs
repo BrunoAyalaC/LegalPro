@@ -16,7 +16,7 @@ public class PlazosController : ControllerBase
 
     /// <summary>
     /// Calcula plazos procesales según CPC (art. 147, 360) y NCPP (art. 414).
-    /// Lógica pura en memoria — sin llamada a Gemini, respuesta inmediata.
+    /// Lógica pura en memoria — sin llamada al proveedor IA, respuesta inmediata.
     /// </summary>
     [HttpPost("calcular")]
     public async Task<IActionResult> Calcular([FromBody] CalcularPlazosQuery query, CancellationToken ct)

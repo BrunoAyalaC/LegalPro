@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using Microsoft.EntityFrameworkCore;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Entities;
@@ -12,13 +13,14 @@ namespace LegalPro.Application.Documentos.Commands;
 // expediente validando multi-tenancy.
 // ═══════════════════════════════════════════════════════
 
-public class CrearDocumentoCommand : IRequest<DocumentoCreadoDto>
+public class CrearDocumentoCommand : IRequest<DocumentoCreadoDto>, ITenantRequest
 {
     public string Titulo { get; set; } = string.Empty;
     public string? Contenido { get; set; }
     public string? Url { get; set; }
     public string Tipo { get; set; } = "escrito";
     public Guid ExpedienteId { get; set; }
+    public Guid OrganizationId { get; set; }
 }
 
 public record DocumentoCreadoDto(
@@ -84,7 +86,9 @@ public class CrearDocumentoHandler : IRequestHandler<CrearDocumentoCommand, Docu
             documento.Url,
             documento.Tipo,
             documento.ExpedienteId,
-            documento.OrganizationId,
+            // OrganizationId es Guid? en la entidad; el DTO expone Guid (no-null).
+            // El factory Crear exige organizationId != Guid.Empty, así que .Value es seguro.
+            documento.OrganizationId!.Value,
             documento.CreatedAt);
     }
 }

@@ -1,11 +1,19 @@
 import { useState } from 'react';
 import AppIcon from '../components/AppIcon';
 import Header from '../components/Header';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import EmptyState from '../components/EmptyState';
 import sinResultadosImg from '../assets/empty-states/sin_resultados.png';
+import sinResultadosWebp from '../assets/empty-states/sin_resultados.webp';
 import { api } from '../api/client';
+import { useSeo } from '../hooks/useSeo';
 
 export default function BuscadorJurisprudencia() {
+  useSeo({
+    title: 'Buscador de Jurisprudencia IA | LegalPro',
+    description: 'Buscador jurisprudencial semántico de casaciones, amparos y precedentes vinculantes de la Corte Suprema y Tribunal Constitucional del Perú.',
+  });
+
   const [buscar, setBuscar] = useState('');
   const [loading, setLoading] = useState(false);
   const [resultados, setResultados] = useState(null);
@@ -16,8 +24,23 @@ export default function BuscadorJurisprudencia() {
     setLoading(true);
     setError('');
     try {
+      // Node GET /api/ai/jurisprudencia?q= devuelve { resultados: [...], query, rama, provider }.
+      // Se mapean los campos del backend (tribunal/numero/año/relevancia/resumen)
+      // a los que renderiza esta página (tipo/numero/titulo/fecha/sala).
       const data = await api.consulta(buscar, 'jurisprudencia');
-      setResultados(data.resultado);
+      const resultadosNode = Array.isArray(data?.resultados) ? data.resultados : null;
+      setResultados(
+        resultadosNode
+          ? resultadosNode.map(r => ({
+              tipo: r.relevancia || r.tipo || 'Jurisprudencia',
+              numero: r.numero || '',
+              titulo: r.tribunal || r.titulo || (r.numero ? `Casación ${r.numero}` : 'Jurisprudencia'),
+              fecha: r.año || r.fecha || '',
+              sala: r.tribunal || r.sala || '',
+              resumen: r.resumen || '',
+            }))
+          : (typeof data?.resultado === 'string' ? data.resultado : null)
+      );
     } catch {
       setError('Error al conectar con el servidor');
       setResultados(null);
@@ -36,6 +59,9 @@ export default function BuscadorJurisprudencia() {
       <Header title="Buscador Jurisprudencial" showBack rightAction={<AppIcon name="gavel" size={20} />} />
 
       <div className="px-4 py-3 space-y-4">
+        {/* LPDP Art.21: disclaimer obligatorio, no dismissible (regla dura #10) */}
+        <IADisclaimerBanner variant="general" dismissible={false} />
+
         <div className="flex gap-2">
           <div className="relative flex-1">
             <AppIcon name="search" size={20} />
@@ -68,7 +94,7 @@ export default function BuscadorJurisprudencia() {
 
       {/* Skeletons de carga */}
       {loading && (
-        <main className="px-4 space-y-3 pb-28">
+        <main className="px-4 space-y-3 pb-28 lg:pb-8">
           {[1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
               <div className="h-4 bg-surface-dark rounded w-1/3 mb-2" />
@@ -84,6 +110,7 @@ export default function BuscadorJurisprudencia() {
       {!loading && resultados !== null && !resultadosArray && !resultadoTexto && (
         <EmptyState
           image={sinResultadosImg}
+          imageWebp={sinResultadosWebp}
           title="Sin resultados"
           description={`No se encontraron resultados para "${buscar}". Intenta con otros términos.`}
         />
@@ -91,7 +118,7 @@ export default function BuscadorJurisprudencia() {
 
       {/* Resultados como array */}
       {!loading && resultadosArray && resultadosArray.length > 0 && (
-        <main className="px-4 space-y-3 pb-28">
+        <main className="px-4 space-y-3 pb-28 lg:pb-8">
           <div className="flex items-center justify-between pt-2">
             <span className="text-sm font-semibold uppercase tracking-wider text-slate-400">Resultados ({resultadosArray.length})</span>
             <button className="text-xs font-medium text-primary flex items-center gap-1"><AppIcon name="tune" size={20} /> Ordenar</button>
@@ -122,14 +149,14 @@ export default function BuscadorJurisprudencia() {
 
       {/* Resultado como texto libre */}
       {!loading && resultadoTexto && (
-        <main className="px-4 space-y-3 pb-28 pt-2">
+        <main className="px-4 space-y-3 pb-28 lg:pb-8 pt-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold uppercase tracking-wider text-slate-400">Resultados</span>
           </div>
           <article className="card hover:border-primary/50">
             <div className="flex items-center gap-2 mb-3">
               <AppIcon name="auto_awesome" size={20} />
-              <span className="text-xs font-bold text-primary">Análisis Gemini</span>
+              <span className="text-xs font-bold text-primary">Análisis IA</span>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{resultadoTexto}</p>
           </article>
@@ -140,6 +167,7 @@ export default function BuscadorJurisprudencia() {
       {!loading && resultados === null && (
         <EmptyState
           image={sinResultadosImg}
+          imageWebp={sinResultadosWebp}
           title="Busca jurisprudencia"
           description="Ingresa una palabra clave o número de expediente para buscar."
         />

@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Enums;
 using LegalPro.Domain.Exceptions;
@@ -14,12 +15,13 @@ namespace LegalPro.Application.Expedientes.Commands;
 // Tenant isolation: filtra por Id + OrganizationId (OWASP A01).
 // ═══════════════════════════════════════════════════════
 
-public class ActualizarExpedienteCommand : IRequest<ActualizarExpedienteResult>
+public class ActualizarExpedienteCommand : IRequest<ActualizarExpedienteResult>, ITenantRequest
 {
     public Guid Id { get; set; }
     public string? Titulo { get; set; }
     public string? Estado { get; set; }
     public bool? EsUrgente { get; set; }
+    public Guid OrganizationId { get; set; }
 }
 
 public record ActualizarExpedienteResult(
@@ -103,7 +105,9 @@ public class ActualizarExpedienteCommandHandler : IRequestHandler<ActualizarExpe
             expediente.Tipo.ToString(),
             expediente.Estado.ToString(),
             expediente.EsUrgente,
-            expediente.OrganizationId,
+            // OrganizationId es Guid? en la entidad; el DTO expone Guid (no-null).
+            // El filtro de tenant en Where garantiza no-null en la fila retornada.
+            expediente.OrganizationId!.Value,
             expediente.UpdatedAt);
     }
 }

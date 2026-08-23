@@ -3,9 +3,13 @@ import AppIcon from '../components/AppIcon';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import EmptyState from '../components/EmptyState';
-import api from '../api/client';
+import { nodeClient } from '../api/client';
 import { exportToExcel } from '../utils/documents';
 import sinExpedientesImg from '../assets/empty-states/sin_expedientes.png';
+import sinExpedientesWebp from '../assets/empty-states/sin_expedientes.webp';
+import { useSeo } from '../hooks/useSeo';
+
+const PAGE_SIZE = 10;
 
 export default function Expedientes() {
   const [expedientes, setExpedientes] = useState([]);
@@ -13,8 +17,10 @@ export default function Expedientes() {
   const [buscar, setBuscar] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [fetchError, setFetchError] = useState('');
+  const [page, setPage] = useState(1);
 
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);         // null=crear, string=editar
   const [exportLoading, setExportLoading] = useState(false);
   const [formData, setFormData] = useState({
     numero: '',
@@ -27,14 +33,33 @@ export default function Expedientes() {
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  const cargarExpedientes = () => {
+  const [totalExp, setTotalExp] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const cargarExpedientes = (signal) => {
     setFetchError('');
-    const params = {};
+    const params = { page, pageSize: PAGE_SIZE };
     if (filtro !== 'todos') params.tipo = filtro;
     if (buscar) params.buscar = buscar;
-    api.getExpedientes(params)
-      .then(data => { setExpedientes(data); setLoaded(true); })
-      .catch(() => {
+    nodeClient
+      .get('/api/expedientes', { params, signal })
+      .then(res => {
+        const data = res.data?.data ?? res.data;
+        const items = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.expedientes)
+            ? data.expedientes
+            : [];
+        setExpedientes(items);
+        setTotalExp(data?.total ?? data?.totalCount ?? items.length);
+        setTotalPages(data?.totalPages ?? Math.max(1, Math.ceil((data?.total ?? items.length) / PAGE_SIZE)));
+        setLoaded(true);
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError' || err?.code === 'ERR_CANCELED') return;
         setExpedientes([]);
         setFetchError('No se pudieron cargar los expedientes. Intenta de nuevo más tarde.');
         setLoaded(true);
@@ -42,8 +67,19 @@ export default function Expedientes() {
   };
 
   useEffect(() => {
-    cargarExpedientes();
+    const controller = new AbortController();
+    cargarExpedientes(controller.signal);
+    return () => controller.abort();
+  }, [filtro, buscar, page]);
+
+  useEffect(() => {
+    setPage(1);
   }, [filtro, buscar]);
+
+  useSeo({
+    title: 'Mis Expedientes Judiciales | LegalPro',
+    description: 'Administra y organiza tus expedientes judiciales. Filtra por materias, controla plazos y prioridades, y accede a herramientas de IA.',
+  });
 
   const tipos = ['todos', 'penal', 'civil', 'laboral', 'constitucional', 'familia'];
   const tipoIcons = { penal: 'gavel', civil: 'balance', laboral: 'work', constitucional: 'account_balance', familia: 'family_restroom', administrativo: 'apartment' };
@@ -71,24 +107,68 @@ export default function Expedientes() {
     setSubmitLoading(true);
     setFormErrors(prev => ({ ...prev, general: '' }));
     try {
-      await api.createExpediente(formData);
+      if (editingId) {
+        await nodeClient.patch(`/api/expedientes/${editingId}`, formData);
+      } else {
+        await nodeClient.post('/api/expedientes', formData);
+      }
       setShowModal(false);
+      setEditingId(null);
       setFormData({ numero: '', titulo: '', tipo: 'penal', juzgado: '', estado: 'activo', prioridad: 'media' });
       cargarExpedientes();
-    } catch {
-      setFormErrors(prev => ({ ...prev, general: 'Error al crear el expediente. Intenta de nuevo.' }));
+    } catch (err) {
+      const msg = err?.response?.data?.error || (editingId ? 'Error al actualizar el expediente. Intenta de nuevo.' : 'Error al crear el expediente. Intenta de nuevo.');
+      setFormErrors(prev => ({ ...prev, general: msg }));
     } finally {
       setSubmitLoading(false);
     }
   };
 
+  const handleEditClick = (exp) => {
+    setEditingId(exp.id);
+    setFormData({
+      numero: exp.numero || '',
+      titulo: exp.titulo || '',
+      tipo: exp.tipo || 'penal',
+      juzgado: exp.juzgado || '',
+      estado: exp.estado || 'activo',
+      prioridad: exp.prioridad || 'media',
+    });
+    setFormErrors({});
+    setShowModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      await nodeClient.delete(`/api/expedientes/${deleteTarget.id}`);
+      setShowDeleteConfirm(false);
+      setDeleteTarget(null);
+      if (page > 1 && expedientes.length === 1) {
+        setPage(p => p - 1);
+      } else {
+        cargarExpedientes();
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.error || 'Error al eliminar el expediente. Intenta de nuevo.';
+      setFetchError(msg);
+      setShowDeleteConfirm(false);
+      setDeleteTarget(null);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const filtrados = expedientes;
+  const safePage = Math.min(page, totalPages);
 
   return (
     <div className="page-enter">
       <Header title="Mis Expedientes" rightAction={
         <div className="flex items-center gap-2">
           <button 
+            id="btn-exportar-expedientes-excel"
             onClick={async () => {
               if (!filtrados.length) return;
               setExportLoading(true);
@@ -119,22 +199,22 @@ export default function Expedientes() {
               <AppIcon name="table_chart" size={18} />
             )}
           </button>
-          <button onClick={() => setShowModal(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white"><AppIcon name="add" size={20} /></button>
+          <button id="btn-nuevo-expediente-header" onClick={() => setShowModal(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white"><AppIcon name="add" size={20} /></button>
         </div>
       } />
 
       {/* Search */}
-      <div className="px-4 py-3">
+      <div className="px-4 py-3 max-w-5xl mx-auto w-full">
         <div className="relative">
-          <AppIcon name="search" size={20} />
-          <input value={buscar} onChange={e => setBuscar(e.target.value)} className="input pl-10" placeholder="Buscar por N° o título..." />
+          <AppIcon name="search" size={20} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-60" />
+          <input id="input-buscar-expediente" value={buscar} onChange={e => setBuscar(e.target.value)} className="input pl-10 w-full" placeholder="Buscar por N° o título..." />
         </div>
       </div>
 
       {/* Filter Chips */}
-      <div className="flex gap-2 px-4 pb-3 overflow-x-auto no-scrollbar">
+      <div className="flex gap-2 px-4 pb-3 max-w-5xl mx-auto w-full overflow-x-auto no-scrollbar">
         {tipos.map(t => (
-          <button key={t} onClick={() => setFiltro(t)}
+          <button key={t} id={`btn-filtro-tipo-${t}`} onClick={() => setFiltro(t)}
             className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold border transition-colors ${filtro === t ? 'bg-primary/20 text-primary border-primary/30' : 'bg-surface-dark text-slate-400 border-border-dark'}`}>
             {t === 'todos' ? 'Todos' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
@@ -151,7 +231,7 @@ export default function Expedientes() {
 
       {filtrados.length > 0 && (
         <div className="px-4 flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Resultados ({filtrados.length})</span>
+          <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Resultados ({totalExp})</span>
         </div>
       )}
 
@@ -159,34 +239,125 @@ export default function Expedientes() {
       {loaded && filtrados.length === 0 ? (
         <EmptyState
           image={sinExpedientesImg}
+          imageWebp={sinExpedientesWebp}
           title="Sin expedientes"
           description="No tienes expedientes registrados. Crea tu primer caso para comenzar."
           action={
-            <button onClick={() => setShowModal(true)} className="btn btn-primary">
+            <button id="btn-nuevo-expediente-empty" onClick={() => setShowModal(true)} className="btn btn-primary">
               <AppIcon name="add" size={20} /> Nuevo Expediente
             </button>
           }
         />
       ) : (
-        <div className="px-4 space-y-3">
+        <div className="px-4 space-y-3 pb-24 lg:pb-6 max-w-5xl mx-auto w-full">
           {filtrados.map((exp, i) => (
-            <Link key={exp.id} to={`/expediente/${exp.id}`}
-              className="card flex gap-3 items-start active:scale-[0.98] transition-transform anim-fade-in-up"
-              style={{ animationDelay: `${i * 0.05}s`, opacity: 0 }}>
-              <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <AppIcon name={tipoIcons[exp.tipo] || 'folder'} size={28} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`badge ${estadoColors[exp.estado] || 'badge-primary'}`}>{exp.estado?.replace('_', ' ')}</span>
-                  <div className={`w-2 h-2 rounded-full ${prioridadColors[exp.prioridad] || 'bg-slate-500'}`}></div>
+            <div key={exp.id}
+              className="expediente-row card flex flex-row gap-3 items-center py-3 anim-fade-in-up group"
+              style={{ animationDelay: `${i * 0.05}s` }}>
+              <Link to={`/expediente/${exp.id}`}
+                id={`link-expediente-${exp.id}`}
+                className="flex gap-3 items-start flex-1 min-w-0 active:scale-[0.98] transition-transform">
+                <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <AppIcon name={tipoIcons[exp.tipo] || 'folder'} size={28} />
                 </div>
-                <p className="font-bold text-sm leading-tight truncate">{exp.titulo}</p>
-                <p className="text-xs text-slate-500 mt-0.5">Exp. {exp.numero} • {exp.juzgado}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`badge ${estadoColors[exp.estado] || 'badge-primary'}`}>{exp.estado?.replace('_', ' ')}</span>
+                    <div className={`w-2 h-2 rounded-full ${prioridadColors[exp.prioridad] || 'bg-slate-500'}`}></div>
+                  </div>
+                  <p className="font-bold text-sm leading-tight truncate">{exp.titulo}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Exp. {exp.numero} • {exp.juzgado}</p>
+                </div>
+              </Link>
+              <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <button
+                  id={`btn-editar-expediente-${exp.id}`}
+                  onClick={(e) => { e.preventDefault(); handleEditClick(exp); }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 transition-colors"
+                  title="Editar expediente"
+                >
+                  <AppIcon name="edit" size={15} />
+                </button>
+                <button
+                  id={`btn-eliminar-expediente-${exp.id}`}
+                  onClick={(e) => { e.preventDefault(); setDeleteTarget(exp); setShowDeleteConfirm(true); }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition-colors"
+                  title="Eliminar expediente"
+                >
+                  <AppIcon name="delete" size={15} />
+                </button>
               </div>
-              <AppIcon name="chevron_right" size={20} />
-            </Link>
+              <AppIcon name="chevron_right" size={20} className="text-slate-500 shrink-0" />
+            </div>
           ))}
+
+          {/* Paginación */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 pb-6">
+              <button
+                id="btn-pagina-anterior"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-dark border border-border-dark text-sm text-slate-300 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                <AppIcon name="chevron_left" size={16} />
+                Anterior
+              </button>
+
+              <span className="text-xs text-slate-500 font-medium">
+                Página {safePage} de {totalPages}
+                <span className="ml-2 text-slate-600">({totalExp} resultados)</span>
+              </span>
+
+              <button
+                id="btn-pagina-siguiente"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-dark border border-border-dark text-sm text-slate-300 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                Siguiente
+                <AppIcon name="chevron_right" size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Modal de Confirmación de Eliminación */}
+      {showDeleteConfirm && deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+          <div className="bg-[#0f0f16] border border-red-500/20 rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="px-5 py-4 border-b border-border-dark">
+              <h2 className="text-base font-bold text-white">Eliminar Expediente</h2>
+            </div>
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-slate-300 leading-relaxed">
+                ¿Estás seguro de eliminar el expediente <strong className="text-white">{deleteTarget.titulo}</strong> (Exp. {deleteTarget.numero})?
+              </p>
+              <ul className="text-xs text-slate-400 list-disc pl-4 space-y-1">
+                <li>Esta acción no se puede deshacer.</li>
+                <li>Se eliminarán todos los documentos y datos asociados.</li>
+              </ul>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => { setShowDeleteConfirm(false); setDeleteTarget(null); }}
+                  disabled={deleteLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-white/5 text-slate-300 text-xs font-bold border border-white/10 hover:bg-white/10 transition-colors disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={deleteLoading}
+                  className="flex-1 py-2.5 rounded-xl bg-red-500/15 text-red-400 text-xs font-bold border border-red-500/25 hover:bg-red-500/25 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {deleteLoading ? (
+                    <><span className="inline-block w-4 h-4 rounded-full border-2 border-red-400/30 border-t-red-400 animate-spin" /> Eliminando...</>
+                  ) : 'Sí, eliminar'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -195,8 +366,8 @@ export default function Expedientes() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
           <div className="bg-[#0f0f16] border border-border-dark rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border-dark">
-              <h2 className="text-base font-bold text-white">Nuevo Expediente</h2>
-              <button onClick={() => setShowModal(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400">
+              <h2 className="text-base font-bold text-white">{editingId ? 'Editar Expediente' : 'Nuevo Expediente'}</h2>
+              <button id="btn-cerrar-modal" onClick={() => { setShowModal(false); setEditingId(null); }} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 text-slate-400">
                 <AppIcon name="close" size={20} />
               </button>
             </div>
@@ -208,17 +379,17 @@ export default function Expedientes() {
               )}
               <div>
                 <label className="block text-xs font-semibold text-slate-400 mb-1">Número <span className="text-red-400">*</span></label>
-                <input name="numero" value={formData.numero} onChange={handleChange} className={`input w-full ${formErrors.numero ? 'border-red-500' : ''}`} placeholder="Ej: 04532-2023" />
+                <input id="input-form-numero" name="numero" value={formData.numero} onChange={handleChange} className={`input w-full ${formErrors.numero ? 'border-red-500' : ''}`} placeholder="Ej: 04532-2023" />
                 {formErrors.numero && <p className="text-xs text-red-400 mt-1">{formErrors.numero}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-400 mb-1">Título <span className="text-red-400">*</span></label>
-                <input name="titulo" value={formData.titulo} onChange={handleChange} className={`input w-full ${formErrors.titulo ? 'border-red-500' : ''}`} placeholder="Ej: Colusión Agravada" />
+                <input id="input-form-titulo" name="titulo" value={formData.titulo} onChange={handleChange} className={`input w-full ${formErrors.titulo ? 'border-red-500' : ''}`} placeholder="Ej: Colusión Agravada" />
                 {formErrors.titulo && <p className="text-xs text-red-400 mt-1">{formErrors.titulo}</p>}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-400 mb-1">Tipo</label>
-                <select name="tipo" value={formData.tipo} onChange={handleChange} className="input w-full bg-transparent">
+                <select id="select-form-tipo" name="tipo" value={formData.tipo} onChange={handleChange} className="input w-full bg-transparent">
                   <option value="penal">Penal</option>
                   <option value="civil">Civil</option>
                   <option value="laboral">Laboral</option>
@@ -228,13 +399,13 @@ export default function Expedientes() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-400 mb-1">Juzgado <span className="text-red-400">*</span></label>
-                <input name="juzgado" value={formData.juzgado} onChange={handleChange} className={`input w-full ${formErrors.juzgado ? 'border-red-500' : ''}`} placeholder="Ej: 1er Juzgado Penal" />
+                <input id="input-form-juzgado" name="juzgado" value={formData.juzgado} onChange={handleChange} className={`input w-full ${formErrors.juzgado ? 'border-red-500' : ''}`} placeholder="Ej: 1er Juzgado Penal" />
                 {formErrors.juzgado && <p className="text-xs text-red-400 mt-1">{formErrors.juzgado}</p>}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-400 mb-1">Estado</label>
-                  <select name="estado" value={formData.estado} onChange={handleChange} className="input w-full bg-transparent">
+                  <select id="select-form-estado" name="estado" value={formData.estado} onChange={handleChange} className="input w-full bg-transparent">
                     <option value="activo">Activo</option>
                     <option value="en_tramite">En trámite</option>
                     <option value="apelacion">Apelación</option>
@@ -244,7 +415,7 @@ export default function Expedientes() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-400 mb-1">Prioridad</label>
-                  <select name="prioridad" value={formData.prioridad} onChange={handleChange} className="input w-full bg-transparent">
+                  <select id="select-form-prioridad" name="prioridad" value={formData.prioridad} onChange={handleChange} className="input w-full bg-transparent">
                     <option value="urgente">Urgente</option>
                     <option value="alta">Alta</option>
                     <option value="media">Media</option>
@@ -253,11 +424,14 @@ export default function Expedientes() {
                 </div>
               </div>
               <div className="pt-2 flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 btn bg-surface-dark border border-border-dark text-slate-300 hover:bg-white/5">
+                <button id="btn-cancelar-creacion" type="button" onClick={() => { setShowModal(false); setEditingId(null); }} className="flex-1 btn bg-surface-dark border border-border-dark text-slate-300 hover:bg-white/5">
                   Cancelar
                 </button>
-                <button type="submit" disabled={submitLoading} className="flex-1 btn btn-primary disabled:opacity-50">
-                  {submitLoading ? 'Creando...' : 'Crear Expediente'}
+                <button id="btn-submit-creacion" type="submit" disabled={submitLoading} className="flex-1 btn btn-primary disabled:opacity-50">
+                  {submitLoading
+                    ? (editingId ? 'Guardando...' : 'Creando...')
+                    : (editingId ? 'Guardar Cambios' : 'Crear Expediente')
+                  }
                 </button>
               </div>
             </form>

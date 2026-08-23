@@ -214,9 +214,24 @@ function prefijoComun(a, b) {
  * "contencioso-administrativo" comparte 26 chars con "contencioso-administrativa"
  * pero solo 4 con "contestacion" → gana el plazo específico.
  *
+ * SKILL: enrutamiento-intenciones-chat v1.3.0 — fix bug P1 (2026-08-22):
+ * consultas GENÉRICAS tipo "apelar una sentencia" empataban con TODAS las
+ * sub-materias de apelación (civil/penal/laboral/alimentos, mismo stem 'apela'
+ * + 'sente') y el desempate por suma de prefijos elegía "Apelación de sentencia
+ * de alimentos" por un solape ESPURIO de 1 char ('apelar'~'alimentos' = 'a').
+ * Dos correcciones:
+ *   1) Umbral de solape significativo: prefijos < 3 chars son ruido morfológico
+ *      y NO suman al desempate.
+ *   2) Desempate final por GENERICIDAD: a igualdad de score y prefijos, gana el
+ *      plazo con acto más corto (la regla general del código, p. ej. CPC art.
+ *      367 para apelaciones), no una sub-materia que el usuario nunca mencionó.
+ *
  * @param {object} catalog - Contenido de catalogs/plazos-procesales.json
  * @param {string} actoProcesal - Texto del acto (ej: "apelar la sentencia civil")
  */
+/** Solapes de prefijo menores a este umbral se consideran ruido (no suman). */
+const MIN_PREFIJO_SIGNIFICATIVO = 3;
+
 export function resolverPlazoId(catalog, actoProcesal) {
   if (!actoProcesal) return null;
   const norm = normalizar(actoProcesal);
@@ -226,6 +241,7 @@ export function resolverPlazoId(catalog, actoProcesal) {
   let mejor = null;
   let mejorScore = 0;
   let mejorPrefijo = 0;
+  let mejorNumPalabras = Infinity;
   for (const p of catalog?.plazos || []) {
     const actoNorm = normalizar(p.acto || '');
     const materiaNorm = normalizar(p.materia || '');
@@ -239,9 +255,11 @@ export function resolverPlazoId(catalog, actoProcesal) {
     for (const t of tokens) {
       const st = stemPalabra(t);
       if (st && stemActo.includes(st)) matActo++;
-      // Prefijo común máximo de este token contra cualquier palabra del acto.
+      // Prefijo común máximo de este token contra cualquier palabra del acto,
+      // descontando solapes espurios (< MIN_PREFIJO_SIGNIFICATIVO chars).
       for (const pa of palabrasActo) {
-        sumaPrefijos += prefijoComun(t, pa);
+        const pc = prefijoComun(t, pa);
+        if (pc >= MIN_PREFIJO_SIGNIFICATIVO) sumaPrefijos += pc;
       }
     }
     const matMateria = tokens.some((t) => {
@@ -249,14 +267,19 @@ export function resolverPlazoId(catalog, actoProcesal) {
       return st && stemMateria.includes(st);
     }) ? 1 : 0;
 
-    // Score principal (compat) + desempate por suma de prefijos comunes.
+    // Score principal (compat) + desempates:
+    //   a) suma de prefijos comunes significativos (fix v1.1.0)
+    //   b) genericidad: menos palabras en el acto = regla general del código (fix v1.3.0)
     const score = matActo * 2 + matMateria;
-    if (
+    const numPalabrasActo = palabrasActo.length;
+    const gana =
       score > mejorScore
       || (score === mejorScore && sumaPrefijos > mejorPrefijo)
-    ) {
+      || (score === mejorScore && sumaPrefijos === mejorPrefijo && numPalabrasActo < mejorNumPalabras);
+    if (gana) {
       mejorScore = score;
       mejorPrefijo = sumaPrefijos;
+      mejorNumPalabras = numPalabrasActo;
       mejor = p;
     }
   }

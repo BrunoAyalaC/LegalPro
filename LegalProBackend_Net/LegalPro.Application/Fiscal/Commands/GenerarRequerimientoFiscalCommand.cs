@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using System.Text.Json;
 using LegalPro.Application.Common;
 using LegalPro.Application.Common.Interfaces;
@@ -11,8 +12,9 @@ namespace LegalPro.Application.Fiscal.Commands;
 /// Tipos: acusacion | sobreseimiento | formalizacion | prision_preventiva | incautacion.
 /// Estructura NCPP: Sumilla → Señor Juez → Hechos → Calificación Jurídica → Petitorio.
 /// </summary>
-public class GenerarRequerimientoFiscalCommand : IRequest<RequerimientoFiscalDto>
+public class GenerarRequerimientoFiscalCommand : IRequest<RequerimientoFiscalDto>, ITenantRequest
 {
+    public Guid OrganizationId { get; set; }
     public string TipoRequerimiento { get; set; } = string.Empty;
     public string Hechos            { get; set; } = string.Empty;
     public string Imputado          { get; set; } = string.Empty;
@@ -61,15 +63,15 @@ public class GenerarRequerimientoFiscalValidator : AbstractValidator<GenerarRequ
 
 public class GenerarRequerimientoFiscalHandler : IRequestHandler<GenerarRequerimientoFiscalCommand, RequerimientoFiscalDto>
 {
-    private readonly ILegalFiscal _gemini;
+    private readonly ILegalFiscal _minimax;
 
-    public GenerarRequerimientoFiscalHandler(ILegalFiscal gemini) => _gemini = gemini;
+    public GenerarRequerimientoFiscalHandler(ILegalFiscal minimax) => _minimax = minimax;
 
     public async Task<RequerimientoFiscalDto> Handle(
         GenerarRequerimientoFiscalCommand request,
         CancellationToken cancellationToken)
     {
-        var json = await _gemini.GenerarRequerimientoFiscalAsync(
+        var json = await _minimax.GenerarRequerimientoFiscalAsync(
             request.TipoRequerimiento,
             request.Hechos,
             request.Imputado,

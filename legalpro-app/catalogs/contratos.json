@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "descripcion": "Catálogo de contratos entre componentes del sistema. Los contratos son la fuente de verdad para integraciones cross-stack.",
+  "principio": "Si dos componentes se comunican, DEBE existir un contrato versionado. La versión se incrementa en breaking changes.",
+  "tipos_contratos": {
+    "openapi": {
+      "descripcion": "REST API contract",
+      "version_actual": "3.0.3",
+      "archivos": [
+        "docs/api/openapi-legalpro-dotnet.json",
+        "docs/api/openapi-legalpro-node.json",
+        "docs/api/openapi-owner-dashboard.json"
+      ],
+      "reglas": {
+        "breaking_changes": "Version MAJOR bump + deprecation notice 3 meses antes",
+        "nuevos_campos": "Backward compatible, opcional",
+        "deprecacion": "Anunciar 3 meses antes, marcar como deprecated en OpenAPI"
+      },
+      "validacion": [
+        "verifier-contrato-api.mjs (Pact broker)",
+        "verifier-schemas-openapi.mjs"
+      ]
+    },
+    "json_schema": {
+      "descripcion": "JSON Schema para mensajes (eventos, function calls de IA, payloads)",
+      "version_actual": "draft-07",
+      "archivos": [
+        "catalogs/schemas/*.schema.json"
+      ],
+      "reglas": {
+        "breaking_changes": "Version major + migration guide",
+        "campos_opcionales": "Backward compatible",
+        "validacion": "Validar SIEMPRE en runtime con Ajv"
+      }
+    },
+    "pact": {
+      "descripcion": "Consumer-driven contracts (CDC)",
+      "version_actual": "4.x",
+      "uso": "Frontend ↔ legalpro-node, legalpro-node ↔ legalpro-dotnet, Owner dashboard ↔ legalpro-node",
+      "provider": "Pact Broker (futuro)",
+      "reglas": {
+        "consumer": "Frontend/Node define qué necesita del provider",
+        "provider": "Publica los pacts cumplidos",
+        "verificacion": "Provider verifica pacts en CI"
+      },
+      "archivos": [
+        "pacts/frontend-node.json",
+        "pacts/node-dotnet.json",
+        "pacts/owner-node.json"
+      ],
+      "validacion": [
+        "verifier-contrato-api.mjs"
+      ]
+    },
+    "sla": {
+      "descripcion": "Service Level Agreements (contractuales con usuarios)",
+      "definidos_en": "catalogs/sla-slo.md",
+      "planes": {
+        "FREE": "99.5% availability, 1h response soporte",
+        "PRO": "99.9% availability, 24h response soporte",
+        "ENTERPRISE": "99.95% + SLA penal, 1h response soporte"
+      }
+    },
+    "eventos_outbox": {
+      "descripcion": "Eventos asíncronos via outbox pattern",
+      "catalogo": "catalogs/audit-events.json",
+      "version": "1.0",
+      "reglas": {
+        "schema": "versionado",
+        "compatibilidad": "Nuevos campos opcionales, NUNCA renombrar"
+      }
+    }
+  },
+  "metricas_contrato": {
+    "cumplimiento_openapi_frontend": 0.95,
+    "cumplimiento_pact_node_dotnet": 0.90,
+    "cumplimiento_sla_pro": 0.999,
+    "drift_detectado_ultimo_mes": 3
+  },
+  "reglas_duras": [
+    "NUNCA cambiar el schema sin versionar",
+    "SIEMPRE validar en runtime con Ajv",
+    "SIEMPRE mantener backward compatibility 3 meses",
+    "SIEMPRE documentar en CHANGELOG.md",
+    "SIEMPRE ejecutar verifier-contrato-api.mjs en CI"
+  ],
+  "drift_detection": {
+    "metodo": "Comparar OpenAPI del producer con el consumer esperado",
+    "frecuencia": "Cada PR + cron diario",
+    "alerta": "Slack #ops si drift detectado"
+  },
+  "consumer_driven_contracts": {
+    "principio": "El consumer define lo que necesita, el provider verifica que lo cumple",
+    "beneficios": [
+      "Deteccion temprana de breaking changes",
+      "Mocking del provider para tests del consumer",
+      "Documentacion viva del contrato"
+    ]
+  }
+}

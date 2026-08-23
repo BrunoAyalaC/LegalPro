@@ -4,21 +4,50 @@
  */
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 // Mock pg Pool (db.js) — previene conexión real a PostgreSQL en tests
+// FIX R-01: las rutas usan `tenantQuery` además de `db.query`, por lo que
+// el mock debe exportarlo también. Apuntamos ambos al mismo vi.fn() para
+// no romper las aserciones existentes que sólo mockean db.query.
+// IMPORTANTE: default.query DEBE ser directamente el vi.fn() (no un wrapper)
+// porque los tests usan db.query.mockResolvedValueOnce(...) — eso requiere
+// que query sea la función espía original con todos sus métodos mock.
+const _dbQueryMock = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 });
 vi.mock('../db.js', () => ({
   default: {
-    query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+    query: _dbQueryMock,
+    connect: vi.fn(),
+    on: vi.fn(),
   },
+  tenantQuery: _dbQueryMock,
+  tenantContext: { getStore: () => undefined, run: (_ctx, fn) => fn() },
 }));
-// Backwards-compat shim
-vi.mock('../supabase.js', () => ({ default: null, supabaseAdmin: null, createUserClient: vi.fn() }));
 
 let app;
 beforeAll(async () => {
   const mod = await import('../../server/index.js');
   app = mod.default;
 });
+
+// Helper: genera un JWT válido para pruebas autenticadas
+const TEST_JWT_SECRET = process.env.JWT_SECRET || 'TestSmokeKey_MustBe32CharsLongForValidation!';
+function generateTestToken(overrides = {}) {
+  const payload = {
+    sub: '00000000-0000-0000-0000-000000000010',
+    email: 'admin@legalpro.pe',
+    rol: 'ADMIN',
+    nombre_completo: 'Admin Test',
+    especialidad: 'GENERAL',
+    ...overrides,
+  };
+  return jwt.sign(payload, TEST_JWT_SECRET, {
+    issuer: 'LegalProAPI',
+    audience: 'LegalProClients',
+    expiresIn: '1h',
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════════════
 // JOURNEY 1: Registro — Validaciones exhaustivas
@@ -194,9 +223,9 @@ describe('Journey: GET /api/auth/me — Validación de token', () => {
 describe('Journey: Rutas protegidas sin token retornan 401', () => {
   const protectedRoutes = [
     '/api/organizaciones/me',
-    '/api/gemini/chat',
-    '/api/gemini/redactor',
-    '/api/gemini/predictor',
+    '/api/ai/chat',
+    '/api/ai/redactor',
+    '/api/ai/predictor',
   ];
 
   for (const route of protectedRoutes) {
@@ -209,4 +238,171 @@ describe('Journey: Rutas protegidas sin token retornan 401', () => {
       expect(res.status).toBe(401);
     });
   }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// JOURNEY 5: POST /api/auth/change-password
+// ═══════════════════════════════════════════════════════════════════════
+// NOTA: Algunos tests aceptan 429 (rate limited) como status válido porque
+// los tests previos (register/login/me) consumen los 10 intentos del authLimiter.
+// El patrón `expect([400, 429]).toContain(res.status)` se usa en otras suites
+// del mismo archivo.
+describe('Journey: POST /api/auth/change-password', () => {
+  const validToken = generateTestToken();
+  const tokenInvalido = 'Bearer token-manualmente-invalido';
+
+  it('401 — sin token de autenticación', async () => {
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .send({ passwordActual: 'Old1', nuevaPassword: 'NewPass123!', confirmarPassword: 'NewPass123!' });
+    expect([401, 429]).toContain(res.status);
+  });
+
+  it('401/429 — token inválido', async () => {
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', tokenInvalido)
+      .send({ passwordActual: 'Old1', nuevaPassword: 'NewPass123!', confirmarPassword: 'NewPass123!' });
+    expect([401, 429]).toContain(res.status);
+  });
+
+  it('400/429 — sin campos obligatorios', async () => {
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${validToken}`)
+      .send({});
+    expect([400, 429]).toContain(res.status);
+    if (res.status === 400) {
+      expect(res.body).toHaveProperty('error');
+      expect(res.body.error).toMatch(/obligatorios/i);
+    }
+  });
+
+  it('400/429 — nuevaPassword menor a 8 caracteres', async () => {
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${validToken}`)
+      .send({ passwordActual: 'Old1', nuevaPassword: '1234567', confirmarPassword: '1234567' });
+    expect([400, 429]).toContain(res.status);
+    if (res.status === 400) {
+      expect(res.body.error).toMatch(/8 caracteres/i);
+    }
+  });
+
+  it('400/429 — nuevaPassword no coincide con confirmarPassword', async () => {
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${validToken}`)
+      .send({ passwordActual: 'Old1', nuevaPassword: 'NewPass123!', confirmarPassword: 'Distinta123!' });
+    expect([400, 429]).toContain(res.status);
+    if (res.status === 400) {
+      expect(res.body.error).toMatch(/no coinciden/i);
+    }
+  });
+
+  it('400/429 — nuevaPassword igual a passwordActual', async () => {
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${validToken}`)
+      .send({ passwordActual: 'MismaPass1!', nuevaPassword: 'MismaPass1!', confirmarPassword: 'MismaPass1!' });
+    expect([400, 429]).toContain(res.status);
+    if (res.status === 400) {
+      expect(res.body.error).toMatch(/diferente/i);
+    }
+  });
+
+  it('401/429 — passwordActual es incorrecta', async () => {
+    const hash = await bcrypt.hash('RealOldPass1!', 4); // costo bajo para tests rápidos
+    const db = (await import('../db.js')).default;
+    db.query.mockResolvedValueOnce({
+      rows: [{ id: '00000000-0000-0000-0000-000000000010', password_hash: hash }],
+      rowCount: 1,
+    });
+
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${validToken}`)
+      .send({
+        passwordActual: 'WrongPass1!',
+        nuevaPassword: 'NewPass1234!',
+        confirmarPassword: 'NewPass1234!',
+      });
+    expect([401, 429]).toContain(res.status);
+    if (res.status === 401) {
+      expect(res.body.error).toMatch(/incorrecta/i);
+    }
+  });
+
+  it('200/429 — cambio exitoso', async () => {
+    const hash = await bcrypt.hash('RealOldPass1!', 4);
+    const db = (await import('../db.js')).default;
+    // SELECT usuario
+    db.query.mockResolvedValueOnce({
+      rows: [{ id: '00000000-0000-0000-0000-000000000010', password_hash: hash }],
+      rowCount: 1,
+    });
+    // UPDATE password (el logAudit es fire-and-forget, no bloquea)
+    db.query.mockResolvedValueOnce({ rowCount: 1 });
+
+    const res = await request(app)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${validToken}`)
+      .send({
+        passwordActual: 'RealOldPass1!',
+        nuevaPassword: 'NewPass1234!',
+        confirmarPassword: 'NewPass1234!',
+      });
+    expect([200, 429]).toContain(res.status);
+    if (res.status === 200) {
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toMatch(/actualizada/i);
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// JOURNEY 6: POST /api/auth/forgot-password
+// ═══════════════════════════════════════════════════════════════════════
+describe('Journey: POST /api/auth/forgot-password', () => {
+  it('400 — email faltante', async () => {
+    const res = await request(app).post('/api/auth/forgot-password').send({});
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error');
+    expect(res.body.error).toMatch(/email/i);
+  });
+
+  it('400 — email vacío', async () => {
+    const res = await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email: '' });
+    expect(res.status).toBe(400);
+  });
+
+  it('200 — email existente (genera token)', async () => {
+    const db = (await import('../db.js')).default;
+    // SELECT usuario existente
+    db.query.mockResolvedValueOnce({
+      rows: [{ id: '00000000-0000-0000-0000-000000000010', email: 'admin@legalpro.pe' }],
+      rowCount: 1,
+    });
+    // UPDATE reset_token
+    db.query.mockResolvedValueOnce({ rowCount: 1 });
+
+    const res = await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email: 'admin@legalpro.pe' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toMatch(/instrucciones/i);
+  });
+
+  it('200 — email NO existente (misma respuesta por seguridad)', async () => {
+    const res = await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email: 'noexiste@test.pe' });
+    // Siempre 200 sin revelar si el email existe
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toMatch(/instrucciones/i);
+  });
 });

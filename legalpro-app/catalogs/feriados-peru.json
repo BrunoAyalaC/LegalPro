@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "descripcion": "Feriados oficiales en Perú para cálculo de plazos procesales (CPC Art. 144)",
+  "fuente": "El Peruano - Decreto Legislativo N° 713, actualizado 2026",
+  "regla_calculo": "Se cuentan solo lunes a viernes. Si plazo vence en feriado o fin de semana, se traslada al siguiente día hábil.",
+  "feriados_fijos": [
+    { "fecha": "01-01", "nombre": "Año Nuevo", "tipo": "nacional" },
+    { "fecha": "05-01", "nombre": "Día del Trabajo", "tipo": "nacional" },
+    { "fecha": "06-29", "nombre": "San Pedro y San Pablo", "tipo": "nacional" },
+    { "fecha": "07-28", "nombre": "Fiestas Patrias (Independencia)", "tipo": "nacional" },
+    { "fecha": "07-29", "nombre": "Fiestas Patrias", "tipo": "nacional" },
+    { "fecha": "08-06", "nombre": "Batalla de Junín", "tipo": "nacional" },
+    { "fecha": "08-30", "nombre": "Santa Rosa de Lima", "tipo": "nacional" },
+    { "fecha": "10-08", "nombre": "Combate de Angamos", "tipo": "nacional" },
+    { "fecha": "11-01", "nombre": "Día de Todos los Santos", "tipo": "nacional" },
+    { "fecha": "12-08", "nombre": "Inmaculada Concepción", "tipo": "nacional" },
+    { "fecha": "12-09", "nombre": "Batalla de Ayacucho", "tipo": "nacional" },
+    { "fecha": "12-25", "nombre": "Navidad", "tipo": "nacional" }
+  ],
+  "feriados_moviles": [
+    { "regla": "jueves_viernes_santo", "nombre": "Semana Santa (Jueves Santo y Viernes Santo)", "tipo": "religioso", "calculo": "Basado en Pascua: Pascua - 3 días (Jueves), Pascua - 2 días (Viernes)" },
+    { "regla": "santa_rosa_lima_agosto_30", "nombre": "Santa Rosa de Lima (solo Lima Metropolitana)", "tipo": "regional_lima" }
+  ],
+  "dias_no_habiles": ["sabado", "domingo"],
+  "notas": [
+    "CPC Art. 144: 'Los actos procesales se practican en días y horas hábiles. Son días hábiles los no feriados.'",
+    "Ley 27466 (2001) agregó Fiestas Patrias (28-29 julio) como feriados irrenunciables",
+    "Algunos feriados son regionales/locales según cada municipalidad (no incluidos aquí, extender según necesidad)"
+  ]
+}

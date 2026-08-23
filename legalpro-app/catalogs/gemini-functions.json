@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "obsoleto": true,
+  "fecha_obsoleto": "2026-08-01",
+  "sustituido_por": "catalogs/opencode-functions.json",
+  "motivo_obsoleto": "Migración IA a OpenCode Go (DeepSeek V4 Flash). Gemini eliminado 2026-08-01. El nombre legacy 'gemini-functions' se conserva SOLO por compatibilidad de consumidores (verifier-transferencia-internacional TI-01, verifier-deprecation-modelos, verifier-catalogos, legal-catalog-updater, pre-commit.validate-catalogos). No usar para nuevas finalidades.",
+  "version": "1.0.0",
+  "descripcion": "OBSOLETO (2026-08-01): catálogo legacy de Function Declarations tras la migración a OpenCode Go (DeepSeek V4 Flash). Sustituido por catalogs/opencode-functions.json. Se conserva únicamente para compatibilidad de los verificadores que consumen 'consentimiento_internacional'.",
+  "sdk_recomendado": "OpenAI SDK (opencodeClient.js) o minimaxClient.js (legacy)",
+  "modo_default": "AUTO",
+  "consentimiento_transferencia_internacional_requerido": true,
+  "funciones": [
+    {
+      "nombre": "analizar_expediente",
+      "descripcion": "Analiza un expediente judicial peruano con subtipo: completo, fortalezas_debilidades, riesgos, estrategia, resumen",
+      "modo_fc": "AUTO",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "expediente_id": { "type": "string", "format": "uuid" },
+          "tipo_analisis": { "type": "string", "enum": ["completo", "fortalezas_debilidades", "riesgos", "estrategia", "resumen"] },
+          "rol_usuario": { "type": "string", "enum": ["ABOGADO", "FISCAL", "JUEZ", "CONTADOR"] }
+        },
+        "required": ["expediente_id", "tipo_analisis"]
+      },
+      "agente": "ia-analista-expedientes",
+      "consentimiento_internacional": true,
+      "coste_estimado_usd": 0.05
+    },
+    {
+      "nombre": "buscar_jurisprudencia",
+      "descripcion": "Busca jurisprudencia en 5 fuentes: PJ, TC, INDECOPI, SUNARP, MINJUS",
+      "modo_fc": "AUTO",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "fuente": { "type": "string", "enum": ["PJ", "TC", "INDECOPI", "SUNARP", "MINJUS"] },
+          "max_resultados": { "type": "integer", "default": 10 }
+        },
+        "required": ["query"]
+      },
+      "agente": "ia-buscador-jurisprudencia",
+      "consentimiento_internacional": true,
+      "grounding": "google_search",
+      "coste_estimado_usd": 0.03
+    },
+    {
+      "nombre": "redactar_escrito",
+      "descripcion": "Redacta un escrito legal (demanda, contestación, apelación, casación, amparo, hábeas corpus, medida cautelar, acusación, sobreseimiento, pericial, alegato, requerimiento, resolución)",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "tipo_escrito": { "type": "string", "enum": ["demanda", "contestacion", "apelacion", "casacion", "amparo", "habeas_corpus", "medida_cautelar", "acusacion", "sobreseimiento", "pericial", "alegato", "requerimiento", "resolucion", "reconvencion", "queja", "reposicion", "traslado"] },
+          "expediente_id": { "type": "string", "format": "uuid" },
+          "hechos": { "type": "string" },
+          "fundamentos": { "type": "string" }
+        },
+        "required": ["tipo_escrito"]
+      },
+      "agente": "ia-redactor-escritos",
+      "consentimiento_internacional": true,
+      "disclaimer_obligatorio": true,
+      "firma_digital_obligatoria_al_exportar": true,
+      "coste_estimado_usd": 0.10
+    },
+    {
+      "nombre": "calcular_plazos",
+      "descripcion": "Calcula plazos procesales peruanos (CPC, NCPP, laboral, contencioso)",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "acto_procesal": { "type": "string" },
+          "fecha_inicio": { "type": "string", "format": "date" },
+          "tipo_plazo": { "type": "string", "enum": ["habil", "calendario", "administrativo"] }
+        },
+        "required": ["acto_procesal", "fecha_inicio"]
+      },
+      "agente": "ia-calculadora-plazos",
+      "consentimiento_internacional": false,
+      "coste_estimado_usd": 0.01
+    },
+    {
+      "nombre": "predecir_resultado",
+      "descripcion": "Predice resultado de un caso judicial basado en +50,000 sentencias",
+      "modo_fc": "AUTO",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "expediente_id": { "type": "string", "format": "uuid" },
+          "materia": { "type": "string" }
+        },
+        "required": ["expediente_id"]
+      },
+      "agente": "ia-predictor-judicial",
+      "consentimiento_internacional": true,
+      "disclaimer_obligatorio": true,
+      "disclaimer_texto": "Esto NO es una predicción cierta, es un análisis probabilístico basado en sentencias previas",
+      "coste_estimado_usd": 0.08
+    },
+    {
+      "nombre": "generar_estrategia",
+      "descripcion": "Genera estrategia de interrogatorio, objeción o caso_simulacion bajo NCPP",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "subtipo": { "type": "string", "enum": ["interrogatorio", "objecion", "caso_simulacion"] },
+          "rol_usuario": { "type": "string", "enum": ["ABOGADO", "FISCAL"] },
+          "rol_ia": { "type": "string", "enum": ["JUEZ", "FISCAL", "TESTIGO", "ABOGADO_CONTRARIO", "PERITO"] },
+          "contexto": { "type": "string" }
+        },
+        "required": ["subtipo"]
+      },
+      "agente": "ia-estrategia-interrogatorio",
+      "consentimiento_internacional": true,
+      "coste_estimado_usd": 0.06
+    },
+    {
+      "nombre": "consultar_norma",
+      "descripcion": "Consulta una norma del catálogo legal peruano",
+      "modo_fc": "AUTO",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "norma_id": { "type": "string" },
+          "articulo": { "type": "string" }
+        },
+        "required": ["norma_id"]
+      },
+      "agente": "ia-chat-legal",
+      "consentimiento_internacional": false,
+      "coste_estimado_usd": 0.01
+    },
+    {
+      "nombre": "sugerir_objecion",
+      "descripcion": "Sugiere objeciones procesales aplicables en tiempo real (CPC art. 300, NCPP art. 352)",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "actuacion_procesal": { "type": "string" },
+          "rol_usuario": { "type": "string" }
+        },
+        "required": ["actuacion_procesal"]
+      },
+      "agente": "ia-objeciones",
+      "consentimiento_internacional": true,
+      "coste_estimado_usd": 0.04
+    },
+    {
+      "nombre": "sugerir_pregunta_interrogatorio",
+      "descripcion": "Sugiere preguntas para interrogatorio bajo NCPP art. 375, 376",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "tipo_testigo": { "type": "string", "enum": ["testigo", "perito", "acusado", "agraviado"] },
+          "rol_usuario": { "type": "string" }
+        },
+        "required": ["tipo_testigo"]
+      },
+      "agente": "ia-estrategia-interrogatorio",
+      "consentimiento_internacional": true,
+      "coste_estimado_usd": 0.05
+    },
+    {
+      "nombre": "evaluar_tipicidad",
+      "descripcion": "Evalúa tipicidad, antijuridicidad y culpabilidad de hechos",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "hechos": { "type": "string" },
+          "tipo_analisis": { "type": "string", "enum": ["tipicidad", "antijuridicidad", "culpabilidad"] }
+        },
+        "required": ["hechos", "tipo_analisis"]
+      },
+      "agente": "legal-penalista",
+      "consentimiento_internacional": false,
+      "coste_estimado_usd": 0.05
+    },
+    {
+      "nombre": "liquidar_laboral",
+      "descripcion": "Calcula CTS, gratificaciones, vacaciones, utilidades con tasa BCRP",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "tipo_liquidacion": { "type": "string", "enum": ["cts", "gratificacion", "vacaciones", "utilidades"] },
+          "fecha_inicio": { "type": "string", "format": "date" },
+          "fecha_fin": { "type": "string", "format": "date" },
+          "remuneracion": { "type": "number" },
+          "sistema_pension": { "type": "string", "enum": ["AFP", "ONP"] }
+        },
+        "required": ["tipo_liquidacion", "remuneracion"]
+      },
+      "agente": "contador-laboralista",
+      "consentimiento_internacional": false,
+      "coste_estimado_usd": 0.02
+    },
+    {
+      "nombre": "liquidar_tributario",
+      "descripcion": "Calcula IGV, IR, percepciones, retenciones",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "tipo_impuesto": { "type": "string", "enum": ["igv", "ir_3ra", "ir_4ta", "ir_5ta", "percepcion", "retencion"] },
+          "monto": { "type": "number" },
+          "periodo": { "type": "string" }
+        },
+        "required": ["tipo_impuesto", "monto"]
+      },
+      "agente": "contador-tributarista",
+      "consentimiento_internacional": false,
+      "coste_estimado_usd": 0.02
+    },
+    {
+      "nombre": "comparar_precedentes",
+      "descripcion": "Compara precedentes vinculantes y detecta contradicciones",
+      "modo_fc": "AUTO",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "precedente_ids": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["precedente_ids"]
+      },
+      "agente": "ia-comparador-precendentes",
+      "consentimiento_internacional": true,
+      "coste_estimado_usd": 0.07
+    },
+    {
+      "nombre": "generar_resumen_ejecutivo",
+      "descripcion": "Genera resumen ejecutivo del caso para cliente/socio",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "expediente_id": { "type": "string", "format": "uuid" }
+        },
+        "required": ["expediente_id"]
+      },
+      "agente": "ia-resumen-ejecutivo",
+      "consentimiento_internacional": true,
+      "coste_estimado_usd": 0.04
+    },
+    {
+      "nombre": "monitorear_sinoe",
+      "descripcion": "Monitorea notificaciones del SINOE del PJ peruano",
+      "modo_fc": "ANY",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "usuario_id": { "type": "string" },
+          "frecuencia": { "type": "string", "enum": ["1min", "5min", "15min", "1h"] }
+        },
+        "required": ["usuario_id"]
+      },
+      "agente": "ia-monitor-sinoe",
+      "consentimiento_internacional": false,
+      "coste_estimado_usd": 0.01
+    },
+    {
+      "nombre": "chat_legal",
+      "descripcion": "Chat legal general con contexto opcional de expediente",
+      "modo_fc": "AUTO",
+      "parametros_json_schema": {
+        "type": "object",
+        "properties": {
+          "mensaje": { "type": "string" },
+          "expediente_id": { "type": "string", "format": "uuid" },
+          "rol_usuario": { "type": "string" }
+        },
+        "required": ["mensaje"]
+      },
+      "agente": "ia-chat-legal",
+      "consentimiento_internacional": true,
+      "coste_estimado_usd": 0.02
+    }
+  ]
+}

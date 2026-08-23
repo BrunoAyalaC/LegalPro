@@ -1,0 +1,48 @@
+# Contexto de build raíz (usado por legalpro-app/Dockerfile -> imagen node)
+# Excluye artefactos pesados; el Dockerfile reinstala dependencias y solo
+# necesita legalpro-app/ y catalogs/.
+
+.git
+**/node_modules
+**/dist
+**/build
+**/bin
+**/obj
+**/.gradle
+**/.vite
+
+# Android (no participa en imágenes de servidor)
+LegalProAndroid
+
+# Artefactos, reportes y scratch
+archive
+arnes
+arneses
+reports
+exposicion
+test-results
+test-results-prod
+playwright-report
+.playwright-mcp
+**/*.zip
+**/*.apk
+
+# Prototipos / carpetas de mockups que no forman parte del backend
+analista_de_expedientes_ai_*
+simulador_de_juicios_ia_*
+monitor_de_notificaciones_sinoe_ia_*
+generador_de_*
+gesti_n_de_expediente_multidoc
+b_veda_de_evidencia_digital_segura
+asistente_de_objeciones_en_vivo
+dashboard_abogado_defensor
+dashboard_de_fiscal_a_ia
+estrategia_de_interrogatorio_ncpp
+reporte_de_retroalimentaci_n_ia
+resumen_ejecutivo_del_caso_ai
+
+# Secretos locales (nunca al contexto de imagen)
+datos.txt
+**/.env
+**/.env.*
+!**/.env.example

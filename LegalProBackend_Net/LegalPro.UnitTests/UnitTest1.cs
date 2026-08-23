@@ -9,7 +9,7 @@ namespace LegalPro.UnitTests;
 
 // ═══════════════════════════════════════════════════════════════════════
 // TESTS DE VALIDADORES — Sin mocks. FluentValidation es lógica pura.
-// No requieren DB ni Gemini. Corren 100% offline y en milisegundos.
+// No requieren DB ni proveedor IA. Corren 100% offline y en milisegundos.
 // ═══════════════════════════════════════════════════════════════════════
 
 public class AnalizarExpedienteValidatorTests

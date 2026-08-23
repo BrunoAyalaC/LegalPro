@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Schema de Plazos Procesales",
+  "type": "object",
+  "required": ["version", "plazos"],
+  "properties": {
+    "version": { "type": "string" },
+    "fuente_oficial": { "type": "string" },
+    "plazos": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Plazo" }
+    },
+    "reglas_globales": { "type": "object" }
+  },
+  "$defs": {
+    "Plazo": {
+      "type": "object",
+      "required": ["id", "codigo", "articulo", "acto", "dias", "tipo"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+        "codigo": { "enum": ["CPC", "NCPP", "LPCL", "CPCL", "DLeg 1071", "TUO Ley 27584", "Ley 28237"] },
+        "articulo": { "type": "string" },
+        "acto": { "type": "string" },
+        "dias": { "type": "integer" },
+        "tipo": { "enum": ["habil", "calendario", "administrativo"] },
+        "dies_a_quem": { "type": "string" },
+        "suspension_feriado": { "type": "string" },
+        "consecuencia_vencimiento": { "type": "string" },
+        "extension": { "type": "string" },
+        "nota": { "type": "string" }
+      }
+    }
+  }
+}

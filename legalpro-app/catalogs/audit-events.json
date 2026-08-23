@@ -1,0 +1,457 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.1.0",
+  "descripcion": "Eventos canónicos del audit log (LPDP Art. 23 + ISO 27001 A.12.4). v1.1.0: migración IA a OpenCode Go / DeepSeek V4 Flash + Xiaomi MiMo V2.5 (visión), Gemini eliminado, eventos GEMINI_* reemplazados por IA_* genéricos.",
+  "severidades": [
+    "INFO",
+    "WARNING",
+    "ERROR",
+    "CRITICAL"
+  ],
+  "eventos": [
+    {
+      "nombre": "AUTH_LOGIN_SUCCESS",
+      "severidad": "INFO",
+      "categoria": "auth",
+      "iso27001_control": "A.9.4.1",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "pii_masking": [
+        "password",
+        "token"
+      ],
+      "payload_required": [
+        "user_id",
+        "ip_address",
+        "user_agent",
+        "method"
+      ]
+    },
+    {
+      "nombre": "AUTH_LOGIN_FAILURE",
+      "severidad": "WARNING",
+      "categoria": "auth",
+      "iso27001_control": "A.9.4.1",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "pii_masking": [
+        "password"
+      ],
+      "payload_required": [
+        "email_attempted",
+        "ip_address",
+        "reason"
+      ]
+    },
+    {
+      "nombre": "AUTH_REGISTER",
+      "severidad": "INFO",
+      "categoria": "auth",
+      "iso27001_control": "A.9.4.1",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "pii_masking": [
+        "password"
+      ],
+      "payload_required": [
+        "user_id",
+        "email",
+        "ip_address",
+        "consentimiento_versiones"
+      ]
+    },
+    {
+      "nombre": "AUTH_TOKEN_REFRESH",
+      "severidad": "INFO",
+      "categoria": "auth",
+      "retention_dias": 365,
+      "payload_required": [
+        "user_id"
+      ]
+    },
+    {
+      "nombre": "AUTH_LOGOUT",
+      "severidad": "INFO",
+      "categoria": "auth",
+      "retention_dias": 365,
+      "payload_required": [
+        "user_id"
+      ]
+    },
+    {
+      "nombre": "RESOURCE_CREATE",
+      "severidad": "INFO",
+      "categoria": "data",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "payload_required": [
+        "table_name",
+        "record_key",
+        "user_id"
+      ]
+    },
+    {
+      "nombre": "RESOURCE_READ",
+      "severidad": "INFO",
+      "categoria": "data",
+      "retention_dias": 365,
+      "payload_required": [
+        "table_name",
+        "record_key",
+        "user_id"
+      ],
+      "condicional": "Solo si PII (LPDP)"
+    },
+    {
+      "nombre": "RESOURCE_UPDATE",
+      "severidad": "INFO",
+      "categoria": "data",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "payload_required": [
+        "table_name",
+        "record_key",
+        "user_id",
+        "cambios"
+      ]
+    },
+    {
+      "nombre": "RESOURCE_DELETE",
+      "severidad": "WARNING",
+      "categoria": "data",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "payload_required": [
+        "table_name",
+        "record_key",
+        "user_id",
+        "soft_delete"
+      ]
+    },
+    {
+      "nombre": "TENANT_VIOLATION",
+      "severidad": "ERROR",
+      "categoria": "security",
+      "iso27001_control": "A.13.1.1",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 3650,
+      "alerta": "Slack #security + email CTO",
+      "payload_required": [
+        "user_id",
+        "intentado_organization_id",
+        "claim_organization_id"
+      ]
+    },
+    {
+      "nombre": "RATE_LIMIT_HIT",
+      "severidad": "WARNING",
+      "categoria": "security",
+      "iso27001_control": "A.13.1.1",
+      "retention_dias": 365,
+      "payload_required": [
+        "endpoint",
+        "ip_address",
+        "user_id",
+        "limit",
+        "window"
+      ]
+    },
+    {
+      "nombre": "BRUTE_FORCE_DETECTED",
+      "severidad": "CRITICAL",
+      "categoria": "security",
+      "iso27001_control": "A.13.1.1",
+      "retention_dias": 3650,
+      "alerta": "Slack #security + bloqueo automatico",
+      "payload_required": [
+        "ip_address",
+        "endpoint",
+        "attempts",
+        "lockout_until"
+      ]
+    },
+    {
+      "nombre": "PERMISSION_DENIED",
+      "severidad": "WARNING",
+      "categoria": "security",
+      "retention_dias": 365,
+      "payload_required": [
+        "user_id",
+        "endpoint",
+        "required_role",
+        "user_role"
+      ]
+    },
+    {
+      "nombre": "IA_REQUEST",
+      "severidad": "INFO",
+      "categoria": "ai",
+      "retention_dias": 1825,
+      "pii_masking": [
+        "user_prompt",
+        "system_instruction"
+      ],
+      "payload_required": [
+        "user_id",
+        "organization_id",
+        "proveedor",
+        "model",
+        "tokens_input",
+        "tokens_output",
+        "costo_usd",
+        "function_name",
+        "consentimiento_transferencia_internacional"
+      ],
+      "nota": "proveedor válido: 'opencode' | 'opencode-vision' | 'minimax'. Sustituye a GEMINI_REQUEST (proveedor eliminado 2026-08-01)."
+    },
+    {
+      "nombre": "IA_QUOTA_EXCEEDED",
+      "severidad": "ERROR",
+      "categoria": "ai",
+      "retention_dias": 365,
+      "alerta": "Slack #ops",
+      "payload_required": [
+        "organization_id",
+        "proveedor",
+        "limite",
+        "uso_actual"
+      ]
+    },
+    {
+      "nombre": "IA_MODEL_DEPRECATION_WARNING",
+      "severidad": "WARNING",
+      "categoria": "ai",
+      "retention_dias": 365,
+      "payload_required": [
+        "modelo_actual",
+        "modelo_recomendado",
+        "fecha_deprecation"
+      ]
+    },
+    {
+      "nombre": "PLAN_LIMIT_EXCEEDED",
+      "severidad": "WARNING",
+      "categoria": "billing",
+      "retention_dias": 1825,
+      "payload_required": [
+        "organization_id",
+        "plan",
+        "recurso",
+        "limite",
+        "uso_actual"
+      ]
+    },
+    {
+      "nombre": "CONSENTIMIENTO_GRANTED",
+      "severidad": "INFO",
+      "categoria": "lpdp",
+      "lpdp_articulo": "Art. 14",
+      "retention_dias": 3650,
+      "payload_required": [
+        "user_id",
+        "finalidades",
+        "version_terminos",
+        "version_privacidad",
+        "ip_address"
+      ]
+    },
+    {
+      "nombre": "CONSENTIMIENTO_REVOKED",
+      "severidad": "INFO",
+      "categoria": "lpdp",
+      "lpdp_articulo": "Art. 24",
+      "retention_dias": 3650,
+      "payload_required": [
+        "user_id",
+        "finalidades_revocadas",
+        "motivo"
+      ]
+    },
+    {
+      "nombre": "ARCO_REQUEST",
+      "severidad": "INFO",
+      "categoria": "lpdp",
+      "lpdp_articulo": "Art. 25-28",
+      "retention_dias": 3650,
+      "payload_required": [
+        "user_id",
+        "tipo_arco",
+        "fecha_solicitud",
+        "fecha_respuesta"
+      ]
+    },
+    {
+      "nombre": "TRANSFERENCIA_INTERNACIONAL",
+      "severidad": "INFO",
+      "categoria": "lpdp",
+      "lpdp_articulo": "Art. 21",
+      "retention_dias": 3650,
+      "payload_required": [
+        "user_id",
+        "destino",
+        "datos_transferidos_categorias",
+        "consentimiento_flag",
+        "proveedor"
+      ],
+      "proveedores_validos": [
+        "opencode",
+        "opencode-vision",
+        "minimax",
+        "self_hosted"
+      ],
+      "nota": "proveedor='opencode' (DeepSeek V4 Flash vía OpenCode Go, destino China), 'opencode-vision' (MiMo V2.5 vía proveedor externo, destino según proveedor), 'minimax' (fallback legacy, China/Singapur), 'self_hosted' (MiMo V2.5 local — NO hay transferencia internacional, se registra para trazabilidad del principio de minimización). Gemini fue eliminado el 2026-08-01 y no genera eventos."
+    },
+    {
+      "nombre": "FIRMA_DIGITAL_GENERATED",
+      "severidad": "INFO",
+      "categoria": "firma_digital",
+      "lpdp_articulo": "Ley 27269",
+      "retention_dias": 3650,
+      "payload_required": [
+        "documento_id",
+        "hash_sha256",
+        "firma_id",
+        "tsa_id",
+        "certificado_id"
+      ]
+    },
+    {
+      "nombre": "LPDP_BREACH_SUSPECTED",
+      "severidad": "CRITICAL",
+      "categoria": "lpdp",
+      "lpdp_articulo": "Art. 24",
+      "retention_dias": 99999,
+      "alerta": "Slack #lpdp + email CISO + notificación ANPDP en <=5 días hábiles",
+      "payload_required": [
+        "fecha_deteccion",
+        "categoria_datos_afectados",
+        "volumen_estimado",
+        "vector_ataque"
+      ]
+    },
+    {
+      "nombre": "SECRETS_ROTATION",
+      "severidad": "INFO",
+      "categoria": "security",
+      "retention_dias": 3650,
+      "payload_required": [
+        "secret_id",
+        "rotated_by",
+        "old_hash_prefix",
+        "new_hash_prefix"
+      ]
+    },
+    {
+      "nombre": "DEPLOY_SUCCESS",
+      "severidad": "INFO",
+      "categoria": "devops",
+      "retention_dias": 1825,
+      "payload_required": [
+        "service",
+        "version",
+        "deployer",
+        "environment"
+      ]
+    },
+    {
+      "nombre": "DEPLOY_FAILURE",
+      "severidad": "ERROR",
+      "categoria": "devops",
+      "retention_dias": 1825,
+      "alerta": "Slack #ops",
+      "payload_required": [
+        "service",
+        "version",
+        "deployer",
+        "error"
+      ]
+    },
+    {
+      "nombre": "MIGRATION_EXECUTED",
+      "severidad": "INFO",
+      "categoria": "devops",
+      "retention_dias": 3650,
+      "payload_required": [
+        "migration_id",
+        "executed_by",
+        "execution_time_ms",
+        "rows_affected"
+      ]
+    },
+    {
+      "nombre": "MIGRATION_FAILED",
+      "severidad": "CRITICAL",
+      "categoria": "devops",
+      "retention_dias": 3650,
+      "alerta": "Slack #ops + rollback automático",
+      "payload_required": [
+        "migration_id",
+        "executed_by",
+        "error",
+        "rollback_status"
+      ]
+    },
+    {
+      "nombre": "OUTBOX_MESSAGE_PROCESSED",
+      "severidad": "INFO",
+      "categoria": "messaging",
+      "retention_dias": 365,
+      "payload_required": [
+        "message_id",
+        "type",
+        "processing_time_ms"
+      ]
+    },
+    {
+      "nombre": "OUTBOX_MESSAGE_FAILED",
+      "severidad": "ERROR",
+      "categoria": "messaging",
+      "retention_dias": 365,
+      "alerta": "Slack #ops",
+      "payload_required": [
+        "message_id",
+        "type",
+        "retry_count",
+        "error"
+      ]
+    },
+    {
+      "nombre": "VENCIMIENTO_ACTUALIZADO",
+      "severidad": "INFO",
+      "categoria": "data",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "payload_required": [
+        "user_id",
+        "organization_id",
+        "expediente_id",
+        "evento",
+        "nueva_fecha_limite",
+        "completado"
+      ],
+      "nota": "CalendarioVencimientos v6.12.14+: drag & drop o marcado como completado en UI persistido en backend."
+    },
+    {
+      "nombre": "ORCHESTRATOR_DISPATCHED",
+      "severidad": "INFO",
+      "categoria": "orquestacion",
+      "iso27001_control": "A.12.4.1",
+      "lpdp_articulo": "Art. 23",
+      "retention_dias": 1825,
+      "pii_masking": [
+        "query"
+      ],
+      "payload_required": [
+        "orchestrator",
+        "materia_detectada",
+        "subagents_invocados",
+        "subagents_skipped",
+        "tokens_total",
+        "costo_usd",
+        "latency_ms",
+        "disclaimers_validados",
+        "citas_verificadas_pct"
+      ]
+    }
+  ]
+}

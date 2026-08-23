@@ -357,7 +357,7 @@ test.describe('Gemini FC — Predictor Judicial (Correcto)', () => {
   });
 
   test('Predictor: respuesta FC válida → datos estructurados visibles', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultado: mockPredictorFC, tipo: 'predictor', tokens: 450 }),
     }));
@@ -381,7 +381,7 @@ test.describe('Gemini FC — Predictor Judicial (Correcto)', () => {
   });
 
   test('Predictor: respuesta FC lenta (2s) → spinner visible, no timeout UI', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', async r => {
+    await page.route('**/api/ai/consulta', async r => {
       await new Promise(res => setTimeout(res, 2000)); // Simular latencia de 2s
       await r.fulfill({
         status: 200, contentType: 'application/json',
@@ -419,7 +419,7 @@ test.describe('Gemini FC — Predictor Judicial (Incorrecto)', () => {
   });
 
   test('Predictor: backend 500 → UI muestra error y no crashea', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 500, contentType: 'application/json',
       body: JSON.stringify({ error: 'Error interno del servidor de IA.' }),
     }));
@@ -442,7 +442,7 @@ test.describe('Gemini FC — Predictor Judicial (Incorrecto)', () => {
   });
 
   test('Predictor: API rate limit (429) → UI no crashea', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 429, contentType: 'application/json',
       body: JSON.stringify({ error: 'Límite de solicitudes alcanzado. Intente en 1 minuto.' }),
     }));
@@ -453,7 +453,7 @@ test.describe('Gemini FC — Predictor Judicial (Incorrecto)', () => {
   });
 
   test('Predictor: respuesta FC malformada (no JSON válido) → no crashea', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultado: null, tipo: 'predictor' }), // sin datos estructurados
     }));
@@ -464,7 +464,7 @@ test.describe('Gemini FC — Predictor Judicial (Incorrecto)', () => {
   });
 
   test('Predictor: red caída → graceful error', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.abort('failed'));
+    await page.route('**/api/ai/consulta', r => r.abort('failed'));
 
     await page.goto('/predictor');
     await page.waitForTimeout(1000);
@@ -488,7 +488,7 @@ test.describe('Gemini FC — Análisis de Expediente (Correcto)', () => {
   });
 
   test('Analista: texto válido → análisis FC estructurado', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultado: mockAnalisisFC, tipo: 'analisis', tokens: 720 }),
     }));
@@ -502,7 +502,7 @@ test.describe('Gemini FC — Análisis de Expediente (Correcto)', () => {
   });
 
   test('Analista: texto extenso (1000 chars) → procesa sin timeout UI', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultado: mockAnalisisFC, tipo: 'analisis', tokens: 1200 }),
     }));
@@ -529,7 +529,7 @@ test.describe('Gemini FC — Análisis de Expediente (Incorrecto)', () => {
 
   test('Analista: rol sin permiso (CONTADOR) → 403 no crashea', async ({ page }) => {
     await setupAuth(page, 'CONTADOR');
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 403, contentType: 'application/json',
       body: JSON.stringify({ error: 'Su rol no tiene acceso a esta función IA.' }),
     }));
@@ -543,7 +543,7 @@ test.describe('Gemini FC — Análisis de Expediente (Incorrecto)', () => {
   });
 
   test('Analista: texto con prompt injection → backend sanitiza, UI no explota', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 400, contentType: 'application/json',
       body: JSON.stringify({ error: 'El contenido del prompt contiene elementos no permitidos.' }),
     }));
@@ -578,14 +578,14 @@ test.describe('Chat IA — Flujos Correctos', () => {
   });
 
   test('Chat: mensaje válido → respuesta del asistente visible', async ({ page }) => {
-    await page.route('**/api/gemini/chat', r => r.fulfill({
+    await page.route('**/api/ai/chat', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({
         respuesta: 'Según el artículo 168 del CPC, la notificación es el acto procesal por el cual...',
         tokens: 280,
       }),
     }));
-    await page.route('**/api/gemini/historial', r => r.fulfill({
+    await page.route('**/api/ai/historial', r => r.fulfill({
       status: 200, body: JSON.stringify({ historial: [] }),
     }));
 
@@ -606,11 +606,11 @@ test.describe('Chat IA — Flujos Correctos', () => {
   });
 
   test('Chat: historial de 5 mensajes → UI no se rompe', async ({ page }) => {
-    await page.route('**/api/gemini/chat', r => r.fulfill({
+    await page.route('**/api/ai/chat', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ respuesta: 'Respuesta del asistente legal.', tokens: 150 }),
     }));
-    await page.route('**/api/gemini/historial', r => r.fulfill({
+    await page.route('**/api/ai/historial', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({
         historial: [
@@ -632,13 +632,13 @@ test.describe('Chat IA — Flujos Correctos', () => {
 test.describe('Chat IA — Flujos Incorrectos', () => {
   test.beforeEach(async ({ page }) => {
     await setupAuth(page, 'ABOGADO');
-    await page.route('**/api/gemini/historial', r => r.fulfill({
+    await page.route('**/api/ai/historial', r => r.fulfill({
       status: 200, body: JSON.stringify({ historial: [] }),
     }));
   });
 
   test('Chat: backend Gemini 503 → UI no crashea con mensaje de error', async ({ page }) => {
-    await page.route('**/api/gemini/chat', r => r.fulfill({
+    await page.route('**/api/ai/chat', r => r.fulfill({
       status: 503, contentType: 'application/json',
       body: JSON.stringify({ error: 'Servicio de IA temporalmente no disponible.' }),
     }));
@@ -659,7 +659,7 @@ test.describe('Chat IA — Flujos Incorrectos', () => {
   });
 
   test('Chat: prompt injection → backend retorna 400, UI muestra error', async ({ page }) => {
-    await page.route('**/api/gemini/chat', r => r.fulfill({
+    await page.route('**/api/ai/chat', r => r.fulfill({
       status: 400, contentType: 'application/json',
       body: JSON.stringify({ error: 'El mensaje contiene contenido no permitido.' }),
     }));
@@ -682,7 +682,7 @@ test.describe('Chat IA — Flujos Incorrectos', () => {
   });
 
   test('Chat: respuesta vacía del servidor → UI no queda en blanco', async ({ page }) => {
-    await page.route('**/api/gemini/chat', r => r.fulfill({
+    await page.route('**/api/ai/chat', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ respuesta: '', tokens: 0 }),
     }));
@@ -703,7 +703,7 @@ test.describe('Buscador Jurisprudencia — Flujos Correctos', () => {
   });
 
   test('Búsqueda válida → resultados de jurisprudencia visibles', async ({ page }) => {
-    await page.route('**/api/gemini/jurisprudencia**', r => r.fulfill({
+    await page.route('**/api/ai/jurisprudencia**', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({
         resultados: [
@@ -731,7 +731,7 @@ test.describe('Buscador Jurisprudencia — Flujos Correctos', () => {
   });
 
   test('Búsqueda en penal → resultados filtrados por rama', async ({ page }) => {
-    await page.route('**/api/gemini/jurisprudencia**', r => r.fulfill({
+    await page.route('**/api/ai/jurisprudencia**', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultados: [], total: 0 }),
     }));
@@ -748,7 +748,7 @@ test.describe('Buscador Jurisprudencia — Flujos Incorrectos', () => {
   });
 
   test('Búsqueda sin resultados → estado vacío visible, no crashea', async ({ page }) => {
-    await page.route('**/api/gemini/jurisprudencia**', r => r.fulfill({
+    await page.route('**/api/ai/jurisprudencia**', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultados: [], total: 0 }),
     }));
@@ -759,7 +759,7 @@ test.describe('Buscador Jurisprudencia — Flujos Incorrectos', () => {
   });
 
   test('API Gemini 429 en búsqueda → UI no crashea', async ({ page }) => {
-    await page.route('**/api/gemini/jurisprudencia**', r => r.fulfill({
+    await page.route('**/api/ai/jurisprudencia**', r => r.fulfill({
       status: 429, contentType: 'application/json',
       body: JSON.stringify({ error: 'Límite de solicitudes alcanzado.' }),
     }));
@@ -842,14 +842,14 @@ test.describe('Simulador de Juicios — Flujos Correctos', () => {
   });
 
   test('Simulador: inicio de simulación → responde sin crash', async ({ page }) => {
-    await page.route('**/api/gemini/chat', r => r.fulfill({
+    await page.route('**/api/ai/chat', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({
         respuesta: 'Fiscal: Sr. testigo, ¿estaba usted presente en el lugar de los hechos el día 15 de enero?',
         tokens: 120,
       }),
     }));
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultado: 'Simulación iniciada correctamente.', tipo: 'general' }),
     }));
@@ -861,7 +861,7 @@ test.describe('Simulador de Juicios — Flujos Correctos', () => {
 
   test('Simulador: turnos alternados → estado de la simulación actualiza', async ({ page }) => {
     let callCount = 0;
-    await page.route('**/api/gemini/chat', r => {
+    await page.route('**/api/ai/chat', r => {
       callCount++;
       r.fulfill({
         status: 200, contentType: 'application/json',
@@ -886,11 +886,11 @@ test.describe('Simulador de Juicios — Flujos Incorrectos', () => {
   });
 
   test('Simulador: Gemini 500 → UI no desmonta', async ({ page }) => {
-    await page.route('**/api/gemini/chat', r => r.fulfill({
+    await page.route('**/api/ai/chat', r => r.fulfill({
       status: 500, contentType: 'application/json',
       body: JSON.stringify({ error: 'Error en el servicio de simulación.' }),
     }));
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 500, contentType: 'application/json',
       body: JSON.stringify({ error: 'Error en el servicio.' }),
     }));
@@ -918,7 +918,7 @@ test.describe('Redactor de Escritos IA — Flujos Correctos', () => {
   });
 
   test('Redactor: genera escrito de demanda → texto legal estructurado', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({
         resultado: `SEÑOR JUEZ DEL JUZGADO CIVIL DE LIMA:\n\nJUAN PÉREZ GARCIA, identificado con DNI 12345678...\nPOR DERECHO EXPONGO:\n\nI. HECHOS\nQue con fecha...\n\nPOR TANTO:\nA Ud. señor Juez, pido admitir la presente demanda.`,
@@ -933,7 +933,7 @@ test.describe('Redactor de Escritos IA — Flujos Correctos', () => {
   });
 
   test('Redactor: genera alegatos de clausura → sin crash', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify({ resultado: 'Señor Juez, los hechos probados en el juicio...', tipo: 'alegatos', tokens: 420 }),
     }));
@@ -950,7 +950,7 @@ test.describe('Redactor de Escritos IA — Flujos Incorrectos', () => {
   });
 
   test('Redactor: prompt vacío → validación o error del backend', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 400, contentType: 'application/json',
       body: JSON.stringify({ error: 'El prompt no puede estar vacío.' }),
     }));
@@ -961,7 +961,7 @@ test.describe('Redactor de Escritos IA — Flujos Incorrectos', () => {
   });
 
   test('Redactor: tipo inválido → 400 sin crash UI', async ({ page }) => {
-    await page.route('**/api/gemini/consulta', r => r.fulfill({
+    await page.route('**/api/ai/consulta', r => r.fulfill({
       status: 400, contentType: 'application/json',
       body: JSON.stringify({ error: 'Tipo inválido. Valores: general, analisis, redaccion, jurisprudencia, predictor, alegatos, interrogatorio.' }),
     }));
@@ -1070,7 +1070,7 @@ test.describe('Dashboard — Resiliencia con APIs mixtas', () => {
     await page.route('**/api/notificaciones**', r => r.fulfill({
       status: 200, body: JSON.stringify([{ id: 1, titulo: 'Notificación test', tipo: 'info' }]),
     }));
-    await page.route('**/api/gemini/notificaciones**', r => r.fulfill({
+    await page.route('**/api/ai/notificaciones**', r => r.fulfill({
       status: 200, body: JSON.stringify([]),
     }));
 
@@ -1087,7 +1087,7 @@ test.describe('Dashboard — Resiliencia con APIs mixtas', () => {
     await page.route('**/api/notificaciones**', r => r.fulfill({
       status: 200, body: JSON.stringify([]),
     }));
-    await page.route('**/api/gemini/notificaciones**', r => r.fulfill({
+    await page.route('**/api/ai/notificaciones**', r => r.fulfill({
       status: 200, body: JSON.stringify([]),
     }));
 
@@ -1118,7 +1118,7 @@ test.describe('Dashboard — Resiliencia con APIs mixtas', () => {
     await page.route('**/api/notificaciones**', r => r.fulfill({
       status: 200, body: JSON.stringify([]),
     }));
-    await page.route('**/api/gemini/notificaciones**', r => r.fulfill({
+    await page.route('**/api/ai/notificaciones**', r => r.fulfill({
       status: 200, body: JSON.stringify([]),
     }));
 
@@ -1242,7 +1242,7 @@ test.describe('Monitor SINOE — Resiliencia', () => {
   });
 
   test('SINOE: notificaciones cargadas correctamente', async ({ page }) => {
-    await page.route('**/api/gemini/notificaciones**', r => r.fulfill({
+    await page.route('**/api/ai/notificaciones**', r => r.fulfill({
       status: 200, contentType: 'application/json',
       body: JSON.stringify([
         { id: 1, titulo: 'Notificación de audiencia', mensaje: 'Exp. 00123-2024 — Audiencia mañana', tipo: 'urgente' },
@@ -1256,7 +1256,7 @@ test.describe('Monitor SINOE — Resiliencia', () => {
   });
 
   test('SINOE: sin notificaciones → estado vacío', async ({ page }) => {
-    await page.route('**/api/gemini/notificaciones**', r => r.fulfill({
+    await page.route('**/api/ai/notificaciones**', r => r.fulfill({
       status: 200, body: JSON.stringify([]),
     }));
 
@@ -1266,7 +1266,7 @@ test.describe('Monitor SINOE — Resiliencia', () => {
   });
 
   test('SINOE: API error → no crashea', async ({ page }) => {
-    await page.route('**/api/gemini/notificaciones**', r => r.abort('failed'));
+    await page.route('**/api/ai/notificaciones**', r => r.abort('failed'));
 
     await page.goto('/monitor-sinoe');
     await page.waitForTimeout(1500);
@@ -1282,7 +1282,7 @@ test.describe('Herramientas IA — Carga Resiliente Completa', () => {
   test.beforeEach(async ({ page }) => {
     await setupAuth(page, 'ABOGADO');
     // Mock genérico para todas las rutas de Gemini
-    await page.route('**/api/gemini/**', r => r.fulfill({
+    await page.route('**/api/ai/**', r => r.fulfill({
       status: 200, body: JSON.stringify({ resultado: 'Respuesta IA simulada', tipo: 'general', tokens: 100 }),
     }));
     await page.route('**/api/expedientes**', r => r.fulfill({
@@ -1312,7 +1312,7 @@ test.describe('Herramientas IA — Todas con API Error (Resiliente)', () => {
   test.beforeEach(async ({ page }) => {
     await setupAuth(page, 'ABOGADO');
     // Todas las APIs fallan → la UI debe ser resiliente
-    await page.route('**/api/gemini/**', r => r.fulfill({
+    await page.route('**/api/ai/**', r => r.fulfill({
       status: 500, body: JSON.stringify({ error: 'Servicio de IA no disponible.' }),
     }));
     await page.route('**/api/expedientes**', r => r.fulfill({

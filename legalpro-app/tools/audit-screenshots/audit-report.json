@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-06-23T13:33:04.156Z",
+  "pages": [
+    {
+      "route": "/dashboard",
+      "status": 200,
+      "loadMs": 1919,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_dashboard.png"
+    },
+    {
+      "route": "/expedientes",
+      "status": 200,
+      "loadMs": 1337,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_expedientes.png"
+    },
+    {
+      "route": "/chat-ia",
+      "status": 200,
+      "loadMs": 1458,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_chat-ia.png"
+    },
+    {
+      "route": "/herramientas",
+      "status": 200,
+      "loadMs": 1343,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_herramientas.png"
+    },
+    {
+      "route": "/redactor",
+      "status": 200,
+      "loadMs": 1443,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_redactor.png"
+    },
+    {
+      "route": "/simulador",
+      "status": 200,
+      "loadMs": 1347,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_simulador.png"
+    },
+    {
+      "route": "/perfil",
+      "status": 200,
+      "loadMs": 1360,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_perfil.png"
+    },
+    {
+      "route": "/login",
+      "status": 200,
+      "loadMs": 1344,
+      "crash": false,
+      "jsErrors": [],
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\_login.png"
+    }
+  ],
+  "chat": {
+    "inputVisible": true,
+    "apiStatus": 200,
+    "hasReply": true,
+    "snippet": "{\"respuesta\":\"Estimado Dr. García Pérez, es un gusto saludarlo.\\n\\nEn atención a su consulta sobre los plazos para contestar una demanda en el proceso civil peruano, le informo que, de acuerdo con el **Código Procesal Civil (CPC)**, el plazo varía según la vía procedimental en la que se tramite la causa:\\n\\n1.  **Proceso de Conocimiento:** El plazo es de **30 días hábiles** (Art. 478, inciso 1 del"
+  },
+  "mobile": [
+    {
+      "route": "/dashboard",
+      "horizontalOverflow": false,
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\mobile_dashboard.png"
+    },
+    {
+      "route": "/chat-ia",
+      "horizontalOverflow": false,
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\mobile_chat-ia.png"
+    },
+    {
+      "route": "/expedientes",
+      "horizontalOverflow": false,
+      "file": "C:\\Users\\Pc\\Desktop\\Abogacia\\tools\\audit-screenshots\\mobile_expedientes.png"
+    }
+  ],
+  "issues": [],
+  "positives": [
+    "Landing premium accesible desde /",
+    "Chat IA: respuesta real visible"
+  ],
+  "landing": {
+    "url": "https://legalpro-frontend-production-a988.up.railway.app/landing/",
+    "hasVideo": true
+  }
+}

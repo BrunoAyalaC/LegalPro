@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Enums;
 using LegalPro.Domain.Exceptions;
@@ -14,7 +15,10 @@ namespace LegalPro.Application.Expedientes.Commands;
 // Tenant isolation: filtra por Id + OrganizationId (OWASP A01).
 // ═══════════════════════════════════════════════════════
 
-public record EliminarExpedienteCommand(Guid Id) : IRequest;
+public record EliminarExpedienteCommand(Guid Id) : IRequest, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public class EliminarExpedienteCommandValidator : AbstractValidator<EliminarExpedienteCommand>
 {
@@ -46,9 +50,9 @@ public class EliminarExpedienteCommandHandler : IRequestHandler<EliminarExpedien
             .FirstOrDefaultAsync(e => e.Id == request.Id && e.OrganizationId == orgId, cancellationToken)
             ?? throw new NotFoundException(nameof(Domain.Entities.Expediente), request.Id);
 
-        // Soft-delete: archivar en lugar de eliminar físicamente.
+        // Soft-delete: marcar DeletedAt en lugar de eliminar físicamente.
         // Preserva el histórico forense requerido en procedimientos legales peruanos.
-        expediente.CambiarEstado(EstadoExpediente.Archivado);
+        expediente.Eliminar();
 
         await _context.SaveChangesAsync(cancellationToken);
     }

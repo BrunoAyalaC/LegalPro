@@ -34,9 +34,11 @@ public enum EstadoExpediente
 {
     Activo,
     EnTramite,
+    Suspendido,
     Apelacion,
     Casacion,
     Archivado,
+    Cerrado,
     Ejecutoria,
     Sentenciado
 }

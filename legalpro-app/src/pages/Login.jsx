@@ -151,6 +151,12 @@ export default function Login() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [aceptaPrivacidad, setAceptaPrivacidad] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  // "Recordarme": true → access token en localStorage; false → sessionStorage
+  const [remember, setRemember] = useState(true);
 
   /* Auto-advance slides each 4s */
   useEffect(() => {
@@ -173,14 +179,14 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const { organizacion } = await login(email, password);
+      const { organizacion } = await login(email, password, remember);
       navigate(organizacion ? '/dashboard' : '/setup-organizacion');
     } catch (err) {
       setError(err.message ?? 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
-  }, [email, password, login, navigate]);
+  }, [email, password, remember, login, navigate]);
 
   const handleRegister = useCallback(async (e) => {
     e.preventDefault();
@@ -213,7 +219,7 @@ export default function Login() {
         aceptaPrivacidad,
       });
       // Auto-login después de registro
-      const { organizacion } = await login(email, password);
+      const { organizacion } = await login(email, password, remember);
       navigate(organizacion ? '/dashboard' : '/setup-organizacion');
     } catch (err) {
       const msg = err?.message ?? '';
@@ -227,7 +233,7 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  }, [email, password, confirmPassword, nombreCompleto, aceptaTerminos, aceptaPrivacidad, aceptaTransferencia, login, navigate]);
+  }, [email, password, confirmPassword, nombreCompleto, aceptaTerminos, aceptaPrivacidad, aceptaTransferencia, remember, login, navigate]);
 
   const isSubmitting = loading || contextLoading;
 
@@ -461,6 +467,8 @@ export default function Login() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
+                    autoFocus
+                    autoComplete="email"
                     placeholder="tu@correo.com"
                     style={{
                       width: '100%', boxSizing: 'border-box',
@@ -492,6 +500,7 @@ export default function Login() {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                     placeholder="••••••••"
                     style={{
                       width: '100%', boxSizing: 'border-box',
@@ -558,12 +567,21 @@ export default function Login() {
               {!isRegister && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12, color: 'rgba(255,255,255,0.45)', cursor: 'pointer' }}>
-                    <input type="checkbox" defaultChecked style={{ accentColor: '#06B6D4' }} />
+                    <input
+                      type="checkbox"
+                      checked={remember}
+                      onChange={e => setRemember(e.target.checked)}
+                      style={{ accentColor: '#06B6D4' }}
+                    />
                     Recordarme
                   </label>
-                  <a href="#" style={{ fontSize: 12, color: '#06B6D4', textDecoration: 'none' }}>
+                  <button
+                    type="button"
+                    onClick={() => { setForgotEmail(email); setForgotSent(false); setShowForgotModal(true); }}
+                    style={{ fontSize: 12, color: '#06B6D4', textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                  >
                     ¿Olvidó su contraseña?
-                  </a>
+                  </button>
                 </div>
               )}
 
@@ -591,7 +609,7 @@ export default function Login() {
                     />
                     <span>
                       Acepto la{' '}
-                      <a href="/privacidad.html" target="_blank" rel="noopener noreferrer" style={{ color: '#06B6D4', textDecoration: 'underline' }}>Política de Privacidad</a>
+                      <a href="/legal/privacidad" target="_blank" rel="noopener noreferrer" style={{ color: '#06B6D4', textDecoration: 'underline' }}>Política de Privacidad</a>
                     </span>
                   </label>
                   <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', lineHeight: 1.5 }}>
@@ -602,8 +620,8 @@ export default function Login() {
                       style={{ accentColor: '#06B6D4', marginTop: 2 }}
                     />
                     <span>
-                      Acepto que mis datos puedan ser transferidos a proveedores de servicios cloud ubicados en el extranjero (Estados Unidos) para el procesamiento de IA, conforme a la{' '}
-                      <a href="/privacidad.html" target="_blank" rel="noopener noreferrer" style={{ color: '#06B6D4', textDecoration: 'underline' }}>Política de Privacidad</a>
+                      Acepto que mis datos puedan ser transferidos a proveedores de servicios cloud ubicados en el extranjero (China / EE.UU.) para el procesamiento de IA, conforme a la{' '}
+                      <a href="/legal/privacidad" target="_blank" rel="noopener noreferrer" style={{ color: '#06B6D4', textDecoration: 'underline' }}>Política de Privacidad</a>
                     </span>
                   </label>
                 </div>
@@ -709,6 +727,133 @@ export default function Login() {
           </p>
         </div>
       </main>
+
+      {/* ── Forgot Password Modal ── */}
+      {showForgotModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+          onClick={() => setShowForgotModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="forgot-title"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#0f0f16',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 20, padding: '32px 28px',
+              width: '100%', maxWidth: 400,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+            }}
+          >
+            <h3 id="forgot-title" style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 6, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+              Restablecer contraseña
+            </h3>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginBottom: 20 }}>
+              Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.
+            </p>
+
+            {forgotSent ? (
+              <div
+                role="alert"
+                style={{
+                  padding: '16px 14px',
+                  background: 'rgba(6,182,212,0.1)',
+                  border: '1px solid rgba(6,182,212,0.25)',
+                  borderRadius: 10, fontSize: 13,
+                  color: '#22d3ee',
+                  marginBottom: 16,
+                }}
+              >
+                <span style={{ display: 'block', fontWeight: 700, marginBottom: 4 }}>📧 Correo enviado</span>
+                Si existe una cuenta con {forgotEmail}, recibirás un enlace para restablecer tu contraseña.
+              </div>
+            ) : (
+              <div style={{ marginBottom: 16 }}>
+                <label htmlFor="forgot-email" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+                  Correo electrónico
+                </label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={e => setForgotEmail(e.target.value)}
+                  autoFocus
+                  autoComplete="email"
+                  placeholder="tu@correo.com"
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    padding: '12px 14px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    borderRadius: 12, fontSize: 14, color: '#fff',
+                    outline: 'none',
+                  }}
+                  onFocus={e => e.target.style.borderColor = 'rgba(6,182,212,0.5)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.10)'}
+                />
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(false)}
+                style={{
+                  flex: 1, padding: '12px',
+                  borderRadius: 12, border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'transparent', color: 'rgba(255,255,255,0.7)',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {forgotSent ? 'Cerrar' : 'Cancelar'}
+              </button>
+              {!forgotSent && (
+                <button
+                  type="button"
+                  disabled={forgotLoading || !forgotEmail.trim()}
+                  onClick={async () => {
+                    if (!forgotEmail.trim()) return;
+                    setForgotLoading(true);
+                    try {
+                      const { nodeClient } = await import('../api/client');
+                      await nodeClient.post('/api/auth/forgot-password', { email: forgotEmail.trim() });
+                      setForgotSent(true);
+                    } catch {
+                      // Siempre mostrar mensaje genérico por seguridad (no revelar si existe o no)
+                      setForgotSent(true);
+                    } finally {
+                      setForgotLoading(false);
+                    }
+                  }}
+                  style={{
+                    flex: 1, padding: '12px',
+                    borderRadius: 12, border: 'none',
+                    background: forgotLoading || !forgotEmail.trim()
+                      ? 'rgba(6,182,212,0.4)'
+                      : 'linear-gradient(135deg, #06B6D4 0%, #0891b2 100%)',
+                    color: '#fff', fontSize: 13, fontWeight: 700,
+                    cursor: forgotLoading || !forgotEmail.trim() ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  }}
+                >
+                  {forgotLoading ? (
+                    <div style={{
+                      width: 16, height: 16, borderRadius: '50%',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTopColor: '#fff',
+                      animation: 'spin 0.7s linear infinite',
+                    }} />
+                  ) : (
+                    'Enviar enlace'
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -15,7 +15,7 @@
 
 // Lee URLs desde env vars → permite sobreescribir sin editar el archivo
 // Uso: FRONTEND_URL=https://... NODE_API_URL=https://... node smoke-production.mjs
-const FRONTEND  = process.env.FRONTEND_URL  ?? 'https://legalpro-frontend-production.up.railway.app';
+const FRONTEND  = process.env.FRONTEND_URL  ?? 'https://legalpro-frontend-production-a988.up.railway.app';
 const NODE_API  = process.env.NODE_API_URL  ?? 'https://legalpro-node-production-34ac.up.railway.app';
 const DOTNET_API = process.env.DOTNET_API_URL ?? 'https://legalpro-dotnet-production-5a39.up.railway.app';
 const APK_URL   = process.env.APK_URL       ?? 'https://github.com/BrunoAyalaC/Abogacia/releases/download/v1.1.0/LegalPro-v1.1.0.apk';
@@ -27,6 +27,8 @@ const TEST_USER = {
   email: `smoke-${TS}@legalpro-test.pe`,
   password: 'SmokeTest2026!',
   rol: 'ABOGADO',
+  aceptaTerminos: true,
+  aceptaPrivacidad: true,
 };
 // .NET espera PascalCase y Rol con primera mayúscula
 const TEST_USER_DOTNET = {

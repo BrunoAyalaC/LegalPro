@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using System.Text.Json;
 using LegalPro.Application.Common;
 using LegalPro.Application.Common.Interfaces;
@@ -10,10 +11,11 @@ namespace LegalPro.Application.Juez.Commands;
 /// Genera resoluciones judiciales con motivación formal según art. 139.5 Constitución.
 /// Tipos: auto_admisorio | sentencia | auto_cautelar | resolucion_incidente | sentencia_absolutoria | sentencia_condenatoria.
 /// Estructura: SUMILLA → VISTOS → CONSIDERANDO (numerado) → FALLO / SE RESUELVE.
-/// FC garantizado: Gemini actúa como magistrado, no como abogado.
+/// FC garantizado: MiniMax actúa como magistrado, no como abogado.
 /// </summary>
-public class GenerarResolucionJudicialCommand : IRequest<ResolucionJudicialDto>
+public class GenerarResolucionJudicialCommand : IRequest<ResolucionJudicialDto>, ITenantRequest
 {
+    public Guid OrganizationId { get; set; }
     public string TipoResolucion      { get; set; } = string.Empty;
     public string Hechos              { get; set; } = string.Empty;
     public string Pretensiones        { get; set; } = string.Empty;
@@ -68,15 +70,15 @@ public class GenerarResolucionJudicialValidator : AbstractValidator<GenerarResol
 
 public class GenerarResolucionJudicialHandler : IRequestHandler<GenerarResolucionJudicialCommand, ResolucionJudicialDto>
 {
-    private readonly ILegalJuez _gemini;
+    private readonly ILegalJuez _minimax;
 
-    public GenerarResolucionJudicialHandler(ILegalJuez gemini) => _gemini = gemini;
+    public GenerarResolucionJudicialHandler(ILegalJuez minimax) => _minimax = minimax;
 
     public async Task<ResolucionJudicialDto> Handle(
         GenerarResolucionJudicialCommand request,
         CancellationToken cancellationToken)
     {
-        var json = await _gemini.GenerarResolucionJudicialAsync(
+        var json = await _minimax.GenerarResolucionJudicialAsync(
             request.TipoResolucion,
             request.Hechos,
             request.Pretensiones,

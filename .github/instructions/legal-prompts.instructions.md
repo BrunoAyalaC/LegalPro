@@ -1,16 +1,16 @@
 ---
-description: "Reglas para prompts y configuración de Gemini AI en contexto legal peruano. Usa SDK oficial @google/genai."
-applyTo: "**/services/gemini*.{js,ts,cs}"
+description: "Reglas para prompts y configuración de la IA de MiniMax en contexto legal peruano. Usa adaptador minimaxClient o cliente compatible con OpenAI."
+applyTo: "**/services/*ai*.{js,ts,cs}"
 ---
 
-# Gemini AI Legal Prompts - Reglas
+# MiniMax AI Legal Prompts - Reglas
 
-## SDK Oficial
+## API y Modelos
 
-- Paquete: `@google/genai` (NO `@google/generative-ai`)
-- Import: `import { GoogleGenAI, FunctionCallingConfigMode, Type } from '@google/genai'`
-- Modelo: `gemini-2.5-flash`
-- Function declarations: usar `parametersJsonSchema` (formato JSON Schema)
+- Proveedor: MiniMax (OpenAI-compatible)
+- Import (Node): `import { GoogleGenAI, FunctionCallingConfigMode, Type } from '../utils/minimaxClient.js'`
+- Modelo: `MiniMax-M2.5-highspeed` o `MiniMax-M3`
+- Function declarations: estructuradas en formato compatible con OpenAI/MiniMax
 
 ## System Instruction obligatorio
 
@@ -33,10 +33,10 @@ Eres un asistente legal especializado en el sistema jurídico peruano.
 
 1. `buscar_jurisprudencia` → Supabase: jurisprudencia
 2. `analizar_expediente` → Supabase: expedientes + documentos
-3. `redactar_escrito` → Gemini generativo
+3. `redactar_escrito` → MiniMax generativo
 4. `calcular_plazos` → Reglas CPC/NCPP
 5. `predecir_resultado` → Supabase: precedentes
-6. `generar_estrategia` → Gemini + contexto
+6. `generar_estrategia` → MiniMax + contexto
 7. `consultar_norma` → Supabase: base_legal_vectorial
 
 ## Restricciones

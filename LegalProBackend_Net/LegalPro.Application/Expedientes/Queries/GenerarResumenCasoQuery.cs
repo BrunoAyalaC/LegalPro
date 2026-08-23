@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using System.Text.Json;
 using LegalPro.Application.Common;
 using LegalPro.Application.Common.Interfaces;
@@ -13,7 +14,10 @@ namespace LegalPro.Application.Expedientes.Queries;
 /// El abogado obtiene en segundos: hechos clave, fortalezas, debilidades, próximos pasos.
 /// Tenant-isolated: solo accede a expedientes de la organización del usuario autenticado.
 /// </summary>
-public record GenerarResumenCasoQuery(Guid ExpedienteId) : IRequest<ResumenCasoDto>;
+public record GenerarResumenCasoQuery(Guid ExpedienteId) : IRequest<ResumenCasoDto>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public record ResumenCasoDto(
     Guid ExpedienteId,
@@ -40,16 +44,16 @@ public class GenerarResumenCasoQueryHandler : IRequestHandler<GenerarResumenCaso
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
-    private readonly ILegalResumenCaso _gemini;
+    private readonly ILegalResumenCaso _minimax;
 
     public GenerarResumenCasoQueryHandler(
         IApplicationDbContext context,
         ICurrentUserService currentUser,
-        ILegalResumenCaso gemini)
+        ILegalResumenCaso minimax)
     {
         _context = context;
         _currentUser = currentUser;
-        _gemini = gemini;
+        _minimax = minimax;
     }
 
     public async Task<ResumenCasoDto> Handle(
@@ -67,7 +71,7 @@ public class GenerarResumenCasoQueryHandler : IRequestHandler<GenerarResumenCaso
                 cancellationToken)
             ?? throw new NotFoundException(nameof(Domain.Entities.Expediente), request.ExpedienteId);
 
-        // Serializar expediente para contexto de Gemini (sin datos sensibles extra)
+        // Serializar expediente para contexto de MiniMax (sin datos sensibles extra)
         var expedienteJson = System.Text.Json.JsonSerializer.Serialize(new
         {
             numero     = expediente.Numero,
@@ -78,7 +82,7 @@ public class GenerarResumenCasoQueryHandler : IRequestHandler<GenerarResumenCaso
             createdAt  = expediente.CreatedAt
         });
 
-        var json = await _gemini.GenerarResumenCasoAsync(expedienteJson, documentosTexto: "");
+        var json = await _minimax.GenerarResumenCasoAsync(expedienteJson, documentosTexto: "");
 
         using var doc = JsonDocument.Parse(json);
         var r = doc.RootElement;

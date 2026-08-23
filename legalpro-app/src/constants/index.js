@@ -140,7 +140,7 @@ export const DEFAULT_PAGE_SIZE = 25;
 
 /* ── Keys de localStorage ──────────────────────────────────── */
 export const STORAGE_KEYS = {
-  TOKEN:             'legalpro_token',
+  TOKEN:             'legalpro_access_token',
   SIDEBAR_COLLAPSED: 'legalpro_sidebar_collapsed',
   TOUR_COMPLETED:    'legalpro_tour_completed',
   THEME:             'legalpro_theme',

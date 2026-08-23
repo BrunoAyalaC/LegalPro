@@ -7,8 +7,10 @@ namespace LegalPro.Domain.Entities;
 /// Entidad de dominio: MensajeChat
 /// Persiste el historial de conversaciones legales por usuario y organización.
 /// Permite retomar conversaciones entre sesiones (multi-turn persistido).
+/// Implementa ITenantEntity: el chat pertenece a un Usuario y a su Organización.
+/// El query filter global lo aísla por tenant para evitar fugas cross-tenant.
 /// </summary>
-public class MensajeChat : BaseGuidEntity
+public class MensajeChat : BaseGuidEntity, ITenantEntity
 {
     public Guid UsuarioId { get; private set; }
     public Guid? OrganizationId { get; private set; }

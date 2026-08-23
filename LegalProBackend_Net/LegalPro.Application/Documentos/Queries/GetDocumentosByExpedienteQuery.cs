@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using Microsoft.EntityFrameworkCore;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Entities;
@@ -12,9 +13,10 @@ namespace LegalPro.Application.Documentos.Queries;
 // por organización del usuario autenticado.
 // ═══════════════════════════════════════════════════════
 
-public class GetDocumentosByExpedienteQuery : IRequest<IReadOnlyList<DocumentoDto>>
+public class GetDocumentosByExpedienteQuery : IRequest<IReadOnlyList<DocumentoDto>>, ITenantRequest
 {
     public Guid ExpedienteId { get; set; }
+    public Guid OrganizationId { get; set; }
 }
 
 public record DocumentoDto(
@@ -71,7 +73,9 @@ public class GetDocumentosByExpedienteHandler : IRequestHandler<GetDocumentosByE
                 d.Url,
                 d.Tipo,
                 d.ExpedienteId,
-                d.OrganizationId,
+                // OrganizationId es Guid? en la entidad; el DTO expone Guid (no-null).
+                // El filtro en Where garantiza no-null en la fila retornada.
+                d.OrganizationId!.Value,
                 d.CreatedAt,
                 d.UpdatedAt))
             .ToListAsync(cancellationToken);

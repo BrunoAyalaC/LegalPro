@@ -1,0 +1,105 @@
+# Dependabot — Actualizaciones automáticas
+# Configuración centralizada del catálogo, copiada a .github/dependabot.yml
+
+version: 2
+updates:
+  # Node.js (legalpro-app/server y frontend)
+  - package-ecosystem: "npm"
+    directory: "/legalpro-app"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Bogota"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "backend-node"
+      - "frontend"
+      - "arquitecto-chief"
+    labels:
+      - "dependencies"
+      - "area/backend"
+      - "area/frontend"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    ignore:
+      # No auto-merge major versions
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # .NET (LegalProBackend_Net)
+  - package-ecosystem: "nuget"
+    directory: "/LegalProBackend_Net"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "America/Bogota"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "backend-dotnet"
+      - "arquitecto-chief"
+    labels:
+      - "dependencies"
+      - "area/backend"
+    commit-message:
+      prefix: "chore(deps)"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "America/Bogota"
+    reviewers:
+      - "devops"
+      - "arquitecto-chief"
+    labels:
+      - "dependencies"
+      - "area/devops"
+    commit-message:
+      prefix: "chore(ci)"
+
+  # Android (Gradle)
+  - package-ecosystem: "gradle"
+    directory: "/LegalProAndroid"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+      timezone: "America/Bogota"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "android"
+      - "arquitecto-chief"
+    labels:
+      - "dependencies"
+      - "area/android"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # Docker (Dockerfile base images)
+  - package-ecosystem: "docker"
+    directory: "/legalpro-app"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "09:00"
+      timezone: "America/Bogota"
+    reviewers:
+      - "devops"
+      - "arquitecto-chief"
+    labels:
+      - "dependencies"
+      - "area/devops"

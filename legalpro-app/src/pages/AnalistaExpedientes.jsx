@@ -4,6 +4,8 @@ import AppIcon from '../components/AppIcon';
 import Header from '../components/Header';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import { api } from '../api/client';
+import { getProviderLabel } from '../lib/iaProviders.js';
+import { useSeo } from '../hooks/useSeo';
 
 export default function AnalistaExpedientes() {
   const { id } = useParams();
@@ -33,6 +35,15 @@ export default function AnalistaExpedientes() {
 
     return () => { cancelled = true; };
   }, [id]);
+
+  useSeo({
+    title: expediente
+      ? `Análisis de Expediente ${expediente.numero || expediente.id} | LegalPro`
+      : 'Análisis de Expediente | LegalPro',
+    description: expediente
+      ? `Consulta detalles, resume hechos, detecta plazos procesales y analiza la jurisprudencia asociada al expediente judicial N° ${expediente.numero || expediente.id} con ayuda de Lex-IA.`
+      : 'Analiza expedientes judiciales con Lex-IA: resume hechos, detecta plazos y revisa jurisprudencia relevante.',
+  });
 
   const sendMessage = async (promptText) => {
     const text = (promptText || input).trim();
@@ -64,7 +75,7 @@ export default function AnalistaExpedientes() {
 
   if (loadingExp) {
     return (
-      <div className="page-enter flex flex-col h-screen items-center justify-center text-slate-400">
+      <div className="page-enter flex flex-col h-[calc(100dvh-148px)] lg:h-[calc(100dvh-64px)] items-center justify-center text-slate-400">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
         <p className="text-sm">Cargando expediente...</p>
       </div>
@@ -73,7 +84,7 @@ export default function AnalistaExpedientes() {
 
   if (errorExp) {
     return (
-      <div className="page-enter flex flex-col h-screen items-center justify-center px-6 text-center">
+      <div className="page-enter flex flex-col h-[calc(100dvh-148px)] lg:h-[calc(100dvh-64px)] items-center justify-center px-6 text-center">
         <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
           <AppIcon name="error_outline" size={32} />
         </div>
@@ -87,9 +98,9 @@ export default function AnalistaExpedientes() {
   }
 
   return (
-    <div className="page-enter flex flex-col h-screen">
+    <div className="page-enter flex flex-col h-[calc(100dvh-148px)] lg:h-[calc(100dvh-64px)] overflow-hidden">
       <Header title={expediente ? `Expediente N° ${expediente.numero || expediente.id}` : 'Expediente'} showBack
-        rightAction={<span className="badge badge-primary"><AppIcon name="auto_awesome" size={20} /> Gemini 2.0</span>}
+        rightAction={<span className="badge badge-primary"><AppIcon name="auto_awesome" size={20} /> {getProviderLabel('opencode')}</span>}
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">

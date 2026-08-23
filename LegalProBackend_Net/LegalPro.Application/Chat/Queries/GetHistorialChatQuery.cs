@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 
 namespace LegalPro.Application.Chat.Queries;
@@ -9,10 +10,11 @@ namespace LegalPro.Application.Chat.Queries;
 /// Obtiene el historial de mensajes de una sesión de chat específica.
 /// Requiere autenticación — solo devuelve mensajes del usuario autenticado.
 /// </summary>
-public class GetHistorialChatQuery : IRequest<HistorialChatDto>
+public class GetHistorialChatQuery : IRequest<HistorialChatDto>, ITenantRequest
 {
     public Guid SesionId { get; set; }
     public int? Limit { get; set; } = 50;
+    public Guid OrganizationId { get; set; }
 }
 
 public record HistorialChatDto(
@@ -55,6 +57,7 @@ public class GetHistorialChatHandler : IRequestHandler<GetHistorialChatQuery, Hi
         var orgId = _currentUser.OrganizationId;
 
         var query = _db.MensajesChat
+            .AsNoTracking()
             .Where(m => m.SesionId == request.SesionId && m.UsuarioId == userId);
 
         // Aislamiento multi-tenant adicional por organización si aplica

@@ -9,7 +9,7 @@ namespace LegalPro.Domain.Entities;
 /// Aggregate Root: Expediente (Case File)
 /// Contains business rules for state transitions and urgency management.
 /// </summary>
-public class Expediente : BaseGuidEntity
+public class Expediente : BaseGuidEntity, ITenantEntity, ISoftDelete
 {
     public string Numero { get; private set; } = string.Empty;
     public string Titulo { get; private set; } = string.Empty;
@@ -20,7 +20,7 @@ public class Expediente : BaseGuidEntity
     public Guid UsuarioId { get; private set; }
     public Usuario? Usuario { get; private set; }
 
-    public Guid OrganizationId { get; private set; }
+    public Guid? OrganizationId { get; private set; }
     public Organizacion? Organizacion { get; private set; }
 
     private Expediente() { }
@@ -89,6 +89,17 @@ public class Expediente : BaseGuidEntity
             throw new DomainException("El nuevo título no puede estar vacío.");
 
         Titulo = nuevoTitulo.Trim();
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public DateTime? DeletedAt { get; private set; }
+
+    public void Eliminar()
+    {
+        if (DeletedAt.HasValue)
+            throw new DomainException("El expediente ya ha sido eliminado.");
+
+        DeletedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
     }
 }

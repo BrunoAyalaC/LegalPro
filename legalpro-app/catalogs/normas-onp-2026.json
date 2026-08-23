@@ -1,0 +1,116 @@
+{
+  "metadata": {
+    "nombre": "ONP - Resoluciones y Normas 2026 (Sistema Nacional de Pensiones - D.L. 19990)",
+    "fuente": "https://www.gob.pe/onp",
+    "fuente_complementaria": "https://www.onp.gob.pe",
+    "fecha_consulta": "2026-08-01",
+    "descripcion": "Catalogo de Resoluciones de Presidencia Ejecutiva y normas de la Oficina de Normalizacion Previsional (ONP) emitidas en julio 2026, obtenidas del portal gob.pe/institucion/onp. La ONP reconoce, califica, liquida y paga los derechos pensionarios del Sistema Nacional de Pensiones (D.L. N. 19990) y otros regimenes a su cargo.",
+    "total_normas_2026_documentadas": 5,
+    "periodo_cubierto": "Julio 2026"
+  },
+  "normas": [
+    {
+      "id": "ONP-PE-2026-010",
+      "tipo": "Resolucion de Presidencia Ejecutiva",
+      "numero": "N 000010-2026-PE-ONP",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Acepta renuncia de Ejecutiva de Relaciones Laborales de la Oficina de Recursos Humanos de la ONP",
+      "sumilla": "Acepta la renuncia presentada por la Ejecutiva de Relaciones Laborales de la Oficina de Recursos Humanos de la Oficina de Normalizacion Previsional.",
+      "materia": "Recursos humanos - Gestion interna ONP",
+      "url_fuente": "https://www.gob.pe/institucion/onp/normas-legales/8430257-000010-2026-pe-onp",
+      "relevancia_legalpro": "BAJA"
+    },
+    {
+      "id": "ONP-PE-2026-009",
+      "tipo": "Resolucion de Presidencia Ejecutiva",
+      "numero": "N 000009-2026-PE-ONP",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Designa Oficial de Seguridad y Confianza Digital de la ONP",
+      "sumilla": "Designa al Oficial de Seguridad y Confianza Digital de la Oficina de Normalizacion Previsional conforme a las normas de gobierno digital y seguridad de la informacion.",
+      "materia": "Seguridad digital - Gobierno digital - Confianza digital",
+      "url_fuente": "https://www.gob.pe/institucion/onp/normas-legales/8423851-000009-2026-pe-onp",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "ONP-PE-2026-008",
+      "tipo": "Resolucion de Presidencia Ejecutiva",
+      "numero": "N 000008-2026-PE-ONP",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Desagregacion de Transferencia de Partidas (D.S. 144-2026-EF) a favor de la ONP - Ejercicio 2026",
+      "sumilla": "Aprueba la desagregacion de la Transferencia de Partidas autorizada mediante el Decreto Supremo N 144-2026-EF a favor del Pliego 095: ONP, correspondiente al ano fiscal 2026.",
+      "materia": "Presupuesto publico - Transferencias - Sistema Previsional",
+      "url_fuente": "https://www.gob.pe/institucion/onp/normas-legales/8426503-000008-2026-pe-onp",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "ONP-PE-2026-007",
+      "tipo": "Resolucion de Presidencia Ejecutiva",
+      "numero": "N 000007-2026-PE-ONP",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Desagregacion de transferencia de partidas (D.S. 145-2026-EF) a reserva de contingencia MEF",
+      "sumilla": "Aprueba la desagregacion de la transferencia de partidas autorizada mediante el DS N 145-2026-EF a favor de la reserva de contingencia del MEF, correspondiente al ano fiscal 2026.",
+      "materia": "Presupuesto publico - Reserva de contingencia",
+      "url_fuente": "https://www.gob.pe/institucion/onp/normas-legales/8423947-000007-2026-pe-onp",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "ONP-PE-2026-006",
+      "tipo": "Resolucion de Presidencia Ejecutiva",
+      "numero": "N 000006-2026-PE-ONP",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Desagregacion de credito suplementario ONP (Ley N. 32732)",
+      "sumilla": "Desagregacion de los recursos autorizados via credito suplementario a favor de la ONP en el marco de la Ley N. 32732, Ley de Presupuesto del Sector Publico para el Ano Fiscal 2026.",
+      "materia": "Presupuesto publico - Credito suplementario",
+      "url_fuente": "https://www.gob.pe/institucion/onp/normas-legales/8424777-000006-2026-pe-onp",
+      "relevancia_legalpro": "MEDIA"
+    }
+  ],
+  "cronograma_pagos_agosto_2026": {
+    "descripcion": "Cronograma oficial de pagos a pensionistas del D.L. N. 19990 del mes de agosto 2026",
+    "abono_cuenta_bancaria": {
+      "bancos": ["Banco de la Nacion", "BBVA", "GNB Peru", "Scotiabank", "Interbank", "Banbif"],
+      "letra_A_C": "Lunes 10 de agosto",
+      "letra_D_L": "Martes 11 de agosto",
+      "letra_M_Q": "Miercoles 12 de agosto",
+      "letra_R_Z": "Jueves 13 de agosto"
+    },
+    "convenios_internacionales": "Viernes 14 de agosto",
+    "pago_domicilio": "Del 17 al 26 de agosto",
+    "url_fuente": "https://www.gob.pe/10952-cronograma-de-pago-del-pensionista"
+  },
+  "normativa_clave_vinculada": [
+    {
+      "id": "D.L.-19990",
+      "tipo": "Decreto Ley",
+      "numero": "19990",
+      "titulo": "Sistema Nacional de Pensiones (SNP)",
+      "descripcion": "Norma que crea el Sistema Nacional de Pensiones, regulado y administrado por la ONP para los trabajadores dependientes e independientes aportantes.",
+      "materia": "Seguridad social - Pensiones - Sistema previsional publico"
+    },
+    {
+      "id": "LEY-31301",
+      "tipo": "Ley",
+      "numero": "31301",
+      "titulo": "Ley de Pension de Jubilacion Proporcional Especial",
+      "descripcion": "Permite acceder a una pension de jubilacion proporcional especial a afiliados que no cumplieron los requisitos del D.L. 19990.",
+      "materia": "Jubilacion proporcional - Pensiones"
+    },
+    {
+      "id": "LEY-30237",
+      "tipo": "Ley",
+      "numero": "30237",
+      "titulo": "Ley que dispone la devolucion de aportes del SNP a trabajadores independientes",
+      "descripcion": "Regula la devolucion de aportes obligatorios para trabajadores independientes que no alcanzaron pension.",
+      "materia": "Devolucion de aportes - Trabajadores independientes"
+    },
+    {
+      "id": "LEY-20530",
+      "tipo": "Ley",
+      "numero": "20530",
+      "titulo": "Regimen de Pensiones y Compensaciones por Servicios Civiles prestados al Estado",
+      "descripcion": "Regimen previsional cerrado para servidores publicos. La ONP asumio la transferencia del regimen D.L. 20530 (campana 2026 en curso).",
+      "materia": "Regimenes previsionales cerrados - Servidores publicos"
+    }
+  ],
+  "nota_relevante": "Se documentan 5 Resoluciones de Presidencia Ejecutiva ONP del 30-31 de julio 2026 y el cronograma de pagos de agosto 2026. El portal gob.pe de la ONP tambien incluye compendios de Decretos Supremos, Directivas y Circulares historicas. Para una cobertura completa, se recomienda iterar paginacion de '/institucion/onp/normas-legales'."
+}

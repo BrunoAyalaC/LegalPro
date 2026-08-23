@@ -10,7 +10,7 @@ namespace LegalPro.Application.Contador.Commands;
 /// Calcula liquidación laboral peruana: CTS, vacaciones truncas, gratificaciones
 /// truncas, indemnización por despido arbitrario e intereses BCRP (Tasa Legal).
 /// Lógica IA + reglas de Ley de Productividad y Competitividad Laboral (LPCL).
-/// No requiere valores exactos al inicio — Gemini infiere rangos si faltan datos.
+/// No requiere valores exactos al inicio — el proveedor IA infiere rangos si faltan datos.
 /// </summary>
 public class CalcularLiquidacionLaboralCommand : IRequest<LiquidacionLaboralDto>
 {
@@ -66,15 +66,15 @@ public class CalcularLiquidacionLaboralValidator : AbstractValidator<CalcularLiq
 public class CalcularLiquidacionLaboralHandler
     : IRequestHandler<CalcularLiquidacionLaboralCommand, LiquidacionLaboralDto>
 {
-    private readonly ILegalContador _gemini;
+    private readonly ILegalContador _minimax;
 
-    public CalcularLiquidacionLaboralHandler(ILegalContador gemini) => _gemini = gemini;
+    public CalcularLiquidacionLaboralHandler(ILegalContador minimax) => _minimax = minimax;
 
     public async Task<LiquidacionLaboralDto> Handle(
         CalcularLiquidacionLaboralCommand request,
         CancellationToken cancellationToken)
     {
-        var json = await _gemini.CalcularLiquidacionLaboralAsync(
+        var json = await _minimax.CalcularLiquidacionLaboralAsync(
             request.DatosEmpleadoJson,
             request.MotivoCese);
 

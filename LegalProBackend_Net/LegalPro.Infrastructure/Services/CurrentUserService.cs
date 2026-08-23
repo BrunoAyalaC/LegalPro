@@ -60,11 +60,18 @@ public class CurrentUserService : ICurrentUserService
 
     /// <inheritdoc/>
     /// <remarks>
-    /// JwtService usa ClaimTypes.Role que es el URI largo de Microsoft.
-    /// Después de la validación JWT se puede acceder con ClaimTypes.Role.
+    /// Lectura multi-origen del claim de rol:
+    ///   1. "rol" — claim emitido por el backend Node.js (legalpro-app/server/utils/jwt.js:52)
+    ///      con el rol profesional (ABOGADO/FISCAL/JUEZ/CONTADOR). MapInboundClaims de ASP.NET
+    ///      NO lo reescribe (solo mapea "role" → ClaimTypes.Role), así que llega intacto como "rol".
+    ///   2. ClaimTypes.Role — claim emitido por JwtService (.NET) con el rol de membresía.
+    ///   3. "role" — variante corta por compatibilidad con clientes que emiten "role".
+    /// Nota: NO se unifican los modelos de rol (decisión de @abogado-chief/@arquitecto-chief);
+    ///       esto solo hace que el claim "rol" sea legible vía ICurrentUserService.Role.
     /// </remarks>
     public string? Role
-        => User?.FindFirstValue(ClaimTypes.Role)
+        => User?.FindFirstValue("rol")
+           ?? User?.FindFirstValue(ClaimTypes.Role)
            ?? User?.FindFirstValue("role");
 
     /// <inheritdoc/>

@@ -2,7 +2,7 @@
 
 ## Contexto del Proyecto
 
-**LegalPro** es una plataforma integral de asistencia legal para abogados, fiscales y jueces peruanos, potenciada por IA (Google Gemini). Es una **aplicación móvil nativa** (Android) con backend en la nube. Incluye gestión de expedientes, simulación de juicios, redacción de escritos legales, predicción de resultados judiciales, búsqueda de jurisprudencia en tiempo real y más.
+**LegalPro** es una plataforma integral de asistencia legal para abogados, fiscales y jueces peruanos, potenciada por IA (MiniMax M3). Es una **aplicación móvil nativa** (Android) con backend en la nube. Incluye gestión de expedientes, simulación de juicios, redacción de escritos legales, predicción de resultados judiciales, búsqueda de jurisprudencia en tiempo real y más.
 
 ## Arquitectura Cloud-Native
 
@@ -10,14 +10,14 @@
 ┌─────────────────┐     ┌──────────────────────┐     ┌──────────────────┐
 │  Android App    │────▶│  Backend (Railway)    │────▶│  Supabase Cloud  │
 │  Kotlin/Compose │     │  Express 5 / .NET 8   │     │  PostgreSQL + Auth│
-│  (Mobile-first) │     │  + Gemini SDK         │     │  + Storage + RLS │
+│  (Mobile-first) │     │  + MiniMax SDK       │     │  + Storage + RLS │
 └─────────────────┘     └──────────────────────┘     └──────────────────┘
                                │
                                ▼
                         ┌──────────────┐
-                        │ Google Gemini │
-                        │ @google/genai │
-                        │ Function Call │
+                        │  MiniMax M3  │
+                        │ minimaxClient│
+                        │ Function Call│
                         └──────────────┘
 ```
 
@@ -29,7 +29,7 @@
 | **Backend API**   | Express 5 (Railway) + Supabase Client + JWT                                 |
 | **Backend .NET**  | ASP.NET Core 8 (Railway) + Supabase/PostgreSQL + MediatR + FluentValidation |
 | **Base de Datos** | PostgreSQL en Supabase Cloud (RLS + Auth + Realtime)                        |
-| **IA**            | Google Gemini SDK oficial (`@google/genai`) con Function Calling            |
+| **IA**            | MiniMax AI (OpenAI-compatible SDK) con Function Calling            |
 | **Storage**       | Supabase Storage (documentos, evidencia digital)                            |
 | **Auth**          | Supabase Auth (JWT) + bcrypt                                                |
 | **Infra**         | Railway (backends) + Supabase (BaaS) — 100% cloud                           |
@@ -50,21 +50,21 @@ LegalProAndroid/       → App Android nativa (app principal para usuarios)
 3. **Backend Node**: Express 5 en Railway, Supabase como BD cloud, rutas en `server/routes/`
 4. **Backend .NET**: Clean Architecture (Domain → Application → Infrastructure → Api) en Railway
 5. **CQRS**: MediatR (Commands escritura, Queries lectura) en .NET
-6. **IA**: SDK oficial `@google/genai` con Function Calling declarativo y `gemini-2.5-flash`
+6. **IA**: API oficial de MiniMax (OpenAI-compatible) con Function Calling y modelos `MiniMax-M3`/`MiniMax-M2.5-highspeed`
 7. **Base de datos**: PostgreSQL en Supabase Cloud con Row Level Security (RLS)
 8. **Auth**: Supabase Auth para autenticación, JWT para API tokens
 9. **Storage**: Supabase Storage para documentos y evidencia digital
 10. **Seguridad**: RLS en todas las tablas, JWT validation, bcrypt, nunca exponer API keys
 11. **Realtime**: Supabase Realtime para notificaciones push y presencia
 
-## SDK de Google Gemini (Oficial `@google/genai`)
+## Cliente de MiniMax (OpenAI-compatible)
 
 ```javascript
-import { GoogleGenAI, FunctionCallingConfigMode, Type } from '@google/genai';
+import { GoogleGenAI } from './utils/minimaxClient.js'; // Adaptador local de compatibilidad
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.MINIMAX_API_KEY });
 const response = await ai.models.generateContent({
-  model: 'gemini-2.5-flash',
+  model: 'MiniMax-M2.5-highspeed',
   contents: 'Analiza este expediente...',
   config: {
     tools: [{ functionDeclarations: [...] }],
@@ -173,8 +173,8 @@ SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_KEY=eyJ...
 
-# Gemini IA
-GEMINI_API_KEY=AIza...
+# MiniMax IA
+MINIMAX_API_KEY=mk-...
 
 # JWT
 JWT_SECRET=super-secret-key-256-bits
@@ -190,5 +190,5 @@ Ver `.github/AGENTS_GUIDE.md` para la guía completa de 13 agentes y 8 skills es
 
 ## Herramientas MCP Disponibles
 
-- `#tool:context7` — Documentación actualizada de librerías (Gemini SDK, Supabase, etc.)
+- `#tool:context7` — Documentación actualizada de librerías (MiniMax SDK, Supabase, etc.)
 - `#tool:fetch` — Peticiones HTTP externas

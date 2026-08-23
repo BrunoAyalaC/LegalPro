@@ -1,0 +1,51 @@
+# Lefthook — Orquestador de hooks del arnés
+# https://github.com/evilmartians/lefthook
+
+min_version: 1.0.0
+colors: true
+no_tty: false
+rc: lefthook.yml
+
+pre-commit:
+  parallel: true
+  commands:
+    lint-eslint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: bash arneses/hooks/pre-commit.lint-eslint.sh {staged_files}
+      stage_fixed: true
+    format-prettier:
+      glob: "*.{js,jsx,ts,tsx,json,md,yml,yaml}"
+      run: bash arneses/hooks/pre-commit.format-prettier.sh {staged_files}
+      stage_fixed: true
+    lint-dotnet:
+      glob: "*.{cs,csproj}"
+      run: bash arneses/hooks/pre-commit.lint-dotnet.sh {staged_files}
+    detect-secrets:
+      run: bash arneses/hooks/pre-commit.detect-secrets.sh {staged_files}
+    validate-catalogos:
+      glob: "catalogs/**/*.{json,md,yml}"
+      run: bash arneses/hooks/pre-commit.validate-catalogos.sh {staged_files}
+    validate-agents:
+      glob: ".opencode/agents/*.md"
+      run: bash arneses/hooks/pre-commit.validate-agents.sh {staged_files}
+    no-console-log:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: bash arneses/hooks/pre-commit.no-console-log.sh {staged_files}
+
+pre-push:
+  parallel: false
+  commands:
+    test-unit:
+      run: bash arneses/hooks/pre-push.test-unit.sh
+    smoke-build:
+      run: bash arneses/hooks/pre-push.smoke-build.sh
+
+commit-msg:
+  commands:
+    conventional-commits:
+      run: bash arneses/hooks/commit-msg.conventional.sh {1}
+
+post-merge:
+  commands:
+    reindex:
+      run: bash arneses/hooks/post-merge.reindex.sh

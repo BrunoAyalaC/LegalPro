@@ -258,7 +258,7 @@ export default function SetupOrganizacion() {
         <div className="mt-8 text-center">
           <button
             onClick={() => {
-              localStorage.removeItem('legalpro_token');
+              api.clearTokens(); // limpia memoria + localStorage/sessionStorage
               window.location.href = '/login';
             }}
             className="text-xs text-slate-500 hover:text-slate-400 transition"

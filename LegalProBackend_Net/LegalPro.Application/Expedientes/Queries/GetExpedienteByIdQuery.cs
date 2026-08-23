@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Exceptions;
 
@@ -12,7 +13,10 @@ namespace LegalPro.Application.Expedientes.Queries;
 // evita leakage de información cross-tenant.
 // ═══════════════════════════════════════════════════════
 
-public record GetExpedienteByIdQuery(Guid Id) : IRequest<ExpedienteDto>;
+public record GetExpedienteByIdQuery(Guid Id) : IRequest<ExpedienteDto>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public class GetExpedienteByIdQueryValidator : AbstractValidator<GetExpedienteByIdQuery>
 {
@@ -54,7 +58,9 @@ public class GetExpedienteByIdQueryHandler : IRequestHandler<GetExpedienteByIdQu
             expediente.Estado.ToString(),
             expediente.EsUrgente,
             expediente.UsuarioId,
-            expediente.OrganizationId,
+            // OrganizationId es Guid? en la entidad pero el DTO lo expone Guid (no-null).
+            // El filtro orgId garantiza que la fila returned tiene OrganizationId no-null.
+            expediente.OrganizationId!.Value,
             expediente.CreatedAt,
             expediente.UpdatedAt);
     }

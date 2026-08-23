@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Entities;
 
@@ -12,7 +13,10 @@ namespace LegalPro.Application.Chat.Commands;
 public record EnviarMensajeChatCommand(
     string History,
     string UserInput,
-    Guid? SesionId = null) : IRequest<ChatResult>;
+    Guid? SesionId = null) : IRequest<ChatResult>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public record ChatResult(string Respuesta, Guid SesionId);
 
@@ -26,16 +30,16 @@ public class EnviarMensajeChatValidator : AbstractValidator<EnviarMensajeChatCom
 
 public class EnviarMensajeChatHandler : IRequestHandler<EnviarMensajeChatCommand, ChatResult>
 {
-    private readonly IGeminiService _geminiService;
+    private readonly IMinimaxService _minimaxService;
     private readonly IApplicationDbContext _db;
     private readonly ICurrentUserService _currentUser;
 
     public EnviarMensajeChatHandler(
-        IGeminiService geminiService,
+        IMinimaxService minimaxService,
         IApplicationDbContext db,
         ICurrentUserService currentUser)
     {
-        _geminiService = geminiService;
+        _minimaxService = minimaxService;
         _db = db;
         _currentUser = currentUser;
     }
@@ -47,8 +51,8 @@ public class EnviarMensajeChatHandler : IRequestHandler<EnviarMensajeChatCommand
             ?? throw new UnauthorizedAccessException("Usuario no autenticado.");
         var orgId = _currentUser.OrganizationId;
 
-        // Llamar a Gemini IA
-        var resultJson = await _geminiService.ChatLegalAsync(request.History, request.UserInput);
+        // Llamar a MiniMax IA
+        var resultJson = await _minimaxService.ChatLegalAsync(request.History, request.UserInput);
         var doc = System.Text.Json.JsonDocument.Parse(resultJson);
         var root = doc.RootElement;
         var respuesta = root.TryGetProperty("respuesta", out var r) ? r.GetString() ?? "" : resultJson;

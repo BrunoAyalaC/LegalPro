@@ -1,0 +1,149 @@
+{
+  "metadata": {
+    "nombre": "Normativa Reciente del MINJUSDH - Actualizado al 01/08/2026",
+    "fuente_principal": "https://www.gob.pe/minjus",
+    "fecha_actualizacion": "2026-08-01",
+    "version": "1.0",
+    "descripcion": "Normas, resoluciones y noticias recientes del Ministerio de Justicia y Derechos Humanos",
+    "total_documentos": 12
+  },
+  "normas": [
+    {
+      "id": "MINJUSDH-2026-015",
+      "tipo": "Decreto Supremo",
+      "numero": "N.° 015-2025-JUS",
+      "fecha_publicacion": "2025-08-06",
+      "titulo": "Decreto Supremo y Formularios para elaborar solicitudes de extradición activa",
+      "sumilla": "Aprueba formularios estandarizados para solicitudes de extradición activa en el Perú.",
+      "materia": "Cooperación Internacional - Penal",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "ALTA - Procedimiento penal internacional"
+    },
+    {
+      "id": "MINJUSDH-2026-RD-219",
+      "tipo": "Resolución Directoral",
+      "numero": "N.° 219-2026-JUS/DGJLR",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Declarar procedente solicitud presentada por entidad religiosa",
+      "sumilla": "Declara procedente la solicitud presentada por la entidad religiosa denominada 'Iglesia Nueva Apostólica' para inscripción registral.",
+      "materia": "Entidades Religiosas - Registral",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA - Registro de entidades religiosas"
+    },
+    {
+      "id": "MINJUSDH-2026-RD-215",
+      "tipo": "Resolución Directoral",
+      "numero": "N.° 215-2026-JUS/DGJLR",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Otorgar licencia con eficacia anticipada",
+      "sumilla": "Otorga licencia con eficacia anticipada del 15-16 enero 2026 a favor de secigrista de la Dirección General de Justicia y Libertad Religiosa.",
+      "materia": "Recursos Humanos - Administrativo",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "BAJA - RRHH interno"
+    },
+    {
+      "id": "MINJUSDH-2026-RD-221",
+      "tipo": "Resolución Directoral",
+      "numero": "N.° 221-2026-JUS/DGJLR",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Otorgar licencia con eficacia anticipada - secigrista",
+      "sumilla": "Otorga licencia con eficacia anticipada del 23 al 27 de marzo de 2026 a favor del secigrista EMERSON.",
+      "materia": "Recursos Humanos - Administrativo",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "BAJA - RRHH interno"
+    },
+    {
+      "id": "MINJUSDH-2026-POI",
+      "tipo": "Plan Operativo Institucional",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Plan Operativo Institucional (POI) 2026 - Reporte de seguimiento semestral",
+      "sumilla": "Reporte de seguimiento semestral del POI 2026 del MINJUSDH.",
+      "materia": "Gestión Pública - Planificación",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA - Política pública"
+    },
+    {
+      "id": "MINJUSDH-2026-BOLETIN",
+      "tipo": "Boletín Extraordinario",
+      "fecha_publicacion": "2026-07-31",
+      "titulo": "Boletín Extraordinario de julio - DGCR",
+      "sumilla": "Boletín Extraordinario de julio de la Dirección General de Desarrollo Normativo y Calidad Regulatoria del MINJUSDH.",
+      "materia": "Calidad Regulatoria - Desarrollo Normativo",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA - Calidad regulatoria"
+    },
+    {
+      "id": "MINJUSDH-2026-PEI",
+      "tipo": "Reporte de Seguimiento",
+      "fecha_publicacion": "2026-07-30",
+      "titulo": "Reporte de seguimiento del PEI 2025-2030 - Primer semestre 2026",
+      "sumilla": "Reporte de seguimiento del Plan Estratégico Institucional 2025-2030 al primer semestre de 2026.",
+      "materia": "Gestión Pública - Planificación Estratégica",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA - Política pública"
+    },
+    {
+      "id": "MINJUSDH-2026-CONVOC-OECE",
+      "tipo": "Convocatoria",
+      "numero": "N° 001-2026-OECE/VTCP",
+      "fecha_publicacion": "2026-05-14",
+      "titulo": "Concurso Público Vocales del Tribunal de Contrataciones Públicas - OECE",
+      "sumilla": "Concurso Público de evaluación y selección de Vocales del Tribunal de Contrataciones Públicas del Organismo Especializado para las Contrataciones Públicas Eficientes (OECE).",
+      "materia": "Contrataciones Públicas - Administrativo",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA - Selección de vocales"
+    },
+    {
+      "id": "MINJUSDH-DS-089-2025-EF",
+      "tipo": "Decreto Supremo",
+      "numero": "N.° 089-2025-EF",
+      "fecha_publicacion": "2025-12-21",
+      "titulo": "Decreto Supremo de convocatoria OECE",
+      "sumilla": "Decreto Supremo que aprueba la convocatoria al concurso público del OECE.",
+      "materia": "Contrataciones Públicas - Presupuesto",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA"
+    },
+    {
+      "id": "MINJUSDH-2026-MINISTRO",
+      "tipo": "Noticia Institucional",
+      "fecha": "2026-07-28",
+      "titulo": "Dr. Ernesto Álvarez Miranda asume como ministro de Justicia",
+      "sumilla": "Dr. Ernesto Álvarez Miranda asume como ministro de Justicia y Derechos Humanos (cambio de mando 28/07/2026).",
+      "materia": "Institucional",
+      "palabras_clave": ["ministro", "Ernesto Álvarez", "cambio de mando"],
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA - Información institucional"
+    },
+    {
+      "id": "MINJUSDH-2026-PRONABI",
+      "tipo": "Noticia",
+      "fecha": "2026-07-31",
+      "titulo": "PRONABI recaudó más de S/960 mil en subasta",
+      "sumilla": "PRONABI (Programa Nacional de Bienes Incautados) recaudó más de S/ 960,000 soles en subasta pública de vehículos.",
+      "materia": "Patrimonio Incautado - Penal",
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "MEDIA - Penal económico"
+    },
+    {
+      "id": "MINJUSDH-2026-EXTORSION",
+      "tipo": "Reporte Interinstitucional",
+      "fecha": "2026-07-25",
+      "titulo": "Primer reporte interinstitucional sobre extorsión en Perú",
+      "sumilla": "MINJUSDH y MININTER presentan el primer reporte interinstitucional sobre la extorsión en el Perú.",
+      "materia": "Penal - Seguridad Ciudadana",
+      "palabras_clave": ["extorsión", "MININTER", "reporte interinstitucional", "seguridad"],
+      "url_fuente": "https://www.gob.pe/minjus",
+      "relevancia_legalpro": "ALTA - Crimen organizado y extorsión"
+    }
+  ],
+  "enlaces_relevantes": {
+    "spiJ_url": "https://spij.minjus.gob.pe",
+    "consulta_normas": "https://www.gob.pe/minjus",
+    "concursos": "https://www.gob.pe/minjus/trabaja-con-nosotros",
+    "pagos_tasas": "https://www.gob.pe/minjus",
+    "renade": "https://www.gob.pe/minjus/renade",
+    "indaga_observatorio": "https://www.gob.pe/minjus/observatorio-nacional-de-politica-criminal-indaga",
+    "pronabi": "https://www.gob.pe/minjus/pronabi"
+  }
+}

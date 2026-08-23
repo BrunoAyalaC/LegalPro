@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using System.Text.Json;
 using LegalPro.Application.Common;
 using LegalPro.Application.Common.Interfaces;
@@ -7,7 +8,7 @@ using LegalPro.Application.Common.Interfaces;
 namespace LegalPro.Application.Alegato.Commands;
 
 /// <summary>
-/// Genera un alegato de clausura (apertura o cierre) potenciado por IA Gemini.
+/// Genera un alegato de clausura (apertura o cierre) potenciado por IA MiniMax M3.
 /// Aplica NCPP art. 386-390 (alegatos orales), CPC art. 212 (alegatos escritos).
 /// </summary>
 public record GenerarAlegatoCommand(
@@ -15,7 +16,10 @@ public record GenerarAlegatoCommand(
     string RamaDerecho,      // "penal" | "civil" | "laboral" | "familia" | "administrativo"
     string Hechos,           // resumen de hechos del caso
     string RolUsuario        // "defensa" | "fiscalia" | "demandante" | "demandado"
-) : IRequest<AlegatoDto>;
+) : IRequest<AlegatoDto>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public record AlegatoDto(
     string Apertura,
@@ -59,16 +63,16 @@ public class GenerarAlegatoValidator : AbstractValidator<GenerarAlegatoCommand>
 
 public class GenerarAlegatoHandler : IRequestHandler<GenerarAlegatoCommand, AlegatoDto>
 {
-    private readonly ILegalAlegato _geminiAlegato;
+    private readonly ILegalAlegato _minimaxAlegato;
 
-    public GenerarAlegatoHandler(ILegalAlegato geminiAlegato)
+    public GenerarAlegatoHandler(ILegalAlegato minimaxAlegato)
     {
-        _geminiAlegato = geminiAlegato;
+        _minimaxAlegato = minimaxAlegato;
     }
 
     public async Task<AlegatoDto> Handle(GenerarAlegatoCommand request, CancellationToken cancellationToken)
     {
-        var json = await _geminiAlegato.GenerarAlegatoAsync(
+        var json = await _minimaxAlegato.GenerarAlegatoAsync(
             request.TipoAlegato, request.RamaDerecho, request.Hechos, request.RolUsuario);
 
         var doc = JsonDocument.Parse(json);

@@ -1,0 +1,346 @@
+# =============================================================================
+# Alertas Sentry para el sistema RAG de LegalPro
+# =============================================================================
+# Config-as-code para alertas de Sentry (Monitors / Metric Alerts).
+# El script ops/scripts/sync-sentry-alerts.mjs traduce este YAML al payload
+# que espera la API de Sentry (POST /api/0/projects/{org}/{project}/monitors/).
+#
+# Convenciones:
+#   * Cada entrada en `monitors` es UN Monitor de Sentry.
+#   * `metric:` se mapea a una query de Sentry (Custom Metric / APM / logs).
+#   * `threshold:` es el valor numérico que dispara el Monitor.
+#   * `time_window_minutes:` y `frequency_minutes:` siguen la API de Sentry.
+#   * Las acciones (Slack, PagerDuty, email) referencian Sentry integrations
+#     ya configuradas en la organización (IDs en `sentry_integrations`).
+#   * `runbook` apunta a arneses/runbooks/ del repo para triage inmediato.
+#
+# Catálogo de runbooks referenciados:
+#   RB-001  Spike 5xx            arneses/runbooks/RB-001-5xx-spike.md
+#   RB-006  PostgreSQL Down      arneses/runbooks/RB-006-pg-down.md
+#   RB-012  Spike de Costo IA    arneses/runbooks/RB-012-cost-ia-spike.md
+#   RB-013  SLO Violation        arneses/runbooks/RB-013-slo-violation.md
+# =============================================================================
+
+# IDs de integraciones Sentry (placeholders — reemplazar por IDs reales en producción).
+# Obtener con: curl -H "Authorization: Bearer $SENTRY_AUTH_TOKEN" \
+#   "https://sentry.io/api/0/organizations/$SENTRY_ORG/integrations/"
+sentry_integrations:
+  slack_legalpro_alerts: "1234567"          # Canal #legalpro-alerts
+  slack_legalpro_critical: "1234568"        # Canal #legalpro-alerts-critical
+  slack_legalpro_performance: "1234569"     # Canal #legalpro-performance
+  pagerduty_tech_lead: "2345678"            # Service "tech-lead-on-call"
+  pagerduty_db_oncall: "2345679"            # Service "db-on-call"
+  email_tech: "tech@legalpro.app"
+  email_cfo: "cfo@legalpro.app"
+  email_rag_quality: "rag-quality@legalpro.app"
+  email_cto: "cto@legalpro.app"
+
+# Lista de proyectos Sentry donde aplican los Monitors.
+# legalpro-node y legalpro-dotnet emiten transactions y custom metrics
+# desde server/middleware/ragMiddleware.js y tools/rag/metrics.mjs.
+sentry_projects:
+  - "legalpro-node"
+  - "legalpro-dotnet"
+  - "legalpro-web"
+
+# Entornos Sentry sobre los que se evalúan las alertas.
+sentry_environments:
+  - "production"
+  - "staging"
+
+monitors:
+  # ───────────────────────────────────────────────────────────────────────────
+  # LATENCIA
+  # ───────────────────────────────────────────────────────────────────────────
+
+  - name: "RAG - Latencia p95 > 5s (5min)"
+    description: "La latencia p95 del sistema RAG ha superado los 5 segundos durante 5 minutos. SLO: p95 < 3s."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "transaction.duration"
+    query: "transaction:rag.query p95(5m) > 5000"
+    threshold_type: "absolute"
+    threshold: 5000
+    time_window_minutes: 5
+    frequency_minutes: 1
+    comparison: "greater"
+    severity: "high"
+    runbook: "arneses/runbooks/RB-013-slo-violation.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":rotating_light: RAG p95 > 5s durante 5min. Revisar Grafana https://grafana.legalpro.app/d/legalpro-rag-v1 y runbook RB-013."
+      - type: "email"
+        to: "tech@legalpro.app"
+
+  - name: "RAG - Latencia p95 > 3s (SLO breach, 10min)"
+    description: "p95 de RAG > 3s (SLO) durante 10 minutos. Pre-aviso antes del umbral crítico."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "transaction.duration"
+    query: "transaction:rag.query p95(10m) > 3000"
+    threshold_type: "absolute"
+    threshold: 3000
+    time_window_minutes: 10
+    frequency_minutes: 2
+    comparison: "greater"
+    severity: "medium"
+    runbook: "arneses/runbooks/RB-013-slo-violation.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_performance"
+        channel: "#legalpro-performance"
+        message: ":warning: RAG p95 > 3s (SLO) durante 10min. No crítico aún, vigilar tendencia."
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # ERROR RATE
+  # ───────────────────────────────────────────────────────────────────────────
+
+  - name: "RAG - Error rate 5xx > 1% (5min)"
+    description: "Tasa de errores 5xx en endpoints /api/ai/* y /api/legal/* superior al 1% durante 5 minutos."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "failure_rate"
+    query: "transaction:rag.query failure_rate(5m) > 0.01"
+    threshold_type: "absolute"
+    threshold: 0.01
+    time_window_minutes: 5
+    frequency_minutes: 1
+    comparison: "greater"
+    severity: "high"
+    runbook: "arneses/runbooks/RB-001-5xx-spike.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":fire: 5xx > 1% en endpoints RAG (5min). Correlacionar con deploy/migración reciente. RB-001."
+      - type: "pagerduty"
+        integration_id_ref: "pagerduty_tech_lead"
+        service: "tech-lead-on-call"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # CACHE
+  # ───────────────────────────────────────────────────────────────────────────
+
+  - name: "RAG - Cache Hit Rate < 30% (15min)"
+    description: "Tasa de cache hit del sistema RAG cayó por debajo del 30% durante 15 minutos. Objetivo >= 60%."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "rag.cache.hit_rate"
+    query: "rag.cache.hit_rate:avg(15m) < 0.30"
+    threshold_type: "absolute"
+    threshold: 0.30
+    time_window_minutes: 15
+    frequency_minutes: 5
+    comparison: "less"
+    severity: "medium"
+    runbook: "arneses/runbooks/RB-006-pg-down.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":warning: Cache hit rate RAG < 30% (15min). Verificar Redis, TTL y warm-up."
+
+  - name: "RAG - Redis Cache Down (1min)"
+    description: "El cache Redis no responde. Sistema degradado a fallback en memoria. Impacto: latencia +costo +carga pgvector."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "rag.cache.redis_connected"
+    query: "rag.cache.redis_connected:min(1m) == 0"
+    threshold_type: "absolute"
+    threshold: 0
+    time_window_minutes: 1
+    frequency_minutes: 1
+    comparison: "equal"
+    severity: "high"
+    runbook: "arneses/runbooks/RB-006-pg-down.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":electric_plug: Redis cache RAG caído. Sistema en fallback de memoria. Verificar UPSTASH/REDIS_URL y conectividad."
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # COSTE
+  # ───────────────────────────────────────────────────────────────────────────
+
+  - name: "RAG - Costo diario > $50 (1h)"
+    description: "El costo diario de IA del RAG ha superado los 50 USD. Plan PRO: S/1000/mes ≈ $270/mes. Costo diario promedio esperado: < $9/día."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "rag.cost.daily_usd"
+    query: "rag.cost.daily_usd:max(1h) > 50"
+    threshold_type: "absolute"
+    threshold: 50
+    time_window_minutes: 60
+    frequency_minutes: 15
+    comparison: "greater"
+    severity: "high"
+    runbook: "arneses/runbooks/RB-012-cost-ia-spike.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":moneybag: Costo RAG diario > $50. Posible spike de uso o tenant abusivo. RB-012."
+      - type: "email"
+        to: "cfo@legalpro.app"
+
+  - name: "RAG - Costo mensual proyectado > 1.5x plan"
+    description: "Costo mensual IA del RAG proyectado a fin de mes supera 1.5x el plan contratado. SLO: IGV/S/1000 PRO, S/5000 ENTERPRISE."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "rag.cost.monthly_projection_usd"
+    query: "rag.cost.monthly_projection_usd:max(6h) > 405"   # 1.5x $270 PRO
+    threshold_type: "absolute"
+    threshold: 405
+    time_window_minutes: 360
+    frequency_minutes: 60
+    comparison: "greater"
+    severity: "high"
+    runbook: "arneses/runbooks/RB-012-cost-ia-spike.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":moneybag: Costo mensual RAG proyectado > 1.5x plan. Revisar tenants top-consumo."
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # CALIDAD
+  # ───────────────────────────────────────────────────────────────────────────
+
+  - name: "RAG - Citaciones con baja confianza > 10% (1h)"
+    description: "Más del 10% de las citaciones tienen similitud_promedio < 0.60. Calidad del corpus degradada."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "rag.citations.low_confidence_pct"
+    query: "rag.citations.low_confidence_pct:avg(1h) > 10"
+    threshold_type: "absolute"
+    threshold: 10
+    time_window_minutes: 60
+    frequency_minutes: 10
+    comparison: "greater"
+    severity: "high"
+    runbook: "docs/MONITORING_RAG_OPS.md#alertas-de-calidad"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":books: >10% citaciones con similitud < 60%. Revisar corpus jurídico y vista v_rag_top_low_confidence."
+      - type: "email"
+        to: "rag-quality@legalpro.app"
+
+  - name: "RAG - Hallucinations Detectadas (1)"
+    description: "Se detectaron respuestas con alucinaciones. PÁGINA inmediata — riesgo legal alto."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "rag.hallucinations.count"
+    query: "rag.hallucinations.count:sum(5m) > 0"
+    threshold_type: "absolute"
+    threshold: 0
+    time_window_minutes: 5
+    frequency_minutes: 1
+    comparison: "greater"
+    severity: "critical"
+    runbook: "docs/MONITORING_RAG_OPS.md#alucinaciones"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_critical"
+        channel: "#legalpro-alerts-critical"
+        message: ":rotating_light: ALUCINACIÓN detectada en respuesta RAG. Revisar manualmente el log, no entregar al cliente hasta validar."
+      - type: "pagerduty"
+        integration_id_ref: "pagerduty_tech_lead"
+        service: "tech-lead-on-call"
+      - type: "email"
+        to: "cto@legalpro.app"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # INFRAESTRUCTURA RAG
+  # ───────────────────────────────────────────────────────────────────────────
+
+  - name: "RAG - pgvector Query p95 > 1s (5min)"
+    description: "Queries pgvector lentas (>1s p95). Posible saturación del índice o falta de ANN tuning."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "transaction.duration"
+    query: "transaction:rag.vector_search p95(5m) > 1000"
+    threshold_type: "absolute"
+    threshold: 1000
+    time_window_minutes: 5
+    frequency_minutes: 1
+    comparison: "greater"
+    severity: "medium"
+    runbook: "arneses/runbooks/RB-006-pg-down.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_performance"
+        channel: "#legalpro-performance"
+        message: ":turtle: pgvector p95 > 1s (5min). Revisar índices ivfflat/hnsw y tamaño del corpus."
+
+  - name: "RAG - PostgreSQL Down (1min)"
+    description: "PostgreSQL no responde. P0: RAG + backend completo no operacionales."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "infrastructure.postgres.up"
+    query: "infrastructure.postgres.up:min(1m) == 0"
+    threshold_type: "absolute"
+    threshold: 0
+    time_window_minutes: 1
+    frequency_minutes: 1
+    comparison: "equal"
+    severity: "critical"
+    runbook: "arneses/runbooks/RB-006-pg-down.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_critical"
+        channel: "#legalpro-alerts-critical"
+        message: ":no_entry: PostgreSQL DOWN. /health/ready 500. RB-006 — failover o esperar proveedor."
+      - type: "pagerduty"
+        integration_id_ref: "pagerduty_db_oncall"
+        service: "db-on-call"
+
+  - name: "RAG - OpenAI / Gemini quota excedida (1h)"
+    description: "Costo diario o RPM excedido. Riesgo de rate-limit general del proveedor."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "custom"
+    custom_query: "rag.provider.quota_pct"
+    query: "rag.provider.quota_pct:max(1h) > 90"
+    threshold_type: "absolute"
+    threshold: 90
+    time_window_minutes: 60
+    frequency_minutes: 15
+    comparison: "greater"
+    severity: "high"
+    runbook: "docs/MONITORING_RAG_OPS.md#cuota-de-proveedor"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":vertical_traffic_light: Quota proveedor IA > 90%. Planificar fallback o upgrade."
+
+  - name: "RAG - Latencia p99 > 8s (15min)"
+    description: "p99 muy degradado, posibles timeouts en clientes (Android + Web). Preaviso antes de P0."
+    project: "legalpro-node"
+    environment: "production"
+    metric: "transaction.duration"
+    query: "transaction:rag.query p99(15m) > 8000"
+    threshold_type: "absolute"
+    threshold: 8000
+    time_window_minutes: 15
+    frequency_minutes: 5
+    comparison: "greater"
+    severity: "high"
+    runbook: "arneses/runbooks/RB-013-slo-violation.md"
+    actions:
+      - type: "slack"
+        integration_id_ref: "slack_legalpro_alerts"
+        channel: "#legalpro-alerts"
+        message: ":snail: RAG p99 > 8s (15min). Posibles timeouts en cliente. RB-013."

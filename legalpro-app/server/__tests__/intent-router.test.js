@@ -197,10 +197,13 @@ describe('data estructurada por tool (v3) — shapes canónicos', () => {
     }, req);
 
     expect(r.texto).toContain('Cálculo de plazo procesal');
+    // Catálogo v1.4.0 (CPC art. 367): las SENTENCIAS se apelan en 10 días
+    // hábiles; los autos en 5 (plazo_apelacion_autos_civil). El valor 5 de
+    // este test correspondía al catálogo previo a la ampliación sub-materia.
     expect(r.data).toMatchObject({
       acto_procesal: 'Apelación de sentencia',
       fecha_inicio: '2026-08-07',
-      dias_habiles: 5,
+      dias_habiles: 10,
     });
     expect(typeof r.data.base_legal).toBe('string');
     expect(r.data.base_legal).toContain('CPC');
@@ -240,7 +243,10 @@ describe('data estructurada por tool (v3) — shapes canónicos', () => {
       requiere_fecha_inicio: true,
     });
     expect(r.data.plazo_info.id).toBe('plazo_contencioso_administrativo');
-    expect(typeof r.data.consecuencia).toBe('string');
+    // Shape canónico v3: `consecuencia` es string cuando el catálogo define
+    // `consecuencia_vencimiento`, o null cuando la ficha no lo trae (caso de
+    // plazo_contencioso_administrativo, que documenta la caducidad en `nota`).
+    expect(r.data.consecuencia === null || typeof r.data.consecuencia === 'string').toBe(true);
   });
 
   test('calcular_plazo SIN fecha_inicio (args vacíos) → ficha del catálogo', async () => {
@@ -312,8 +318,15 @@ describe('data estructurada por tool (v3) — shapes canónicos', () => {
     expect(r.tipo_respuesta).toBe('plazo');
     expect(r.fase).toBe('fase0');
     expect(r.data).toBeTruthy();
-    expect(r.data.dias_habiles).toBe(5);
-    expect(r.data.fecha_vencimiento).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    // Catálogo v1.4.0 (CPC art. 367): apelación de SENTENCIA civil = 10 días
+    // hábiles (los autos son 5). Ver test de ejecutarHerramienta más arriba.
+    expect(r.data.dias_habiles).toBe(10);
+    // SKILL v1.1.0 (fix P0 auditor-legal): el mensaje NO trae fecha_inicio
+    // explícita → el router NUNCA inventa fecha (=hoy, devolvería un
+    // vencimiento falso). Devuelve la ficha del catálogo con
+    // fecha_vencimiento null y pide la fecha de inicio al usuario.
+    expect(r.data.fecha_vencimiento).toBeNull();
+    expect(r.data.requiere_fecha_inicio).toBe(true);
   });
 
   test('tipoRespuestaDeIntent: contrato estable por intención', () => {

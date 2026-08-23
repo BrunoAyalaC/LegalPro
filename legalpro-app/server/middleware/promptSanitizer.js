@@ -1,12 +1,12 @@
 /**
- * Módulo de saneamiento de prompts para Gemini.
+ * Módulo de saneamiento de prompts para MiniMax.
  * Previene Prompt Injection — OWASP LLM01:2025.
  *
  * Un atacante que controla el input podría:
  *   - Redirigir el comportamiento del modelo ("Ignora las instrucciones anteriores...")
  *   - Filtrar datos de otros tenants si el prompt incluye contexto del expediente
  *   - Generar contenido malicioso para otros usuarios (indirect injection)
- *   - Consumir tokens excesivos (DoS económico en API Gemini)
+ *   - Consumir tokens excesivos (DoS económico en API MiniMax)
  *
  * Estrategia de defensa en capas:
  *   1. Límite de longitud — previene token flooding
@@ -51,7 +51,7 @@ const MAX_LENGTHS = {
 };
 
 /**
- * Sanea el texto de usuario antes de enviarlo a Gemini.
+ * Sanea el texto de usuario antes de enviarlo a MiniMax.
  *
  * @param {string} texto - Input del usuario
  * @param {'consulta'|'expediente'|'escrito'|'alegato'|'default'} tipo - Contexto del campo
@@ -73,7 +73,7 @@ export function sanitizarPrompt(texto, tipo = 'default') {
   // 2. Detectar patrones de injection
   for (const pattern of INJECTION_PATTERNS) {
     if (pattern.test(sanitizado)) {
-      // Log de seguridad sin bloquear — el sistema prompt de Gemini ya tiene instrucciones
+      // Log de seguridad sin bloquear — el sistema prompt de MiniMax ya tiene instrucciones
       // de ignorar redirecciones de rol. Registramos para análisis de amenazas.
       advertencias.push(`[SECURITY] Posible prompt injection detectado: ${pattern.source}`);
 

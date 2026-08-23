@@ -63,15 +63,15 @@ public class GenerarInformePericialValidator : AbstractValidator<GenerarInformeP
 public class GenerarInformePericialHandler
     : IRequestHandler<GenerarInformePericialCommand, InformePericialDto>
 {
-    private readonly ILegalContador _gemini;
+    private readonly ILegalContador _minimax;
 
-    public GenerarInformePericialHandler(ILegalContador gemini) => _gemini = gemini;
+    public GenerarInformePericialHandler(ILegalContador minimax) => _minimax = minimax;
 
     public async Task<InformePericialDto> Handle(
         GenerarInformePericialCommand request,
         CancellationToken cancellationToken)
     {
-        var json = await _gemini.GenerarInformePericialAsync(
+        var json = await _minimax.GenerarInformePericialAsync(
             request.TipoPericia,
             request.HallazgosJson);
 

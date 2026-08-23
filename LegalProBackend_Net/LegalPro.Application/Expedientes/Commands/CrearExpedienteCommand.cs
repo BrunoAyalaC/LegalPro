@@ -15,12 +15,14 @@ namespace LegalPro.Application.Expedientes.Commands;
 // el cupo del plan ANTES de ejecutar el handler (OCP, SRP).
 // ═══════════════════════════════════════════════════════
 
-public class CrearExpedienteCommand : IRequest<CrearExpedienteResult>, IPlanLimitedRequest
+public class CrearExpedienteCommand : IRequest<CrearExpedienteResult>, IPlanLimitedRequest, ITenantRequest
 {
     public string Numero { get; set; } = string.Empty;
     public string Titulo { get; set; } = string.Empty;
     public TipoRamaProcesal Tipo { get; set; }
     public bool EsUrgente { get; set; } = false;
+
+    public Guid OrganizationId { get; set; }
 
     // IPlanLimitedRequest: activa PlanLimitsBehavior antes de ejecutar el handler
     public string RecursoTipo => "expediente";
@@ -97,7 +99,9 @@ public class CrearExpedienteCommandHandler : IRequestHandler<CrearExpedienteComm
             expediente.Tipo.ToString(),
             expediente.Estado.ToString(),
             expediente.EsUrgente,
-            expediente.OrganizationId,
+            // OrganizationId es Guid? en la entidad; el DTO expone Guid (no-null).
+            // El factory Crear exige organizationId != Guid.Empty, así que .Value es seguro.
+            expediente.OrganizationId!.Value,
             expediente.CreatedAt);
     }
 }

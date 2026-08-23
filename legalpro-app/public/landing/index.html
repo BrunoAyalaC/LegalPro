@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -41,7 +41,7 @@
       --border-gold:  rgba(201,168,76,0.3);
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg-deep);
@@ -146,6 +146,16 @@
     .blob-1 { width: 700px; height: 700px; background: rgba(6,182,212,0.07); top: -200px; left: -200px; }
     .blob-2 { width: 500px; height: 500px; background: rgba(201,168,76,0.05); top: 20%; right: -150px; }
     .blob-3 { width: 450px; height: 450px; background: rgba(6,182,212,0.05); bottom: 10%; left: 30%; }
+    /* Contenedor de efectos de fondo: fija al viewport y recorta los blobs.
+       Evita el overflow horizontal (los blobs absolute se posicionaban contra
+       el documento y expandían scrollWidth a 563px en móvil). */
+    .bg-fx {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
     .page { position: relative; z-index: 2; }
 
     /* ─── UTILITIES ──────────────────────────────────────────────── */
@@ -1019,9 +1029,11 @@
 
 <canvas id="neural-canvas" aria-hidden="true"></canvas>
 <div class="noise-overlay" aria-hidden="true"></div>
-<div class="blob blob-1" aria-hidden="true"></div>
-<div class="blob blob-2" aria-hidden="true"></div>
-<div class="blob blob-3" aria-hidden="true"></div>
+<div class="bg-fx" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
 
 <div class="page">
 
@@ -1043,15 +1055,15 @@
         <div class="logo-text">Lex<span class="ia">.ia</span></div>
       </a>
       <ul class="navbar-links">
-        <li><a href="#inicio" class="active">Inicio</a></li>
-        <li><a href="#funciones">Funciones</a></li>
-        <li><a href="#precios">Precios</a></li>
-        <li><a href="#nosotros">Sobre nosotros</a></li>
-        <li><a href="#">Blog</a></li>
+        <li><a href="#inicio" id="nav-link-inicio" class="active">Inicio</a></li>
+        <li><a href="#funciones" id="nav-link-funciones">Funciones</a></li>
+        <li><a href="#precios" id="nav-link-precios">Precios</a></li>
+        <li><a href="#nosotros" id="nav-link-nosotros">Sobre nosotros</a></li>
+        <li><a href="#" id="nav-link-blog">Blog</a></li>
       </ul>
       <div class="navbar-actions">
-        <a href="/login" class="btn btn-ghost btn-sm">Iniciar Sesión</a>
-        <a href="/descargar" class="btn btn-primary btn-sm">Descargar App</a>
+        <a href="/login" id="nav-btn-login" class="btn btn-ghost btn-sm">Iniciar Sesión</a>
+        <a href="/descargar" id="nav-btn-download" class="btn btn-primary btn-sm">Descargar App</a>
       </div>
       <button class="hamburger" id="hamburger" aria-label="Menú" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -1105,10 +1117,10 @@
         </p>
 
         <div class="hero-ctas">
-          <a href="/login" class="btn btn-primary" style="font-size:16px;padding:15px 30px;">
+          <a href="/login" id="hero-btn-start" class="btn btn-primary" style="font-size:16px;padding:15px 30px;">
             Comienza Gratis →
           </a>
-          <a href="/descargar" class="btn btn-ghost" style="font-size:16px;padding:15px 30px;">
+          <a href="/descargar" id="hero-btn-demo" class="btn btn-ghost" style="font-size:16px;padding:15px 30px;">
             Ver Demo ▶
           </a>
         </div>
@@ -1213,7 +1225,7 @@
       <div class="chapter-content">
         <div class="chapter-number">01</div>
         <div class="chapter-title">ANÁLISIS IA</div>
-        <p class="chapter-desc">Carga cualquier expediente en PDF y recibe en segundos un análisis completo: fortalezas, debilidades, jurisprudencia aplicable y estrategia recomendada. Potenciado por Gemini AI.</p>
+        <p class="chapter-desc">Carga cualquier expediente en PDF y recibe en segundos un análisis completo: fortalezas, debilidades, jurisprudencia aplicable y estrategia recomendada. Potenciado por IA (DeepSeek V4 Flash).</p>
         <a href="#" class="chapter-link">Explorar función →</a>
       </div>
       <div class="chapter-visual">
@@ -1522,7 +1534,7 @@
             <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Simulador de juicios</li>
             <li style="color:var(--text-muted);"><span style="color:var(--text-muted);">✕</span> Monitor de notificaciones</li>
           </ul>
-          <a href="/login" class="btn btn-ghost" style="width:100%;justify-content:center;">Comenzar Gratis</a>
+          <a href="/login" id="pricing-btn-basic" class="btn btn-ghost" style="width:100%;justify-content:center;">Comenzar Gratis</a>
         </div>
 
         <!-- PRO -->
@@ -1542,7 +1554,7 @@
             <li><span class="price-check">✓</span> Monitor de notificaciones</li>
             <li><span class="price-check">✓</span> Soporte prioritario</li>
           </ul>
-          <a href="/login" class="btn btn-primary" style="width:100%;justify-content:center;">Empezar 14 días gratis</a>
+          <a href="/login" id="pricing-btn-pro" class="btn btn-primary" style="width:100%;justify-content:center;">Empezar 14 días gratis</a>
         </div>
 
         <!-- Estudio -->
@@ -1561,7 +1573,7 @@
             <li><span class="price-check">✓</span> Gerente de cuenta dedicado</li>
             <li><span class="price-check">✓</span> Alta disponibilidad</li>
           </ul>
-          <a href="/login" class="btn btn-gold" style="width:100%;justify-content:center;">Contactar Ventas</a>
+          <a href="/login" id="pricing-btn-enterprise" class="btn btn-gold" style="width:100%;justify-content:center;">Contactar Ventas</a>
         </div>
 
       </div>
@@ -1599,10 +1611,10 @@
         Plataforma legal con IA para el mercado peruano. Sin tarjeta requerida.
       </p>
       <div class="cta-buttons reveal reveal-delay-2">
-        <a href="/login" class="btn btn-primary" style="font-size:16px;padding:15px 32px;">
+        <a href="/login" id="cta-btn-start" class="btn btn-primary" style="font-size:16px;padding:15px 32px;">
           Comienza Gratis →
         </a>
-        <a href="/descargar" class="btn btn-ghost" style="font-size:16px;padding:15px 32px;">
+        <a href="/descargar" id="cta-btn-demo" class="btn btn-ghost" style="font-size:16px;padding:15px 32px;">
           Ver Demo ▶
         </a>
       </div>
@@ -1651,8 +1663,8 @@
         <div>
           <div class="footer-col-title">Legal</div>
           <ul class="footer-links">
-            <li><a href="#">Términos de uso</a></li>
-            <li><a href="#">Política de privacidad</a></li>
+            <li><a href="/terminos.html">Términos de uso</a></li>
+            <li><a href="/legal/privacidad">Política de privacidad</a></li>
             <li><a href="#">Política de cookies</a></li>
             <li><a href="#">Seguridad</a></li>
             <li><a href="#">Cumplimiento</a></li>
@@ -1679,8 +1691,8 @@
           Powered by <strong style="color:var(--cyan);margin-left:4px;">Lex.ia AI</strong>
         </div>
         <div class="footer-legal">
-          <a href="#">Términos</a>
-          <a href="#">Privacidad</a>
+          <a href="/terminos.html">Términos</a>
+          <a href="/legal/privacidad">Privacidad</a>
           <a href="#">Cookies</a>
         </div>
       </div>

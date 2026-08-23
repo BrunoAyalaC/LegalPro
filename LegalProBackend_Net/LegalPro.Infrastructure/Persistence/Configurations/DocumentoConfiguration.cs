@@ -41,5 +41,10 @@ public class DocumentoConfiguration : IEntityTypeConfiguration<Documento>
 
         builder.HasIndex(d => d.OrganizationId)
             .HasDatabaseName("ix_documentos_org");
+
+        builder.HasOne(d => d.Organizacion)
+            .WithMany()
+            .HasForeignKey(d => d.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

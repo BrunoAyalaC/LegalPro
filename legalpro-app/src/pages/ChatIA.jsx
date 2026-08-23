@@ -6,14 +6,75 @@ import AppIcon from '../components/AppIcon';
 import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import SpriteIcon from '../components/ui/SpriteIcon';
 import TarjetaRespuesta from '../components/chat/TarjetaRespuesta';
+import Mensaje from '../components/chat/Mensaje';
 import { api, nodeClient, detectarDocumento, redactarDocumento } from '../api/client';
 import { useSeo } from '../hooks/useSeo';
 import avatarIA from '../assets/avatar/avatar_ia.jpeg';
 import chatVacioImg from '../assets/empty-states/chat_ia_vacio.png';
+import chatVacioWebp from '../assets/empty-states/chat_ia_vacio.webp';
 import { getProviderLabel } from '../lib/iaProviders.js';
 
-const MAX_STORED = 100;
+const MAX_STORED = 50; // LPDP: limitar PII en storage cliente
+const TTL_MS = 24 * 60 * 60 * 1000; // 24h — expira automático
 const DISCLAIMER_KEY = 'legalpro_chat_disclaimer_dismissed';
+
+/**
+ * Persistencia segura de mensajes — SECURITY P0 + LPDP
+ * - sessionStorage (no localStorage) — se limpia al cerrar pestaña
+ * - TTL 24h con envelope { v, ts, expiresAt, messages }
+ * - Migra y limpia legacy localStorage si existe
+ */
+function loadMessagesSafe(storageKey) {
+  // Migración legacy: si hay datos en localStorage, mover y borrar
+  try {
+    const legacy = localStorage.getItem(storageKey);
+    if (legacy) {
+      try { sessionStorage.setItem(storageKey, legacy); } catch { /* ignore */ }
+      localStorage.removeItem(storageKey);
+    }
+  } catch { /* ignore */ }
+  try {
+    const raw = sessionStorage.getItem(storageKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    // Soporte retro: si es array plano (formato antiguo sin envelope), envolver y validar
+    if (Array.isArray(parsed)) {
+      return parsed.slice(-MAX_STORED);
+    }
+    if (!parsed || typeof parsed.expiresAt !== 'number') return [];
+    if (Date.now() > parsed.expiresAt) {
+      try { sessionStorage.removeItem(storageKey); } catch { /* ignore */ }
+      return [];
+    }
+    const msgs = Array.isArray(parsed.messages) ? parsed.messages : [];
+    return msgs.slice(-MAX_STORED);
+  } catch {
+    return [];
+  }
+}
+
+function saveMessagesSafe(storageKey, msgs) {
+  try {
+    const payload = {
+      v: 1,
+      ts: Date.now(),
+      expiresAt: Date.now() + TTL_MS,
+      messages: msgs.slice(-MAX_STORED),
+    };
+    sessionStorage.setItem(storageKey, JSON.stringify(payload));
+  } catch {
+    // QuotaExceeded: intentar guardar solo últimos 20
+    try {
+      const fallback = {
+        v: 1,
+        ts: Date.now(),
+        expiresAt: Date.now() + TTL_MS,
+        messages: msgs.slice(-20),
+      };
+      sessionStorage.setItem(storageKey, JSON.stringify(fallback));
+    } catch { /* ignore — modo privado */ }
+  }
+}
 
 const QUICK_ACTIONS = [
   { icon: 'summarize', label: 'Resumir caso', prompt: 'Resume los hechos principales de mi expediente activo más urgente.' },
@@ -42,18 +103,6 @@ function chatErrorMessage(err) {
   return msg || 'Error al conectar con LexIA. Verifica tu conexión e intenta de nuevo.';
 }
 
-function formatAiMessage(text) {
-  if (!text) return '';
-  let t = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  t = t.replace(/^#{1,6}\s+(.+)$/gm, '<div class="text-cyan-300 font-bold text-sm mt-3 mb-1">$1</div>');
-  t = t.replace(/^\s*(\d+)\.\s+\*\*(.+?)\*\*/gm, '<div class="mt-2 mb-0.5 text-sm"><span class="text-cyan-400 font-bold">$1.</span> <strong class="text-cyan-200">$2</strong></div>');
-  t = t.replace(/^\s*(\d+)\.\s+(.+)$/gm, '<span class="block ml-1 pl-2 border-l-2 border-cyan-500/20 my-1 text-slate-300"><span class="text-cyan-400 font-semibold mr-1">$1.</span>$2</span>');
-  t = t.replace(/\*\*(.+?)\*\*/g, '<strong class="text-cyan-200 font-semibold">$1</strong>');
-  t = t.replace(/^\s*[-*]\s+(.+)$/gm, '<span class="block ml-3 pl-1 text-slate-300 my-0.5">• $1</span>');
-  t = t.replace(/\n/g, '<br/>');
-  return t;
-}
-
 export default function ChatIA() {
   const [searchParams] = useSearchParams();
   const expedienteId = searchParams.get('expediente_id');
@@ -61,14 +110,7 @@ export default function ChatIA() {
     ? `legalpro_chat_messages_${expedienteId}`
     : 'legalpro_chat_messages';
 
-  const [messages, setMessages] = useState(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [messages, setMessages] = useState(() => loadMessagesSafe(storageKey));
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -86,16 +128,42 @@ export default function ChatIA() {
   const [documentoGenerado, setDocumentoGenerado] = useState(null);
   const [errorDoc, setErrorDoc] = useState(null);
 
+  // ═══ Contexto del expediente vinculado (materia + número legible) ═══
+  // Declarado ANTES de los useCallback que lo referencian (handleMensajeDownload)
+  // para evitar TDZ: las dependencias de useCallback se evalúan en el render
+  // y acceder a una const en TDZ lanza ReferenceError (P0 chat roto).
+  const materiaContexto = expedienteSeleccionado?.tipo ?? undefined;
+  const numeroExpediente = expedienteSeleccionado?.numero ?? undefined;
+
   const messagesEnd = useRef(null);
   const inputRef = useRef(null);
 
+  // Recargar al cambiar de expediente (storageKey distinto)
   useEffect(() => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(messages.slice(-MAX_STORED)));
-    } catch {
-      try { localStorage.setItem(storageKey, JSON.stringify(messages.slice(-20))); } catch { /* ignore */ }
-    }
+    setMessages(loadMessagesSafe(storageKey));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
+  useEffect(() => {
+    saveMessagesSafe(storageKey, messages);
   }, [messages, storageKey]);
+
+  // Limpia mensajes expirados al re-enfocar pestaña (TTL 24h)
+  useEffect(() => {
+    const onFocus = () => {
+      try {
+        const raw = sessionStorage.getItem(storageKey);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed?.expiresAt && Date.now() > parsed.expiresAt) {
+          sessionStorage.removeItem(storageKey);
+          setMessages([]);
+        }
+      } catch { /* ignore */ }
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [storageKey]);
 
   useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });
@@ -108,7 +176,7 @@ export default function ChatIA() {
     let active = true;
     setCargandoExpedientes(true);
     nodeClient
-      .get('/api/expedientes', { params: { page: 1, pageSize: 200 } })
+      .get('/api/expedientes', { params: { page: 1, pageSize: 30 } })
       .then((res) => {
         if (!active) return;
         const data = res.data?.data ?? res.data;
@@ -142,7 +210,7 @@ export default function ChatIA() {
     if (!window.confirm('¿Limpiar todo el historial del chat? Esta acción no se puede deshacer.')) return;
     setMessages([]);
     setExpandidosLeyes({});
-    localStorage.removeItem(storageKey);
+    try { sessionStorage.removeItem(storageKey); localStorage.removeItem(storageKey); } catch { /* ignore */ }
   }, [storageKey]);
 
   const toggleLeyes = useCallback((idx) => {
@@ -154,6 +222,55 @@ export default function ChatIA() {
       await navigator.clipboard.writeText(text);
     } catch { /* ignore */ }
   }, []);
+
+  // Descarga de un escrito en una burbuja concreta. Stable callback para que
+  // React.memo en <Mensaje> no se invalide en cada render del padre.
+  const handleMensajeDownload = useCallback(async (formato, msg) => {
+    if (msg.tipoRespuesta !== 'escrito') return;
+    try {
+      setDetectandoDoc(true);
+      const conversacion = messages.map((m) => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        text: m.text,
+      }));
+      const tipoDoc = msg.raw?.data?.tipo || 'escrito_simple';
+      const resp = await redactarDocumento(
+        {
+          conversacion,
+          tipoDocumento: tipoDoc,
+          materia: materiaContexto,
+          numeroExpediente: numeroExpediente,
+        },
+        formato,
+      );
+      const cd = resp.headers?.['content-disposition'];
+      const match = cd && /filename="?([^";]+)"?/i.exec(cd);
+      const ext = formato === 'docx' ? 'docx' : 'pdf';
+      const nombre = match?.[1] ?? `${tipoDoc}_${Date.now()}.${ext}`;
+      const url = URL.createObjectURL(resp.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nombre;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      let mensaje = 'No se pudo generar el archivo para descarga.';
+      try {
+        const blob = err?.response?.data;
+        const ct = String(err?.response?.headers?.['content-type'] ?? '');
+        if (blob instanceof Blob && ct.includes('application/json')) {
+          const parsed = JSON.parse(await blob.text());
+          if (parsed?.error) mensaje = parsed.error;
+          else if (parsed?.message) mensaje = parsed.message;
+        }
+      } catch { /* ignore */ }
+      setErrorDoc(mensaje);
+    } finally {
+      setDetectandoDoc(false);
+    }
+  }, [messages, materiaContexto, numeroExpediente, setDetectandoDoc, setErrorDoc]);
 
   const handleSend = async (text) => {
     if (loading) return;
@@ -202,10 +319,6 @@ export default function ChatIA() {
       inputRef.current?.focus();
     }
   };
-
-  // ═══ Contexto del expediente vinculado (materia + número legible) ═══
-  const materiaContexto = expedienteSeleccionado?.tipo ?? undefined;
-  const numeroExpediente = expedienteSeleccionado?.numero ?? undefined;
 
   // Detecta el tipo de documento a partir de la conversación y habilita la descarga
   const generarDocumento = async () => {
@@ -394,7 +507,10 @@ export default function ChatIA() {
       >
         {isEmpty ? (
           <div className="empty-state flex flex-col items-center justify-center min-h-[40vh] text-center px-4 py-8">
-            <img src={chatVacioImg} alt="" loading="lazy" className="w-36 sm:w-44 max-w-full mb-4 opacity-90" />
+            <picture>
+              <source srcSet={chatVacioWebp} type="image/webp" />
+              <img src={chatVacioImg} alt="" loading="lazy" decoding="async" className="w-36 sm:w-44 max-w-full mb-4 opacity-90" />
+            </picture>
             <h3 className="text-lg font-bold text-white mb-2">
               Hola, soy <span className="gradient-text">Lex-IA</span>
             </h3>
@@ -417,151 +533,22 @@ export default function ChatIA() {
           </div>
         ) : (
           messages.map((msg, i) => (
-            <div
+            <Mensaje
               key={`${msg.role}-${msg.time}-${i}`}
-              className={`flex gap-2.5 anim-fade-in-up ${
-                msg.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              {msg.role === 'ai' ? (
-                <img src={avatarIA} alt="LexIA" loading="lazy" className="ai-avatar w-8 h-8 sm:w-9 sm:h-9 shrink-0 mt-0.5" />
-              ) : (
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-indigo-500/30 border border-indigo-400/30 flex items-center justify-center shrink-0 mt-0.5 order-2">
-                  <AppIcon name="person" size={18} className="text-indigo-200" />
-                </div>
-              )}
-              <div className={`flex flex-col gap-1 min-w-0 ${
-                msg.role === 'user'
-                  ? 'items-end max-w-[85%] sm:max-w-[75%] order-1'
-                  : 'items-start max-w-[88%] sm:max-w-[80%]'
-              }`}>
-                <div className={`group relative p-3 sm:p-3.5 rounded-2xl break-words ${
-                  msg.role === 'user'
-                    ? 'chat-user rounded-br-md text-white inline-block max-w-full'
-                    : msg.isError
-                      ? 'bg-red-500/10 border border-red-500/25 text-red-200 rounded-bl-md w-full'
-                      : 'chat-ai rounded-bl-md w-full'
-                }`}>
-                  {msg.role === 'user' ? (
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                  ) : (
-                    <>
-                      <TarjetaRespuesta
-                        respuesta={msg.raw || { respuesta: msg.text, tipo_respuesta: 'respuesta', data: { leyes: msg.leyes } }}
-                        onDownload={async (formato) => {
-                          // Disparar descarga de escrito usando el tipo detectado.
-                          if (msg.tipoRespuesta !== 'escrito') return;
-                          try {
-                            setDetectandoDoc(true);
-                            const conversacion = messages.map((m) => ({
-                              role: m.role === 'user' ? 'user' : 'model',
-                              text: m.text,
-                            }));
-                            const tipoDoc = msg.raw?.data?.tipo || 'escrito_simple';
-                            const resp = await redactarDocumento(
-                              {
-                                conversacion,
-                                tipoDocumento: tipoDoc,
-                                materia: materiaContexto,
-                                numeroExpediente: numeroExpediente,
-                              },
-                              formato,
-                            );
-                            const cd = resp.headers?.['content-disposition'];
-                            const match = cd && /filename="?([^";]+)"?/i.exec(cd);
-                            const ext = formato === 'docx' ? 'docx' : 'pdf';
-                            const nombre = match?.[1] ?? `${tipoDoc}_${Date.now()}.${ext}`;
-                            const url = URL.createObjectURL(resp.data);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = nombre;
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-                            URL.revokeObjectURL(url);
-                          } catch (err) {
-                            let mensaje = 'No se pudo generar el archivo para descarga.';
-                            try {
-                              const blob = err?.response?.data;
-                              const ct = String(err?.response?.headers?.['content-type'] ?? '');
-                              if (blob instanceof Blob && ct.includes('application/json')) {
-                                const parsed = JSON.parse(await blob.text());
-                                if (parsed?.error) mensaje = parsed.error;
-                                else if (parsed?.message) mensaje = parsed.message;
-                              }
-                            } catch { /* ignore */ }
-                            setErrorDoc(mensaje);
-                          } finally {
-                            setDetectandoDoc(false);
-                          }
-                        }}
-                      />
-                      {/* Si tipo_respuesta === 'respuesta' (o no hay raw), mostramos además el markdown
-                          de la burbuja clásica para mantener la experiencia de chat libre. */}
-                      {(!msg.raw || msg.tipoRespuesta === 'respuesta' || !msg.tipoRespuesta) && (
-                        <div
-                          className="chat-ai-content text-sm leading-relaxed text-slate-200"
-                          dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(formatAiMessage(msg.text), {
-                              ALLOWED_TAGS: ['strong', 'br', 'span', 'div', 'p'],
-                              ALLOWED_ATTR: ['class'],
-                            }),
-                          }}
-                        />
-                      )}
-                    </>
-                  )}
-                  {msg.role === 'ai' && !msg.isError && (
-                    <div className="mt-2.5 pt-2 border-t border-white/8 flex items-center justify-between gap-2 flex-wrap">
-                      <p className="text-[10px] text-amber-400/70 flex items-center gap-1">
-                        <AppIcon name="warning" size={10} />
-                        Borrador IA — requiere revisión profesional
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => copyMessage(msg.text)}
-                        className="sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 text-[10px] text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-opacity"
-                        aria-label="Copiar respuesta"
-                      >
-                        <AppIcon name="content_copy" size={12} /> Copiar
-                      </button>
-                    </div>
-                  )}
-                  {msg.leyes?.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-white/10">
-                      <button
-                        type="button"
-                        onClick={() => toggleLeyes(i)}
-                        className="text-xs text-slate-400 hover:text-cyan-400 flex items-center gap-1"
-                      >
-                        <AppIcon name="gavel" size={14} />
-                        Base legal ({msg.leyes.length})
-                        <AppIcon name={expandidosLeyes[i] ? 'expand_less' : 'expand_more'} size={14} />
-                      </button>
-                      {expandidosLeyes[i] && (
-                        <div className="mt-2 pl-2 border-l-2 border-cyan-500/40 space-y-1">
-                          {msg.leyes.map((ley, li) => (
-                            <p key={li} className="text-[11px] text-slate-400">
-                              <span className="text-cyan-400">{ley.norma}</span>
-                              {ley.articulos && ` — Art. ${ley.articulos}`}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <span className={`text-[10px] text-slate-500 px-1 ${msg.role === 'user' ? 'text-right' : ''}`}>
-                  {msg.time}
-                </span>
-              </div>
-            </div>
+              msg={msg}
+              index={i}
+              avatarIA={avatarIA}
+              leyesExpandidas={!!expandidosLeyes[i]}
+              onToggleLeyes={toggleLeyes}
+              onCopy={copyMessage}
+              onDownload={(formato) => handleMensajeDownload(formato, msg)}
+            />
           ))
         )}
 
         {loading && (
           <div className="flex gap-2.5 max-w-[88%]" aria-busy="true" aria-label="LexIA está escribiendo">
-            <img src={avatarIA} alt="" className="ai-avatar w-8 h-8 shrink-0" />
+            <img src={avatarIA} alt="" loading="lazy" decoding="async" className="ai-avatar w-8 h-8 shrink-0" />
             <div className="chat-ai p-3.5 flex items-center gap-2.5 rounded-2xl rounded-bl-md">
               <div className="flex gap-1">
                 <div className="typing-dot" />

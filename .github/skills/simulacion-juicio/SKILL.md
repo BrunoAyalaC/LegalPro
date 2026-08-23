@@ -2,15 +2,15 @@
 
 ## Cuándo usar
 
-Cuando necesites implementar o mejorar el simulador de juicios interactivo con Gemini IA.
+Cuando necesites implementar o mejorar el simulador de juicios interactivo con MiniMax AI.
 
 ## Concepto
 
-Simulación role-playing donde Gemini juega roles procesales (juez, fiscal, testigo, etc.) y el usuario practica su intervención. Datos almacenados en Supabase.
+Simulación role-playing donde MiniMax juega roles procesales (juez, fiscal, testigo, etc.) y el usuario practica su intervención. Datos almacenados en Supabase.
 
 ## Roles Disponibles
 
-| Simulación  | Rol del usuario  | Roles Gemini             |
+| Simulación  | Rol del usuario  | Roles MiniMax             |
 | ----------- | ---------------- | ------------------------ |
 | Juicio oral | ABOGADO defensor | Juez, fiscal, testigo    |
 | Juicio oral | FISCAL acusador  | Juez, abogado, testigo   |
@@ -21,12 +21,12 @@ Simulación role-playing donde Gemini juega roles procesales (juez, fiscal, test
 ```
 1. Usuario selecciona tipo de simulación (app Android)
 2. Request → Backend Railway
-3. Backend genera caso con Gemini: `generar_estrategia` tipo=caso_simulacion
+3. Backend genera caso con MiniMax: `generar_estrategia` tipo=caso_simulacion
 4. Backend crea simulación en Supabase: tabla `simulaciones`
 5. Loop de turnos:
-   a. Gemini presenta situación procesal
+   a. MiniMax presenta situación procesal
    b. Usuario responde (intervención legal)
-   c. Gemini evalúa y puntúa
+   c. MiniMax evalúa y puntúa
    d. Se registra turno en Supabase: tabla `eventos_simulacion`
 6. Al finalizar: retroalimentación IA + puntuación final
 ```
@@ -86,7 +86,7 @@ CREATE TABLE eventos_simulacion (
 
 ## Checklist
 
-- [ ] Caso generado con Gemini Function Calling
+- [ ] Caso generado con MiniMax Function Calling
 - [ ] Datos en Supabase (simulaciones + eventos)
 - [ ] Loop de turnos con evaluación IA
 - [ ] Puntuación por turno y final

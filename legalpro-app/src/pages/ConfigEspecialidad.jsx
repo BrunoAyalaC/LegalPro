@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
-import api from '../api/client';
+import { api } from '../api/client';
 import { useTenant } from '../context/TenantContext';
 
 const ESPECIALIDADES = [
@@ -20,15 +20,24 @@ export default function ConfigEspecialidad() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
 
+  // ── Cleanup del setTimeout "saved" para evitar setState tras unmount ──
+  const savedTimerRef = useRef(null);
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    };
+  }, []);
+
   const handleSave = async () => {
     setSaving(true);
     setError('');
     setSaved(false);
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
     try {
       await api.updateMisDatos({ especialidad: selected });
       await refreshToken();
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       setError('No se pudo guardar la especialidad. Intenta de nuevo.');
     } finally {

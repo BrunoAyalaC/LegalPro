@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "last_updated": "2026-08-21",
+  "titulo": "Loop Driven Development Engine (LDDE) — Configuración canónica",
+  "descripcion": "Define el loop de calidad obligatorio que TODO output de skill debe recorrer antes de ship. 6 etapas: BUILD → AUDIT → REFUTE → OPTIMIZE → SECURE → GATE. Cada etapa tiene agentes responsables (todos subagents sin model propio), verifiers de gate y criterios de salida. Si GATE falla, el loop itera con los hallazgos (max max_iterations) y luego escala al chief del dominio.",
+  "reglas_globales": {
+    "primary_unico": "lexia-orchestrator orquesta TODOS los loops; ningún subagent ejecuta un loop completo por sí solo.",
+    "sin_modelo_propio": "Todos los agentes del loop son mode:subagent con model:null — heredan del primary.",
+    "gates_no_negociables": "Un gate FAIL bloquea el SHIP. No existe 'ship con warnings' para gates de seguridad/LPDP.",
+    "audit_event_obligatorio": "Cada iteración emite audit event LDDE_ITERATION con stage, hallazgos, duración y veredicto.",
+    "max_iterations_default": 3,
+    "escalation_map": {
+      "seguridad": "@arquitecto-chief",
+      "lpdp": "@gobernanza-chief",
+      "legal": "@abogado-chief",
+      "arquitectura": "@arquitecto-chief",
+      "performance": "@auditor-performance"
+    }
+  },
+  "etapas": [
+    { "id": "S1", "nombre": "BUILD", "descripcion": "El agente owner ejecuta la skill y produce el output.", "responsable": "skill.agente_owner", "salida": "output + self-check" },
+    { "id": "S2", "nombre": "AUDIT", "descripcion": "Auditor del dominio valida contra catálogos canónicos y quality gates.", "responsable": "loop.auditores", "salida": "informe auditoría + score" },
+    { "id": "S3", "nombre": "REFUTE", "descripcion": "Refutador adversarial intenta romper el output (casos borde, ataques, falsedad).", "responsable": "loop.refutadores", "salida": "vectores de ataque confirmados/refutados" },
+    { "id": "S4", "nombre": "OPTIMIZE", "descripcion": "Optimizador mejora performance/costo sin sacrificar corrección.", "responsable": "loop.optimizadores", "salida": "output optimizado + métricas antes/después" },
+    { "id": "S5", "nombre": "SECURE", "descripcion": "Pase de seguridad OWASP + LPDP sobre el output final.", "responsable": "loop.seguridad", "salida": "hallazgos seguridad con severidad" },
+    { "id": "S6", "nombre": "GATE", "descripcion": "Verifiers automáticos deben dar PASS. Determina SHIP o nueva iteración.", "responsable": "tools/verifiers/*", "salida": "SHIP | ITERATE(hallazgos) | ESCALATE(chief)" }
+  ],
+  "loops_por_categoria": {
+    "creacion": {
+      "skills": ["crear-endpoint", "crear-pagina"],
+      "auditores": ["@auditor-seguridad", "@auditor-multi-tenant"],
+      "refutadores": ["@refutador-seguridad"],
+      "optimizadores": ["@auditor-performance"],
+      "seguridad": ["@auditor-lpdp"],
+      "gates_verifiers": ["verifier-owasp.mjs", "verifier-rbac.mjs", "verifier-multi-tenant.mjs", "verifier-bundle-size.mjs", "verifier-masking.mjs"],
+      "criterios_gate": { "errores_criticos": 0, "citas_legales_pct": null, "score_minimo": 80 },
+      "max_iterations": 3
+    },
+    "ia-legal": {
+      "skills": ["analizar-expediente", "redactar-escrito-legal", "buscar-jurisprudencia", "liquidacion-laboral", "analisis-riesgos-procesales"],
+      "auditores": ["@auditor-legal"],
+      "refutadores": ["@refutador-legal"],
+      "optimizadores": ["@prompt-engineer"],
+      "seguridad": ["@auditor-lpdp"],
+      "gates_verifiers": ["verifier-citas-legales.mjs", "verifier-plazos.mjs", "verifier-tipificacion.mjs", "verifier-lpdp.mjs"],
+      "criterios_gate": { "errores_criticos": 0, "citas_legales_pct": 100, "disclaimers_ia_min": 4, "score_minimo": 85 },
+      "max_iterations": 2
+    },
+    "ia-rag": {
+      "skills": ["rag-busqueda-semantica"],
+      "auditores": ["@auditor-legal"],
+      "refutadores": ["@refutador-legal"],
+      "optimizadores": ["@auditor-performance"],
+      "seguridad": ["@auditor-lpdp"],
+      "gates_verifiers": ["verifier-rag-corpus.mjs", "verifier-citas-legales.mjs", "verifier-lpdp.mjs"],
+      "criterios_gate": { "errores_criticos": 0, "citas_legales_pct": 100, "degraded_permitido_solo_con_flag": true, "score_minimo": 80 },
+      "max_iterations": 2
+    },
+    "auditoria": {
+      "skills": ["auditar-lpdp", "auditar-seguridad"],
+      "auditores": ["@arquitecto-chief"],
+      "refutadores": ["@red-team"],
+      "optimizadores": ["@auditor-performance"],
+      "seguridad": ["@auditor-seguridad"],
+      "gates_verifiers": ["verifier-hard-rules.mjs", "verifier-catalogos.mjs"],
+      "criterios_gate": { "errores_criticos": 0, "falsos_positivos_max": 2, "score_minimo": 85 },
+      "max_iterations": 2
+    },
+    "devops": {
+      "skills": ["deploy-backend"],
+      "auditores": ["@auditor-seguridad"],
+      "refutadores": ["@refutador-seguridad"],
+      "optimizadores": ["@sre"],
+      "seguridad": ["@auditor-seguridad"],
+      "gates_verifiers": ["verifier-owner-secrets.mjs", "verifier-owasp.mjs"],
+      "criterios_gate": { "errores_criticos": 0, "health_checks_required": ["/health/live", "/health/ready"], "score_minimo": 85 },
+      "max_iterations": 3
+    },
+    "patron-arquitectonico": {
+      "skills": ["decoradores-patterns", "observadores-eventos", "adaptadores-externos", "protocolos-pipeline"],
+      "auditores": ["@arquitecto-chief"],
+      "refutadores": ["@refutador-arquitectura"],
+      "optimizadores": ["@auditor-performance"],
+      "seguridad": ["@auditor-seguridad"],
+      "gates_verifiers": ["verifier-adaptadores.mjs", "verifier-contrato-api.mjs", "verifier-idempotencia.mjs"],
+      "criterios_gate": { "errores_criticos": 0, "anti_patrones": 0, "score_minimo": 80 },
+      "max_iterations": 2
+    },
+    "performance": {
+      "skills": ["optimizadores-rendimiento"],
+      "auditores": ["@auditor-performance"],
+      "refutadores": ["@refutador-performance"],
+      "optimizadores": ["@auditor-performance"],
+      "seguridad": ["@auditor-seguridad"],
+      "gates_verifiers": ["verifier-bundle-size.mjs", "verifier-cost-spike.mjs"],
+      "criterios_gate": { "regresion_max_pct": 5, "errores_criticos": 0, "score_minimo": 80 },
+      "max_iterations": 3
+    },
+    "producto": {
+      "skills": ["objetivos-y-metas"],
+      "auditores": ["@product-owner"],
+      "refutadores": ["@gobernanza-chief"],
+      "optimizadores": ["@planner-chief"],
+      "seguridad": ["@gobernanza-chief"],
+      "gates_verifiers": ["verifier-hard-rules.mjs"],
+      "criterios_gate": { "okrs_medibles": true, "errores_criticos": 0, "score_minimo": 75 },
+      "max_iterations": 2
+    },
+    "ia-config": {
+      "skills": ["configurar-minimax", "enrutamiento-intenciones-chat"],
+      "auditores": ["@prompt-engineer"],
+      "refutadores": ["@refutador-legal"],
+      "optimizadores": ["@auditor-cost-ia"],
+      "seguridad": ["@auditor-lpdp"],
+      "gates_verifiers": ["verifier-deprecation-modelos.mjs", "verifier-lpdp.mjs", "verifier-masking.mjs"],
+      "criterios_gate": { "errores_criticos": 0, "pii_masking": true, "costo_por_request_max_usd": 0.10, "score_minimo": 80 },
+      "max_iterations": 2
+    }
+  },
+  "loop_especial_ldde": {
+    "skill": "loop-driven-development",
+    "agente_owner": "@lexia-orchestrator",
+    "nota": "Meta-skill: define cómo se ejecutan todos los demás loops. Solo el orquestador la consume directamente; los subagents la reciben como instrucciones de dispatch."
+  }
+}

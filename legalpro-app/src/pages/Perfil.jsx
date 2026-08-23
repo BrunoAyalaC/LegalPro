@@ -1,13 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Sliders, Bell, Shield, Sparkles, Download,
   HelpCircle, ChevronRight, LogOut, Building2,
-  Trash2, FileText, Edit3, Save, X, AlertTriangle
+  Trash2, FileText, Edit3, Save, X, AlertTriangle, Ban
 } from 'lucide-react';
 import { useTenant } from '../context/TenantContext';
-import { api } from '../api/client';
+import { api, nodeClient, revocarConsentimiento } from '../api/client';
 
 const APK_URL = import.meta.env.VITE_APK_URL ?? null;
 
@@ -62,6 +62,34 @@ export default function Perfil() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmDeleteText, setConfirmDeleteText] = useState('');
   const [deleting, setDeleting] = useState(false);
+
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordChanging, setPasswordChanging] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+
+  // ── Revocación de consentimientos LPDP (Arts. 14, 15) ──
+  const [revocando, setRevocando] = useState(null);
+  const [revocacionMsg, setRevocacionMsg] = useState('');
+  const [revocacionError, setRevocacionError] = useState('');
+  const [showConsentimiento, setShowConsentimiento] = useState(false);
+
+  // ── Oposición al tratamiento LPDP Art. 27 (LEG-06) ──
+  const [oponiendo, setOponiendo] = useState(null);
+  const [oposicionMsg, setOposicionMsg] = useState('');
+  const [oposicionError, setOposicionError] = useState('');
+  const [showOposicion, setShowOposicion] = useState(false);
+
+  // ── Cleanup de timers (logout diferido por revocación crítica) ──
+  const revocacionTimerRef = useRef(null);
+  useEffect(() => {
+    return () => {
+      if (revocacionTimerRef.current) clearTimeout(revocacionTimerRef.current);
+    };
+  }, []);
 
   const nombreCompleto = usuario?.nombreCompleto || usuario?.nombre || 'Usuario';
   const iniciales = nombreCompleto.split(' ').map(n => n.charAt(0)).join('').slice(0, 2).toUpperCase();
@@ -131,7 +159,7 @@ export default function Perfil() {
     }
     setDeleting(true);
     try {
-      await api.deleteCuenta();
+      await api.deleteAccount();
       logout();
       navigate('/login');
     } catch {
@@ -140,9 +168,82 @@ export default function Perfil() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
+
+  const MENSAJES_REVOCACION = {
+    terminos:
+      '¿Revocar la aceptación de Términos y Condiciones? Tu cuenta será DESACTIVADA por seguridad.',
+    privacidad:
+      '¿Revocar la aceptación de Política de Privacidad? Tu cuenta será DESACTIVADA por seguridad.',
+    marketing:
+      '¿Revocar el consentimiento de marketing? Dejarás de recibir comunicaciones promocionales.',
+    transferencia_internacional:
+      '¿Revocar el consentimiento de transferencia internacional a proveedores de IA (DeepSeek vía OpenCode Go)? Las funciones de IA dejarán de estar disponibles.',
+  };
+
+  const handleRevocar = async (tipo) => {
+    setRevocacionError('');
+    setRevocacionMsg('');
+    const ok = window.confirm(MENSAJES_REVOCACION[tipo]);
+    if (!ok) return;
+
+    setRevocando(tipo);
+    try {
+      const result = await revocarConsentimiento(tipo);
+      setRevocacionMsg(result.mensaje || 'Consentimiento revocado.');
+      await cargarMisDatos();
+      if (result.cuenta_desactivada) {
+        // Cuenta crítica: cerrar sesión tras 3s y redirigir al login
+        if (revocacionTimerRef.current) clearTimeout(revocacionTimerRef.current);
+        revocacionTimerRef.current = setTimeout(async () => {
+          await logout();
+          window.location.href = '/login';
+        }, 3000);
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.error || err?.message || 'Error al revocar el consentimiento.';
+      setRevocacionError(msg);
+    } finally {
+      setRevocando(null);
+    }
+  };
+
+  // ── Oposición al tratamiento LPDP Art. 27 (LEG-06) ──
+  // Bloquea una finalidad específica SIN eliminar la cuenta (a diferencia de /cancelar).
+  const FINALIDADES_OPOSICION = [
+    { id: 'marketing', label: 'Marketing y comunicaciones', icon: '📧', desc: 'Comunicaciones promocionales y newsletters' },
+    { id: 'ia_automatizada', label: 'Decisiones automatizadas con IA', icon: '🤖', desc: 'Análisis, predictor, redactor con DeepSeek V4 Flash' },
+    { id: 'cesion_terceros', label: 'Cesión de datos a terceros', icon: '🤝', desc: 'Compartir datos con proveedores externos' },
+    { id: 'elaboracion_perfiles', label: 'Elaboración de perfiles', icon: '👤', desc: 'Creación de perfiles de uso y comportamiento' },
+    { id: 'tratamiento_estadistico', label: 'Tratamiento estadístico', icon: '📊', desc: 'Uso de datos para análisis agregados' },
+    { id: 'todos', label: 'Todos los tratamientos no legales', icon: '🚫', desc: 'Tu cuenta seguirá activa para fines contractuales y legales' },
+  ];
+
+  const handleOposicion = async (finalidad) => {
+    setOposicionError('');
+    setOposicionMsg('');
+    const motivo = window.prompt(
+      `¿Por qué te opones a "${finalidad}"? (opcional, ayuda a nuestro cumplimiento LPDP)`
+    );
+    if (motivo === null) return; // usuario canceló
+
+    setOponiendo(finalidad);
+    try {
+      const result = await api.oponerTratamiento(finalidad, motivo || undefined);
+      const plazo = new Date(result.plazo_respuesta).toLocaleDateString('es-PE');
+      setOposicionMsg(
+        `${result.mensaje} Plazo de atención: ${plazo}. ${result.nota}`
+      );
+      await cargarMisDatos();
+    } catch (err) {
+      const msg = err?.response?.data?.error || err?.message || 'Error al registrar la oposición.';
+      setOposicionError(msg);
+    } finally {
+      setOponiendo(null);
+    }
   };
 
   return (
@@ -330,13 +431,163 @@ export default function Perfil() {
         </div>
       </motion.div>
 
+      {/* ── Cambiar Contraseña ── */}
+      <motion.div variants={item} className="mb-4">
+        <button
+          onClick={() => { setShowChangePassword(!showChangePassword); setPasswordError(''); setPasswordSuccess(''); }}
+          className="w-full flex items-center gap-3 text-left p-3.5 group
+            backdrop-blur-xl bg-white/5 border border-white/10
+            hover:bg-white/7 hover:border-white/20
+            rounded-2xl transition-all duration-300 shadow-lg"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center
+            shadow-lg border border-white/10 transition-transform duration-300
+            group-hover:scale-110">
+            <Shield size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-white">Cambiar Contraseña</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Actualiza tu contraseña de acceso</p>
+          </div>
+          <ChevronRight size={16} className={`text-slate-500 transition-transform duration-300 shrink-0 ${showChangePassword ? 'rotate-90' : ''}`} />
+        </button>
+
+        {showChangePassword && (
+          <div className="mt-3 rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-5 shadow-lg">
+            {passwordError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                {passwordError}
+              </div>
+            )}
+            {passwordSuccess && (
+              <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
+                {passwordSuccess}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="current-password" className="block text-xs text-slate-400 mb-1.5 font-medium">
+                  Contraseña actual
+                </label>
+                <input
+                  id="current-password"
+                  type="password"
+                  value={currentPassword}
+                  onChange={e => setCurrentPassword(e.target.value)}
+                  autoComplete="current-password"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50"
+                  placeholder="••••••••"
+                />
+              </div>
+              <div>
+                <label htmlFor="new-password" className="block text-xs text-slate-400 mb-1.5 font-medium">
+                  Nueva contraseña
+                </label>
+                <input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  minLength={8}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50"
+                  placeholder="Mínimo 8 caracteres"
+                />
+              </div>
+              <div>
+                <label htmlFor="confirm-new-password" className="block text-xs text-slate-400 mb-1.5 font-medium">
+                  Confirmar nueva contraseña
+                </label>
+                <input
+                  id="confirm-new-password"
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={e => setConfirmNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-amber-500/50"
+                  placeholder="Repite la contraseña"
+                />
+              </div>
+              <button
+                onClick={async () => {
+                  setPasswordError('');
+                  setPasswordSuccess('');
+
+                  if (!currentPassword) { setPasswordError('Debes ingresar tu contraseña actual.'); return; }
+                  if (newPassword.length < 8) { setPasswordError('La nueva contraseña debe tener al menos 8 caracteres.'); return; }
+                  if (newPassword !== confirmNewPassword) { setPasswordError('Las contraseñas no coinciden.'); return; }
+                  if (currentPassword === newPassword) { setPasswordError('La nueva contraseña debe ser diferente a la actual.'); return; }
+
+                  setPasswordChanging(true);
+                  try {
+                    await nodeClient.post('/api/auth/change-password', {
+                      currentPassword,
+                      newPassword,
+                      confirmNewPassword,
+                    });
+                    setPasswordSuccess('✅ Contraseña actualizada correctamente.');
+                    setCurrentPassword('');
+                    setNewPassword('');
+                    setConfirmNewPassword('');
+                    setTimeout(() => setShowChangePassword(false), 2000);
+                  } catch (err) {
+                    const msg = err?.response?.data?.error || err?.message || 'Error al cambiar la contraseña. Verifica tu contraseña actual e intenta nuevamente.';
+                    setPasswordError(msg);
+                  } finally {
+                    setPasswordChanging(false);
+                  }
+                }}
+                disabled={passwordChanging}
+                className="w-full mt-2 py-2.5 rounded-xl bg-amber-500/15 text-amber-400 text-xs font-bold border border-amber-500/25 hover:bg-amber-500/25 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {passwordChanging ? (
+                  <>
+                    <div className="w-4 h-4 rounded-full border-2 border-amber-400/30 border-t-amber-400 animate-spin" />
+                    Cambiando...
+                  </>
+                ) : (
+                  'Cambiar Contraseña'
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+
+      {/* ── Autenticación de Dos Factores (MFA) ──
+          ADR-004: MFA postergado. Los endpoints /api/auth/mfa/setup|verify|disable
+          NO existen en Node (solo POST /api/auth/login/mfa en auth-login-mfa.js).
+          Antes la sección disparaba 404 silenciosos; ahora muestra estado
+          informativo hasta la iteración MFA dedicada. */}
+      <motion.div variants={item} className="mb-4">
+        <div className="w-full flex items-center gap-3 p-3.5
+          backdrop-blur-xl bg-white/5 border border-white/10
+          rounded-2xl transition-all duration-300 shadow-lg">
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center
+            shadow-lg border border-white/10">
+            <Shield size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-white">Autenticación de Dos Factores (MFA)</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              La autenticación de dos factores (MFA) estará disponible próximamente
+            </p>
+          </div>
+          <span className="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full border shrink-0
+            bg-amber-500/15 text-amber-400 border-amber-500/25">
+            Próximamente
+          </span>
+        </div>
+      </motion.div>
+
       {/* Menú clásico */}
       <div className="space-y-2">
         {[
           { icon: Sliders, label: 'Especialidad Legal', desc: 'Configura tu área de práctica', color: 'bg-violet-500/15 text-violet-400' },
           { icon: Bell, label: 'Notificaciones', desc: 'Alertas y recordatorios', color: 'bg-amber-500/15 text-amber-400' },
           { icon: Shield, label: 'Seguridad', desc: 'Contraseña y 2FA', color: 'bg-emerald-500/15 text-emerald-400' },
-          { icon: Sparkles, label: 'Configuración IA', desc: 'Modelo Gemini y preferencias', color: 'bg-indigo-500/15 text-indigo-400' },
+          { icon: Sparkles, label: 'Configuración IA', desc: 'Modelo IA y preferencias', color: 'bg-indigo-500/15 text-indigo-400' },
           { icon: Download, label: 'Exportar Datos', desc: 'Backup de expedientes', color: 'bg-cyan-500/15 text-cyan-400' },
           { icon: HelpCircle, label: 'Soporte', desc: 'Ayuda y documentación', color: 'bg-slate-500/15 text-slate-400' },
         ].map((menuItem, i) => {
@@ -367,6 +618,174 @@ export default function Perfil() {
         })}
       </div>
 
+      {/* Privacidad y Consentimiento — LPDP (Arts. 14, 15) */}
+      <motion.div variants={item} className="mb-4">
+        <button
+          onClick={() => {
+            setShowConsentimiento(!showConsentimiento);
+            setRevocacionError('');
+            setRevocacionMsg('');
+          }}
+          className="w-full flex items-center gap-3 text-left p-3.5 group
+            backdrop-blur-xl bg-white/5 border border-white/10
+            hover:bg-white/7 hover:border-white/20
+            rounded-2xl transition-all duration-300 shadow-lg"
+          data-testid="lpdp-consentimiento-toggle"
+        >
+          <div className="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center
+            shadow-lg border border-white/10 transition-transform duration-300
+            group-hover:scale-110">
+            <Shield size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-white">Privacidad y Consentimiento (LPDP)</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Revoca tus consentimientos conforme a la Ley 29733 (Arts. 14, 15)
+            </p>
+          </div>
+          <ChevronRight
+            size={16}
+            className={`text-slate-500 transition-transform duration-300 shrink-0 ${showConsentimiento ? 'rotate-90' : ''}`}
+          />
+        </button>
+
+        {showConsentimiento && (
+          <div className="mt-3 rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-5 shadow-lg">
+            {revocacionMsg && (
+              <div className="mb-4 p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs">
+                {revocacionMsg}
+              </div>
+            )}
+            {revocacionError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                {revocacionError}
+              </div>
+            )}
+
+            <div className="space-y-2 text-sm">
+              {[
+                { tipo: 'terminos', label: 'Términos y Condiciones', icon: '📜', critico: true },
+                { tipo: 'privacidad', label: 'Política de Privacidad', icon: '🔒', critico: true },
+                { tipo: 'marketing', label: 'Marketing y Comunicaciones', icon: '📧', critico: false },
+                { tipo: 'transferencia_internacional', label: 'Transferencia Internacional (IA)', icon: '🌐', critico: false },
+              ].map(({ tipo, label, icon, critico }) => (
+                <button
+                  key={tipo}
+                  onClick={() => handleRevocar(tipo)}
+                  disabled={revocando !== null}
+                  data-testid={`lpdp-revocar-${tipo}`}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition disabled:opacity-50 ${
+                    critico
+                      ? 'bg-red-500/5 border-red-500/15 hover:border-red-500/40 hover:bg-red-500/10'
+                      : 'bg-white/5 border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5'
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <span aria-hidden="true">{icon}</span>
+                    <span className="text-white text-left">
+                      Revocar {label}
+                      {critico && (
+                        <span className="block text-[10px] text-red-400/80 font-semibold uppercase mt-0.5">
+                          Desactivará tu cuenta
+                        </span>
+                      )}
+                    </span>
+                  </span>
+                  <span className={`text-xs font-semibold ${critico ? 'text-red-400' : 'text-amber-400'}`}>
+                    {revocando === tipo ? 'Revocando...' : 'Revocar →'}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-[11px] text-slate-500 mt-4 leading-relaxed">
+              Conforme a la <strong className="text-slate-400">Ley N.º 29733</strong> (Ley de Protección
+              de Datos Personales del Perú), tienes derecho a revocar tu consentimiento en cualquier
+              momento, por el mismo medio que lo otorgaste. Arts. 14 y 15.
+            </p>
+          </div>
+        )}
+      </motion.div>
+
+      {/* ── Derecho de OPOSICIÓN al tratamiento (LPDP Art. 27) — LEG-06 ──
+          DISTINTO de cancelación: no borra la cuenta, solo bloquea finalidades específicas. */}
+      <motion.div variants={item} className="mb-4">
+        <button
+          onClick={() => { setShowOposicion(!showOposicion); setOposicionError(''); setOposicionMsg(''); }}
+          className="w-full flex items-center gap-3 text-left p-3.5 group
+            backdrop-blur-xl bg-amber-500/5 border border-amber-500/15
+            hover:bg-amber-500/10 hover:border-amber-500/25
+            rounded-2xl transition-all duration-300 shadow-lg"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center
+            shadow-lg border border-white/10 transition-transform duration-300
+            group-hover:scale-110">
+            <Ban size={20} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-amber-400">Derecho de Oposición (LPDP Art. 27)</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Oponte a un tratamiento específico SIN eliminar tu cuenta · Plazo: 10 días hábiles
+            </p>
+          </div>
+          <ChevronRight
+            size={16}
+            className={`text-slate-500 transition-transform duration-300 shrink-0 ${showOposicion ? 'rotate-90' : ''}`}
+          />
+        </button>
+
+        {showOposicion && (
+          <div className="mt-3 rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 p-5 shadow-lg">
+            {oposicionMsg && (
+              <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs">
+                {oposicionMsg}
+              </div>
+            )}
+            {oposicionError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
+                {oposicionError}
+              </div>
+            )}
+
+            <div className="space-y-2 text-sm">
+              {FINALIDADES_OPOSICION.map(({ id, label, icon, desc }) => (
+                <button
+                  key={id}
+                  onClick={() => handleOposicion(id)}
+                  disabled={oponiendo !== null}
+                  data-testid={`lpdp-oposicion-${id}`}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-lg
+                    bg-white/5 border border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5
+                    transition disabled:opacity-50"
+                >
+                  <span className="flex items-center gap-3">
+                    <span aria-hidden="true">{icon}</span>
+                    <span className="text-white text-left">
+                      Oponerse a: {label}
+                      <span className="block text-[10px] text-slate-500 font-normal mt-0.5">
+                        {desc}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="text-amber-400 text-xs font-semibold shrink-0 ml-2">
+                    {oponiendo === id ? 'Registrando...' : 'Oponerse →'}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <p className="text-[11px] text-slate-500 mt-4 leading-relaxed">
+              Conforme al <strong className="text-slate-400">Art. 27 de la Ley N.º 29733</strong>, puedes
+              oponerte al tratamiento de tus datos personales cuando concurran motivos fundados y
+              legítimos relativos a una situación personal concreta. A diferencia de la cancelación
+              (que elimina tu cuenta), la oposición <strong>bloquea finalidades específicas</strong>{' '}
+              manteniendo tu cuenta activa para los fines contractuales y legales necesarios. Plazo
+              máximo de respuesta: <strong>10 días hábiles</strong> (Art. 28).
+            </p>
+          </div>
+        )}
+      </motion.div>
+
       {/* Eliminar cuenta */}
       <motion.div variants={item} className="mt-4">
         <button
@@ -391,6 +810,7 @@ export default function Perfil() {
 
       {/* Cerrar Sesión */}
       <motion.button
+        id="btn-cerrar-sesion-perfil"
         variants={item}
         onClick={handleLogout}
         whileHover={{ scale: 1.01 }}

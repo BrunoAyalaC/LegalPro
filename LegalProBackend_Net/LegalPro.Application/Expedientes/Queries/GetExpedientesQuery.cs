@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Enums;
 using LegalPro.Domain.Exceptions;
@@ -12,7 +13,7 @@ namespace LegalPro.Application.Expedientes.Queries;
 // SRP: Solo lectura. Tenant isolation vía ICurrentUserService.
 // ═══════════════════════════════════════════════════════
 
-public class GetExpedientesQuery : IRequest<GetExpedientesResult>
+public class GetExpedientesQuery : IRequest<GetExpedientesResult>, ITenantRequest
 {
     public string? Estado { get; set; }
     public string? Tipo { get; set; }
@@ -20,6 +21,7 @@ public class GetExpedientesQuery : IRequest<GetExpedientesResult>
     public string? Search { get; set; }
     public int Page { get; set; } = 1;
     public int Limit { get; set; } = 20;
+    public Guid OrganizationId { get; set; }
 }
 
 public record ExpedienteDto(
@@ -93,10 +95,17 @@ public class GetExpedientesQueryHandler : IRequestHandler<GetExpedientesQuery, G
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            var term = request.Search.ToLower().Trim();
+            // FIX P2 perf 2026-08-21: ToLower().Contains(term) → EF.Functions.ILike con índice GIN trigram (pg_trgm).
+            // - Antes generaba LOWER(titulo) LIKE lower('%term%') → no usa índice → Seq Scan.
+            // - Ahora usa ILIKE '%term%' → Postgres traduce a titulo ILIKE pattern, acelerado por
+            //   índice GIN gin_trgm_ops (CREATE EXTENSION pg_trgm) → Bitmap Index Scan.
+            // - Escape de wildcards % _ \ para evitar inyección de patrón.
+            var raw = request.Search.Trim();
+            var escaped = raw.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+            var pattern = $"%{escaped}%";
             query = query.Where(e =>
-                e.Titulo.ToLower().Contains(term) ||
-                e.Numero.ToLower().Contains(term));
+                EF.Functions.ILike(e.Titulo, pattern) ||
+                EF.Functions.ILike(e.Numero, pattern));
         }
 
         var total = await query.CountAsync(cancellationToken);
@@ -114,7 +123,9 @@ public class GetExpedientesQueryHandler : IRequestHandler<GetExpedientesQuery, G
                 e.Estado.ToString(),
                 e.EsUrgente,
                 e.UsuarioId,
-                e.OrganizationId,
+                // OrganizationId es Guid? en la entidad; el DTO lo expone Guid (no-null).
+                // El filtro e.OrganizationId == orgId en el Where garantiza no-null.
+                e.OrganizationId!.Value,
                 e.CreatedAt,
                 e.UpdatedAt))
             .ToListAsync(cancellationToken);

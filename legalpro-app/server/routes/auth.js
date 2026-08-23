@@ -1,14 +1,80 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import db from '../db.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
+import { idempotencyMiddleware } from '../middleware/idempotencyMiddleware.js';
+import { logAudit } from '../utils/audit.js';
+import logger from '../logger.js';
 
 const router = Router();
+
+// SEGURIDAD: las respuestas de autenticación NUNCA deben cachearse. Sin esto,
+// el navegador puede cachear GET /api/auth/me y "resucitar" la sesión después
+// del logout (la cookie ya no existe pero el navegador sirve la respuesta
+// autenticada desde su caché). OWASP A07:2021.
+router.use((_req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_ISSUER = 'LegalProAPI';
 const JWT_AUDIENCE = 'LegalProClients';
 const JWT_EXPIRY = process.env.JWT_EXPIRY_SECONDS ? parseInt(process.env.JWT_EXPIRY_SECONDS) : 3600;
+const isProd = process.env.NODE_ENV === 'production';
+
+// Configuración de la cookie de sesión. Segura por defecto (producción HTTPS,
+// same-origin). Se puede relajar vía env para entornos de pruebas/E2E que
+// corren sobre HTTP y/o con frontend y API en orígenes distintos:
+//   COOKIE_SECURE=false   → permite enviar la cookie sobre HTTP (solo dev/test)
+//   COOKIE_SAMESITE=lax    → permite navegación cross-site de nivel superior
+// Nota: sameSite='none' EXIGE secure=true (lo fuerza el navegador).
+const COOKIE_SAMESITE = (process.env.COOKIE_SAMESITE || 'strict').toLowerCase();
+const COOKIE_SECURE = process.env.COOKIE_SECURE
+  ? process.env.COOKIE_SECURE === 'true'
+  : isProd; // por defecto: seguro en producción, abierto fuera de producción
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: COOKIE_SAMESITE === 'none' ? true : COOKIE_SECURE,
+  sameSite: COOKIE_SAMESITE,
+  path: '/api',
+  maxAge: JWT_EXPIRY * 1000,
+};
+
+function setTokenCookie(res, token) {
+  res.cookie('token', token, COOKIE_OPTIONS);
+}
+
+function clearTokenCookie(res) {
+  res.clearCookie('token', { path: '/api', sameSite: COOKIE_OPTIONS.sameSite, secure: COOKIE_OPTIONS.secure });
+}
+
+function getRequestIp(req) {
+  return req.headers?.['x-forwarded-for']?.split(',')[0]?.trim()
+    || req.ip
+    || req.socket?.remoteAddress
+    || null;
+}
+
+/**
+ * Normaliza el consentimiento LPDP soportando el contrato anidado y el plano.
+ * Devuelve siempre la forma anidada: { terminos:{aceptado,version}, privacidad:{...}, ... }
+ */
+function normalizarConsentimientos(anidado, body) {
+  if (anidado && typeof anidado === 'object') return anidado;
+  const flag = (v) => v === true || v === 'true';
+  return {
+    terminos: { aceptado: flag(body.aceptaTerminos), version: body.terminosVersion ?? '1.0' },
+    privacidad: { aceptado: flag(body.aceptaPrivacidad), version: body.privacidadVersion ?? '1.0' },
+    marketing: { aceptado: flag(body.aceptaMarketing), version: '1.0' },
+    transferencia: { aceptado: flag(body.aceptaTransferenciaInternacional), version: '1.0' },
+  };
+}
 
 /**
  * Genera un JWT con los claims del usuario + contexto tenant.
@@ -45,17 +111,24 @@ function generateToken(usuario, organizacion) {
  * Registra un usuario nuevo (sin organización — debe crear/unirse después).
  * REQUIERE consentimiento explícito de Términos y Privacidad (LPDP Perú).
  */
-router.post('/register', async (req, res, next) => {
+router.post('/register', idempotencyMiddleware(), async (req, res, next) => {
   try {
     const {
-      nombreCompleto,
+      nombreCompleto: nombreCompletoRaw,
+      nombre_completo,
       email,
       password,
       rol = 'ABOGADO',
       especialidad = 'GENERAL',
-      aceptaTerminos,
-      aceptaPrivacidad,
+      consentimientos: consentimientosRaw,
     } = req.body ?? {};
+
+    const nombreCompleto = nombreCompletoRaw ?? nombre_completo;
+
+    // Normaliza el consentimiento aceptando AMBOS contratos:
+    //  - Anidado:  { consentimientos: { terminos: { aceptado, version }, ... } }
+    //  - Plano:    { aceptaTerminos: true, aceptaPrivacidad: true, ... }
+    const consentimientos = normalizarConsentimientos(consentimientosRaw, req.body ?? {});
 
     if (!nombreCompleto || !email || !password) {
       return res.status(400).json({ error: 'nombreCompleto, email y password son obligatorios.' });
@@ -63,13 +136,18 @@ router.post('/register', async (req, res, next) => {
     if (password.length < 8) {
       return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' });
     }
-    if (aceptaTerminos !== true || aceptaPrivacidad !== true) {
-      return res.status(400).json({ error: 'Debe aceptar los Términos y Condiciones y la Política de Privacidad para registrarse.' });
-    }
 
+    // Validación de formato (rol) antes que las reglas de negocio (consentimiento).
     const rolesPermitidos = ['ABOGADO', 'JUEZ', 'FISCAL', 'CONTADOR'];
     if (!rolesPermitidos.includes(rol.toUpperCase())) {
       return res.status(400).json({ error: `Rol inválido. Valores permitidos: ${rolesPermitidos.join(', ')}.` });
+    }
+
+    if (!consentimientos?.terminos?.aceptado) {
+      return res.status(400).json({ error: 'Debe aceptar los Términos y Condiciones para registrarse.' });
+    }
+    if (!consentimientos?.privacidad?.aceptado) {
+      return res.status(400).json({ error: 'Debe aceptar la Política de Privacidad para registrarse.' });
     }
 
     // Verificar email duplicado (solo usuarios no eliminados)
@@ -83,8 +161,8 @@ router.post('/register', async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(password, 12);
     const ahora = new Date().toISOString();
-    const versionTerminos = '1.0';
-    const versionPrivacidad = '1.0';
+    const versionTerminos = consentimientos?.terminos?.version ?? '1.0';
+    const versionPrivacidad = consentimientos?.privacidad?.version ?? '1.0';
 
     const result = await db.query(
       `INSERT INTO usuarios (
@@ -112,23 +190,69 @@ router.post('/register', async (req, res, next) => {
 
     // Registrar consentimientos en tabla de trazabilidad
     try {
+      const consentValues = [
+        [usuario.id, 'terminos',     versionTerminos,  true, req.ip ?? null, req.headers['user-agent'] ?? null],
+        [usuario.id, 'privacidad',   versionPrivacidad, true, req.ip ?? null, req.headers['user-agent'] ?? null],
+      ];
+      if (consentimientos?.marketing?.aceptado) {
+        consentValues.push([
+          usuario.id, 'marketing',
+          consentimientos.marketing.version ?? '1.0',
+          true, req.ip ?? null, req.headers['user-agent'] ?? null,
+        ]);
+      }
+      if (consentimientos?.transferencia?.aceptado) {
+        consentValues.push([
+          usuario.id, 'transferencia_internacional',
+          consentimientos.transferencia.version ?? '1.0',
+          true, req.ip ?? null, req.headers['user-agent'] ?? null,
+        ]);
+      }
+
+      const placeholders = consentValues.map((_, i) => {
+        const base = i * 6;
+        return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}, NOW())`;
+      }).join(',\n');
+
+      const flatParams = consentValues.flat();
+
       await db.query(
         `INSERT INTO consentimientos (usuario_id, tipo, version, aceptado, ip_address, user_agent, created_at)
-         VALUES ($1, 'terminos', $2, TRUE, $3, $4, NOW()),
-                ($1, 'privacidad', $5, TRUE, $3, $4, NOW())`,
-        [
-          usuario.id,
-          versionTerminos,
-          req.ip ?? null,
-          req.headers['user-agent'] ?? null,
-          versionPrivacidad,
-        ]
+         VALUES ${placeholders}`,
+        flatParams
       );
     } catch (consentErr) {
-      console.warn('[auth] No se pudo registrar consentimiento:', consentErr.message);
+      // LPDP (Ley 29733): la trazabilidad del consentimiento es obligatoria.
+      // NUNCA tragar el error: si el INSERT falla, el registro queda inválido.
+      logger.error('[auth] No se pudo registrar consentimientos LPDP', {
+        error: consentErr.message,
+        code: consentErr.code ?? 'UNKNOWN',
+        userId: usuario.id,
+        ip: getRequestIp(req),
+      });
+
+      // Fallos de validación de datos (CHECK violation, NOT NULL, tipo inválido,
+      // truncamiento) → 400 con detalle.
+      if (['23514', '23502', '22P02', '22001'].includes(consentErr?.code)) {
+        return res.status(400).json({
+          error: 'Datos de consentimiento inválidos. Verifique los valores y vuelva a intentar.',
+        });
+      }
+      // Cualquier otro fallo → 500 explícito (no continuar silenciosamente).
+      return res.status(500).json({
+        error: 'No se pudo registrar el consentimiento LPDP. Inténtelo de nuevo.',
+      });
     }
 
+    logAudit('USER_REGISTERED', {
+      severity: 'INFO',
+      userId: usuario.id,
+      ip: getRequestIp(req),
+      rol: usuario.rol,
+    }).catch(() => {});
+
     const token = generateToken(usuario, null);
+    setTokenCookie(res, token);
     return res.status(201).json({
       token,
       usuario: {
@@ -175,11 +299,17 @@ router.post('/login', async (req, res, next) => {
     const usuario = rows[0] || null;
 
     if (!usuario) {
+      logAudit('LOGIN_FAILED', {
+        severity: 'WARNING', ip: getRequestIp(req), reason: 'user_not_found',
+      }).catch(() => {});
       return res.status(401).json({ error: 'Credenciales incorrectas.' });
     }
 
     const valid = await bcrypt.compare(password, usuario.password_hash);
     if (!valid) {
+      logAudit('LOGIN_FAILED', {
+        severity: 'WARNING', userId: usuario.id, ip: getRequestIp(req), reason: 'bad_password',
+      }).catch(() => {});
       return res.status(401).json({ error: 'Credenciales incorrectas.' });
     }
 
@@ -196,6 +326,14 @@ router.post('/login', async (req, res, next) => {
       : null;
 
     const token = generateToken(usuario, org);
+    setTokenCookie(res, token);
+
+    logAudit('LOGIN_SUCCESS', {
+      severity: 'INFO',
+      userId: usuario.id,
+      organizationId: org?.id ?? null,
+      ip: getRequestIp(req),
+    }).catch(() => {});
 
     return res.json({
       token,
@@ -218,6 +356,14 @@ router.post('/login', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+/**
+ * POST /api/auth/logout
+ */
+router.post('/logout', (_req, res) => {
+  clearTokenCookie(res);
+  return res.json({ mensaje: 'Sesión cerrada.' });
 });
 
 /**
@@ -273,8 +419,17 @@ router.delete('/cuenta', authMiddleware, async (req, res, next) => {
         [usuarioId, req.ip ?? null, req.headers['user-agent'] ?? null]
       );
     } catch (consentErr) {
-      console.warn('[auth] No se pudo registrar consentimiento de eliminación:', consentErr.message);
+      // La cuenta ya fue anonimizada; el fallo de trazabilidad no puede revertirse,
+      // pero NO debe tragarse: queda en el log estructurado con masking PII.
+      logger.error('[auth] No se pudo registrar consentimiento de eliminación', {
+        error: consentErr.message,
+        code: consentErr.code ?? 'UNKNOWN',
+        userId: usuarioId,
+        ip: getRequestIp(req),
+      });
     }
+
+    clearTokenCookie(res);
 
     return res.json({
       mensaje: 'Cuenta eliminada exitosamente. Sus datos personales han sido anonimizados y sus conversaciones eliminadas.',
@@ -325,6 +480,7 @@ router.get('/me', authMiddleware, async (req, res, next) => {
       : null;
 
     const token = generateToken(usuario, org);
+    setTokenCookie(res, token);
 
     return res.json({
       id: usuario.id,
@@ -344,6 +500,143 @@ router.get('/me', authMiddleware, async (req, res, next) => {
             rolMiembro: org.rol_miembro,
           }
         : null,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/auth/change-password
+ * Cambia la contraseña del usuario autenticado.
+ * Protegido con authMiddleware. Requiere contraseña actual + nueva.
+ */
+router.post('/change-password', authMiddleware, async (req, res, next) => {
+  try {
+    const body = req.body ?? {};
+    // Compatibilidad de contrato ES/EN
+    const currentPassword = body.passwordActual ?? body.currentPassword;
+    const newPassword = body.nuevaPassword ?? body.newPassword;
+    const confirmarPassword = body.confirmarPassword ?? body.confirmPassword ?? newPassword;
+
+    // ── Validaciones ──────────────────────────────────────────────────────
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'Campos obligatorios: contraseña actual y nueva contraseña.',
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        error: 'La nueva contraseña debe tener al menos 8 caracteres.',
+      });
+    }
+
+    if (newPassword !== confirmarPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'La nueva contraseña y su confirmación no coinciden.',
+      });
+    }
+
+    if (newPassword === currentPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'La nueva contraseña debe ser diferente de la actual.',
+      });
+    }
+
+    // ── Verificar contraseña actual ────────────────────────────────────────
+    const { rows: usuarios } = await db.query(
+      'SELECT id, password_hash FROM usuarios WHERE id = $1 AND eliminado_en IS NULL',
+      [req.user.sub]
+    );
+
+    if (usuarios.length === 0) {
+      return res.status(404).json({ success: false, error: 'Usuario no encontrado.' });
+    }
+
+    const usuario = usuarios[0];
+    const passwordValida = await bcrypt.compare(currentPassword, usuario.password_hash);
+
+    if (!passwordValida) {
+      return res.status(401).json({ success: false, error: 'La contraseña actual es incorrecta.' });
+    }
+
+    // ── Hashear y actualizar ───────────────────────────────────────────────
+    const nuevoHash = await bcrypt.hash(newPassword, 12);
+
+    await db.query(
+      'UPDATE usuarios SET password_hash = $1, updated_at = NOW() WHERE id = $2',
+      [nuevoHash, req.user.sub]
+    );
+
+    // ── Audit event ────────────────────────────────────────────────────────
+    logAudit('PASSWORD_CHANGED', {
+      severity: 'INFO',
+      userId: req.user.sub,
+      organizationId: req.user.organization_id,
+      ip: req.ip,
+    }).catch(() => {});
+
+    return res.json({
+      success: true,
+      message: 'Contraseña actualizada correctamente.',
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * POST /api/auth/forgot-password
+ * Solicita restablecimiento de contraseña.
+ * Genera y almacena un token temporal con expiración de 1 hora.
+ * Siempre responde el mismo mensaje (seguridad por oscuridad).
+ */
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const { email } = req.body ?? {};
+
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'El campo email es obligatorio.',
+      });
+    }
+
+    // Buscar usuario activo por email
+    const { rows: usuarios } = await db.query(
+      'SELECT id, email FROM usuarios WHERE email = $1 AND esta_activo = TRUE AND eliminado_en IS NULL LIMIT 1',
+      [email.toLowerCase().trim()]
+    );
+
+    if (usuarios.length > 0) {
+      const usuario = usuarios[0];
+      // Generar token seguro de 32 bytes hex
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+      await db.query(
+        'UPDATE usuarios SET reset_token = $1, reset_token_expiry = $2, updated_at = NOW() WHERE id = $3',
+        [resetToken, expiry.toISOString(), usuario.id]
+      );
+
+      // Audit: registrar solicitud (sin incluir el token)
+      logAudit('PASSWORD_RESET_REQUESTED', {
+        severity: 'INFO',
+        userId: usuario.id,
+        email: usuario.email,
+        ip: req.ip,
+      }).catch(() => {});
+    }
+
+    // Siempre responder el mismo mensaje para no revelar si el email existe
+    return res.json({
+      success: true,
+      message: 'Si el email existe, recibirás instrucciones para restablecer tu contraseña.',
     });
   } catch (err) {
     next(err);

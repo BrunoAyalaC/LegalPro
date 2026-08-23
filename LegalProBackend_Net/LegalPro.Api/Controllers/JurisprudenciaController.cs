@@ -7,14 +7,14 @@ using LegalPro.Application.Jurisprudencia.Queries;
 namespace LegalPro.Api.Controllers;
 
 // ═══════════════════════════════════════════════════════
-// Búsqueda de jurisprudencia peruana con Gemini + Google Search grounding.
+// Búsqueda de jurisprudencia peruana con MiniMax + Google Search grounding.
 // SRP: Controller solo delega a MediatR.
 // ILegalJurisprudenciaSearch → BuscarJurisprudenciaQueryHandler.
 // ═══════════════════════════════════════════════════════
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-[EnableRateLimiting("gemini")]
+[EnableRateLimiting("minimax")]
 public class JurisprudenciaController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,7 +22,7 @@ public class JurisprudenciaController : ControllerBase
     public JurisprudenciaController(IMediator mediator) => _mediator = mediator;
 
     // ── POST /api/jurisprudencia/buscar ─────────────────────────────────
-    // Gemini con Google Search grounding busca jurisprudencia real.
+    // MiniMax con Google Search grounding busca jurisprudencia real.
     // Filtros opcionales: sala, materia, fechaDesde, fechaHasta.
     // IncluirVinculantes=true añade precedentes vinculantes Corte Suprema.
     // ─────────────────────────────────────────────────────────────

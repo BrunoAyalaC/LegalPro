@@ -1,0 +1,14 @@
+{
+  "id": "ORG-ENT-001",
+  "slug": "bufete-enterprise",
+  "nombre": "Bufete Enterprise SAC",
+  "ruc": "20444444444",
+  "plan": "ENTERPRISE",
+  "max_expedientes": 9999,
+  "max_usuarios": 9999,
+  "max_consultas_ia_mes": 50000,
+  "consultas_ia_usadas_mes": 12453,
+  "owner_id": "USER-OWN-003",
+  "is_active": true,
+  "created_at": "2024-03-10T09:00:00Z"
+}

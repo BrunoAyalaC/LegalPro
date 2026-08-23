@@ -50,13 +50,19 @@ public class AceptarInvitacionCommandHandler : IRequestHandler<AceptarInvitacion
         var userId = _currentUser.UserId
             ?? throw new ForbiddenAccessException("Debe estar autenticado para aceptar una invitación.");
 
+        // HOTFIX P0-A 2026-08-21: flujo cross-tenant por diseño — el usuario invitado puede no
+        // tener OrganizationId aún y la invitación pertenece a la ORG DESTINO, no al claim del
+        // JWT actual. El filtro global deny-all devolvía 0 filas en todas las queries.
+        // Autorización manual conservada: userId autenticado + match invitacion.Email == usuario.Email.
         var usuario = await _context.Usuarios
+            .IgnoreQueryFilters()
             .Include(u => u.Organizacion)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken)
             ?? throw new NotFoundException(nameof(Usuario), userId);
 
         // Buscar invitación por token incluyendo la organización
         var invitacion = await _context.InvitacionesOrganizacion
+            .IgnoreQueryFilters()
             .Include(i => i.Organizacion)
             .FirstOrDefaultAsync(i => i.Token == request.Token, cancellationToken)
             ?? throw new NotFoundException("Invitación", request.Token);
@@ -89,7 +95,9 @@ public class AceptarInvitacionCommandHandler : IRequestHandler<AceptarInvitacion
             _ => RolMiembro.Member
         };
 
+        // HOTFIX P0-A: membresía se busca en la ORG DESTINO (≠ tenant del claim actual).
         var miembroExistente = await _context.MiembrosOrganizacion
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(m => m.OrganizacionId == org.Id && m.UsuarioId == userId, cancellationToken);
 
         if (miembroExistente == null)
@@ -104,7 +112,10 @@ public class AceptarInvitacionCommandHandler : IRequestHandler<AceptarInvitacion
         invitacion.AddDomainEvent(new Domain.Events.InvitacionAceptadaEvent(invitacion.Id, org.Id, invitacion.Email));
 
         // Regenerar token con org_id actualizado
+        // HOTFIX P0-A: el claim JWT del request sigue apuntando a la org vieja/null →
+        // el filtro tenant no matchearía la nueva OrganizationId a mitad de request.
         var usuarioActualizado = await _context.Usuarios
+            .IgnoreQueryFilters()
             .Include(u => u.Organizacion)
             .FirstAsync(u => u.Id == userId, cancellationToken);
 

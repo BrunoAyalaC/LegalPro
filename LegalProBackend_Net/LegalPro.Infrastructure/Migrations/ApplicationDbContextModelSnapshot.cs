@@ -95,32 +95,30 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_audit_logs");
+                        .HasName("pk_audit_log");
 
                     b.HasIndex("EventType")
-                        .HasDatabaseName("ix_audit_logs_event_type");
+                        .HasDatabaseName("ix_audit_log_event_type");
 
                     b.HasIndex("Severity")
-                        .HasDatabaseName("ix_audit_logs_severity")
+                        .HasDatabaseName("ix_audit_log_severity")
                         .HasFilter("\"severity\" IN ('WARN', 'CRITICAL')");
 
                     b.HasIndex("Timestamp")
-                        .HasDatabaseName("ix_audit_logs_timestamp");
+                        .HasDatabaseName("ix_audit_log_timestamp");
 
                     b.HasIndex("UserId")
-                        .HasDatabaseName("ix_audit_logs_user_id");
+                        .HasDatabaseName("ix_audit_log_user_id");
 
-                    b.ToTable("audit_logs", (string)null);
+                    b.ToTable("audit_log", (string)null);
                 });
 
             modelBuilder.Entity("LegalPro.Domain.Entities.BaseLegalVectorial", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Articulo")
                         .IsRequired()
@@ -153,87 +151,26 @@ namespace LegalPro.Infrastructure.Migrations
                     b.ToTable("base_legal_vectorial", (string)null);
                 });
 
-            modelBuilder.Entity("LegalPro.Domain.Entities.EventoSimulacion", b =>
+            modelBuilder.Entity("LegalPro.Domain.Entities.Documento", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Emisor")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("emisor");
-
-                    b.Property<string>("LeyesInvocadas")
-                        .HasColumnType("text")
-                        .HasColumnName("leyes_invocadas");
-
-                    b.Property<string>("Mensaje")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("mensaje");
-
-                    b.Property<int>("SimulacionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("simulacion_id");
-
-                    b.Property<int>("Turno")
-                        .HasColumnType("integer")
-                        .HasColumnName("turno");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_eventos_simulacion");
-
-                    b.HasIndex("SimulacionId")
-                        .HasDatabaseName("ix_eventos_simulacion_simulacion_id");
-
-                    b.ToTable("eventos_simulacion", (string)null);
-                });
-
-            modelBuilder.Entity("LegalPro.Domain.Entities.Expediente", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<bool>("EsUrgente")
-                        .HasColumnType("boolean")
-                        .HasColumnName("es_urgente");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("estado");
-
-                    b.Property<string>("Numero")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasColumnName("numero");
-
-                    b.Property<Guid?>("OrganizacionId")
                         .HasColumnType("uuid")
-                        .HasColumnName("organizacion_id");
+                        .HasColumnName("id");
+
+                    b.Property<string>("Contenido")
+                        .HasColumnType("text")
+                        .HasColumnName("contenido");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("ExpedienteId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("expediente_id");
 
                     b.Property<Guid>("OrganizationId")
                         .HasColumnType("uuid")
@@ -255,8 +192,119 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UsuarioId")
+                    b.Property<string>("Url")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("url");
+
+                    b.HasKey("Id")
+                        .HasName("pk_documentos");
+
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("ix_documentos_org");
+
+                    b.HasIndex("ExpedienteId", "OrganizationId")
+                        .HasDatabaseName("ix_documentos_expediente_org");
+
+                    b.ToTable("documentos", (string)null);
+                });
+
+            modelBuilder.Entity("LegalPro.Domain.Entities.EventoSimulacion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Emisor")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("emisor");
+
+                    b.Property<string>("LeyesInvocadas")
+                        .HasColumnType("text")
+                        .HasColumnName("leyes_invocadas");
+
+                    b.Property<string>("Mensaje")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("mensaje");
+
+                    b.Property<Guid>("SimulacionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("simulacion_id");
+
+                    b.Property<int>("Turno")
                         .HasColumnType("integer")
+                        .HasColumnName("turno");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_eventos_simulacion");
+
+                    b.HasIndex("SimulacionId")
+                        .HasDatabaseName("ix_eventos_simulacion_simulacion_id");
+
+                    b.ToTable("eventos_simulacion", (string)null);
+                });
+
+            modelBuilder.Entity("LegalPro.Domain.Entities.Expediente", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("EsUrgente")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_urgente");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("estado");
+
+                    b.Property<string>("Numero")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("numero");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("tipo");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("titulo");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid")
                         .HasColumnName("usuario_id");
 
                     b.HasKey("Id")
@@ -266,8 +314,8 @@ namespace LegalPro.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_expedientes_numero");
 
-                    b.HasIndex("OrganizacionId")
-                        .HasDatabaseName("ix_expedientes_organizacion_id");
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("ix_expedientes_organization_id");
 
                     b.HasIndex("UsuarioId")
                         .HasDatabaseName("ix_expedientes_usuario_id");
@@ -337,12 +385,10 @@ namespace LegalPro.Infrastructure.Migrations
 
             modelBuilder.Entity("LegalPro.Domain.Entities.MensajeChat", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Contenido")
                         .IsRequired()
@@ -373,8 +419,8 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer")
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid")
                         .HasColumnName("usuario_id");
 
                     b.HasKey("Id")
@@ -410,8 +456,8 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("invitado_en");
 
-                    b.Property<int?>("InvitadoPorId")
-                        .HasColumnType("integer")
+                    b.Property<Guid?>("InvitadoPorId")
+                        .HasColumnType("uuid")
                         .HasColumnName("invitado_por_id");
 
                     b.Property<Guid>("OrganizacionId")
@@ -432,8 +478,8 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer")
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid")
                         .HasColumnName("usuario_id");
 
                     b.HasKey("Id")
@@ -514,14 +560,82 @@ namespace LegalPro.Infrastructure.Migrations
                     b.ToTable("organizaciones", (string)null);
                 });
 
-            modelBuilder.Entity("LegalPro.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("LegalPro.Domain.Entities.OutboxMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<DateTime>("OccurredOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_on_utc");
+
+                    b.Property<DateTime?>("ProcessedOnUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_on_utc");
+
+                    b.Property<int>("RetryCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("retry_count");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("type");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_messages");
+
+                    b.HasIndex("ProcessedOnUtc")
+                        .HasDatabaseName("ix_outbox_messages_processed_on_utc");
+
+                    b.HasIndex("ProcessedOnUtc", "RetryCount")
+                        .HasDatabaseName("ix_outbox_messages_pending")
+                        .HasFilter("\"processed_on_utc\" IS NULL AND \"retry_count\" < 3");
+
+                    b.ToTable("outbox_messages", (string)null);
+                });
+
+            modelBuilder.Entity("LegalPro.Domain.Entities.PrediccionJudicial", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<decimal>("ProbabilidadExito")
+                        .HasColumnType("numeric")
+                        .HasColumnName("probabilidad_exito");
+
+                    b.HasKey("Id")
+                        .HasName("pk_predicciones_judiciales");
+
+                    b.ToTable("predicciones_judiciales", (string)null);
+                });
+
+            modelBuilder.Entity("LegalPro.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -556,8 +670,8 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer")
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid")
                         .HasColumnName("usuario_id");
 
                     b.HasKey("Id")
@@ -575,12 +689,10 @@ namespace LegalPro.Infrastructure.Migrations
 
             modelBuilder.Entity("LegalPro.Domain.Entities.Simulacion", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ContextoSintetico")
                         .IsRequired()
@@ -625,8 +737,8 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer")
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("uuid")
                         .HasColumnName("usuario_id");
 
                     b.HasKey("Id")
@@ -640,12 +752,10 @@ namespace LegalPro.Infrastructure.Migrations
 
             modelBuilder.Entity("LegalPro.Domain.Entities.Usuario", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -679,10 +789,6 @@ namespace LegalPro.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("nombre_completo");
 
-                    b.Property<Guid?>("OrganizacionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("organizacion_id");
-
                     b.Property<Guid?>("OrganizationId")
                         .HasColumnType("uuid")
                         .HasColumnName("organization_id");
@@ -710,10 +816,31 @@ namespace LegalPro.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_usuarios_email");
 
-                    b.HasIndex("OrganizacionId")
-                        .HasDatabaseName("ix_usuarios_organizacion_id");
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("ix_usuarios_organization_id");
 
                     b.ToTable("usuarios", (string)null);
+                });
+
+            modelBuilder.Entity("LegalPro.Domain.Entities.Documento", b =>
+                {
+                    b.HasOne("LegalPro.Domain.Entities.Expediente", "Expediente")
+                        .WithMany()
+                        .HasForeignKey("ExpedienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_documentos_expedientes_expediente_id");
+
+                    b.HasOne("LegalPro.Domain.Entities.Organizacion", "Organizacion")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_documentos_organizaciones_organization_id");
+
+                    b.Navigation("Expediente");
+
+                    b.Navigation("Organizacion");
                 });
 
             modelBuilder.Entity("LegalPro.Domain.Entities.EventoSimulacion", b =>
@@ -732,8 +859,10 @@ namespace LegalPro.Infrastructure.Migrations
                 {
                     b.HasOne("LegalPro.Domain.Entities.Organizacion", "Organizacion")
                         .WithMany()
-                        .HasForeignKey("OrganizacionId")
-                        .HasConstraintName("fk_expedientes_organizaciones_organizacion_id");
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_expedientes_organizaciones_organization_id");
 
                     b.HasOne("LegalPro.Domain.Entities.Usuario", "Usuario")
                         .WithMany("Expedientes")
@@ -819,9 +948,10 @@ namespace LegalPro.Infrastructure.Migrations
             modelBuilder.Entity("LegalPro.Domain.Entities.Usuario", b =>
                 {
                     b.HasOne("LegalPro.Domain.Entities.Organizacion", "Organizacion")
-                        .WithMany()
-                        .HasForeignKey("OrganizacionId")
-                        .HasConstraintName("fk_usuarios_organizaciones_organizacion_id");
+                        .WithMany("Miembros")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_usuarios_organizaciones_organization_id");
 
                     b.Navigation("Organizacion");
                 });
@@ -831,6 +961,8 @@ namespace LegalPro.Infrastructure.Migrations
                     b.Navigation("Invitaciones");
 
                     b.Navigation("MembresiaDetallada");
+
+                    b.Navigation("Miembros");
                 });
 
             modelBuilder.Entity("LegalPro.Domain.Entities.Simulacion", b =>

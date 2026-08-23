@@ -1,0 +1,11 @@
+{
+  "name": "legalpro-cross-tenant-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Suite de tests cross-tenant para LegalPro (vitest, ESM).",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run cross-tenant-isolation.test.js",
+    "test:watch": "vitest watch cross-tenant-isolation.test.js"
+  }
+}

@@ -1,0 +1,478 @@
+
+============================================
+VERIFIER: verifier-accesibilidad
+============================================
+=== Verifier: Accesibilidad WCAG 2.1 AA ===
+
+OK: aria-label usado 73 veces
+OK: role usado 22 veces
+OK: Tests accesibilidad WCAG existen
+
+Errores: 0, Warnings: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-adaptadores
+============================================
+=== Verifier Adaptadores Externos ===
+
+[auth]
+  OK: Adapter encontrado en legalpro-app/server/supabase.js
+[storage]
+  OK: Adapter encontrado en LegalProBackend_Net/LegalPro.Infrastructure/Services/LocalStorageService.cs
+[database]
+  OK: Adapter encontrado en LegalProBackend_Net/LegalPro.Infrastructure/Persistence/ApplicationDbContext.cs
+[ai]
+  OK: Adapter encontrado en LegalProBackend_Net/LegalPro.Infrastructure/Services/GeminiService.cs
+[bcrp]
+  OK: Adapter encontrado en legalpro-app/server/routes/
+[sinco]
+  OK: Adapter encontrado en legalpro-app/server/routes/
+
+[Verificando mocks de adaptadores]
+El sistema no puede encontrar la ruta especificada.
+WARN: No se pudieron buscar mocks
+
+Errores: 0, Warnings: 1
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-arco
+============================================
+=== Verifier: ARCO (LPDP) ===
+
+OK: [ARCO-01] Rutas datos-personales
+OK: [ARCO-02] Endpoint exportar datos
+OK: [ARCO-03] Endpoint rectificar
+OK: [ARCO-04] Endpoint cancelar
+OK: [ARCO-05] Audit event ARCO
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-arneses-registry
+============================================
+=== Verifier: Arnés Registry ===
+
+OK: [REG-01] INDEX.json
+OK: [REG-02] agents.json
+OK: [REG-03] CHANGELOG.md
+OK: [REG-04] opencode.json
+OK: [REG-05] Agentes en .opencode
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-brute-force
+============================================
+=== Verifier: Brute Force Protection ===
+
+OK: [BF-01] Middleware .NET
+OK: [BF-02] Threshold >= 5 intentos
+OK: [BF-03] Lockout >= 15 min
+OK: [BF-04] Audit events
+OK: [BF-05] Brute force en Node
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-bundle-size
+============================================
+=== Verifier: Bundle Size ===
+
+El sistema no puede encontrar la ruta especificada.
+WARN: dist/ no existe (ejecutar build primero)
+El sistema no puede encontrar la ruta especificada.
+WARN: vite.config.js no tiene manualChunks
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-catalogos
+============================================
+=== Verifier: Catálogos ===
+
+OK: role-tools
+OK: gemini-functions
+OK: tipos-penales
+OK: plazos-procesales
+OK: delitos-economicos
+OK: codigos-leyes
+OK: reguladores
+OK: audit-events
+OK: disclaimers-ia
+
+=== Resumen ===
+Validados: 9
+Saltados: 0
+Warnings: 0
+Errores: 0
+
+OK: Todos los catálogos validados
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-contrato-api
+============================================
+=== Verifier Contratos API (OpenAPI + Pact + JSON Schema) ===
+
+[CONTRACT-01] OpenAPI spec de legalpro-dotnet existe
+  OK: docs/api/openapi-legalpro-dotnet.json
+[CONTRACT-02] OpenAPI spec de legalpro-node existe
+  OK: docs/api/openapi-legalpro-node.json
+[CONTRACT-03] OpenAPI spec de owner-dashboard existe
+  OK: docs/api/openapi-owner-dashboard.json
+[CONTRACT-04] JSON Schemas en catalogs/schemas/ existen
+  OK: catalogs/schemas/role-tools.schema.json
+[CONTRACT-05] Pact contracts definidos
+  OK: pacts/frontend-node.json
+[CONTRACT-06] SLAs documentados en catalogs/sla-slo.md
+  OK: catalogs/sla-slo.md
+[CONTRACT-07] Catalogo de contratos existe
+  OK: catalogs/contratos.json
+[CONTRACT-08] Catalogo de adaptadores existe
+  OK: catalogs/adaptadores.json
+
+Errores: 0, Warnings: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-correcciones-criticas
+============================================
+=== Verifier: Correcciones CRITICAL ===
+
+🔴 FIX 1: IDOR Cross-Tenant
+
+  ✅ [IDOR-01] tenant-validator.js existe
+  ✅ [IDOR-02] requireTenantAccess implementado
+  ✅ [IDOR-03] Lista de tablas protegidas definida
+  ✅ [IDOR-04] expedientes-secure.js usa requireTenantAccess
+  ✅ [IDOR-05] audit log en TENANT_VIOLATION
+
+🟠 FIX 2: 4 Checkboxes Separados (LPDP Art. 14)
+
+  ✅ [CONSENT-01] SignupPage con 4 checkboxes separados
+  ✅ [CONSENT-02] No hay 1 solo checkbox "acepta todo"
+  ✅ [CONSENT-03] Consentimientos separados en state
+  ✅ [CONSENT-04] Versionado de TyC y Privacidad
+  ✅ [CONSENT-05] Detalles expandibles para cada consentimiento
+
+🟠 FIX 3: MFA TOTP
+
+  ✅ [MFA-01] auth-mfa-routes.js existe
+  ✅ [MFA-02] authenticator TOTP implementado
+  ✅ [MFA-03] Backup codes generados
+  ✅ [MFA-04] Login con MFA implementado
+  ✅ [MFA-05] MFA requerido para roles sensibles
+  ✅ [MFA-06] Audit log en eventos MFA
+
+=== Resumen ===
+Errores: 0, Warnings: 0
+
+✅ Todos los fixes CRITICAL implementados. Deploy permitido.
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-cost-spike
+============================================
+=== Verifier: Cost Spike Detection ===
+
+WARN: DATABASE_URL no definida, saltando verificacion real
+NOTA: Este verificador se ejecuta en CI/prod con credenciales
+OK: Verificador de spike de costo configurado correctamente
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-coverage
+============================================
+=== Verifier: Cobertura de Tests ===
+
+WARN: LegalProBackend_Net/LegalPro.UnitTests/coverlet.json no existe
+OK: legalpro-app/vitest.config.server.js existe
+OK: legalpro-app/vitest.config.prod.js existe
+OK: 23 tests .NET encontrados
+OK: 13 tests Node encontrados
+OK: 22 tests E2E encontrados
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-deprecation-modelos
+============================================
+=== Verifier: Modelos Gemini Deprecados ===
+
+El sistema no puede encontrar la ruta especificada.
+OK: Sin modelos Gemini deprecados en codigo
+OK: Catalogo sin modelos deprecados
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-firma-digital
+============================================
+=== Verifier: Firma Digital (Ley 27269) ===
+
+OK: [FD-01] Columna firma_digital_id
+OK: [FD-02] Hash SHA-256
+OK: [FD-03] TSA timestamp
+OK: [FD-04] Ley 27269 en catalogo
+OK: [FD-05] Audit event firma
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-idempotencia
+============================================
+=== Verifier: Idempotencia ===
+
+OK: [IDEM-01] Header Idempotency-Key
+OK: [IDEM-02] Cache/store
+OK: [IDEM-03] TTL/expiracion
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-lpdp
+============================================
+=== Verifier: LPDP (Ley 29733) ===
+
+OK: [LPDP-01] Tabla consentimientos existe
+OK: [LPDP-02] Endpoints ARCO existen
+OK: [LPDP-03] Flag transferencia internacional en columnas de usuario
+OK: [LPDP-04] Política de privacidad versionada
+OK: [LPDP-05] Términos y condiciones versionados
+OK: [LPDP-06] Registro de tratamiento LPDP existe
+OK: [LPDP-07] Cláusula de transferencia internacional
+OK: [LPDP-08] Audit log con eventos LPDP
+OK: [LPDP-09] Plan de rotación de secrets
+
+=== Resumen ===
+Errores: 0
+Warnings: 0
+
+OK: LPDP compliance verified
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-masking
+============================================
+=== Verifier: Masking PII en Logs ===
+
+OK: [MASK-01] MaskingTextFormatter .NET
+OK: [MASK-02] Logger.js Node
+OK: [MASK-03] PromptSanitizer
+OK: [MASK-04] PII masking en audit events
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-multi-tenant
+============================================
+[MT-01] Detectando IgnoreQueryFilters() en codigo de produccion
+  OK: Sin IgnoreQueryFilters() en produccion
+
+[MT-02] Verificando TenantValidationBehavior
+  OK: TenantValidationBehavior presente
+
+[MT-03] Verificando ITenantRequest
+  OK: ITenantRequest presente
+
+[MT-04] Verificando organization_id en JWT
+  OK: organization_id en JwtService
+
+[MT-05] Verificando tenantMiddleware en Node
+  OK: tenantMiddleware presente en authMiddleware.js y tenantMiddleware.js
+
+[MT-06] Verificando que RLS este documentado en catalogos
+  OK: RLS documentado en 10 tablas
+
+=== Resumen ===
+Errores: 0
+Warnings: 0
+
+OK: Multi-tenant verification passed
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-outbox
+============================================
+=== Verifier: Outbox Pattern ===
+
+OK: [OUTBOX-01] Tabla outbox_messages
+OK: [OUTBOX-02] BackgroundService .NET
+OK: [OUTBOX-03] Retry logic
+OK: [OUTBOX-04] DLQ
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-owasp
+============================================
+=== Verifier: OWASP Top 10 ===
+
+
+[A01:2021] Broken Access Control
+
+[A02:2021] Cryptographic Failures
+
+[A03:2021] Injection (template SQL/shell)
+
+[A07:2021] Auth Failures (secret hardcodeado)
+
+[GENERAL] Hardcoded secrets
+
+=== Resumen ===
+Patrones evaluados: 11
+Errores: 0
+Warnings: 0
+
+OK: No critical OWASP violations
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-owner-auth
+============================================
+=== Verifier: Owner Auth ===
+
+OK: [OAUTH-01] Middleware authenticateOwner existe
+OK: [OAUTH-02] Header Authorization usado
+OK: [OAUTH-03] OWNER_SECRET_KEY desde variable de entorno
+OK: [OAUTH-04] No se expone el secret en logs
+OK: [OAUTH-05] Manejo de error 401 sin authorization
+OK: [OAUTH-06] Manejo de error 403 con token invalido
+FAIL: [OAUTH-07] Tests de autenticacion - File not found: legalpro-owner-dashboard/crypto.test.js
+
+=== Resumen ===
+Errores: 1
+Warnings: 0
+
+FAIL: Owner auth verifications failed
+EXIT_CODE: 1
+
+============================================
+VERIFIER: verifier-owner-e2ee
+============================================
+=== Verifier: Owner E2EE ===
+
+FAIL: [E2EE-01] PBKDF2 con 100,000 iteraciones - Pattern not found en ninguno: pbkdf2.*100000|100000.*pbkdf2
+FAIL: [E2EE-02] AES-256-GCM usado - Pattern not found en ninguno: aes-256-gcm|AES-GCM|createCipheriv
+FAIL: [E2EE-03] IV aleatorio de 12 bytes - Pattern not found en ninguno: randomBytes\(12\)
+FAIL: [E2EE-04] Salt aleatorio de 16 bytes - Pattern not found en ninguno: randomBytes\(16\)
+FAIL: [E2EE-05] Tag de autenticidad (GCM) - Pattern not found en ninguno: getAuthTag
+FAIL: [E2EE-06] SHA-256 como hash para PBKDF2 - Pattern not found en ninguno: 'sha256'|'SHA-256'
+FAIL: [E2EE-07] Web Crypto API en frontend - Pattern not found en ninguno: subtle\.crypto|crypto\.subtle|webcrypto
+FAIL: [E2EE-08] Tests E2EE completos - Todos los archivos faltan
+
+--- Ejecutando tests E2EE ---
+WARN: No se pudieron ejecutar tests automaticamente
+Command failed: cd legalpro-owner-dashboard && node --test crypto.test.js 2>&1
+
+=== Resumen ===
+Errores: 8
+Warnings: 0
+
+FAIL: Owner E2EE verification failed
+EXIT_CODE: 1
+
+============================================
+VERIFIER: verifier-owner-secrets
+============================================
+=== Verifier: Owner Secrets ===
+
+OK: Sin secrets hardcoded en archivos del owner
+WARN: .env.example podria tener valores reales en lugar de placeholders
+OK: .env del owner está en .gitignore
+
+=== Resumen ===
+Errores: 0
+Warnings: 1
+
+OK: Owner secrets verification passed
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-quota
+============================================
+=== Verifier: Quota / Plan Limits ===
+
+OK: [QUOTA-01] Middleware de cuota
+OK: [QUOTA-02] PlanLimitsBehavior .NET
+OK: [QUOTA-03] Limites en catalogo
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-rbac
+============================================
+=== Verifier: RBAC ===
+
+OK: [RBAC-01] requireRole en Node
+OK: [RBAC-02] OWNER/ADMIN/MEMBER/VIEWER
+OK: [RBAC-03] 401 sin auth
+OK: [RBAC-04] 403 sin permisos
+OK: [RBAC-05] Authorize en .NET
+
+Errores: 0, Warnings: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-refutador-seguridad
+============================================
+=== Verifier Refutador: Seguridad (Adversarial) ===
+
+[RS-01] Mass assignment vulnerability (.NET)
+El sistema no puede encontrar la ruta especificada.
+[RS-02] IDOR enumeration risk (Node)
+El sistema no puede encontrar la ruta especificada.
+[RS-03] Timing attack in token comparison
+El sistema no puede encontrar la ruta especificada.
+[RS-04] Race condition potential (transacciones)
+El sistema no puede encontrar la ruta especificada.
+[RS-05] Type juggling (JSON parsing)
+El sistema no puede encontrar la ruta especificada.
+[RS-06] Privilege escalation via JWT claims
+El sistema no puede encontrar la ruta especificada.
+[RS-07] Reentrancy / TOCTOU (.NET)
+El sistema no puede encontrar la ruta especificada.
+[RS-08] Insufficient logging on auth events
+El sistema no puede encontrar la ruta especificada.
+
+Errores: 0, Warnings: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-rls
+============================================
+=== Verifier: RLS ===
+
+OK: [RLS-01] RLS documentado en catalogo (10 tablas con RLS)
+OK: [RLS-02] RLS en init.sql (3 tablas con RLS)
+OK: [RLS-03] RLS en initDb.js (3 tablas con RLS)
+
+Errores: 0
+EXIT_CODE: 0
+
+============================================
+VERIFIER: verifier-transferencia-internacional
+============================================
+=== Verifier: Transferencia Internacional (LPDP Art. 21) ===
+
+OK: [TI-01] FC con flag consentimiento
+OK: [TI-02] Columna consentimiento
+OK: [TI-03] Disclaimer transfer internacional
+OK: [TI-04] Audit event transferencia
+OK: [TI-05] Doc de transferencia
+
+Errores: 0
+EXIT_CODE: 0

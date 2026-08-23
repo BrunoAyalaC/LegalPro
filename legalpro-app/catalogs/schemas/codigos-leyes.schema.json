@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Schema de Códigos y Leyes",
+  "description": "Catálogo de códigos y leyes del ordenamiento jurídico peruano",
+  "type": "object",
+  "required": ["version", "normas"],
+  "properties": {
+    "version": { "type": "string" },
+    "ultima_actualizacion": { "type": "string" },
+    "normas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "nombre", "tipo"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "nombre": { "type": "string" },
+          "tipo": { "enum": ["codigo", "ley", "decreto_legislativo", "decreto_supremo", "resolucion", "directiva", "constitucion"] },
+          "numero": { "type": "string" },
+          "fecha_publicacion": { "type": "string" },
+          "vigente": { "type": "boolean" },
+          "ultima_modificacion": { "type": "string" },
+          "articulos_mas_citados": { "type": "array", "items": { "type": "string" } },
+          "fuente_url": { "type": "string", "format": "uri" }
+        }
+      }
+    }
+  }
+}

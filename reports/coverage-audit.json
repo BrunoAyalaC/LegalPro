@@ -1,0 +1,1107 @@
+{
+  "summary": {
+    "total_backend": 119,
+    "node_endpoints": 78,
+    "dotnet_endpoints": 41,
+    "frontend_calls_unique": 41,
+    "covered": 43,
+    "uncovered": 76,
+    "coverage_pct": 36.13
+  },
+  "by_module": {
+    "admin": {
+      "covered": 0,
+      "uncovered": 3,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/admin/update-catalogos",
+          "file": "admin.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/admin/catalogos/status",
+          "file": "admin.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/admin/health",
+          "file": "admin.js"
+        }
+      ]
+    },
+    "ai": {
+      "covered": 1,
+      "uncovered": 13,
+      "pct": 7.1,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/ai/consulta",
+          "file": "ai.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai/consulta/stream",
+          "file": "ai.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/ai/historial",
+          "file": "ai.js"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/ai/historial",
+          "file": "ai.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/ai/notificaciones",
+          "file": "ai.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/ai/jurisprudencia",
+          "file": "ai.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai/panel-expertos",
+          "file": "ai.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/ai/panel-expertos/stream",
+          "file": "ai.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/gemini/chat",
+          "file": "gemini.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/gemini/consulta",
+          "file": "gemini.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/gemini/historial",
+          "file": "gemini.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/gemini/notificaciones",
+          "file": "gemini.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/gemini/jurisprudencia",
+          "file": "gemini.js"
+        }
+      ]
+    },
+    "auth": {
+      "covered": 13,
+      "uncovered": 5,
+      "pct": 72.2,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/auth/login/mfa",
+          "file": "auth-login-mfa.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/refresh",
+          "file": "auth-login-mfa.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/mfa/verify-enable",
+          "file": "auth-mfa-routes.js"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/auth/cuenta",
+          "file": "auth.js"
+        },
+        {
+          "method": "POST",
+          "path": "api/auth/refresh",
+          "file": "AuthController.cs"
+        }
+      ]
+    },
+    "clientes": {
+      "covered": 2,
+      "uncovered": 3,
+      "pct": 40.0,
+      "uncovered_endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/clientes/",
+          "file": "clientes.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/clientes/:id",
+          "file": "clientes.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/clientes/",
+          "file": "clientes.js"
+        }
+      ]
+    },
+    "creditos-uso": {
+      "covered": 0,
+      "uncovered": 1,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/creditos/uso",
+          "file": "creditos-uso.js"
+        }
+      ]
+    },
+    "creditos": {
+      "covered": 3,
+      "uncovered": 2,
+      "pct": 60.0,
+      "uncovered_endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/creditos/saldo",
+          "file": "creditos.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/creditos/culqi-key",
+          "file": "creditos.js"
+        }
+      ]
+    },
+    "mis-datos": {
+      "covered": 4,
+      "uncovered": 2,
+      "pct": 66.7,
+      "uncovered_endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/mis-datos/",
+          "file": "datos-personales.js"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/mis-datos/",
+          "file": "datos-personales.js"
+        }
+      ]
+    },
+    "documentos": {
+      "covered": 1,
+      "uncovered": 2,
+      "pct": 33.3,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/documentos/exportar-pdf",
+          "file": "documentos.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/documentos/exportar",
+          "file": "documentos.js"
+        }
+      ]
+    },
+    "expedientes": {
+      "covered": 7,
+      "uncovered": 10,
+      "pct": 41.2,
+      "uncovered_endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/expedientes/",
+          "file": "expedientes-secure.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/expedientes/",
+          "file": "expedientes-secure.js"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/expedientes/:id",
+          "file": "expedientes-secure.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/expedientes/",
+          "file": "expedientes.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/expedientes/",
+          "file": "expedientes.js"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/expedientes/:id",
+          "file": "expedientes.js"
+        },
+        {
+          "method": "GET",
+          "path": "api/expedientes/{id:guid}",
+          "file": "ExpedientesController.cs"
+        },
+        {
+          "method": "PUT",
+          "path": "api/expedientes/{id:guid}",
+          "file": "ExpedientesController.cs"
+        },
+        {
+          "method": "DELETE",
+          "path": "api/expedientes/{id:guid}",
+          "file": "ExpedientesController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/expedientes/{id:guid}/resumen-ia",
+          "file": "ExpedientesController.cs"
+        }
+      ]
+    },
+    "legal": {
+      "covered": 0,
+      "uncovered": 5,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/legal/interpret",
+          "file": "interpretacion-legal.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/legal/interpret/health",
+          "file": "interpretacion-legal.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/legal/query",
+          "file": "legal-multigent-routes.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/legal/query/stream",
+          "file": "legal-multigent-routes.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/legal/health",
+          "file": "legal-multigent-routes.js"
+        }
+      ]
+    },
+    "notificaciones": {
+      "covered": 1,
+      "uncovered": 1,
+      "pct": 50.0,
+      "uncovered_endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/notificaciones/",
+          "file": "notificaciones.js"
+        }
+      ]
+    },
+    "organizaciones": {
+      "covered": 4,
+      "uncovered": 9,
+      "pct": 30.8,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/organizaciones/",
+          "file": "organizaciones.js"
+        },
+        {
+          "method": "GET",
+          "path": "/api/organizaciones/me/miembros",
+          "file": "organizaciones.js"
+        },
+        {
+          "method": "POST",
+          "path": "/api/organizaciones/invitar",
+          "file": "organizaciones.js"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/organizaciones/me/miembros/:targetUserId",
+          "file": "organizaciones.js"
+        },
+        {
+          "method": "POST",
+          "path": "api/organizaciones/invite",
+          "file": "OrganizacionesController.cs"
+        },
+        {
+          "method": "POST",
+          "path": "api/organizaciones/accept-invite",
+          "file": "OrganizacionesController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/organizaciones/me/miembros",
+          "file": "OrganizacionesController.cs"
+        },
+        {
+          "method": "POST",
+          "path": "api/organizaciones/invitar",
+          "file": "OrganizacionesController.cs"
+        },
+        {
+          "method": "DELETE",
+          "path": "api/organizaciones/members/{usuarioId:guid}",
+          "file": "OrganizacionesController.cs"
+        }
+      ]
+    },
+    "plazos": {
+      "covered": 2,
+      "uncovered": 1,
+      "pct": 66.7,
+      "uncovered_endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/plazos/catalogo",
+          "file": "plazos.js"
+        }
+      ]
+    },
+    "alegato": {
+      "covered": 0,
+      "uncovered": 1,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/alegato/generar",
+          "file": "AlegatoController.cs"
+        }
+      ]
+    },
+    "analista": {
+      "covered": 1,
+      "uncovered": 0,
+      "pct": 100.0,
+      "uncovered_endpoints": []
+    },
+    "chat": {
+      "covered": 0,
+      "uncovered": 3,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/chat/enviar",
+          "file": "ChatController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/chat/historial",
+          "file": "ChatController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/chat/sesiones",
+          "file": "ChatController.cs"
+        }
+      ]
+    },
+    "contador": {
+      "covered": 2,
+      "uncovered": 0,
+      "pct": 100.0,
+      "uncovered_endpoints": []
+    },
+    "fiscal": {
+      "covered": 0,
+      "uncovered": 1,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/fiscal/requerimiento",
+          "file": "FiscalController.cs"
+        }
+      ]
+    },
+    "gemini": {
+      "covered": 0,
+      "uncovered": 4,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/gemini/chat",
+          "file": "GeminiController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/gemini/historial",
+          "file": "GeminiController.cs"
+        },
+        {
+          "method": "POST",
+          "path": "api/gemini/consulta",
+          "file": "GeminiController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/gemini/jurisprudencia",
+          "file": "GeminiController.cs"
+        }
+      ]
+    },
+    "interrogatorio": {
+      "covered": 0,
+      "uncovered": 1,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/interrogatorio/generar",
+          "file": "InterrogatorioController.cs"
+        }
+      ]
+    },
+    "juez": {
+      "covered": 0,
+      "uncovered": 2,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/juez/resolucion",
+          "file": "JuezController.cs"
+        },
+        {
+          "method": "POST",
+          "path": "api/juez/precedentes/comparar",
+          "file": "JuezController.cs"
+        }
+      ]
+    },
+    "jurisprudencia": {
+      "covered": 0,
+      "uncovered": 2,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/jurisprudencia/buscar",
+          "file": "JurisprudenciaController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/jurisprudencia/buscar",
+          "file": "JurisprudenciaController.cs"
+        }
+      ]
+    },
+    "objeciones": {
+      "covered": 0,
+      "uncovered": 1,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/objeciones/sugerir",
+          "file": "ObjecionesController.cs"
+        }
+      ]
+    },
+    "predictor": {
+      "covered": 0,
+      "uncovered": 1,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/predictor/predecir",
+          "file": "PredictorController.cs"
+        }
+      ]
+    },
+    "redactor": {
+      "covered": 0,
+      "uncovered": 1,
+      "pct": 0.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/redactor/generar",
+          "file": "RedactorController.cs"
+        }
+      ]
+    },
+    "simulacion": {
+      "covered": 2,
+      "uncovered": 2,
+      "pct": 50.0,
+      "uncovered_endpoints": [
+        {
+          "method": "POST",
+          "path": "api/simulacion/{id:guid}/finalizar",
+          "file": "SimulacionController.cs"
+        },
+        {
+          "method": "GET",
+          "path": "api/simulacion/{id:guid}/board",
+          "file": "SimulacionController.cs"
+        }
+      ]
+    }
+  },
+  "uncovered_full": [
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/admin/update-catalogos",
+      "module": "admin",
+      "file": "admin.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/admin/catalogos/status",
+      "module": "admin",
+      "file": "admin.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/admin/health",
+      "module": "admin",
+      "file": "admin.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/ai/consulta",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/ai/consulta/stream",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/ai/historial",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "DELETE",
+      "path": "/api/ai/historial",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/ai/notificaciones",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/ai/jurisprudencia",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/ai/panel-expertos",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/ai/panel-expertos/stream",
+      "module": "ai",
+      "file": "ai.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/auth/login/mfa",
+      "module": "auth",
+      "file": "auth-login-mfa.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/auth/refresh",
+      "module": "auth",
+      "file": "auth-login-mfa.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/auth/mfa/verify-enable",
+      "module": "auth",
+      "file": "auth-mfa-routes.js"
+    },
+    {
+      "backend": "node",
+      "method": "DELETE",
+      "path": "/api/auth/cuenta",
+      "module": "auth",
+      "file": "auth.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/clientes/",
+      "module": "clientes",
+      "file": "clientes.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/clientes/:id",
+      "module": "clientes",
+      "file": "clientes.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/clientes/",
+      "module": "clientes",
+      "file": "clientes.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/creditos/uso",
+      "module": "creditos-uso",
+      "file": "creditos-uso.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/creditos/saldo",
+      "module": "creditos",
+      "file": "creditos.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/creditos/culqi-key",
+      "module": "creditos",
+      "file": "creditos.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/mis-datos/",
+      "module": "mis-datos",
+      "file": "datos-personales.js"
+    },
+    {
+      "backend": "node",
+      "method": "PUT",
+      "path": "/api/mis-datos/",
+      "module": "mis-datos",
+      "file": "datos-personales.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/documentos/exportar-pdf",
+      "module": "documentos",
+      "file": "documentos.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/documentos/exportar",
+      "module": "documentos",
+      "file": "documentos.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/expedientes/",
+      "module": "expedientes",
+      "file": "expedientes-secure.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/expedientes/",
+      "module": "expedientes",
+      "file": "expedientes-secure.js"
+    },
+    {
+      "backend": "node",
+      "method": "PUT",
+      "path": "/api/expedientes/:id",
+      "module": "expedientes",
+      "file": "expedientes-secure.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/expedientes/",
+      "module": "expedientes",
+      "file": "expedientes.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/expedientes/",
+      "module": "expedientes",
+      "file": "expedientes.js"
+    },
+    {
+      "backend": "node",
+      "method": "PUT",
+      "path": "/api/expedientes/:id",
+      "module": "expedientes",
+      "file": "expedientes.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/gemini/chat",
+      "module": "ai",
+      "file": "gemini.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/gemini/consulta",
+      "module": "ai",
+      "file": "gemini.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/gemini/historial",
+      "module": "ai",
+      "file": "gemini.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/gemini/notificaciones",
+      "module": "ai",
+      "file": "gemini.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/gemini/jurisprudencia",
+      "module": "ai",
+      "file": "gemini.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/legal/interpret",
+      "module": "legal",
+      "file": "interpretacion-legal.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/legal/interpret/health",
+      "module": "legal",
+      "file": "interpretacion-legal.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/legal/query",
+      "module": "legal",
+      "file": "legal-multigent-routes.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/legal/query/stream",
+      "module": "legal",
+      "file": "legal-multigent-routes.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/legal/health",
+      "module": "legal",
+      "file": "legal-multigent-routes.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/notificaciones/",
+      "module": "notificaciones",
+      "file": "notificaciones.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/organizaciones/",
+      "module": "organizaciones",
+      "file": "organizaciones.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/organizaciones/me/miembros",
+      "module": "organizaciones",
+      "file": "organizaciones.js"
+    },
+    {
+      "backend": "node",
+      "method": "POST",
+      "path": "/api/organizaciones/invitar",
+      "module": "organizaciones",
+      "file": "organizaciones.js"
+    },
+    {
+      "backend": "node",
+      "method": "DELETE",
+      "path": "/api/organizaciones/me/miembros/:targetUserId",
+      "module": "organizaciones",
+      "file": "organizaciones.js"
+    },
+    {
+      "backend": "node",
+      "method": "GET",
+      "path": "/api/plazos/catalogo",
+      "module": "plazos",
+      "file": "plazos.js"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/alegato/generar",
+      "module": "alegato",
+      "file": "AlegatoController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/auth/refresh",
+      "module": "auth",
+      "file": "AuthController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/chat/enviar",
+      "module": "chat",
+      "file": "ChatController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/chat/historial",
+      "module": "chat",
+      "file": "ChatController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/chat/sesiones",
+      "module": "chat",
+      "file": "ChatController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/expedientes/{id:guid}",
+      "module": "expedientes",
+      "file": "ExpedientesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "PUT",
+      "path": "api/expedientes/{id:guid}",
+      "module": "expedientes",
+      "file": "ExpedientesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "DELETE",
+      "path": "api/expedientes/{id:guid}",
+      "module": "expedientes",
+      "file": "ExpedientesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/expedientes/{id:guid}/resumen-ia",
+      "module": "expedientes",
+      "file": "ExpedientesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/fiscal/requerimiento",
+      "module": "fiscal",
+      "file": "FiscalController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/gemini/chat",
+      "module": "gemini",
+      "file": "GeminiController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/gemini/historial",
+      "module": "gemini",
+      "file": "GeminiController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/gemini/consulta",
+      "module": "gemini",
+      "file": "GeminiController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/gemini/jurisprudencia",
+      "module": "gemini",
+      "file": "GeminiController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/interrogatorio/generar",
+      "module": "interrogatorio",
+      "file": "InterrogatorioController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/juez/resolucion",
+      "module": "juez",
+      "file": "JuezController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/juez/precedentes/comparar",
+      "module": "juez",
+      "file": "JuezController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/jurisprudencia/buscar",
+      "module": "jurisprudencia",
+      "file": "JurisprudenciaController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/jurisprudencia/buscar",
+      "module": "jurisprudencia",
+      "file": "JurisprudenciaController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/objeciones/sugerir",
+      "module": "objeciones",
+      "file": "ObjecionesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/organizaciones/invite",
+      "module": "organizaciones",
+      "file": "OrganizacionesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/organizaciones/accept-invite",
+      "module": "organizaciones",
+      "file": "OrganizacionesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/organizaciones/me/miembros",
+      "module": "organizaciones",
+      "file": "OrganizacionesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/organizaciones/invitar",
+      "module": "organizaciones",
+      "file": "OrganizacionesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "DELETE",
+      "path": "api/organizaciones/members/{usuarioId:guid}",
+      "module": "organizaciones",
+      "file": "OrganizacionesController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/predictor/predecir",
+      "module": "predictor",
+      "file": "PredictorController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/redactor/generar",
+      "module": "redactor",
+      "file": "RedactorController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "POST",
+      "path": "api/simulacion/{id:guid}/finalizar",
+      "module": "simulacion",
+      "file": "SimulacionController.cs"
+    },
+    {
+      "backend": "dotnet",
+      "method": "GET",
+      "path": "api/simulacion/{id:guid}/board",
+      "module": "simulacion",
+      "file": "SimulacionController.cs"
+    }
+  ]
+}

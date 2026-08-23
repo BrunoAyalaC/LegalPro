@@ -1,4 +1,5 @@
 using LegalPro.Application.Common.Interfaces;
+using LegalPro.Infrastructure.BackgroundJobs;
 using LegalPro.Infrastructure.Persistence;
 using LegalPro.Infrastructure.Persistence.Repositories;
 using LegalPro.Infrastructure.Services;
@@ -24,7 +25,7 @@ public static class DependencyInjection
         var connectionString = ConvertPostgresUri(rawConnectionString);
 
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString)
+            options.UseNpgsql(connectionString, o => o.MigrationsHistoryTable("__ef_migrations_history"))
                    .UseSnakeCaseNamingConvention());
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -32,37 +33,78 @@ public static class DependencyInjection
         // Multi-tenancy: IHttpContextAccessor (requerido por CurrentUserService)
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ITenantProvider, TenantProvider>();
 
         // Repositorios
         services.AddScoped<IOrganizacionRepository, OrganizacionRepository>();
 
-        services.AddScoped<IGeminiService, GeminiService>();
+        // Memoria Cache para respuestas de MiniMax/IA
+        services.AddMemoryCache();
 
-        // ISP — interfaces segregadas resuelven desde el singleton GeminiService
-        services.AddScoped<ISimulationAI>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalAnalyzer>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalPredictor>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalChat>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalDrafter>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalSimulacion>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalJurisprudenciaSearch>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalAlegato>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalInterrogatorio>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalObjeciones>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalResumenCaso>(p => p.GetRequiredService<IGeminiService>());
+        // FIX P2 perf 2026-08-21: IHttpClientFactory + Polly retry para MiniMax.
+        // - Antes: static HttpClient en ModelsClient → socket exhaustion, DNS staleness, sin retry HTTP.
+        // - Ahora: AddHttpClient("minimax", client => BaseAddress = MINIMAX_BASE_URL) + AddPolicyHandler (Polly retry exponencial 3 intentos).
+        //   La factory gestiona pool + lifetime + DNS, y Polly retry HTTP complementa ResiliencePipeline "minimax-pipeline".
+        var minimaxBaseUrl = configuration["MINIMAX_BASE_URL"]
+                             ?? configuration["Minimax:BaseUrl"]
+                             ?? Environment.GetEnvironmentVariable("MINIMAX_BASE_URL")
+                             ?? "https://api.minimax.io/v1";
+        services.AddHttpClient("minimax", client =>
+        {
+            client.BaseAddress = new Uri(minimaxBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(45);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+        })
+        // Polly retry HTTP (transient errors 5xx + network failures): 3 intentos backoff 2^retry
+        // AddPolicyHandler es la API clásica (Microsoft.Extensions.Http.Polly) requerida por la tarea P2.
+        .AddPolicyHandler(Polly.Policy<HttpResponseMessage>
+            .Handle<HttpRequestException>()
+            .OrResult(r => (int)r.StatusCode >= 500)
+            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                onRetry: (outcome, timespan, retryCount, context) =>
+                {
+                    // Log silenciado aquí; Serilog + OTel capturan el retry vía event
+                    System.Diagnostics.Trace.WriteLine($"[Minimax HttpRetry] Intento {retryCount} tras {timespan.TotalSeconds}s - {outcome.Result?.StatusCode} {outcome.Exception?.Message}");
+                }));
+
+        services.AddScoped<IMinimaxService, MinimaxService>();
+
+        // NOTA (2026-08-07 @auditor-performance): el vertical RAG .NET
+        // (AiController /api/ai/rag/* + IRagService/RagService) fue ELIMINADO.
+        // Escribía en la tabla rag_vectors (v1) que ya no existe en producción y
+        // no tenía consumidores (el RAG real vive en Node: tools/rag + ragMiddleware).
+        // El registro de IRagService y los HttpClients "OpenAI"/"RagCitationValidator"
+        // quedaron sin uso y se removieron junto con el vertical.
+
+        // ISP — interfaces segregadas resuelven desde el singleton MinimaxService
+        services.AddScoped<ISimulationAI>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalAnalyzer>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalPredictor>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalChat>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalDrafter>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalSimulacion>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalJurisprudenciaSearch>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalAlegato>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalInterrogatorio>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalObjeciones>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalResumenCaso>(p => p.GetRequiredService<IMinimaxService>());
         // Interfaces rol-específicas
-        services.AddScoped<ILegalFiscal>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalJuez>(p => p.GetRequiredService<IGeminiService>());
-        services.AddScoped<ILegalContador>(p => p.GetRequiredService<IGeminiService>());
+        services.AddScoped<ILegalFiscal>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalJuez>(p => p.GetRequiredService<IMinimaxService>());
+        services.AddScoped<ILegalContador>(p => p.GetRequiredService<IMinimaxService>());
 
         services.AddScoped<ISimulationService, SimulationService>();
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IStorageService, LocalStorageService>();
+
+        // E2EE: Cifrado AES-256-GCM para Owner Dashboard
+        services.AddScoped<IEncryptionService, EncryptionService>();
 
         // Audit log de seguridad — persistencia de eventos de autenticación y acceso
         services.AddScoped<IAuditLogger, AuditLoggerService>();
 
-        // Resiliencia de IA: Polly v8 Pipeline para Gemini
-        services.AddResiliencePipeline("gemini-pipeline", builder =>
+        // Resiliencia de IA: Polly v8 Pipeline para MiniMax
+        services.AddResiliencePipeline("minimax-pipeline", builder =>
         {
             builder.AddRetry(new RetryStrategyOptions
             {
@@ -73,6 +115,8 @@ public static class DependencyInjection
             })
             .AddTimeout(TimeSpan.FromSeconds(45));
         });
+
+        services.AddHostedService<ProcessOutboxMessagesJob>();
 
         return services;
     }

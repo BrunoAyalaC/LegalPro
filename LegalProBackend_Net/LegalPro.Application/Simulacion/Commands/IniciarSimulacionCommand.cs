@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Entities;
 using LegalPro.Domain.Enums;
@@ -9,17 +10,18 @@ namespace LegalPro.Application.Simulacion.Commands;
 
 // ═══════════════════════════════════════════════════════
 // COMMAND: Iniciar Simulación de Juicio
-// Crea la entidad Simulacion, invoca Gemini (FC) para
+// Crea la entidad Simulacion, invoca MiniMax (FC) para
 // generar el contexto sintético del caso + apertura judicial.
 // Tenant isolation: OrganizationId obligatorio.
 // ═══════════════════════════════════════════════════════
 
-public class IniciarSimulacionCommand : IRequest<IniciarSimulacionResult>
+public class IniciarSimulacionCommand : IRequest<IniciarSimulacionResult>, ITenantRequest
 {
     public TipoRamaProcesal Rama { get; set; }
     public string RolUsuario { get; set; } = string.Empty;
     public string Dificultad { get; set; } = "Media";
-    public string DescripcionCaso { get; set; } = string.Empty;
+    public string DescripcionCaso { get; set; }
+    public Guid OrganizationId { get; set; }
 }
 
 public record IniciarSimulacionResult(
@@ -72,7 +74,7 @@ public class IniciarSimulacionCommandHandler : IRequestHandler<IniciarSimulacion
         IniciarSimulacionCommand request,
         CancellationToken cancellationToken)
     {
-        // Llamar a Gemini FC: genera contexto + apertura judicial
+        // Llamar a MiniMax FC: genera contexto + apertura judicial
         var jsonRaw = await _simulacionAI.IniciarSimulacionAsync(
             rama:            request.Rama.ToString(),
             rolUsuario:      request.RolUsuario,

@@ -26,7 +26,7 @@ public class ContadorController : ControllerBase
     /// FC forzado: cada concepto con monto, base legal y método de cálculo.
     /// </summary>
     [HttpPost("liquidacion-laboral")]
-    [EnableRateLimiting("gemini")]
+    [EnableRateLimiting("minimax")]
     public async Task<IActionResult> CalcularLiquidacion(
         [FromBody] CalcularLiquidacionLaboralCommand command,
         CancellationToken ct)
@@ -42,7 +42,7 @@ public class ContadorController : ControllerBase
     /// TipoPericia: laboral | societario | tributario | bancario | patrimonial | danos_perjuicios
     /// </summary>
     [HttpPost("informe-pericial")]
-    [EnableRateLimiting("gemini")]
+    [EnableRateLimiting("minimax")]
     public async Task<IActionResult> GenerarInformePericial(
         [FromBody] GenerarInformePericialCommand command,
         CancellationToken ct)

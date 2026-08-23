@@ -42,6 +42,7 @@ public class GetCurrentOrganizacionQueryHandler : IRequestHandler<GetCurrentOrga
             ?? throw new ForbiddenAccessException("No pertenece a ninguna organización.");
 
         var org = await _context.Organizaciones
+            .AsNoTracking()
             .Include(o => o.MembresiaDetallada)
             .FirstOrDefaultAsync(o => o.Id == orgId, cancellationToken)
             ?? throw new NotFoundException(nameof(Organizacion), orgId);

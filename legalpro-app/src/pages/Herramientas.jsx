@@ -3,11 +3,14 @@ import { motion } from 'framer-motion';
 import {
   BarChart3, Scale, BookOpen, FileEdit, TrendingUp, Mic2,
   HelpCircle, Hand, Bell, GitCompare, Shield, FileStack,
-  AlertTriangle, FileSearch, MessageSquareDot, Sliders,
+  AlertTriangle, FileSearch, MessageSquareDot, Sliders, Users,
+  Percent, Gavel, Hourglass, ArrowRightLeft,
+  CalendarClock, BriefcaseBusiness
 } from 'lucide-react';
 
 const herramientas = [
   { to: '/analista',      icon: BarChart3,          title: 'Analista de Expedientes', desc: 'Análisis IA de documentos judiciales', badge: 'IA',   glow: 'shadow-blue-500/25',    accent: 'bg-blue-500/15 text-blue-400',    gradient: 'from-blue-600/20 to-indigo-600/10' },
+  { to: '/panel-expertos',icon: Users,              title: 'Panel de Expertos',       desc: 'Análisis paralelo y diagnóstico',      badge: 'IA',   glow: 'shadow-indigo-500/25',  accent: 'bg-indigo-500/15 text-indigo-400',gradient: 'from-indigo-600/20 to-violet-600/10' },
   { to: '/simulador',     icon: Scale,              title: 'Simulador de Juicios',    desc: 'Practica audiencias con IA',           badge: 'IA',   glow: 'shadow-purple-500/25',  accent: 'bg-purple-500/15 text-purple-400',gradient: 'from-purple-600/20 to-pink-600/10' },
   { to: '/buscador',      icon: BookOpen,            title: 'Buscador Jurisprudencial',desc: 'Casaciones, amparos y precedentes',   badge: null,   glow: 'shadow-emerald-500/25', accent: 'bg-emerald-500/15 text-emerald-400', gradient: 'from-emerald-600/20 to-teal-600/10' },
   { to: '/redactor',      icon: FileEdit,            title: 'Redactor Legal IA',       desc: 'Genera escritos automáticamente',     badge: 'IA',   glow: 'shadow-amber-500/25',   accent: 'bg-amber-500/15 text-amber-400', gradient: 'from-amber-600/20 to-orange-600/10' },
@@ -23,6 +26,14 @@ const herramientas = [
   { to: '/resumen-ejecutivo', icon: FileSearch,      title: 'Resumen Ejecutivo',       desc: 'Resúmenes AI del caso',               badge: 'IA',   glow: 'shadow-lime-500/25',    accent: 'bg-lime-500/15 text-lime-400',   gradient: 'from-lime-600/20 to-green-600/10' },
   { to: '/retroalimentacion', icon: MessageSquareDot,title: 'Retroalimentación IA',    desc: 'Reportes de mejora continua',         badge: null,   glow: 'shadow-fuchsia-500/25', accent: 'bg-fuchsia-500/15 text-fuchsia-400', gradient: 'from-fuchsia-600/20 to-pink-600/10' },
   { to: '/config-especialidad', icon: Sliders,       title: 'Config. Especialidad',    desc: 'Personaliza tu perfil legal',         badge: null,   glow: 'shadow-gray-500/25',    accent: 'bg-gray-500/15 text-gray-400',   gradient: 'from-gray-600/20 to-slate-600/10' },
+  // Herramientas determinísticas (sin IA, sin costo por consulta) — /api/herramientas/*
+  { to: '/calculadora-intereses', icon: Percent,      title: 'Calculadora de Intereses',desc: 'Interés moratorio legal simple',      badge: 'CALC', glow: 'shadow-yellow-500/25',  accent: 'bg-yellow-500/15 text-yellow-400', gradient: 'from-yellow-600/20 to-amber-600/10' },
+  { to: '/explorador-delitos',    icon: Gavel,        title: 'Explorador de Delitos',   desc: 'Tipos penales y delitos económicos',  badge: 'CALC', glow: 'shadow-red-500/25',     accent: 'bg-red-500/15 text-red-400',       gradient: 'from-red-600/20 to-orange-600/10' },
+  { to: '/prescripcion',          icon: Hourglass,    title: 'Prescripción Penal',      desc: 'Cómputo CP Arts. 85 y 88',            badge: 'CALC', glow: 'shadow-cyan-500/25',    accent: 'bg-cyan-500/15 text-cyan-400',     gradient: 'from-cyan-600/20 to-teal-600/10' },
+  { to: '/conversor-uit',         icon: ArrowRightLeft,title: 'Conversor UIT',          desc: 'Montos en soles a UITs',              badge: 'CALC', glow: 'shadow-sky-500/25',     accent: 'bg-sky-500/15 text-sky-400',       gradient: 'from-sky-600/20 to-blue-600/10' },
+  { to: '/conversor-plazos',      icon: CalendarClock,      title: 'Conversor de Plazos',     desc: 'Días naturales ↔ hábiles (Art. 144)', badge: 'CALC', glow: 'shadow-teal-500/25',    accent: 'bg-teal-500/15 text-teal-400',     gradient: 'from-teal-600/20 to-cyan-600/10' },
+  { to: '/indemnizacion-despido', icon: BriefcaseBusiness,  title: 'Indemnización Despido',   desc: 'Despido arbitrario D.S. 001-97-TR',   badge: 'CALC', glow: 'shadow-emerald-500/25', accent: 'bg-emerald-500/15 text-emerald-400', gradient: 'from-emerald-600/20 to-green-600/10' },
+  { to: '/tasas-comparativo',     icon: Percent,            title: 'Comparador de Tasas',     desc: 'Moratoria BCRP vs remunerativa vs CC',badge: 'CALC', glow: 'shadow-violet-500/25',  accent: 'bg-violet-500/15 text-violet-400', gradient: 'from-violet-600/20 to-purple-600/10' },
 ];
 
 const container = {
@@ -47,7 +58,7 @@ export default function Herramientas() {
       <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl lg:text-2xl font-extrabold text-white">Herramientas Legales</h1>
-          <p className="text-sm text-slate-400 mt-1">Suite completa potenciada por Gemini AI con Function Calling</p>
+          <p className="text-sm text-slate-400 mt-1">Suite completa potenciada por DeepSeek V4 Flash con Function Calling</p>
         </div>
         <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
           {iaCount} con IA

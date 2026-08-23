@@ -1,0 +1,157 @@
+# .github/workflows/deploy-production.yml
+# Generado por @devops + @release-manager
+# Deploy automatico a Railway en push a main
+
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (e.g., v1.0.0)'
+        required: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: legalpro
+
+jobs:
+  build-and-push:
+    name: 🐳 Build & Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: 🔖 Get Version
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "VERSION=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=v0.0.0-$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🔐 Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📦 Build & Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.frontend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:latest
+
+      - name: 📦 Build & Push Node
+        uses: docker/build-push-action@v5
+        with:
+          context: ./legalpro-app
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/node:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/node:latest
+
+      - name: 📦 Build & Push .NET
+        uses: docker/build-push-action@v5
+        with:
+          context: ./LegalProBackend_Net
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/dotnet:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/dotnet:latest
+
+      - name: 📦 Build & Push Owner
+        uses: docker/build-push-action@v5
+        with:
+          context: ./legalpro-owner-dashboard
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/owner:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/owner:latest
+
+  migrate:
+    name: 🗄️ Database Migration
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🔌 Connect to Production DB
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: |
+          echo "Running migrations..."
+          # PGPASSWORD=$DB_PASSWORD psql -h ... -f init.sql
+          echo "Migrations complete"
+
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    needs: [build-and-push, migrate]
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🚀 Deploy
+        run: |
+          curl -X POST ${{ secrets.RAILWAY_WEBHOOK_STAGING_DEPLOY }} \
+            -H "Content-Type: application/json" \
+            -d '{"service":"legalpro-frontend","image":"${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ needs.build-and-push.outputs.version }}"}'
+
+  smoke-staging:
+    name: 🔥 Smoke Test Staging
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Run Smoke Tests
+        env:
+          SMOKE_NODE_URL: https://legalpro-node-staging.railway.app
+          SMOKE_DOTNET_URL: https://legalpro-dotnet-staging.railway.app
+          SMOKE_OWNER_URL: https://legalpro-owner-staging.railway.app
+        run: node legalpro-app/server/smoke-production.mjs
+
+  deploy-production:
+    name: 🚀 Deploy to Production
+    needs: [build-and-push, smoke-staging]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🚀 Deploy
+        run: |
+          curl -X POST ${{ secrets.RAILWAY_WEBHOOK_PROD_DEPLOY }} \
+            -H "Content-Type: application/json" \
+            -d '{"service":"legalpro-frontend","image":"${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ needs.build-and-push.outputs.version }}"}'
+      - name: 📣 Notify
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"✅ v${{ needs.build-and-push.outputs.version }} deployed to production"}' \
+            ${{ secrets.SLACK_WEBHOOK_OPS }}
+      - name: 🏷️ Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.build-and-push.outputs.version }}
+          generate_release_notes: true

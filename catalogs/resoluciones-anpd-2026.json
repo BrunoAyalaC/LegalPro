@@ -1,0 +1,567 @@
+{
+  "metadata": {
+    "nombre": "Resoluciones y Normativa ANPDP - Autoridad Nacional de Protección de Datos Personales",
+    "fuente_principal": "https://www.gob.pe/anpd",
+    "fuentes_secundarias": [
+      "https://www.gob.pe/institucion/anpd/normas-legales",
+      "https://www.gob.pe/institucion/anpd/colecciones/1801-resoluciones-de-los-procedimientos-sancionadores",
+      "https://www.gob.pe/institucion/anpd/colecciones/1749-decisiones-sobre-derechos-arco"
+    ],
+    "fecha_consulta": "2026-08-01",
+    "fecha_actualizacion": "2026-08-01",
+    "version": "1.0",
+    "autor": "lexia-orchestrator + integraciones-peru",
+    "descripcion": "Catálogo crítico de resoluciones, directivas y precedentes de la Autoridad Nacional de Protección de Datos Personales (ANPDP) del Perú. Base legal para cumplimiento LPDP Ley 29733 y D.S. 016-2024-JUS. Incluye TODAS las resoluciones de 2026.",
+    "total_documentos": 32,
+    "relevancia_legalpro": "CRÍTICA - Cumplimiento Ley N° 29733 (LPDP) y D.S. 016-2024-JUS",
+    "naturaleza_administrativa": "Órgano desconcentrado del MINJUSDH (MINJUSDH/DGTAIPD-DPDP es la Dirección de Protección de Datos Personales que ejerce funciones como ANPDP)",
+    "ente_rector": "MINJUSDH - Ministerio de Justicia y Derechos Humanos",
+    "normas_relevantes_peruanas": [
+      "Ley N° 29733 - Ley de Protección de Datos Personales (2011)",
+      "D.S. N° 003-2013-JUS - Reglamento de la Ley N° 29733",
+      "D.S. N° 016-2024-JUS - Reglamento actualizado (vigente)",
+      "Ley N° 31889 - Ley que modifica la Ley N° 29733"
+    ],
+    "enlaces_descarga_destacados": {
+      "Ley_29733": "https://cdn.www.gob.pe/uploads/document/file/2011398/Ley%20N%C2%BA%2029733%20-%20Ley%20de%20protecci%C3%B3n%20de%20datos%20personales.pdf.pdf",
+      "Directiva_Oficial_Datos_Personales": "https://www.gob.pe/institucion/anpd/normas-legales/7574631-100-2025-jus-dgtaipd"
+    },
+    "notas": "911 resultados totales desde 2015 en compendio sancionador. Se incluyen las resoluciones de 2026 con detalle del expediente, reclamado, derecho ARCO y multa cuando corresponde."
+  },
+  "normativa_relevante_destacada": [
+    {
+      "id": "ANPDP-LEG-29733",
+      "tipo": "Ley",
+      "numero": "N° 29733",
+      "fecha_publicacion": "2011-07-03",
+      "titulo": "Ley de Protección de Datos Personales",
+      "sumilla": "Ley marco que regula el tratamiento de datos personales en bancos de datos públicos y privados en el Perú. Establece derechos ARCO (Acceso, Rectificación, Cancelación, Oposición) y régimen sancionador.",
+      "materia": "Protección de Datos Personales - Derechos ARCO",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/2018427-29733-2011",
+      "relevancia_legalpro": "CRÍTICA - Base legal LPDP compliance"
+    },
+    {
+      "id": "ANPDP-RD-100-2025-OFICIAL",
+      "tipo": "Resolución Directoral",
+      "numero": "N° 100-2025-JUS/DGTAIPD",
+      "fecha_publicacion": "2025-12-31",
+      "titulo": "Directiva que establece las disposiciones para la designación, desempeño y funciones del Oficial de Datos Personales",
+      "sumilla": "Directiva oficial de datos personales que establece el marco regulatorio para la designación del Oficial de Datos Personales (ODP) en entidades públicas y privadas. CRÍTICO para LegalPro porque obliga a designar un ODP en toda organización que maneje datos personales.",
+      "materia": "Oficial de Datos Personales",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/7574631-100-2025-jus-dgtaipd",
+      "relevancia_legalpro": "CRÍTICA - Compliance ODP obligatorio",
+      "destacado_portada": true
+    },
+    {
+      "id": "ANPDP-RD-02-2020-VIDEOVIGILANCIA",
+      "tipo": "Resolución Directoral",
+      "numero": "N° 02-2020-JU/DGTAIPD",
+      "fecha_publicacion": "2020-02-14",
+      "titulo": "Directiva para el Tratamiento de Datos Personales mediante Sistemas de Videovigilancia",
+      "sumilla": "Directiva que regula el tratamiento de datos personales captados por cámaras de videovigilancia en entidades públicas y privadas. Establece obligaciones de información al titular, plazos de conservación y excepciones.",
+      "materia": "Videovigilancia - Datos Personales",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/2018480-02-2020-ju-dgtaipd",
+      "relevancia_legalpro": "ALTA - Cámaras de seguridad de instituciones"
+    }
+  ],
+  "normas": [
+    {
+      "id": "ANPDP-PAS-MAGIC-DYNASTY-071-2023",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: MAGIC DYNASTY INTERNATIONAL CLUB S.A.C. (EXP. 071-2023)",
+      "fecha_publicacion": "2026-05-20",
+      "titulo": "Resolución Directoral - Procedimiento Administrativo Sancionador contra MAGIC DYNASTY INTERNATIONAL CLUB S.A.C.",
+      "sumilla": "Reclamado: MAGIC DYNASTY INTERNATIONAL CLUB S.A.C. Número de expediente: 071-2023-JUS/DGTAIPD-PAS. Resolución Primera Instancia: Resolución Directoral N° 1911-2024-JUS/DGTAIPD-DPDP. Resolución Segunda Instancia por apelación.",
+      "materia": "Sancionador LPDP - Derecho de cancelación",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8163147-pas-magic-dynasty-international-club-s-a-c-exp-071-2023",
+      "relevancia_legalpro": "ALTA - Precedente sancionador a casinos/clubes"
+    },
+    {
+      "id": "ANPDP-RM-208-2026-JUS",
+      "tipo": "Resolución Ministerial",
+      "numero": "N° 208-2026-JUS/SG",
+      "fecha_publicacion": "2026-06-08",
+      "titulo": "Designar Director de Fiscalización e Instrucción de la DGTAIPD",
+      "sumilla": "Designar al señor Genaro Castillo Ramírez en el puesto de confianza de Director de Fiscalización e Instrucción de la Dirección General de Transparencia, Acceso a la Información Pública y Protección de Datos Personales.",
+      "materia": "Recursos Humanos - Designación DGTAIPD",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8238041-208-2026-jus",
+      "relevancia_legalpro": "MEDIA - Designación de autoridad"
+    },
+    {
+      "id": "ANPDP-RJ-175-2026-OGRRHH",
+      "tipo": "Resolución Jefatural",
+      "numero": "N° 175-2026-JUS/OGRRHH",
+      "fecha_publicacion": "2026-06-04",
+      "titulo": "Dejar sin efecto Resolución Jefatural que designaba funciones temporales",
+      "sumilla": "Dejar sin efecto la Resolución Jefatural N° 014-2023-JUS-OGRRHH del 23 de enero de 2023, en lo referido a la designación temporal de funciones de la servidora María Alejandra González Luna.",
+      "materia": "Recursos Humanos - Reorganización interna",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8225001-175-2026-jus-ogrrhh",
+      "relevancia_legalpro": "BAJA - RRHH interno"
+    },
+    {
+      "id": "ANPDP-RM-202-2026-JUS-SG",
+      "tipo": "Resolución Ministerial",
+      "numero": "N° 202-2026-JUS/SG",
+      "fecha_publicacion": "2026-06-03",
+      "titulo": "Designar Director General DGTAIPD",
+      "sumilla": "Designar al señor José Ángel Dávila Córdova en el puesto del Director General de Transparencia, Acceso a la Información Pública y Protección de Datos Personales (DGTAIPD).",
+      "materia": "Recursos Humanos - Designación autoridad LPDP",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8216022-202-2026_jus-sg",
+      "relevancia_legalpro": "ALTA - Designación nueva autoridad ANPDP"
+    },
+    {
+      "id": "ANPDP-PAS-SBN-094-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: SUPERINTENDENCIA NACIONAL DE BIENES ESTATALES (EXP. 094-2025)",
+      "fecha_publicacion": "2026-03-31",
+      "titulo": "Procedimiento Administrativo Sancionador contra SBN",
+      "sumilla": "Reclamado: SUPERINTENDENCIA NACIONAL DE BIENES ESTATALES. Número de expediente: 094-2025-JUS/DGTAIPD-PAS. Resolución Primera Instancia: Resolución Directoral N° 413-2026-JUS/DGTAIPD-DPDP. CASO CRÍTICO: multa a entidad pública por incumplimiento LPDP.",
+      "materia": "Sancionador LPDP - Entidad pública",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8137987-pas-superintendencia-nacional-de-bienes-estatales-exp-094-2025",
+      "relevancia_legalpro": "CRÍTICA - Precedente a entidades públicas"
+    },
+    {
+      "id": "ANPDP-PTT-149-2025-PJ",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-149-2025/PTT - Poder Judicial",
+      "fecha_publicacion": "2026-03-30",
+      "titulo": "Procedimiento Trilateral contra Poder Judicial - Derechos de cancelación y oposición",
+      "sumilla": "Reclamado: Poder Judicial. Derechos ARCO: Derecho de cancelación y oposición. Tratamiento Cuestionado: Realizar tratamiento de datos personales. Resolución N°... (que resuelve Reclamación).",
+      "materia": "Procedimiento Trilateral - Poder Judicial",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283539-exp-149-2025-ptt-poder-judicial",
+      "relevancia_legalpro": "CRÍTICA - Precedente Poder Judicial + datos"
+    },
+    {
+      "id": "ANPDP-PTT-096-2025-PNP",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-096-2025/PTT - Policía Nacional del Perú",
+      "fecha_publicacion": "2026-03-17",
+      "titulo": "Procedimiento Trilateral contra PNP - Derecho de cancelación",
+      "sumilla": "Reclamado: Policía Nacional del Perú. Derechos ARCO: Derecho de cancelación. Tratamiento Cuestionado: Realizar tratamiento de datos personales. Resolución DPDP N° 314-2026.",
+      "materia": "Procedimiento Trilateral - PNP",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8280928-exp-096-2025-ptt-policia-nacional-del-peru",
+      "relevancia_legalpro": "CRÍTICA - Precedente datos policiales/antecedentes"
+    },
+    {
+      "id": "ANPDP-PTT-216-2025-CLINICA-FLOREZ",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-216-2025/PTT - Clínica Florez Salud S.A.C.",
+      "fecha_publicacion": "2026-03-06",
+      "titulo": "Procedimiento Trilateral contra Clínica - Derecho de acceso (datos de salud)",
+      "sumilla": "Reclamado: Clínica Florez Salud S.A.C. Derechos ARCO: Derecho de acceso. Tratamiento Cuestionado: No atender el derecho de acceso. Resolución N° 264-2026-JUS/DGTAIPD-DPDP. CASO datos sensibles (salud).",
+      "materia": "Procedimiento Trilateral - Clínica - Datos de salud",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283985-exp-216-2025-ptt-clinica-florez-salud-s-a-c",
+      "relevancia_legalpro": "CRÍTICA - Precedente datos sensibles (salud)"
+    },
+    {
+      "id": "ANPDP-PTT-152-2025-INTEGRATEL",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-152-2025/PTT - Integratel Perú S.A.A.",
+      "fecha_publicacion": "2026-03-05",
+      "titulo": "Procedimiento Trilateral contra Integratel - Telecomunicaciones",
+      "sumilla": "Reclamado: Integratel Perú S.A.A. Derechos ARCO: Acceso y cancelación. Tratamiento Cuestionado: Realizar tratamiento de datos personales. Resolución N° 263-2026-JUS/DGTAIPD-DPDP.",
+      "materia": "Procedimiento Trilateral - Telecomunicaciones",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283591-exp-152-2025-ptt-integratel-peru-s-a-a",
+      "relevancia_legalpro": "ALTA - Precedente telecomunicaciones"
+    },
+    {
+      "id": "ANPDP-PTT-127-2025-GOOGLE",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-127-2025/PTT - Google LLC",
+      "fecha_publicacion": "2026-03-03",
+      "titulo": "Procedimiento Trilateral contra Google - Big Tech",
+      "sumilla": "Reclamado: Google LLC. Derechos ARCO: Derecho de cancelación y oposición. Tratamiento Cuestionado: Realizar tratamiento de datos personales. Resolución N° 262-2026-JUS/DGTAIPD-DPDP. CASO INTERNACIONAL con empresa Big Tech.",
+      "materia": "Procedimiento Trilateral - Big Tech",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283316-exp-127-2025-ptt-google-llc",
+      "relevancia_legalpro": "CRÍTICA - Precedente Big Tech en Perú"
+    },
+    {
+      "id": "ANPDP-PTT-116-2025-ONCOCENTER",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-116-2025/PTT - Oncocenter Perú S.A.C.",
+      "fecha_publicacion": "2026-02-27",
+      "titulo": "Procedimiento Trilateral contra Oncocenter - Datos oncológicos",
+      "sumilla": "Reclamado: Oncocenter Perú S.A.C. Derechos ARCO: Derecho de acceso. Tratamiento Cuestionado: No atender el derecho de acceso. Resolución N° 258-2026-JUS/DGTAIPD-DPDP. DATO SENSIBLE - salud oncológica.",
+      "materia": "Procedimiento Trilateral - Datos oncológicos",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8281038-exp-116-2025-ptt-oncocenter-peru-s-a-c",
+      "relevancia_legalpro": "CRÍTICA - Datos sensibles (salud/oncología)"
+    },
+    {
+      "id": "ANPDP-PTT-134-2025-PJ-2",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-134-2025/PTT - Poder Judicial",
+      "fecha_publicacion": "2026-02-27",
+      "titulo": "Procedimiento Trilateral contra PJ - Cancelación y oposición",
+      "sumilla": "Reclamado: Poder Judicial. Derechos ARCO: Derecho de cancelación y oposición. Resolución N° 260-2026.",
+      "materia": "Procedimiento Trilateral - Poder Judicial",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283424-exp-134-2025-ptt-poder-judicial",
+      "relevancia_legalpro": "CRÍTICA - Segundo precedente PJ del mes"
+    },
+    {
+      "id": "ANPDP-PTT-131-2025-BRITISH-AMERICAN-HOSPITAL",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-131-2025/PTT - British American Hospital",
+      "fecha_publicacion": "2026-02-27",
+      "titulo": "Procedimiento Trilateral contra Mazzio Confecciones - Datos de salud Hospital",
+      "sumilla": "Nota: Sumilla menciona Mazzio Confecciones y Tiendas Peruanas pero el encabezado indica British American Hospital - discrepancia detectada. Derechos ARCO: Derecho de acceso. Resolución N° 259-2026.",
+      "materia": "Procedimiento Trilateral - Datos hospitalarios",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283400-exp-131-2025-british-american-hospital",
+      "relevancia_legalpro": "ALTA - Datos clínicos/salud",
+      "nota_auditor": "Verificar reclamado real en PDF - sumilla podría tener error"
+    },
+    {
+      "id": "ANPDP-PAS-MIGRANTE-073-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: MIGRANTE S.A.C. (EXP. 073-2025)",
+      "fecha_publicacion": "2026-02-27",
+      "titulo": "Procedimiento Administrativo Sancionador contra Migrante S.A.C.",
+      "sumilla": "Reclamado: MIGRANTE S.A.C. Número de expediente: 073-2025-JUS/DGTAIPD-PAS. Resolución Primera Instancia: Resolución Directoral N° 257-2026-JUS/DGTAIPD-DPDP.",
+      "materia": "Sancionador LPDP - Empresa",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8074283-pas-migrante-s-a-c-exp-073-2025",
+      "relevancia_legalpro": "MEDIA - Sancionador a empresa privada"
+    },
+    {
+      "id": "ANPDP-PAS-TELEFONICA-INTEGRATEL-028-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: TELEFONICA DEL PERU S.A.A. (INTEGRATEL PERÚ S.A.A.) (EXP. 028-2025)",
+      "fecha_publicacion": "2026-02-25",
+      "titulo": "Procedimiento Administrativo Sancionador contra Telefónica/Integratel",
+      "sumilla": "Reclamado: TELEFONICA DEL PERU S.A.A. (INTEGRATEL PERÚ S.A.A.). Número de expediente: 028-2025-JUS/DGTAIPD-PAS. Resolución Primera Instancia: Resolución Directoral N° 197-2026-JUS/DGTAIPD-DPDP. Telecomunicaciones - multa por incumplimiento.",
+      "materia": "Sancionador LPDP - Telecom",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8074124-pas-telefonica-del-peru-s-a-a-integratel-peru-s-a-a-exp-028-2025",
+      "relevancia_legalpro": "ALTA - Multa a gran teleco"
+    },
+    {
+      "id": "ANPDP-PTT-173-2025-MEDIOS-COMUNICACION",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-173-2025/PTT - Media Chirimoya (Perú 21) y ATV",
+      "fecha_publicacion": "2026-02-24",
+      "titulo": "Procedimiento Trilateral contra medios - Cancelación y oposición",
+      "sumilla": "Reclamado: Media Chirimoya S.A.C. (Perú 21) y Andina de Radiodifusión S.A.C. (ATV). Derechos ARCO: Cancelación y oposición. Resolución N° 196-2026.",
+      "materia": "Procedimiento Trilateral - Medios de comunicación",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283677-exp-173-2025-ptt-media-chirimoya-s-a-c-peru-21-y-andina-de-radiodifusion-s-a-c-atv",
+      "relevancia_legalpro": "ALTA - Precedente medios/prensa"
+    },
+    {
+      "id": "ANPDP-PTT-137-2025-MINJUS",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-137-2025/PTT - Ministerio de Justicia y Derechos Humanos",
+      "fecha_publicacion": "2026-02-23",
+      "titulo": "Procedimiento Trilateral contra MINJUS - Cancelación",
+      "sumilla": "Reclamado: Ministerio de Justicia y Derechos Humanos. Derechos ARCO: Derecho de cancelación. Resolución N° 194-2026. IRÓNICO: el propio MINJUSDH es sancionado por incumplimiento LPDP.",
+      "materia": "Procedimiento Trilateral - MINJUSDH",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283433-exp-137-2025-ptt-ministerio-de-justicia-y-derechos-humanos",
+      "relevancia_legalpro": "CRÍTICA - Precedente entidad ministerial"
+    },
+    {
+      "id": "ANPDP-PTT-215-2025-CLINICA-EMMEL",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-215-2025/PTT - Tecnologías Médicas Arequipa (Clínica Emmel)",
+      "fecha_publicacion": "2026-02-20",
+      "titulo": "Procedimiento Trilateral contra Clínica Emmel - Derecho de acceso",
+      "sumilla": "Reclamado: Tecnologías Médicas Arequipa S.A. - Clínica Emmel. Derechos ARCO: Derecho de acceso. Resolución N° 189-2026.",
+      "materia": "Procedimiento Trilateral - Datos clínicos",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283940-exp-215-2025-ptt-tecnologias-medicas-arequipa-s-a-clinica-emmel",
+      "relevancia_legalpro": "ALTA - Datos sensibles salud"
+    },
+    {
+      "id": "ANPDP-PTT-146-2025-EL-COMERCIO",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-146-2025/PTT - Empresa Editora El Comercio S.A.",
+      "fecha_publicacion": "2026-02-19",
+      "titulo": "Procedimiento Trilateral contra El Comercio - Cancelación",
+      "sumilla": "Reclamado: Empresa Editora El Comercio S.A. Derechos ARCO: Derecho de cancelación. Resolución N° 188-2026.",
+      "materia": "Procedimiento Trilateral - Prensa",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283505-exp-146-2025-ptt-empresa-editora-el-comercio-s-a",
+      "relevancia_legalpro": "ALTA - Grupo El Comercio - prensa"
+    },
+    {
+      "id": "ANPDP-PTT-201-2025-CLINICA-EMMEL-2",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-201-2025/PTT - Clínica Emmel (2do caso)",
+      "fecha_publicacion": "2026-02-18",
+      "titulo": "Procedimiento Trilateral contra Clínica Emmel - Derecho de acceso (caso 2)",
+      "sumilla": "Reclamado: Tecnologías Médicas Arequipa S.A. - Clínica Emmel (segundo caso). Derechos ARCO: Derecho de acceso. Resolución N° 187-2026.",
+      "materia": "Procedimiento Trilateral - Datos clínicos",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283876-exp-201-2025-ptt-tecnologias-medicas-arequipa-s-a-clinica-emmel",
+      "relevancia_legalpro": "ALTA - Patrón reincidente en clínica"
+    },
+    {
+      "id": "ANPDP-PAS-RIMAC-065-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: RIMAC SEGUROS Y REASEGUROS S.A. (EXP. 065-2025)",
+      "fecha_publicacion": "2026-02-18",
+      "titulo": "Procedimiento Administrativo Sancionador contra Rímac Seguros",
+      "sumilla": "Reclamado: RIMAC SEGUROS Y REASEGUROS S.A. Número de expediente: 065-2025-JUS/DGTAIPD-PAS. Resolución Primera Instancia: Resolución Directoral N° 186-2026-JUS/DGTAIPD-DPDP. Multa a gran empresa de seguros por incumplimiento LPDP.",
+      "materia": "Sancionador LPDP - Seguros",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8073841-pas-rimac-seguros-y-reaseguros-s-a-exp-065-2025",
+      "relevancia_legalpro": "CRÍTICA - Multa a aseguradora de gran tamaño"
+    },
+    {
+      "id": "ANPDP-PAS-TELEFONICA-INTEGRATEL-064-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: TELEFONICA DEL PERU S.A.A. (INTEGRATEL PERÚ S.A.A.) (EXP. 064-2025)",
+      "fecha_publicacion": "2026-02-18",
+      "titulo": "Procedimiento Administrativo Sancionador contra Telefónica/Integratel (caso 2)",
+      "sumilla": "Reclamado: TELEFONICA DEL PERU S.A.A. (INTEGRATEL PERÚ S.A.A.). Número de expediente: 064-2025-JUS/DGTAIPD-PAS. Resolución Primera Instancia: Resolución Directoral N° 185-2026-JUS/DGTAIPD-DPDP. Segundo caso del mes contra Telefónica.",
+      "materia": "Sancionador LPDP - Telecom",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8074111-pas-telefonica-del-peru-s-a-a-integratel-peru-s-a-a-exp-064-2025",
+      "relevancia_legalpro": "ALTA - Patrón reincidente en Telefónica"
+    },
+    {
+      "id": "ANPDP-PTT-200-2025-INTERBANK",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-200-2025/PTT - Banco Internacional del Perú (Interbank)",
+      "fecha_publicacion": "2026-02-17",
+      "titulo": "Procedimiento Trilateral contra Interbank - Derecho de acceso",
+      "sumilla": "Reclamado: Banco Internacional del Perú S.A.A. (Interbank). Derechos ARCO: Derecho de acceso. Tratamiento Cuestionado: No atender el derecho de acceso. Resolución N° 143-2026.",
+      "materia": "Procedimiento Trilateral - Banca",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283856-exp-200-2025-ptt-banco-internacional-del-peru-s-a-a-interbank",
+      "relevancia_legalpro": "ALTA - Precedente bancos en Perú"
+    },
+    {
+      "id": "ANPDP-PAS-PERSONA-NATURAL-019-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: PERSONA NATURAL (EXP. 019-2025)",
+      "fecha_publicacion": "2026-02-16",
+      "titulo": "Procedimiento Administrativo Sancionador contra persona natural",
+      "sumilla": "Reclamado: PERSONA NATURAL. Número de expediente: 019-2025-JUS/DGTAIPD-PAS. Resolución Primera Instancia: Resolución Directoral N° 142-2026-JUS/DGTAIPD-DPDP. Caso aislado contra persona natural.",
+      "materia": "Sancionador LPDP - Persona natural",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8073834-pas-persona-natural-exp-019-2025",
+      "relevancia_legalpro": "MEDIA - Caso atípico persona natural"
+    },
+    {
+      "id": "ANPDP-PTT-161-2025-SUNAT",
+      "tipo": "Resolución Directoral",
+      "numero": "EXP-161-2025/PTT - SUNAT",
+      "fecha_publicacion": "2026-02-11",
+      "titulo": "Procedimiento Trilateral contra SUNAT - Cancelación",
+      "sumilla": "Reclamado: Superintendencia Nacional de Aduanas y de Administración Tributaria. Derechos ARCO: Derecho de cancelación. Resolución N° 137-2026.",
+      "materia": "Procedimiento Trilateral - SUNAT (tributaria)",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8283641-exp-161-2025-ptt-superintendencia-nacional-de-aduanas-y-de-administracion-tributaria",
+      "relevancia_legalpro": "CRÍTICA - Precedente SUNAT datos tributarios"
+    },
+    {
+      "id": "ANPDP-PAS-AMERICA-MOVIL-060-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: AMERICA MOVIL S.A.C. (EXP. 060-2025)",
+      "fecha_publicacion": "2026-02-05",
+      "titulo": "Procedimiento Administrativo Sancionador contra América Móvil (Claro)",
+      "sumilla": "Reclamado: AMERICA MOVIL S.A.C. (Claro). Número de expediente: 060-2025-JUS/DGTAIPD-PAS. Multa a operadora de telecomunicaciones Claro.",
+      "materia": "Sancionador LPDP - Telecom (Claro)",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8074092-pas-america-movil-s-a-c-exp-060-2025",
+      "relevancia_legalpro": "ALTA - Multa a Claro"
+    },
+    {
+      "id": "ANPDP-PAS-ENTEL-068-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: ENTEL PERU S.A. (EXP. 068-2025)",
+      "fecha_publicacion": "2026-01-30",
+      "titulo": "Procedimiento Administrativo Sancionador contra Entel Perú",
+      "sumilla": "Reclamado: ENTEL PERU S.A. Número de expediente: 068-2025-JUS/DGTAIPD-PAS. Multa a Entel por incumplimiento LPDP.",
+      "materia": "Sancionador LPDP - Telecom (Entel)",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8074274-pas-entel-peru-s-a-exp-068-2025",
+      "relevancia_legalpro": "ALTA - Multa a Entel"
+    },
+    {
+      "id": "ANPDP-PAS-PNP-059-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: POLICIA NACIONAL DEL PERU (EXP. 059-2025)",
+      "fecha_publicacion": "2026-01-28",
+      "titulo": "Procedimiento Administrativo Sancionador contra PNP",
+      "sumilla": "Reclamado: POLICIA NACIONAL DEL PERU. Número de expediente: 059-2025-JUS/DGTAIPD-PAS. Multa histórica a PNP por incumplimiento LPDP en bases de datos policiales.",
+      "materia": "Sancionador LPDP - PNP",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8074264-pas-policia-nacional-del-peru-exp-059-2025",
+      "relevancia_legalpro": "CRÍTICA - Multa histórica a PNP"
+    },
+    {
+      "id": "ANPDP-PAS-ALFIN-024-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: ALFIN BANCO S.A. (EXP. 024-2025)",
+      "fecha_publicacion": "2026-01-16",
+      "titulo": "Procedimiento Administrativo Sancionador contra Alfin Banco",
+      "sumilla": "Reclamado: ALFIN BANCO S.A. Número de expediente: 024-2025-JUS/DGTAIPD-PAS. Multa a banco por incumplimiento LPDP.",
+      "materia": "Sancionador LPDP - Banca",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8074079-pas-alfin-banco-s-a-exp-024-2025",
+      "relevancia_legalpro": "ALTA - Multa a banco"
+    },
+    {
+      "id": "ANPDP-PAS-CONSORCIO-PINO-003-2025",
+      "tipo": "Resolución Directoral",
+      "numero": "PAS: CONSORCIO HERMANOS PINO S.A.C. (EXP. 003-2025)",
+      "fecha_publicacion": "2026-01-12",
+      "titulo": "Procedimiento Administrativo Sancionador contra Consorcio Hermanos Pino",
+      "sumilla": "Reclamado: CONSORCIO HERMANOS PINO S.A.C. Número de expediente: 003-2025-JUS/DGTAIPD-PAS.",
+      "materia": "Sancionador LPDP - Empresa constructora",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/normas-legales/8073811-pas-consorcio-hermanos-pino-s-a-c-exp-003-2025",
+      "relevancia_legalpro": "MEDIA - Multa a constructora"
+    }
+  ],
+  "informes_destacados_2026": [
+    {
+      "id": "ANPDP-INFORME-COMPENDIO-2025",
+      "tipo": "Compendio Normativo",
+      "numero": "Primera Edición Oficial",
+      "fecha_publicacion": "2025-12-31",
+      "titulo": "Compendio sobre Protección de Datos Personales: Normativa y Criterios Interpretativos Relevantes (Actualizada al 22.11.2025)",
+      "sumilla": "Primera Edición Oficial del Compendio sobre Protección de Datos Personales, actualizada al 22 de noviembre de 2025. Incluye toda la normativa LPDP y criterios interpretativos relevantes.",
+      "materia": "Compendio Normativo LPDP",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/informes-publicaciones/7575393-primera-edicion-oficial-del-compendio-sobre-proteccion-de-datos-personales-normativa-y-criterios-interpretativos-relevantes-actualizada-al-22-11-2025",
+      "relevancia_legalpro": "CRÍTICA - Compendio oficial"
+    },
+    {
+      "id": "ANPDP-BOLETIN-BALANCE-2018-2025",
+      "tipo": "Boletín - Balance de Gestión",
+      "fecha_publicacion": "2026-01-27",
+      "titulo": "Balance de Gestión 2018 - 2025 - Autoridad Nacional de Protección de Datos Personales",
+      "sumilla": "Recuento de las principales actividades ejecutadas por ANPDP en los últimos ocho años (2018-2025). Cifras históricas de procedimientos sancionadores, registro de bancos de datos, derechos ARCO.",
+      "materia": "Balance de Gestión - 8 años ANPDP",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/informes-publicaciones/7666109-balance-de-gestion-2018-2025-autoridad-nacional-de-proteccion-de-datos-personales-anpd",
+      "relevancia_legalpro": "ALTA - 8 años de estadísticas"
+    }
+  ],
+  "noticias_y_eventos_destacados_2026": [
+    {
+      "id": "ANPDP-NEWS-MULTA-S-194MIL",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-05-20",
+      "titulo": "MINJUSDH sanciona a empresa por uso indebido de datos personales y aplica multas de hasta S/ 194 mil",
+      "sumilla": "El MINJUSDH ha sancionado a una empresa por uso indebido de datos personales aplicando multas de hasta S/ 194,000. Señala precedente significativo en enforcement de la LPDP.",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1394841-minjusdh-sanciona-a-empresa-por-uso-indebido-de-datos-personales-y-aplica-multas-de-hasta-s-194-mil",
+      "relevancia_legalpro": "CRÍTICA - Multa referencial S/ 194,000"
+    },
+    {
+      "id": "ANPDP-NEWS-IA-DECLARACION",
+      "tipo": "Declaración Conjunta Internacional",
+      "fecha_publicacion": "2026-02-23",
+      "titulo": "Perú se suma a declaración internacional sobre riesgos para la privacidad de las imágenes generadas por IA",
+      "sumilla": "ANPD suscribe Declaración Conjunta sobre imágenes generadas por IA junto a 61 autoridades de protección de datos del mundo (coordinada por IEWG/GPA). Puntos clave: medidas de seguridad, transparencia, mecanismos de eliminación, protección de menores.",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1357514-peru-se-suma-a-declaracion-internacional-sobre-riesgos-para-la-privacidad-de-las-imagenes-generadas-por-ia",
+      "relevancia_legalpro": "CRÍTICA - Compliance IA en Perú"
+    },
+    {
+      "id": "ANPDP-NEWS-SECTOR-SALUD",
+      "tipo": "Noticia Internacional",
+      "fecha_publicacion": "2026-02-25",
+      "titulo": "MINJUSDH promueve jornada internacional de protección de datos personales del sector Salud",
+      "sumilla": "Jornada de capacitación del 25 al 27 de febrero 2026 con expertos de Perú, Ecuador, Colombia, España. Temas: historia clínica electrónica, interoperabilidad, seguridad de información, uso de datos con fines sanitarios. Alianza Digital UE-ALC.",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1358840-minjusdh-promueve-jornada-internacional-de-proteccion-de-datos-personales-del-sector-salud",
+      "relevancia_legalpro": "CRÍTICA - Datos sensibles salud"
+    },
+    {
+      "id": "ANPDP-NEWS-ACOSO-ESCOLAR",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-03-20",
+      "titulo": "MINJUSDH impulsa cultura de prevención contra el acoso escolar en línea",
+      "sumilla": "Campaña del MINJUSDH contra el acoso escolar en línea, relacionada con protección de datos personales de menores de edad (categoría sensible por edad).",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1368433-minjusdh-impulsa-cultura-de-prevencion-contra-el-acoso-escolar-en-linea",
+      "relevancia_legalpro": "ALTA - Datos de menores"
+    },
+    {
+      "id": "ANPDP-NEWS-ESTAFAS-DEPORTIVAS",
+      "tipo": "Alerta - Estafas",
+      "fecha_publicacion": "2026-06-11",
+      "titulo": "ANPD alerta sobre estafas digitales durante eventos deportivos",
+      "sumilla": "ANPD alerta a la ciudadanía sobre estafas digitales durante eventos deportivos y recuerda la importancia de proteger los datos personales.",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1404883-anpd-alerta-sobre-estafas-digitales-durante-eventos-deportivos-y-recuerda-la-importancia-de-proteger-los-datos-personales",
+      "relevancia_legalpro": "MEDIA - Concientización"
+    },
+    {
+      "id": "ANPDP-NEWS-REDES-SOCIALES",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-06-30",
+      "titulo": "Día Mundial de las Redes Sociales: MINJUSDH brinda ocho consejos para proteger tus datos personales",
+      "sumilla": "Ocho consejos del MINJUSDH por el Día Mundial de las Redes Sociales: contraseñas seguras, verificación en dos pasos, configuración de privacidad, etc.",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1412739-dia-mundial-de-las-redes-sociales-minjusdh-brinda-ocho-consejos-para-proteger-tus-datos-personales",
+      "relevancia_legalpro": "MEDIA - Concientización"
+    },
+    {
+      "id": "ANPDP-NEWS-ESTANDARES-INTL",
+      "tipo": "Cooperación Internacional",
+      "fecha_publicacion": "2026-04-23",
+      "titulo": "MINJUSDH participa en esfuerzo internacional para actualizar estándares de protección de datos personales",
+      "sumilla": "MINJUSDH participa en la actualización de estándares internacionales de protección de datos personales (cooperación con Global Privacy Assembly - GPA).",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1383230-minjusdh-participa-en-esfuerzo-internacional-para-actualizar-estandares-de-proteccion-de-datos-personales",
+      "relevancia_legalpro": "ALTA - Estándares internacionales"
+    },
+    {
+      "id": "ANPDP-NEWS-PADRE-DIGITAL",
+      "tipo": "Noticia de Prensa",
+      "fecha_publicacion": "2026-06-20",
+      "titulo": "Día del Padre: MINJUSDH invita a los papás a convertirse en héroes digitales y proteger a sus familias en internet",
+      "sumilla": "Campaña para que padres de familia se conviertan en héroes digitales y protejan a sus familias de riesgos en internet.",
+      "url_fuente": "https://www.gob.pe/institucion/minjus/noticias/1409389-dia-del-padre-minjusdh-invita-a-los-papas-a-convertirse-en-heroes-digitales-y-proteger-a-sus-familias-en-internet.jpeg",
+      "relevancia_legalpro": "MEDIA - Concientización familiar"
+    }
+  ],
+  "campanas_2026": [
+    {
+      "id": "ANPDP-CAMP-CYBERWOW",
+      "titulo": "Protege tus datos personales durante el #CyberWow",
+      "fecha_publicacion": "2026-07-13",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/campa%C3%B1as/143717-protege-tus-datos-personales-durante-el-cyberwow",
+      "relevancia_legalpro": "ALTA - E-commerce + LPDP"
+    },
+    {
+      "id": "ANPDP-CAMP-DATOS-JUEGAN",
+      "titulo": "Tus datos también juegan",
+      "fecha_publicacion": "2026-06-15",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/campa%C3%B1as/143279-tus-datos-tambien-juegan",
+      "relevancia_legalpro": "MEDIA - Concientización"
+    },
+    {
+      "id": "ANPDP-CAMP-CUENTOS",
+      "titulo": "Que no te cuenten cuentos",
+      "fecha_publicacion": "2026-05-04",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/campa%C3%B1as/141519-que-no-te-cuenten-cuentos",
+      "relevancia_legalpro": "MEDIA - Concientización"
+    },
+    {
+      "id": "ANPDP-CAMP-CLASES-ESCOLARES",
+      "titulo": "Protección de datos personales durante las clases escolares",
+      "fecha_publicacion": "2026-03-23",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/campa%C3%B1as/140398-proteccion-de-datos-personales-durante-las-clases-escolares",
+      "relevancia_legalpro": "ALTA - Datos menores/educación"
+    },
+    {
+      "id": "ANPDP-CAMP-5CONSEJOS-WEB",
+      "titulo": "5 Consejos para proteger los datos personales en páginas web",
+      "fecha_publicacion": "2026-02-11",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/campa%C3%B1as/138280-5-consejos-para-proteger-los-datos-personales-en-paginas-web",
+      "relevancia_legalpro": "ALTA - Compliance web"
+    },
+    {
+      "id": "ANPDP-CAMP-BALANCE",
+      "titulo": "Balance de Gestión ANPD 2018–2025",
+      "fecha_publicacion": "2026-01-29",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/campa%C3%B1as/136734-balance-de-gestion-anpd-2018-2025",
+      "relevancia_legalpro": "MEDIA - Cifras históricas"
+    },
+    {
+      "id": "ANPDP-CAMP-ODP-CONFERENCIA",
+      "titulo": "Conferencia: Oficial de Datos Personales",
+      "fecha_publicacion": "2026-01-28",
+      "url_fuente": "https://www.gob.pe/institucion/anpd/campa%C3%B1as/136736-conferencia-oficial-de-datos-personales",
+      "relevancia_legalpro": "ALTA - Obligación ODP"
+    }
+  ],
+  "agregados_estadisticos": {
+    "total_resoluciones_sancionadores_historicas": 911,
+    "total_normas_legales_total": 2217,
+    "multa_referencial_reciente": "S/ 194,000",
+    "categorias_derechos_ARCO_atendidas": ["Acceso", "Rectificación", "Cancelación", "Oposición"],
+    "entidades_sancionadas_destacadas_2026": [
+      "MAGIC DYNASTY INTERNATIONAL CLUB S.A.C.",
+      "SUPERINTENDENCIA NACIONAL DE BIENES ESTATALES (SBN)",
+      "TELEFONICA DEL PERU S.A.A. (INTEGRATEL)",
+      "RIMAC SEGUROS Y REASEGUROS S.A.",
+      "AMERICA MOVIL S.A.C. (Claro)",
+      "ENTEL PERU S.A.",
+      "POLICIA NACIONAL DEL PERU",
+      "ALFIN BANCO S.A.",
+      "MIGRANTE S.A.C.",
+      "CONSORCIO HERMANOS PINO S.A.C."
+    ],
+    "sectores_economicos_mas_sancionados_2026": ["Telecomunicaciones", "Banca y Seguros", "Salud", "Medios de comunicación", "Casinos y entretenimiento"]
+  }
+}

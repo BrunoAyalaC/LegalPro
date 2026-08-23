@@ -1,0 +1,128 @@
+{
+  "consumer": { "name": "legalpro-frontend-web" },
+  "provider": { "name": "legalpro-node-api" },
+  "interactions": [
+    {
+      "description": "login with valid credentials returns access token",
+      "request": {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "headers": { "Content-Type": "application/json" },
+        "body": {
+          "email": "abogado@estudio-pro.pe",
+          "password": "LegalPro2026!"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": {
+          "success": true,
+          "data": {
+            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "refreshToken": "rt_a1b2c3d4...",
+            "user": {
+              "id": "user-uuid",
+              "email": "abogado@estudio-pro.pe",
+              "nombre_completo": "Abogado Demo estudio-pro",
+              "rol": "ABOGADO",
+              "organization_id": "org-uuid"
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "login with invalid credentials returns 401",
+      "request": {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "headers": { "Content-Type": "application/json" },
+        "body": { "email": "x@x.com", "password": "wrong" }
+      },
+      "response": {
+        "status": 401,
+        "headers": { "Content-Type": "application/json" },
+        "body": {
+          "success": false,
+          "error": "Credenciales invalidas",
+          "correlationId": "uuid"
+        }
+      }
+    },
+    {
+      "description": "listarExpedientes with valid auth returns paginated list",
+      "request": {
+        "method": "GET",
+        "path": "/api/expedientes",
+        "headers": { "Authorization": "Bearer eyJ..." },
+        "query": "limit=10&offset=0"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": {
+          "success": true,
+          "data": {
+            "items": [
+              {
+                "id": "exp-uuid-1",
+                "organization_id": "org-uuid",
+                "numero": "00001-2026",
+                "titulo": "Incumplimiento de contrato",
+                "materia": "civil",
+                "estado": "activo",
+                "created_at": "2026-06-12T10:00:00Z"
+              }
+            ],
+            "total": 1,
+            "page": 1,
+            "pageSize": 10
+          }
+        }
+      }
+    },
+    {
+      "description": "ARCO export returns CSV with user data",
+      "request": {
+        "method": "GET",
+        "path": "/api/mis-datos/export",
+        "headers": { "Authorization": "Bearer eyJ..." }
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": {
+          "success": true,
+          "data": {
+            "exportedAt": "2026-06-12T10:00:00Z",
+            "format": "json",
+            "userData": {
+              "id": "user-uuid",
+              "email": "abogado@estudio-pro.pe",
+              "expedientes": []
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "rate limit exceeded returns 429",
+      "request": {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "headers": { "Content-Type": "application/json" },
+        "body": { "email": "x@x.com", "password": "wrong" }
+      },
+      "response": {
+        "status": 429,
+        "headers": { "Retry-After": "60" },
+        "body": { "success": false, "error": "Demasiados intentos" }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": { "version": "4.0" },
+    "pactNode": { "version": "10.0" }
+  }
+}

@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using LegalPro.Application.Common.Interfaces;
 
 namespace LegalPro.Application.Analisis.Commands;
@@ -7,7 +8,10 @@ namespace LegalPro.Application.Analisis.Commands;
 // ═══════════════════════════════════════════════════════
 // COMMAND: Analizar Expediente
 // ═══════════════════════════════════════════════════════
-public record AnalizarExpedienteCommand(string TextoExpediente) : IRequest<AnalizarExpedienteResult>;
+public record AnalizarExpedienteCommand(string TextoExpediente) : IRequest<AnalizarExpedienteResult>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public record AnalizarExpedienteResult(string ResumenGeneral, List<AnotacionResult> Anotaciones);
 public record AnotacionResult(string Titulo, string Descripcion, string Gravedad, string? FolioReferencia);
@@ -24,17 +28,17 @@ public class AnalizarExpedienteValidator : AbstractValidator<AnalizarExpedienteC
 
 public class AnalizarExpedienteHandler : IRequestHandler<AnalizarExpedienteCommand, AnalizarExpedienteResult>
 {
-    private readonly IGeminiService _geminiService;
+    private readonly IMinimaxService _minimaxService;
 
-    public AnalizarExpedienteHandler(IGeminiService geminiService)
+    public AnalizarExpedienteHandler(IMinimaxService minimaxService)
     {
-        _geminiService = geminiService;
+        _minimaxService = minimaxService;
     }
 
     public async Task<AnalizarExpedienteResult> Handle(AnalizarExpedienteCommand request, CancellationToken cancellationToken)
     {
-        var resultJson = await _geminiService.AnalyzeLegalDocumentAsync(request.TextoExpediente);
-        // Parse JSON response from Gemini into typed result
+        var resultJson = await _minimaxService.AnalyzeLegalDocumentAsync(request.TextoExpediente);
+        // Parse JSON response from MiniMax into typed result
         var doc = System.Text.Json.JsonDocument.Parse(resultJson);
         var root = doc.RootElement;
 

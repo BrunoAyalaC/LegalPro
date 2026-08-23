@@ -57,7 +57,10 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, string>
 
     public async Task<string> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        if (await _context.Usuarios.AnyAsync(
+        // HOTFIX P0-A 2026-08-21: registro es flujo anónimo PRE-tenant (sin JWT → TenantId null
+        // → filtro global deny-all). Los checks de unicidad deben ver TODAS las organizaciones,
+        // no solo la del tenant actual. IgnoreQueryFilters puntual y justificado.
+        if (await _context.Usuarios.IgnoreQueryFilters().AnyAsync(
             u => u.Email == request.Email.Trim().ToLowerInvariant(), cancellationToken))
         {
             throw new ConflictException("El email ya está registrado.");
@@ -83,7 +86,8 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, string>
         // Crear organización personal automáticamente al registrarse.
         // Garantiza que el JWT incluya organization_id desde el primer acceso.
         var slug = GenerarSlugPersonal(request.Email);
-        while (await _context.Organizaciones.AnyAsync(o => o.Slug == slug, cancellationToken))
+        // HOTFIX P0-A: unicidad de slug es GLOBAL — debe evaluarse sin filtro tenant.
+        while (await _context.Organizaciones.IgnoreQueryFilters().AnyAsync(o => o.Slug == slug, cancellationToken))
         {
             var suffix = Guid.NewGuid().ToString("N")[..6];
             slug = $"{slug[..Math.Min(slug.Length, 30)]}-{suffix}";
@@ -103,7 +107,10 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, string>
         await _context.SaveChangesAsync(cancellationToken);
 
         // Recargar para que GenerateToken incluya la org y emita organization_id en JWT
+        // HOTFIX P0-A: el usuario recién creado aún no es visible con filtro tenant
+        // (OrganizationId acaba de asignarse, no hay claim JWT en este request anónimo).
         var usuarioConOrg = await _context.Usuarios
+            .IgnoreQueryFilters()
             .FirstAsync(u => u.Id == usuario.Id, cancellationToken);
 
         return _jwtService.GenerateToken(usuarioConOrg);

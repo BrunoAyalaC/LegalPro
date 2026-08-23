@@ -1,0 +1,595 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "version": "3.1",
+  "last_updated": "2026-08-21",
+  "descripcion": "Registro de skills del arnés agentic de LegalPro / LexIA Perú. Versión 3.1 LDDE-integrated: 18 skills en 9 categorías, cada una con loop obligatorio BUILD→AUDIT→REFUTE→OPTIMIZE→SECURE→GATE (arneses/registry/ldde-loop.json).",
+  "total": 18,
+  "skills_creados": [
+    {
+      "name": "auditar-lpdp",
+      "categoria": "auditoria",
+      "version": "3.0",
+      "descripcion": "Audita cumplimiento Ley 29733 LPDP Peru - consentimientos, ARCO, transferencia internacional, firma digital, breach notification, sanciones ANPD.",
+      "agente_owner": "@auditor-lpdp",
+      "archivo": ".opencode/skills/auditar-lpdp.md",
+      "updated": "2026-07-31",
+      "ldde": {
+        "categoria_loop": "auditoria",
+        "auditores": [
+          "@arquitecto-chief"
+        ],
+        "refutadores": [
+          "@red-team"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-hard-rules.mjs",
+          "verifier-catalogos.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "auditar-seguridad",
+      "categoria": "auditoria",
+      "version": "3.0",
+      "descripcion": "Auditoria OWASP Top 10 actualizada 2026 + secretos + RLS + RBAC + brute force + masking + idempotencia + proteccion IA.",
+      "agente_owner": "@auditor-seguridad",
+      "archivo": ".opencode/skills/auditar-seguridad.md",
+      "updated": "2026-07-31",
+      "ldde": {
+        "categoria_loop": "auditoria",
+        "auditores": [
+          "@arquitecto-chief"
+        ],
+        "refutadores": [
+          "@red-team"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-hard-rules.mjs",
+          "verifier-catalogos.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "analizar-expediente",
+      "categoria": "ia-legal",
+      "version": "3.0",
+      "descripcion": "Analiza expediente judicial peruano con 5 subtipos: completo, fortalezas_debilidades, riesgos, estrategia, resumen. Base legal verificada.",
+      "agente_owner": "@ia-analista-expedientes",
+      "archivo": ".opencode/skills/analizar-expediente.md",
+      "updated": "2026-07-31",
+      "ldde": {
+        "categoria_loop": "ia-legal",
+        "auditores": [
+          "@auditor-legal"
+        ],
+        "refutadores": [
+          "@refutador-legal"
+        ],
+        "optimizadores": [
+          "@prompt-engineer"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-citas-legales.mjs",
+          "verifier-plazos.mjs",
+          "verifier-tipificacion.mjs",
+          "verifier-lpdp.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "redactar-escrito-legal",
+      "categoria": "ia-legal",
+      "version": "3.0",
+      "descripcion": "Redacta escritos legales peruanos (demanda, contestacion, apelacion, casacion, amparo, habeas corpus, etc.) con formato del PJ. Citas validadas al 100%.",
+      "agente_owner": "@ia-redactor-escritos",
+      "archivo": ".opencode/skills/redactar-escrito-legal.md",
+      "updated": "2026-07-31",
+      "ldde": {
+        "categoria_loop": "ia-legal",
+        "auditores": [
+          "@auditor-legal"
+        ],
+        "refutadores": [
+          "@refutador-legal"
+        ],
+        "optimizadores": [
+          "@prompt-engineer"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-citas-legales.mjs",
+          "verifier-plazos.mjs",
+          "verifier-tipificacion.mjs",
+          "verifier-lpdp.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "configurar-minimax",
+      "categoria": "ia-config",
+      "version": "3.0",
+      "descripcion": "Configura cliente MiniMax M3 con Function Calling, system instruction, manejo de errores, sanitizacion PII, optimizacion RAG.",
+      "agente_owner": "@prompt-engineer",
+      "archivo": ".opencode/skills/configurar-minimax.md",
+      "nota": "Anteriormente configurar-gemini.md (renombrado v3.0). FIX LDDE-07: owner corregido de @ia-legal (agente inexistente) a @prompt-engineer.",
+      "updated": "2026-08-21",
+      "ldde": {
+        "categoria_loop": "ia-config",
+        "auditores": [
+          "@prompt-engineer"
+        ],
+        "refutadores": [
+          "@refutador-legal"
+        ],
+        "optimizadores": [
+          "@auditor-cost-ia"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-deprecation-modelos.mjs",
+          "verifier-lpdp.mjs",
+          "verifier-masking.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "crear-endpoint",
+      "categoria": "creacion",
+      "version": "3.0",
+      "descripcion": "Crea endpoint REST backend (Node 20 Express 5 ESM o .NET 8 ASP.NET Core CQRS) con auth, RBAC, multi-tenant, validacion, audit log, tests.",
+      "agente_owner": "@backend-node o @backend-dotnet",
+      "archivo": ".opencode/skills/crear-endpoint.md",
+      "updated": "2026-07-31",
+      "ldde": {
+        "categoria_loop": "creacion",
+        "auditores": [
+          "@auditor-seguridad",
+          "@auditor-multi-tenant"
+        ],
+        "refutadores": [
+          "@refutador-seguridad"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-owasp.mjs",
+          "verifier-rbac.mjs",
+          "verifier-multi-tenant.mjs",
+          "verifier-bundle-size.mjs",
+          "verifier-masking.mjs"
+        ],
+        "max_iterations": 3
+      }
+    },
+    {
+      "name": "crear-pagina",
+      "categoria": "creacion",
+      "version": "3.0",
+      "descripcion": "Crea pagina React 19 con Vite 7, TypeScript 6, TailwindCSS 4, React Router 7, lazy load, accesibilidad WCAG 2.1 AA, Core Web Vitals.",
+      "agente_owner": "@frontend",
+      "archivo": ".opencode/skills/crear-pagina.md",
+      "updated": "2026-07-31",
+      "ldde": {
+        "categoria_loop": "creacion",
+        "auditores": [
+          "@auditor-seguridad",
+          "@auditor-multi-tenant"
+        ],
+        "refutadores": [
+          "@refutador-seguridad"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-owasp.mjs",
+          "verifier-rbac.mjs",
+          "verifier-multi-tenant.mjs",
+          "verifier-bundle-size.mjs",
+          "verifier-masking.mjs"
+        ],
+        "max_iterations": 3
+      }
+    },
+    {
+      "name": "deploy-backend",
+      "categoria": "devops",
+      "version": "3.0",
+      "descripcion": "Despliega backend .NET 8 o Node 20 a Railway con Docker multi-stage, health checks, env vars, secrets rotation, zero-downtime.",
+      "agente_owner": "@devops",
+      "archivo": ".opencode/skills/deploy-backend.md",
+      "updated": "2026-07-31",
+      "ldde": {
+        "categoria_loop": "devops",
+        "auditores": [
+          "@auditor-seguridad"
+        ],
+        "refutadores": [
+          "@refutador-seguridad"
+        ],
+        "optimizadores": [
+          "@sre"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-owner-secrets.mjs",
+          "verifier-owasp.mjs"
+        ],
+        "max_iterations": 3
+      }
+    },
+    {
+      "name": "decoradores-patterns",
+      "categoria": "patron-arquitectonico",
+      "version": "3.0",
+      "descripcion": "Patron Decorator implementado como Higher-Order Functions (HOF). Pipe composition. Logging, retry, validation, timing, circuit breaker, idempotencia, memoizacion.",
+      "agente_owner": "@arquitecto-chief",
+      "archivo": ".opencode/skills/decoradores-patterns.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "patron-arquitectonico",
+        "auditores": [
+          "@arquitecto-chief"
+        ],
+        "refutadores": [
+          "@refutador-arquitectura"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-adaptadores.mjs",
+          "verifier-contrato-api.mjs",
+          "verifier-idempotencia.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "observadores-eventos",
+      "categoria": "patron-arquitectonico",
+      "version": "3.0",
+      "descripcion": "Patron Observer + Event Bus desacoplado con outbox opcional, prioridad, wildcard, isolation de errores. Base de CQRS, auditoria, notificaciones.",
+      "agente_owner": "@arquitecto-chief",
+      "archivo": ".opencode/skills/observadores-eventos.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "patron-arquitectonico",
+        "auditores": [
+          "@arquitecto-chief"
+        ],
+        "refutadores": [
+          "@refutador-arquitectura"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-adaptadores.mjs",
+          "verifier-contrato-api.mjs",
+          "verifier-idempotencia.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "adaptadores-externos",
+      "categoria": "patron-arquitectonico",
+      "version": "3.0",
+      "descripcion": "Adapter Pattern (GOF) + Port & Adapter (Hexagonal) para servicios externos (BCRP, SUNAT, SPIJ, SINOE, SMS, EMAIL, CULQI, INDECOPI). Contrato canonico, fallback, circuit breaker.",
+      "agente_owner": "@arquitecto-chief",
+      "archivo": ".opencode/skills/adaptadores-externos.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "patron-arquitectonico",
+        "auditores": [
+          "@arquitecto-chief"
+        ],
+        "refutadores": [
+          "@refutador-arquitectura"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-adaptadores.mjs",
+          "verifier-contrato-api.mjs",
+          "verifier-idempotencia.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "optimizadores-rendimiento",
+      "categoria": "performance",
+      "version": "3.0",
+      "descripcion": "Optimizacion de performance para Node 20, .NET 8, React 19, PostgreSQL/Supabase. Bundle size, latencia p95, queries N+1, cache, Core Web Vitals, cost IA.",
+      "agente_owner": "@auditor-performance",
+      "archivo": ".opencode/skills/optimizadores-rendimiento.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "performance",
+        "auditores": [
+          "@auditor-performance"
+        ],
+        "refutadores": [
+          "@refutador-performance"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-bundle-size.mjs",
+          "verifier-cost-spike.mjs"
+        ],
+        "max_iterations": 3
+      }
+    },
+    {
+      "name": "protocolos-pipeline",
+      "categoria": "patron-arquitectonico",
+      "version": "3.0",
+      "descripcion": "Pipeline de comportamientos transversales (Behaviors en .NET, Middlewares en Node, Decorators). Auth, tenant, RBAC, validacion, logging, audit, idempotencia.",
+      "agente_owner": "@arquitecto-chief",
+      "archivo": ".opencode/skills/protocolos-pipeline.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "patron-arquitectonico",
+        "auditores": [
+          "@arquitecto-chief"
+        ],
+        "refutadores": [
+          "@refutador-arquitectura"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-seguridad"
+        ],
+        "gates": [
+          "verifier-adaptadores.mjs",
+          "verifier-contrato-api.mjs",
+          "verifier-idempotencia.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "objetivos-y-metas",
+      "categoria": "producto",
+      "version": "3.0",
+      "descripcion": "Definicion de objetivos SMART, OKRs, KPIs, metas operacionales y criterios de exito. SMART, MoSCoW, RICE, ICE, Definition-of-Done.",
+      "agente_owner": "@product-owner",
+      "archivo": ".opencode/skills/objetivos-y-metas.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "producto",
+        "auditores": [
+          "@product-owner"
+        ],
+        "refutadores": [
+          "@gobernanza-chief"
+        ],
+        "optimizadores": [
+          "@planner-chief"
+        ],
+        "seguridad": [
+          "@gobernanza-chief"
+        ],
+        "gates": [
+          "verifier-hard-rules.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "rag-busqueda-semantica",
+      "categoria": "ia-rag",
+      "version": "3.0",
+      "descripcion": "Guia de RAG optimizado: indexacion de catalogos legales, embeddings, prompt augmentation, anti-alucinaciones, citaciones verificables.",
+      "agente_owner": "@prompt-engineer",
+      "archivo": ".opencode/skills/rag-busqueda-semantica.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "ia-rag",
+        "auditores": [
+          "@auditor-legal"
+        ],
+        "refutadores": [
+          "@refutador-legal"
+        ],
+        "optimizadores": [
+          "@auditor-performance"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-rag-corpus.mjs",
+          "verifier-citas-legales.mjs",
+          "verifier-lpdp.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "buscar-jurisprudencia",
+      "categoria": "ia-legal",
+      "version": "3.0",
+      "descripcion": "Busqueda de jurisprudencia peruana en 5 fuentes: PJ, TC, INDECOPI, SUNARP, MINJUSDH. Validacion contra catalogos canonicos.",
+      "agente_owner": "@ia-buscador-jurisprudencia",
+      "archivo": ".opencode/skills/buscar-jurisprudencia.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "ia-legal",
+        "auditores": [
+          "@auditor-legal"
+        ],
+        "refutadores": [
+          "@refutador-legal"
+        ],
+        "optimizadores": [
+          "@prompt-engineer"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-citas-legales.mjs",
+          "verifier-plazos.mjs",
+          "verifier-tipificacion.mjs",
+          "verifier-lpdp.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "liquidacion-laboral",
+      "categoria": "ia-legal",
+      "version": "3.0",
+      "descripcion": "Calculo de liquidaciones laborales peruanas: CTS (D.L. 650), Gratificaciones (Ley 27735), Vacaciones, Utilidades, AFP/ONP, BCRP tipo cambio.",
+      "agente_owner": "@contador-laboralista",
+      "archivo": ".opencode/skills/liquidacion-laboral.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "ia-legal",
+        "auditores": [
+          "@auditor-legal"
+        ],
+        "refutadores": [
+          "@refutador-legal"
+        ],
+        "optimizadores": [
+          "@prompt-engineer"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-citas-legales.mjs",
+          "verifier-plazos.mjs",
+          "verifier-tipificacion.mjs",
+          "verifier-lpdp.mjs"
+        ],
+        "max_iterations": 2
+      }
+    },
+    {
+      "name": "analisis-riesgos-procesales",
+      "categoria": "ia-legal",
+      "version": "3.0",
+      "descripcion": "Analisis de riesgos procesales en casos legales peruanos. Matriz probabilidad x impacto, mitigacion, plazos, prescripcion, caducidad, medidas cautelares.",
+      "agente_owner": "@ia-analista-expedientes",
+      "archivo": ".opencode/skills/analisis-riesgos-procesales.md",
+      "updated": "2026-07-31",
+      "nueva_en_v3": true,
+      "ldde": {
+        "categoria_loop": "ia-legal",
+        "auditores": [
+          "@auditor-legal"
+        ],
+        "refutadores": [
+          "@refutador-legal"
+        ],
+        "optimizadores": [
+          "@prompt-engineer"
+        ],
+        "seguridad": [
+          "@auditor-lpdp"
+        ],
+        "gates": [
+          "verifier-citas-legales.mjs",
+          "verifier-plazos.mjs",
+          "verifier-tipificacion.mjs",
+          "verifier-lpdp.mjs"
+        ],
+        "max_iterations": 2
+      }
+    }
+  ],
+  "skills_pendientes": 0,
+  "skills_deprecadas": [],
+  "categorias": {
+    "auditoria": 2,
+    "ia-legal": 4,
+    "ia-config": 1,
+    "ia-rag": 1,
+    "creacion": 2,
+    "devops": 1,
+    "patron-arquitectonico": 4,
+    "performance": 1,
+    "producto": 1
+  },
+  "version_schema": "3.0",
+  "cambios_v3": [
+    "8 skills existentes actualizadas con referencias al 31/07/2026",
+    "9 skills nuevas creadas (decoradores, observadores, adaptadores, optimizadores, protocolos, objetivos, rag, jurisprudencia, liquidacion, riesgos)",
+    "Todas las skills con frontmatter versionado y RAG-optimized",
+    "Inputs/outputs con schemas versionados",
+    "Quality gates explícitos en cada skill",
+    "Audit logs consistentes",
+    "Referencias verificadas al 31/07/2026",
+    "Soporte para MiniMax M3 SDK oficial"
+  ],
+  "cambios_v31": [
+    "Campo ldde por skill: loop obligatorio con agentes y gates",
+    "Owner configurar-minimax corregido @ia-legal → @prompt-engineer (LDDE-07)",
+    "Integración con arneses/registry/ldde-loop.json v1.0",
+    "Anti-robo: verifier-ldde-loop.mjs LDDE-08 valida builder/refuter separation"
+  ]
+}

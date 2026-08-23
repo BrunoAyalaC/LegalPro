@@ -121,7 +121,7 @@ test.describe('Chat IA Legal — Journey', () => {
   test.beforeEach(async ({ page }) => {
     await mockAuthAndOrg(page);
     await injectFakeAuth(page);
-    await page.route('**/api/gemini/**', route =>
+    await page.route('**/api/ai/**', route =>
       route.fulfill({ status: 200, body: JSON.stringify({ respuesta: 'Respuesta de prueba del asistente legal.' }) })
     );
   });

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Schema de Delitos Económicos Peru",
+  "description": "Catálogo de delitos económicos del Código Penal peruano",
+  "type": "object",
+  "required": ["version", "delitos"],
+  "properties": {
+    "version": { "type": "string" },
+    "fuente_oficial": { "type": "string" },
+    "ultima_actualizacion": { "type": "string" },
+    "delitos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "nombre", "articulo_cp"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "nombre": { "type": "string" },
+          "articulo_cp": { "type": "string" },
+          "descripcion": { "type": "string" },
+          "bien_juridico": { "type": "string" },
+          "pena_minima": { "type": "string" },
+          "pena_maxima": { "type": "string" },
+          "modalidades": { "type": "array", "items": { "type": "string" } },
+          "jurisprudencia_vinculante": { "type": "array", "items": { "type": "string" } },
+          "es_perseguible_oficio": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@ namespace LegalPro.Domain.Entities;
 /// Representa un documento o escrito asociado a un expediente.
 /// Por ahora almacena metadatos y contenido textual/URL (no archivos binarios).
 /// </summary>
-public class Documento : BaseGuidEntity
+public class Documento : BaseGuidEntity, ITenantEntity
 {
     public string Titulo { get; private set; } = string.Empty;
     public string? Contenido { get; private set; }
@@ -16,7 +16,7 @@ public class Documento : BaseGuidEntity
     public Guid ExpedienteId { get; private set; }
     public Expediente? Expediente { get; private set; }
 
-    public Guid OrganizationId { get; private set; }
+    public Guid? OrganizationId { get; private set; }
     public Organizacion? Organizacion { get; private set; }
 
     private Documento() { }

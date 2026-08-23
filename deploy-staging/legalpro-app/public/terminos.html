@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Términos y Condiciones — LegalPro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            legal: {
+              bg: '#050508',
+              panel: '#080d14',
+              cyan: '#06B6D4',
+              gold: '#C9A84C',
+              glass: 'rgba(255,255,255,0.03)',
+              border: 'rgba(255,255,255,0.08)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #050508; color: #e5e7eb; font-family: 'Inter', sans-serif; }
+    .glass {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .glass-strong {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+    .text-cyan-glow { color: #06B6D4; text-shadow: 0 0 20px rgba(6,182,212,0.35); }
+    .text-gold-glow { color: #C9A84C; text-shadow: 0 0 20px rgba(201,168,76,0.30); }
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .prose-legal h2 { color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; font-size: 1.25rem; border-left: 3px solid #06B6D4; padding-left: 10px; }
+    .prose-legal h3 { color: #06B6D4; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.05rem; }
+    .prose-legal p { color: rgba(255,255,255,0.72); line-height: 1.75; margin-bottom: 0.75rem; text-align: justify; }
+    .prose-legal ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+    .prose-legal li { color: rgba(255,255,255,0.72); line-height: 1.7; margin-bottom: 0.35rem; }
+    .prose-legal a { color: #06B6D4; text-decoration: underline; text-underline-offset: 3px; }
+    .prose-legal a:hover { color: #22d3ee; }
+    .prose-legal strong { color: #fff; font-weight: 600; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/landing/index.html" class="flex items-center gap-3">
+        <img src="/landing/assets/img/logo-icon.jpeg" alt="LegalPro" class="w-9 h-9 rounded-lg object-contain" style="box-shadow: 0 0 18px rgba(6,182,212,0.35);" />
+        <div>
+          <div class="text-white font-display font-extrabold text-lg tracking-tight">Legal<span class="text-cyan-glow">Pro</span></div>
+          <div class="text-[10px] text-white/40 uppercase tracking-[0.15em]">Plataforma Legal IA</div>
+        </div>
+      </a>
+      <div class="hidden md:flex items-center gap-6 text-sm text-white/50">
+        <a href="/terminos.html" class="text-white/80 hover:text-cyan-400 transition-colors">Términos</a>
+        <a href="/privacidad.html" class="hover:text-cyan-400 transition-colors">Privacidad</a>
+        <a href="/login" class="px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold hover:bg-cyan-500/20 transition-all">Ingresar</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero mini -->
+  <header class="pt-32 pb-12 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(6,182,212,0.08), transparent 70%);"></div>
+    <div class="max-w-3xl mx-auto text-center relative">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/8 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-5">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+        Documento legal vinculante — legislación peruana
+      </div>
+      <h1 class="section-title text-3xl md:text-4xl text-white mb-4">Términos y Condiciones de Uso</h1>
+      <p class="text-white/50 text-sm max-w-xl mx-auto font-display">Al acceder o utilizar LegalPro, usted acepta estos términos en su totalidad. Lea atentamente antes de continuar.</p>
+      <div class="mt-6 text-[11px] text-white/30">Última actualización: <span class="text-white/60">21 de mayo de 2026</span></div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="max-w-3xl mx-auto px-6 pb-24">
+    <article class="glass-strong rounded-2xl p-8 md:p-10 prose-legal">
+      <h2>1. Objeto del Servicio y Naturaleza Legal</h2>
+      <p><strong>LegalPro</strong> (operado por LegalPro S.A.C., con R.U.C. N° 20601234567) es una plataforma de software como servicio (SaaS) que proporciona herramientas basadas en Inteligencia Artificial (IA) orientadas al sector legal de la República del Perú. Los servicios proporcionados incluyen asistencia en análisis de expedientes, redacción preliminar de escritos judiciales, predicción de tendencias jurisprudenciales, simulación de juicios orales conforme al Nuevo Código Procesal Penal (NCPP), monitorización de notificaciones del SINOE del Poder Judicial y optimización de cláusulas contractuales.</p>
+      <p><strong>DECLARACIÓN DE EXCLUSIÓN DE EJERCICIO PROFESIONAL:</strong> LegalPro no es un estudio de abogados, no brinda asesoría jurídica personalizada, no ejerce el patrocinio judicial ni sustituye en circunstancia alguna el juicio y criterio técnico de un profesional del derecho calificado y colegiado en el Perú. La plataforma actúa estrictamente como un <em>asistente cognitivo tecnológico complementario</em>.</p>
+
+      <h2>2. Responsabilidad Profesional y Deber de Validación Técnica</h2>
+      <p>De conformidad con el artículo 290 de la Ley Orgánica del Poder Judicial, el artículo 132 del Código Procesal Civil y el artículo IX del Título Preliminar del Código Procesal Penal de la República del Perú, la defensa técnica y la redacción final de escritos judiciales o contratos son de responsabilidad exclusiva del abogado patrocinante firmante.</p>
+      <p>Por lo tanto, el usuario reconoce y acepta de manera expresa que:</p>
+      <ul>
+        <li>Todos los documentos, cláusulas contractuales, análisis y sugerencias generados por la IA de LegalPro son <strong>borradores orientativos y no definitivos</strong>.</li>
+        <li>El usuario tiene la <strong>obligación legal y ética ineludible</strong> de revisar, corregir, validar y contrastar con fuentes normativas, doctrinales y jurisprudenciales oficiales (tales como El Peruano, el SPIJ, jurisprudencia vinculante de la Corte Suprema o del Tribunal Constitucional) cualquier resultado obtenido antes de su presentación ante órganos judiciales, administrativos, arbitrales o su suscripción por particulares.</li>
+        <li>La falta de revisión de los borradores generados por la plataforma constituye una negligencia profesional directa del usuario y una manifestación de <strong>"hecho propio de la víctima o de un tercero"</strong> conforme al artículo 1972 del Código Civil peruano, lo cual fractura cualquier nexo de causalidad imputable a LegalPro S.A.C.</li>
+      </ul>
+
+      <h2>3. Registro, Perfil de Usuario y Obligación de Veracidad</h2>
+      <p>Para registrarse en la plataforma, el usuario debe ser una persona natural mayor de edad (18 años o más), con plena capacidad civil en el Perú. Al crear una cuenta, el usuario garantiza que toda la información suministrada es veraz y actualizada. Se prohíbe el uso de identidades falsas o la suplantación de identidad de otros profesionales u operadores de justicia (fiscales, jueces, secretarios). Cualquier infracción a este punto facultará a LegalPro a la cancelación inmediata de la cuenta y, de corresponder, a la interposición de las acciones penales por el delito de falsedad genérica (Art. 438 del Código Penal peruano) o fraude informático.</p>
+
+      <h2>4. Planes, Tarifas, Facturación e Impuestos</h2>
+      <p>El uso de la plataforma se rige bajo suscripciones mensuales o anuales descritas en la sección de planes:</p>
+      <ul>
+        <li><strong>Plan Free:</strong> Límite de 3 usuarios y 5 expedientes, acceso a funciones básicas y volumen limitado de créditos de IA.</li>
+        <li><strong>Plan Pro:</strong> Límite de 15 usuarios y 200 expedientes, acceso a modelos de lenguaje avanzados, monitorización automatizada de SINOE y soporte prioritario. Tarifa de S/ 99.00 PEN (Soles peruanos) al mes, más el Impuesto General a las Ventas (IGV - 18%).</li>
+        <li><strong>Plan Enterprise:</strong> Usuarios e integrantes ilimitados, integraciones personalizadas vía API, SLA garantizado y entrenamiento corporativo dedicado. Precio sujeto a cotización formal.</li>
+      </ul>
+      <p>De conformidad con las leyes tributarias del Perú, todas las operaciones de pago electrónico generan la emisión del comprobante de pago electrónico correspondiente (boleta de venta o factura electrónica), la cual se enviará al correo registrado por el usuario. Los cobros son recurrentes y pueden cancelarse en cualquier momento previo al siguiente periodo de facturación.</p>
+
+      <h2>5. Firmas y Certificados Digitales (Ley N° 27269)</h2>
+      <p>La plataforma LegalPro puede integrar herramientas que faciliten la suscripción de acuerdos o aprobaciones internas mediante mecanismos electrónicos. En virtud de la <strong>Ley N° 27269 (Ley de Firmas y Certificados Digitales)</strong> y su Reglamento aprobado por D.S. N° 052-2008-PCM:</p>
+      <ul>
+        <li>Las firmas generadas directamente a través de las interfaces de LegalPro se considerarán como <strong>Firmas Electrónicas</strong> (simples o avanzadas), poseyendo plena validez jurídica para la manifestación de voluntad entre las partes de conformidad con el artículo 141-A del Código Civil peruano, siempre que medie acuerdo previo o aceptación tácita de los firmantes.</li>
+        <li>Es responsabilidad exclusiva del usuario verificar si la naturaleza del contrato o acto jurídico requiere una <strong>Firma Digital</strong> emitida por un Prestador de Servicios de Certificación Digital debidamente acreditado ante el INDECOPI, exonerando a LegalPro S.A.C. de toda validez o nulidad que pudiera alegarse judicialmente por el uso de firmas no aptas para el tipo de acto jurídico.</li>
+      </ul>
+
+      <h2>6. Propiedad Intelectual</h2>
+      <p>Todos los componentes del software, diseños, logotipos, marcas comerciales, código de programación, arquitectura de datos y algoritmos de IA estructurados en LegalPro son propiedad intelectual exclusiva de LegalPro S.A.C. y se encuentran protegidos por el Decreto Legislativo N° 822 (Ley sobre el Derecho de Autor de la República del Perú) y la Decisión 351 de la Comunidad Andina.</p>
+      <p>Con relación al contenido ingresado por los usuarios y el material generado:</p>
+      <ul>
+        <li>El usuario retiene en todo momento los derechos de propiedad intelectual sobre los datos, documentos y expedientes cargados a la plataforma.</li>
+        <li>Los documentos redactados con el soporte de la IA pertenecen al usuario, quien asume el riesgo total de su propiedad y originalidad.</li>
+        <li>El usuario concede a LegalPro S.A.C. una licencia no exclusiva, gratuita y temporal, limitada estrictamente a procesar, indexar, anonimizar y estructurar la información ingresada con la única finalidad de prestar los servicios solicitados y mejorar la precisión del sistema local de IA, bajo estrictas reglas de confidencialidad descritas en nuestra <a href="/privacidad.html">Política de Privacidad</a>.</li>
+      </ul>
+
+      <h2>7. Limitación de Responsabilidad Civil y Penal</h2>
+      <p><strong>CONFORME A LA LEGISLACIÓN PERUANA:</strong></p>
+      <ul>
+        <li><strong>Ruptura del Nexo Causal (Art. 1972 Código Civil):</strong> LegalPro S.A.C. no será responsable civilmente por daños directos, indirectos, lucro cesante o pérdida de oportunidades procesales derivadas de sentencias desfavorables, multas judiciales, nulidades de actos jurídicos o resoluciones administrativas perjudiciales que resulten del uso de documentos generados por la IA. El profesional legal actúa como un filtro técnico decisor indispensable.</li>
+        <li><strong>Exclusiones de Responsabilidad Penal:</strong> La plataforma proporciona una herramienta tecnológica y no tiene control directo sobre el uso final de los textos generados. LegalPro S.A.C., sus directores y desarrolladores quedan exentos de toda responsabilidad penal derivada del delito de estafa procesal (Art. 416 del Código Penal), fraude en la administración de personas jurídicas o cualquier otro delito originado por documentos redactados o modificados con auxilio de la IA que contengan información falsa, inexacta o fraudulenta proporcionada voluntaria o involuntariamente por el usuario.</li>
+      </ul>
+
+      <h2>8. Cumplimiento de Normativa de Datos Personales (Ley N° 29733)</h2>
+      <p>LegalPro S.A.C. garantiza que el tratamiento de los datos ingresados se realiza en estricto cumplimiento de la Ley N° 29733, su Reglamento y las directrices de la Autoridad Nacional de Protección de Datos Personales (ANPD). Para mayor detalle sobre el ejercicio de sus derechos de Acceso, Rectificación, Cancelación y Oposición, revise nuestra <a href="/privacidad.html">Política de Privacidad</a>.</p>
+
+      <h2>9. Ley Aplicable, Jurisdicción y Resolución de Conflictos</h2>
+      <p>Los presentes Términos y Condiciones se rigen e interpretan exclusivamente de conformidad con las leyes de la República del Perú. Para la resolución de cualquier controversia, discrepancia o reclamación derivada de la interpretación, ejecución o resolución de este contrato, las partes acuerdan prorrogar voluntariamente la competencia territorial a favor de los <strong>Jueces y Tribunales del Distrito Judicial de Lima Cercado (jurisdicción Lima, Perú)</strong>, renunciando expresamente a cualquier otro fuero que por razón de domicilio u otro factor pudiera corresponderles.</p>
+
+      <h2>10. Modificaciones de los Términos</h2>
+      <p>LegalPro se reserva el derecho de modificar o actualizar estos Términos y Condiciones en cualquier momento para adecuarse a cambios legislativos, jurisprudenciales o del mercado tecnológico en el Perú. Toda actualización relevante será comunicada al usuario con un mínimo de quince (15) días calendario de anticipación a través del correo electrónico registrado o mediante notificaciones destacadas dentro de la plataforma.</p>
+
+      <h2>11. Canales de Atención y Contacto</h2>
+      <p>Para consultas, aclaraciones o reportes relacionados con estos Términos, los usuarios pueden comunicarse a través de los siguientes canales oficiales:</p>
+      <ul>
+        <li><strong>Correo electrónico:</strong> <a href="mailto:legal@legalpro.pe">legal@legalpro.pe</a></li>
+        <li><strong>Dirección física:</strong> Av. Javier Prado Este 123, San Isidro, Lima, Perú.</li>
+      </ul>
+      <p class="text-white/40 text-xs mt-8">LegalPro S.A.C. — R.U.C. 20601234567. Todos los derechos reservados conforme a la legislación peruana.</p>
+    </article>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-8 px-6 text-center">
+    <p class="text-white/25 text-xs">© 2026 LegalPro S.A.C. Todos los derechos reservados.</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,3150 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "edit": "allow",
+    "write": "allow",
+    "read": "allow",
+    "bash": "allow",
+    "webfetch": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "task": {
+      "*": "allow"
+    },
+    "todowrite": "allow",
+    "skill": "allow"
+  },
+  "agent": {
+    "build": {
+      "description": "Built-in default agent with full tool access (alias para compatibilidad)",
+      "mode": "primary",
+      "temperature": 0.2,
+      "steps": 100,
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "plan": {
+      "description": "Built-in agent for analysis without code changes (alias para compatibilidad)",
+      "mode": "primary",
+      "temperature": 0.1,
+      "steps": 80,
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "lexia-orchestrator": {
+      "description": "Orquestador PRIMARY de LegalPro LexIA Peru - UNICO agente primary custom. Clasifica consultas, delega a 132 subagents especializados via @task, coordina resultados cross-rama, valida disclaimers IA.",
+      "mode": "primary",
+      "temperature": 0.2,
+      "steps": 200,
+      "color": "#0F172A",
+      "prompt": "{file:./.opencode/agents/lexia-orchestrator.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-chief": {
+      "description": "Abogado Chief - Estratega +15 anos, coordina todos los abogados del arnes, aprueba casos complejos cross-rama, veto tecnico final, firma releases legales.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/abogado-chief.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-administrativo": {
+      "description": "Abogado Junior Administrativo - TUO Ley 27444, procedimiento administrativo general, recursos, sanciones, silencio administrativo. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-administrativo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-ambiental": {
+      "description": "Abogado Junior Ambiental - especialista en OEFA, MINAM, delitos ambientales, EIA, recursos naturales. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-ambiental.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-amparo": {
+      "description": "Abogado Junior Amparo - procesos constitucionales ante el TC, amparo, habeas corpus, habeas data, accion popular. Reporta a @abogado-senior-constitucional.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-amparo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-arbitraje": {
+      "description": "Abogado Junior Arbitraje - D.Leg. 1071, laudos, anulacion, centros de arbitraje, conciliacion extrajudicial. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-arbitraje.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-civil": {
+      "description": "Abogado Junior Civil - obligaciones, contratos, propiedad, posesion, prescripcion adquisitiva, sucesiones. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-civil.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-comercial": {
+      "description": "Abogado Junior Comercial - sociedades (LGS), contratos mercantiles, titulos valores. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-comercial.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-compliance": {
+      "description": "Abogado Junior Compliance - prevencion LA/FT (D.Leg. 1249), UIF, SBS, modelos de prevencion, OFAC, ONU. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-compliance.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-concursal": {
+      "description": "Abogado Junior Concursal - Ley 27809, INDECOPI concursal, quiebra, reorganizacion, refinanciamiento. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-concursal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-consumidor": {
+      "description": "Abogado Junior Consumidor - Ley 29571, INDECOPI, reclamos, productos defectuosos, publicidad enganosa. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-consumidor.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-crimen-organizado": {
+      "description": "Abogado Junior Crimen Organizado - Ley 30077, organizaciones criminales, lavado, narcotrafico,Trata, trata de personas. Reporta a @abogado-senior-penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-crimen-organizado.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-educacion": {
+      "description": "Abogado Junior Educacion - Ley 28044, MINEDU, SUNEDU, sanciones docentes, derechos universitarios. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-educacion.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-familia": {
+      "description": "Abogado Junior Familia - especialista en alimentos, divorcio, tenencia, violencia familiar, adopcion. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-familia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-laboral-colectivo": {
+      "description": "Abogado Junior Laboral Colectivo - negociacion colectiva, huelga, sindicato, libertad sindical, fuero sindical. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-laboral-colectivo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-laboral-individual": {
+      "description": "Abogado Junior Laboral Individual - contratacion, despidos, indemnizaciones, hostilidad, reposicion, CTS (D.L. 650), gratificaciones (Ley 27735), vacaciones. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-laboral-individual.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-procesal-laboral": {
+      "description": "Abogado Junior Procesal Laboral - demanda laboral, audiencia unica, carga probatoria (inversion), apelacion, ejecucion. Normas: Ley 29497 (NLPT). Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-procesal-laboral.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-transparencia": {
+      "description": "Abogado Junior Transparencia y Acceso a la Informacion Publica - Ley 27806, TUO D.S. 021-2019-JUS, transparencia activa y pasiva, TTAIP/ANTAIP, amparo conexo. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-transparencia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-pueblos-indigenas": {
+      "description": "Abogado Junior Pueblos Indigenas y Consulta Previa - Convenio 169 OIT, Ley 29785, comunidades campesinas y nativas, conocimientos colectivos, territorios. Reporta a @abogado-senior-publico (cross con mineria/energia).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-pueblos-indigenas.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-energetico": {
+      "description": "Abogado Junior Energetico - sector electrico (Ley 25844 + Reglamento) y gas natural (Ley 27133), Ley 28832, Ley 26876, D.S. 026-2016-EM, COES/OSINERGMIN, tarifas y concesiones. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-energetico.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-sst": {
+      "description": "Abogado Junior Seguridad y Salud en el Trabajo (SST) - Ley 29783, D.S. 005-2012-TR, D.S. 024-2016-EM, CP art. 168-A, fiscalizaciones SUNAFIL. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-sst.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-contencioso-administrativo": {
+      "description": "Abogado Junior Contencioso Administrativo - Ley 27584, TUO D.S. 011-2021-JUS, CPC supletorio, plazos de caducidad, medidas cautelares, agotamiento de via administrativa. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-contencioso-administrativo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-tributario-municipal": {
+      "description": "Abogado Junior Tributario Municipal - D.L. 776 (TUO tributacion municipal), impuesto predial, alcabala, arbitrios, impuesto vehicular, reclamaciones ante municipalidad y Tribunal Fiscal. Reporta a @abogado-senior-tributario.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-tributario-municipal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-registral": {
+      "description": "Abogado Junior Registral - SUNARP, Ley 26366, TUO D.S. 126-2012-JUS, inmatriculacion, observaciones y tachas, COFOPRI, SBN, derechos registrales. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-registral.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-ia-tecnologia": {
+      "description": "Abogado Junior IA y Tecnologia - Ley 31814 (IA), D.L. 1412 (gobierno digital), Ley 27269 (firma electronica), criptoactivos, plataformas digitales, Reglamento UE IA como referente. Reporta a @abogado-senior-constitucional.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-ia-tecnologia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-migratorio": {
+      "description": "Abogado Junior Migratorio - D.Leg. 1350, MIGRACIONES, visas, residencia, refugio, sanciones. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-migratorio.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-mineria-energia": {
+      "description": "Abogado Junior Mineria y Energia - TUO 014-92-EM, OSINERGMIN, INGEMMET, canon minero, regalías. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-mineria-energia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-notarial": {
+      "description": "Abogado Junior Notarial y Registral - Ley del Notariado (D.Leg. 1049), SUNARP, Colegio de Notarios. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-notarial.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-penal": {
+      "description": "Abogado Junior Penal sustantivo - tipicidad, antijuridicidad, culpabilidad, eximentes, autores, participes. Reporta a @abogado-senior-penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-penal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-penal-economico": {
+      "description": "Abogado Junior Penal Economico - especialista en lavado de activos, corrupcion, peculado, colusion, concusion, enriquecimiento ilicito, mineria ilegal. Reporta a @abogado-senior-penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-penal-economico.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-procesal-penal": {
+      "description": "Abogado Junior Procesal Penal - NCPP, investigacion preparatoria, acusacion, juzgamiento, recursos. Reporta a @abogado-senior-penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-procesal-penal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-propiedad-intelectual": {
+      "description": "Abogado Junior Propiedad Intelectual - especialista en derechos de autor, marcas, patentes, software, lemas comerciales. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-propiedad-intelectual.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-sanitario": {
+      "description": "Abogado Junior Sanitario - Ley 26842, SUSALUD, MINSA, responsabilidad medica, SISCO, conflictos con Establecimientos de Salud.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-sanitario.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-seguridad-social": {
+      "description": "Abogado Junior Seguridad Social - ONP, AFP, EsSalud, SCTR, pensiones, jubilacion. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-seguridad-social.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-trabajo-forzoso": {
+      "description": "Abogado Junior Trabajo Forzoso - CP art. 168-B, explotacion laboral,Trata, MINCETUR, MTPE. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-trabajo-forzoso.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-tributario": {
+      "description": "Abogado Junior Tributario - IGV, IR, SUNAT, Tribunal Fiscal, fiscalizacion tributaria, contencioso tributario. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-tributario.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-senior-civil": {
+      "description": "Abogado Senior Civil - coordina civil, familia, comercial, propiedad intelectual, notarial, consumidor, arbitraje. +10 anos experiencia. Valida outputs de juniors.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/abogado-senior-civil.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "abogado-jr-civil": "allow",
+          "abogado-jr-familia": "allow",
+          "abogado-jr-comercial": "allow",
+          "abogado-jr-consumidor": "allow",
+          "abogado-jr-notarial": "allow",
+          "abogado-jr-propiedad-intelectual": "allow",
+          "abogado-jr-arbitraje": "allow",
+          "abogado-jr-registral": "allow",
+          "abogado-jr-agrario": "allow",
+          "abogado-jr-ejecucion": "allow",
+          "abogado-jr-ciberespacio": "allow",
+          "abogado-jr-cultura": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-senior-constitucional": {
+      "description": "Abogado Senior Constitucional - coordina TC, amparo, habeas corpus, habeas data, control constitucional, control convencional. Valida estrategia procesal constitucional.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/abogado-senior-constitucional.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "abogado-jr-amparo": "allow",
+          "abogado-jr-ia-tecnologia": "allow",
+          "abogado-jr-electoral": "allow",
+          "abogado-jr-internacional": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-senior-empresarial": {
+      "description": "Abogado Senior Empresarial - coordina societario, concursal, titulos valores, contratos mercantiles, compliance corporativo. Valida estrategia empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/abogado-senior-empresarial.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "abogado-jr-comercial": "allow",
+          "abogado-jr-compliance": "allow",
+          "abogado-jr-concursal": "allow",
+          "abogado-jr-bancario": "allow",
+          "abogado-jr-competencia": "allow",
+          "abogado-jr-maritimo": "allow",
+          "abogado-jr-aeronautico": "allow",
+          "abogado-jr-seguros": "allow",
+          "abogado-jr-cooperativo": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-senior-laboral": {
+      "description": "Abogado Senior Laboral - coordina laboral individual, colectivo, seguridad social, migratorio laboral. Valida estrategia procesal laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/abogado-senior-laboral.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "abogado-jr-laboral-colectivo": "allow",
+          "abogado-jr-laboral-individual": "allow",
+          "abogado-jr-procesal-laboral": "allow",
+          "abogado-jr-sst": "allow",
+          "abogado-jr-migratorio": "allow",
+          "abogado-jr-seguridad-social": "allow",
+          "abogado-jr-trabajo-forzoso": "allow",
+          "abogado-jr-extranjeria": "allow",
+          "abogado-jr-previsional": "allow",
+          "abogado-jr-adulto-mayor": "allow",
+          "abogado-jr-discapacidad": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-senior-penal": {
+      "description": "Abogado Senior Penal - coordina penal sustantivo, procesal penal, penal economico, crimen organizado, trabajo forzoso. +12 anos experiencia. Valida estrategia procesal penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/abogado-senior-penal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "abogado-jr-crimen-organizado": "allow",
+          "abogado-jr-penal": "allow",
+          "abogado-jr-penal-economico": "allow",
+          "abogado-jr-procesal-penal": "allow",
+          "abogado-jr-penitenciario": "allow",
+          "abogado-jr-genero": "allow",
+          "abogado-jr-militar": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-senior-publico": {
+      "description": "Abogado Senior Publico - coordina administrativo, tributario, disciplinario, compliance, ambiental, sanitario, educativo, minero. Valida estrategia en derecho publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/abogado-senior-publico.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "abogado-jr-administrativo": "allow",
+          "abogado-jr-ambiental": "allow",
+          "abogado-jr-educacion": "allow",
+          "abogado-jr-transparencia": "allow",
+          "abogado-jr-pueblos-indigenas": "allow",
+          "abogado-jr-energetico": "allow",
+          "abogado-jr-contencioso-administrativo": "allow",
+          "abogado-jr-mineria-energia": "allow",
+          "abogado-jr-tributario": "allow",
+          "abogado-jr-contrataciones": "allow",
+          "abogado-jr-aduanero": "allow",
+          "abogado-jr-telecomunicaciones": "allow",
+          "abogado-jr-pesca": "allow",
+          "abogado-jr-aguas": "allow",
+          "abogado-jr-forestal": "allow",
+          "abogado-jr-datos-personales": "allow",
+          "abogado-jr-municipal": "allow",
+          "abogado-jr-deporte": "allow",
+          "abogado-jr-turismo": "allow",
+          "abogado-jr-policial": "allow",
+          "abogado-jr-sanitario": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "android": {
+      "description": "Android Kotlin/Compose - Hilt, Coroutines+Flow, Retrofit, Supabase SDK, EncryptedSharedPreferences, Room, multi-rol. Cubre LegalProAndroid/.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/android.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "arquitecto-chief": {
+      "description": "Arquitecto Chief del arnes - aprueba ADRs cross-stack, tiene veto tecnico, evalua impacto regulatorio, firma releases.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 150,
+      "prompt": "{file:./.opencode/agents/arquitecto-chief.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "backend-node": "allow",
+          "backend-dotnet": "allow",
+          "frontend": "allow",
+          "android": "allow",
+          "database": "allow",
+          "devops": "allow",
+          "debug": "allow",
+          "sre": "allow",
+          "reviser": "allow",
+          "refutador-arquitectura": "allow",
+          "refutador-performance": "allow",
+          "auditor-seguridad": "allow",
+          "auditor-multi-tenant": "allow",
+          "auditor-performance": "allow",
+          "red-team": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "auditor-accesibilidad": {
+      "description": "Auditor de Accesibilidad - WCAG 2.1 AA con axe-core, ARIA, contraste, focus traps, navegacion por teclado, lectores de pantalla (NVDA/JAWS/VoiceOver/TalkBack).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/auditor-accesibilidad.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "auditor-cost-ia": {
+      "description": "Auditor de Costos IA - coste de MiniMax por request, por org, por mes, optimizacion de modelo (Pro/Flash/Lite), benchmark A/B, alerta de spike.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/auditor-cost-ia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "auditor-legal": {
+      "description": "Auditor Legal - valida citas legales contra catalogs/codigos-leyes.json, detecta alucinaciones en outputs IA, valida plazos procesales, calificaciones juridicas.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/auditor-legal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "auditor-lpdp": {
+      "description": "Auditor LPDP - valida cumplimiento Ley 29733 Proteccion de Datos Personales: consentimientos, retencion, ARCO, transferencia internacional, firma digital, breach notification.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/auditor-lpdp.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "auditor-multi-tenant": {
+      "description": "Auditor Multi-Tenant - detecta IgnoreQueryFilters(), ausencia de ITenantRequest, cross-tenant leaks, valida filtros HasQueryFilter, organization_id en JWT.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/auditor-multi-tenant.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "auditor-performance": {
+      "description": "Auditor de Performance - bundle size (Android, Web), latencia API (p95, p99), query plans (EXPLAIN ANALYZE), coste de tokens MiniMax, Core Web Vitals.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/auditor-performance.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "auditor-seguridad": {
+      "description": "Auditor de Seguridad - ejecuta los 22 verificadores de seguridad, mapea OWASP Top 10, secrets, RLS, RBAC, brute force, rate limit, masking, idempotencia, quota, outbox.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/auditor-seguridad.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "backend-dotnet": {
+      "description": "Backend .NET 9 - ASP.NET Core, EF Core, MediatR/CQRS, FluentValidation, JWT, multi-tenant, RLS, observabilidad OTel. Cubre LegalProBackend_Net/.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/backend-dotnet.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "backend-node": {
+      "description": "Backend Node 20 - Express 5 ESM, Supabase Auth, Railway, multi-tenant, RBAC, Helmet, CORS dinamico, rate limit, idempotencia, sanitizacion IA. Cubre legalpro-app/server/.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/backend-node.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-jr-forense": {
+      "description": "Contador Junior Forense - peritaje contable penal, lavado de activos, investigacion financiera, calculos forenses. Reporta a @contador-senior-tributario.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/contador-jr-forense.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-laboralista": {
+      "description": "Contador Laboralista - especialista en liquidaciones laborales: CTS (D.L. 650), Gratificaciones (Ley 27735), Vacaciones, Utilidades, AFP/ONP, BCRP.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/contador-laboralista.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-senior-laboral": {
+      "description": "Contador Senior Laboral - coordina liquidaciones laborales, CTS, gratificaciones, vacaciones, utilidades, AFP/ONP, BCRP, SCTR, EsSalud. Valida calculos complejos.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/contador-senior-laboral.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "contador-laboralista": "allow",
+          "contador-asistente-laboral": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-senior-tributario": {
+      "description": "Contador Senior Tributario - coordina IGV, IR, SUNAT, PCGE, NIIF, precios de transferencia, peritaje tributario. Valida liquidaciones tributarias complejas.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/contador-senior-tributario.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "contador-jr-forense": "allow",
+          "contador-tributarista": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-tributarista": {
+      "description": "Contador Tributarista - especialista en tributacion peruana: IGV, IR, SUNAT, PCGE, NIIF/NIC, percepciones, retenciones, declaraciones.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/contador-tributarista.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "database": {
+      "description": "Database PostgreSQL 15/Supabase - schemas, migraciones versionadas, RLS, indices, query plans, multi-tenant, soft-delete, audit_log. Cubre SQL/migrations.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/database.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "debug": {
+      "description": "Debug - metodologia 5 pasos para resolver bugs: Reproducir -> Localizar -> Diagnosticar -> Resolver -> Verificar. Catalogo de errores por stack (Android, Node, .NET, Supabase, MiniMax).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/debug.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "devops": {
+      "description": "DevOps - Railway (Node + .NET), Docker multi-stage, GHCR, health checks, env vars, secrets rotation, OTel, k8s (futuro).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/devops.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "docs-writer": {
+      "description": "Docs Writer - mantenimiento de docs: README, ADRs, OpenAPI, runbooks, CHANGELOG, tutoriales, manpages, JSDoc/XML docs, mantener docs sincronizados con codigo.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/docs-writer.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "frontend": {
+      "description": "Frontend React 19 - Vite 7, TailwindCSS 4, React Router 7, Supabase JS, accessibility WCAG 2.1 AA, performance budget. Cubre legalpro-app/src/.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/frontend.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "gobernanza-chief": {
+      "description": "Gobernanza Chief - cumplimiento LPDP, ARCO, INDECOPI, normatividad publicitaria, versionado de docs legales, politicas de uso. Veto de release.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 120,
+      "prompt": "{file:./.opencode/agents/gobernanza-chief.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-analista-expedientes": {
+      "description": "IA Analista de Expedientes - resume hechos, extrae pruebas, detecta nulidades, cita base legal peruana (CPC, NCPP, CC, CP). 5 subtipos: completo, fortalezas/debilidades, riesgos, estrategia, resumen.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/ia-analista-expedientes.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-boveda-evidencia": {
+      "description": "IA Boveda de Evidencia Digital - SHA-256, cadena de custodia, generacion de PDF de custodia (Ley 27269 firma digital).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-boveda-evidencia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-buscador-jurisprudencia": {
+      "description": "IA Buscador de Jurisprudencia - 5 fuentes: PJ (Poder Judicial), TC (Tribunal Constitucional), INDECOPI, SUNARP, MINJUSDH. Con RAG + Google Search grounding.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-buscador-jurisprudencia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-chat-legal": {
+      "description": "IA Chat Legal - chat general con contexto opcional de expediente, soporta los 4 roles, mantiene historial, funciona como asistente juridico general.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-chat-legal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-comparador-precendentes": {
+      "description": "IA Comparador de Precedentes - compara precedentes vinculantes, detecta contradicciones, evalua aplicabilidad al caso concreto.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-comparador-precendentes.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-estrategia-interrogatorio": {
+      "description": "IA Estrategia de Interrogatorio NCPP - plan de preguntas segun NCPP peruano (art. 375, 376), testigo, perito, acusado, agraviado.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-estrategia-interrogatorio.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-generador-alegatos": {
+      "description": "IA Generador de Alegatos de Clausura - alegatos orales y escritos al final del juicio (NCPP art. 387, 388).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-generador-alegatos.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-generador-casos-criticos": {
+      "description": "IA Generador de Casos Criticos - identifica casos urgentes, plazos por vencer, prescripcion, caducidad, medidas cautelares necesarias.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-generador-casos-criticos.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-gestion-multidoc": {
+      "description": "IA Gestion Multidocumento - vista multi-documento por expediente, OCR, extraccion de datos, vinculacion con hechos.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-gestion-multidoc.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-monitor-sinoe": {
+      "description": "IA Monitor SINOE - monitoreo 24/7 del SINOE del Poder Judicial peruano (notificaciones electronicas judiciales).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-monitor-sinoe.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-objeciones": {
+      "description": "IA Asistente de Objeciones en Vivo - sugiere objeciones procesales en tiempo real durante audiencia (CPC art. 300, NCPP art. 352).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-objeciones.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-predictor-judicial": {
+      "description": "IA Predictor Judicial - prediccion basada en +50,000 sentencias (publicitado 94% accuracy), con disclaimers explicitos sobre limites.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-predictor-judicial.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-redactor-escritos": {
+      "description": "IA Redactor de Escritos Legales - genera escritos: demanda, contestacion, apelacion, casacion, amparo, habeas corpus, medida cautelar, acusacion, sobreseimiento, pericial, alegato, con formato del PJ peruano.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/ia-redactor-escritos.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-reporte-retroalimentacion": {
+      "description": "IA Reporte de Retroalimentacion - reporte post-audiencia con feedback para mejora del abogado.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-reporte-retroalimentacion.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-resumen-ejecutivo": {
+      "description": "IA Resumen Ejecutivo del Caso - resumen ejecutivo para cliente/socio del estudio, no tecnico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-resumen-ejecutivo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ia-simulador-juicios": {
+      "description": "IA Simulador de Juicios - simula audiencias orales con IA actuando como contraparte (Juez/Fiscal/Testigo/Abogado). Loop de turnos con puntuacion.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ia-simulador-juicios.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "integraciones-peru": {
+      "description": "Integraciones Peru - mock-first para APIs de PJ (Poder Judicial), TC, SUNARP, SUNAT, INDECOPI, BCRP, ANPDP, MINJUS. Integracion real cuando exista API publica.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/integraciones-peru.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "journey-tester": {
+      "description": "Journey Tester - orquesta journeys cross-stack (Playwright + server integration + Android UI), valida flujos por rol (ABOGADO/FISCAL/JUEZ/CONTADOR), RBAC end-to-end.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/journey-tester.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "legal-civilista": {
+      "description": "Legal Civilista - especialista en derecho civil peruano (CC, CPC). Obligaciones, contratos, propiedad, familia, sucesiones, responsabilidad civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/legal-civilista.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "legal-constitucionalista": {
+      "description": "Legal Constitucionalista - especialista en derecho constitucional peruano (Const. 1993, TC, habeas corpus, amparo, habeas data, accion popular, accion de inconstitucionalidad).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/legal-constitucionalista.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "legal-fiscalista": {
+      "description": "Legal Fiscalista - especialista en derecho penal desde perspectiva del Ministerio Publico (Fiscalia). Tipicidad, acusacion, estrategia de investigacion, NCPP.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/legal-fiscalista.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "legal-laboralista": {
+      "description": "Legal Laboralista - especialista en derecho laboral peruano (LPCL, CPCL, D.L. 650 CTS, Ley 27735 Gratificaciones, AFP/ONP, MTPE).",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/legal-laboralista.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "legal-penalista": {
+      "description": "Legal Penalista - especialista en derecho penal peruano (CP, NCPP). Delitos contra el patrimonio, vida, libertad, seguridad publica, delitos economicos.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/legal-penalista.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "localization": {
+      "description": "Localization - i18n, es-PE (principal), aymara/quechua (futuro), formatos fecha/moneda, formatos judiciales peruanos, pluralizacion, encoding UTF-8.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/localization.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "marketing-growth": {
+      "description": "Marketing & Growth - landing, conversion, A/B testing, SEO, SEM, email marketing, embudos, metricas de activacion, contenido.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/marketing-growth.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "onboarding-mentor": {
+      "description": "Onboarding Mentor - asistente para nuevos devs (estudiantes, pasantes): tour guiado del proyecto, glosario, FAQ, recursos de aprendizaje, primeros pasos.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/onboarding-mentor.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "owner-admin": {
+      "description": "Owner Admin - administrador SaaS de LegalPro, gestiona tenants, planes, facturacion, monitor de plataforma. Acceso E2EE con OWNER_SECRET_KEY + OWNER_DECRYPTION_SECRET.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/owner-admin.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "planner-chief": {
+      "description": "Planner Chief - genera roadmaps trimestrales, dependencias cross-equipo, metricas de salud, planificacion MoSCoW, planificacion MoSCoW, M/L/XL. Vision temporal del proyecto.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 120,
+      "prompt": "{file:./.opencode/agents/planner-chief.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "plataforma-finanzas": {
+      "description": "Plataforma Finanzas - gestion costos IA, precios, MRR, forecasting, optimizacion de margen, alertas de costo, ROI por tenant.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/plataforma-finanzas.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "product-owner": {
+      "description": "Product Owner - PRDs, Definition of Done, priorizacion RICE/ICE, valor de negocio, feedback de usuarios, metricas de adopcion.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/product-owner.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "prompt-engineer": {
+      "description": "Prompt Engineer - optimiza prompts MiniMax: latencia, costo, calidad. Eval-set testing, A/B benchmark, calibracion de temperatura, regression prevention.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/prompt-engineer.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "red-team": {
+      "description": "Red Team - simulacion atacante real (state-sponsored, criminal organizado, insider malicioso). Pentest mental exhaustivo.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/red-team.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "refutador-arquitectura": {
+      "description": "Refutador Arquitectura - cuestiona decisiones arquitectonicas, busca anti-patrones, deuda tecnica, violaciones SOLID, problemas de mantenibilidad.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/refutador-arquitectura.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "refutador-legal": {
+      "description": "Refutador Legal - intenta encontrar errores juridicos sutiles en citas, plazos, tipificaciones. Cuestiona la jurisprudencia citada.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/refutador-legal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "refutador-lpdp": {
+      "description": "Refutador LPDP - intenta encontrar violaciones a la Ley 29733 que el auditor normal pasa por alto. Cuestiona consentimientos, ARCO, transferencia.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/refutador-lpdp.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "refutador-performance": {
+      "description": "Refutador Performance - intenta romper performance con carga, edge cases, condiciones extremas. Encuentra N+1, queries lentas, leaks de memoria.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/refutador-performance.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "refutador-seguridad": {
+      "description": "Refutador de Seguridad - agente adversarial Red Team. Intenta romper la seguridad, encuentra vulnerabilidades que el auditor normal no detecta. Pentester mental.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/refutador-seguridad.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "release-manager": {
+      "description": "Release Manager - semver, changelog, GitHub Release, sign-off, rollback plan, calendarizacion de releases, hotfixes.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/release-manager.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "reviser": {
+      "description": "Revisor de Codigo - code review continuo con checklist SOLID, DRY, KISS, YAGNI, convenciones del repo, anti-patrones. Se invoca en cada PR.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/reviser.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "smoke-tester": {
+      "description": "Smoke Tester - ejecuta smoke-production.mjs post-deploy y tras migraciones, valida los 5 roles demo, health checks, endpoints criticos.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/smoke-tester.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "soporte-cliente": {
+      "description": "Soporte Cliente - atencion al cliente (tenants), tickets, escalaciones, KB, satisfaction, NPS. Canal: email, chat in-app, formulario web.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/soporte-cliente.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "sre": {
+      "description": "SRE (Site Reliability Engineer) - observabilidad: logs (Serilog, Winston), metricas (Prometheus), trazas (OTel), alertas (Sentry/Datadog), SLOs, runbooks, on-call.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/sre.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "ux-ui": {
+      "description": "UX/UI Designer - diseno centrado en usuario, prototipos, design system, accesibilidad WCAG 2.1 AA, A/B testing UI, user research, heuristicas de Nielsen.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/ux-ui.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-bancario": {
+      "description": "Abogado Junior Bancario - Ley 26702 (Ley General del Sistema Financiero), SBS, creditos, garantias, productos financieros. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-bancario.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-contrataciones": {
+      "description": "Abogado Junior Contrataciones del Estado - Ley 30225, TUO aprobado por D.S. 082-2019-EF, OSCE, Tribunal de Contrataciones, recursos. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-contrataciones.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-aduanero": {
+      "description": "Abogado Junior Aduanero - D.Leg. 1053 (Ley General de Aduanas), SUNAT, clasificacion arancelaria, regimenes aduaneros, infracciones. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-aduanero.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-competencia": {
+      "description": "Abogado Junior Libre Competencia - D.Leg. 1034, INDECOPI, practicas colusorias, abuso de posicion dominante, dumping (D.Leg. 1126), control de concentraciones. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-competencia.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-telecomunicaciones": {
+      "description": "Abogado Junior Telecomunicaciones - Ley 29904, MTC, OSIPTEL, regulacion de servicios, interconexion, portabilidad, sanciones. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-telecomunicaciones.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-electoral": {
+      "description": "Abogado Junior Electoral - JNE, ONPE, RENIEC, Ley 26859 (Ley Organica de Elecciones), Ley 28094 (partidos), financiamiento, vacancia, revocatoria. Reporta a @abogado-senior-constitucional.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-electoral.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-penitenciario": {
+      "description": "Abogado Junior Penitenciario - Codigo de Ejecucion Penal (D.Leg. 654), INPE, beneficios penitenciarios, redencion de pena, regimen carcelario. Reporta a @abogado-senior-penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-penitenciario.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-genero": {
+      "description": "Abogado Junior Violencia de Genero - Ley 30364, femicidio (CP 108-B), medidas de proteccion, trata con fines de explotacion, acoso. Reporta a @abogado-senior-penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-genero.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-extranjeria": {
+      "description": "Abogado Junior Extranjeria - D.Leg. 1350, MIGRACIONES, visas, residencia, calidad migratoria, sanciones. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-extranjeria.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-previsional": {
+      "description": "Abogado Junior Previsional - D.L. 19990 (ONP), D.L. 25897 (AFP), SBS, pensiones, jubilacion, CTS, compensacion por tiempo de servicios. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-previsional.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-maritimo": {
+      "description": "Abogado Junior Maritimo - derecho maritimo-portuario, APN, Ley 27943 (Sistema Portuario Nacional), navegacion, transporte maritimo, contratos de fletamento, conocimiento de embarque. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-maritimo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-aeronautico": {
+      "description": "Abogado Junior Aeronautico - Ley 27261 (Ley de Aeronautica Civil), DGAC, MTC, transporte aereo, responsabilidad del transportador, convenios de Montreal/Varsovia. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-aeronautico.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-agrario": {
+      "description": "Abogado Junior Agrario - D.Leg. 25902, MIDAGRI/MINAGRI, tierras, comunidades campesinas, contratos agrarios, reforma agraria. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-agrario.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-pesca": {
+      "description": "Abogado Junior Pesquero - Ley 25977 (Ley General de Pesca), PRODUCE, SANIPES, cuotas de pesca, licencias, sanciones. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-pesca.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-aguas": {
+      "description": "Abogado Junior de Aguas - Ley 29338 (Ley de Recursos Hidricos), ANA, licencias de uso de agua, derechos de agua, sanciones. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-aguas.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-forestal": {
+      "description": "Abogado Junior Forestal - Ley 29763 (Ley Forestal y de Fauna Silvestre), SERFOR, bosques, concesiones forestales, tala ilegal. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-forestal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-datos-personales": {
+      "description": "Abogado Junior de Proteccion de Datos Personales - Ley 29733, D.S. 016-2024-JUS, ANPDP, ARCO, transferencia internacional, sanciones. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-datos-personales.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-internacional": {
+      "description": "Abogado Junior Internacional - derecho internacional publico y privado, tratados, DIPr (D.Leg. 1776), cooperacion judicial, extradicion, arbitraje internacional. Reporta a @abogado-senior-constitucional.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-internacional.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-municipal": {
+      "description": "Abogado Junior Municipal - Ley 27972 (Ley Organica de Municipalidades), tributos municipales, licencias de funcionamiento, arbitrios, sanciones administrativas. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-municipal.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-ejecucion": {
+      "description": "Abogado Junior de Ejecucion Procesal - ejecucion de sentencias, embargos, remates, ejecucion coactiva, juzgados de ejecucion penal y civil. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-ejecucion.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-seguros": {
+      "description": "Abogado Junior Seguros - Ley 29946 (Contrato de Seguro), SBS, polizas, reclamaciones, siniestros, SOAT, SCTR. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-seguros.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-ciberespacio": {
+      "description": "Abogado Junior Ciberespacio - Ley 30096 (delitos informaticos), Ley 29733 (proteccion de datos), Ley 27269 (firma electronica), contratos electronicos, criptomonedas. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-ciberespacio.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-deporte": {
+      "description": "Abogado Junior Deporte - Ley 28036 (Ley del Deporte), IPD, federaciones deportivas, contratos de jugadores, doping. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-deporte.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-turismo": {
+      "description": "Abogado Junior Turismo - Ley 29408 (Ley General de Turismo), MINCETUR, servicios turisticos, hoteles, agencias de viaje, sanciones. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-turismo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-militar": {
+      "description": "Abogado Junior Militar - D.Leg. 961 (Codigo Penal Militar Policial), D.Leg. 1142 (Codigo de Justicia Militar), fueros privativos, consejos de guerra. Reporta a @abogado-senior-penal.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-militar.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-policial": {
+      "description": "Abogado Junior Policial - Ley 27238 (Ley de la PNP) y D.Leg. 1267, regimen disciplinario policial, sanciones, defensa de efectivos. Reporta a @abogado-senior-publico.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-policial.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-cooperativo": {
+      "description": "Abogado Junior Cooperativo - Ley 26702, Ley 29683 (cooperativas de ahorro y credito), cooperativas en general, SBS, FENACREP. Reporta a @abogado-senior-empresarial.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-cooperativo.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-cultura": {
+      "description": "Abogado Junior Cultura - Ley 28296 (Patrimonio Cultural), MINCU, bienes culturales, proteccion, restitucion, trafico ilicito. Reporta a @abogado-senior-civil.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-cultura.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-adulto-mayor": {
+      "description": "Abogado Junior Adulto Mayor - Ley 30490 (Persona Adulta Mayor), pension 65, proteccion, maltrato, centros de atencion. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-adulto-mayor.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-jr-discapacidad": {
+      "description": "Abogado Junior Discapacidad - Ley 29973 (Persona con Discapacidad), CONADIS, inclusion laboral, ajustes razonables, accesibilidad. Reporta a @abogado-senior-laboral.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-jr-discapacidad.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-asistente-redaccion": {
+      "description": "Asistente de redaccion legal - borradores, estilo forense, citas verificadas. Apoya a todos los abogados. Reporta a @abogado-chief.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-asistente-redaccion.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-asistente-investigacion": {
+      "description": "Asistente de investigacion legal - jurisprudencia, doctrina, normativa, SPIJ, precedentes. Apoya a todos los abogados. Reporta a @abogado-chief.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/abogado-asistente-investigacion.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "abogado-senior-tributario": {
+      "description": "Abogado Senior Tributario - coordina abogado-jr-tributario y contador-tributarista, IGV, IR, SUNAT, Tribunal Fiscal, contencioso tributario. Reporta a @abogado-chief.",
+      "mode": "subagent",
+      "temperature": 0.15,
+      "steps": 80,
+      "prompt": "{file:./.opencode/agents/abogado-senior-tributario.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "abogado-jr-tributario": "allow",
+          "abogado-jr-tributario-municipal": "allow",
+          "contador-tributarista": "allow",
+          "*": "deny"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-chief": {
+      "description": "Contador Chief - estratega contable +15 anos, coordina contadores senior y junior del arnes contable, aprueba liquidaciones complejas cross-area. Reporta a @abogado-chief.",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "steps": 100,
+      "prompt": "{file:./.opencode/agents/contador-chief.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-asistente-forense": {
+      "description": "Asistente contable forense - apoyo en peritajes contables, revision de cifras, trazabilidad de flujos financieros. Apoya a contador-jr-forense. Reporta a @contador-chief.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/contador-asistente-forense.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    },
+    "contador-asistente-laboral": {
+      "description": "Asistente contable laboral - apoyo en liquidaciones laborales: CTS, gratificaciones, vacaciones, utilidades, retenciones. Apoya a contador-senior-laboral. Reporta a @contador-chief.",
+      "mode": "subagent",
+      "temperature": 0.2,
+      "steps": 60,
+      "prompt": "{file:./.opencode/agents/contador-asistente-laboral.md}",
+      "permission": {
+        "edit": "allow",
+        "write": "allow",
+        "read": "allow",
+        "bash": "allow",
+        "webfetch": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "task": {
+          "*": "allow"
+        },
+        "todowrite": "allow",
+        "skill": "allow"
+      }
+    }
+  },
+  "subagent_depth": 2
+}

@@ -1,0 +1,238 @@
+{
+  "metadata": {
+    "nombre": "Funciones del Router de Intenciones del Chat LegalPro / LexIA",
+    "proveedor": "OpenCode Go (DeepSeek V4 Flash) / MiniMax M3 (fallback)",
+    "modelo": "deepseek-v4-flash-free / MiniMax-M3",
+    "version": "1.0.0",
+    "fecha": "2026-08-07",
+    "modo_default": "AUTO",
+    "formato": "functionDeclarations (Gemini-like, consumido por mapTools de providerRouter.js)",
+    "router_skill": ".opencode/skills/enrutamiento-intenciones-chat.md",
+    "reemplaza_a": [
+      "catalogs/minimax-functions.json (referencia rota: el archivo nunca existió)",
+      "catalogs/gemini-functions.json (obsoleto 2026-08-01, solo compatibilidad)"
+    ],
+    "consumidores": [
+      "legalpro-app/server/utils/providerRouter.js (mapTools)",
+      "legalpro-app/server/utils/minimaxClient.js",
+      "legalpro-app/server/routes/ai.js",
+      "legalpro-app/server/routes/documento-chat.js",
+      "legalpro-app/server/routes/plazos.js"
+    ]
+  },
+  "tools": [
+    {
+      "functionDeclarations": [
+        {
+          "name": "redactar_documento",
+          "description": "Redacta un escrito legal peruano (demanda, contestacion, apelacion, casacion, amparo, habeas corpus, medida cautelar, acusacion, sobreseimiento, alegato, requerimiento, resolucion) con formato del PJ y firma digital al exportar (Ley 27269). CUANDO USARLA: el usuario pide generar/redactar/elaborar un escrito, memorial o documento legal, o un texto extenso estructurado con EXPONE/FUNDAMENTOS/PETITORIO/PRUEBA/ANEXOS/FIRMA. CUANDO NO USARLA: consultas cortas de derecho, preguntas de 'que dice la ley', resumen de hechos sin pedido de documento, ni cuando solo se necesita jurisprudencia. Ejecutar via documento-chat.js (POST /api/ai/redactar-documento) con disclaimerAceptado=true.",
+          "parametersJsonSchema": {
+            "type": "object",
+            "properties": {
+              "tipo_documento": {
+                "type": "string",
+                "enum": ["demanda", "contestacion", "apelacion", "casacion", "amparo", "habeas_corpus", "medida_cautelar", "acusacion", "sobreseimiento", "pericial", "alegato", "requerimiento", "resolucion", "reconvencion", "queja", "reposicion", "traslado"],
+                "description": "Tipo de escrito legal a redactar (catalogo canónico)."
+              },
+              "expediente_id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "UUID del expediente en el sistema (opcional, enriquece contexto)."
+              },
+              "materia": {
+                "type": "string",
+                "enum": ["penal", "civil", "laboral", "constitucional", "comercial", "tributario", "administrativo", "familia"],
+                "description": "Materia jurídica del documento."
+              },
+              "hechos": {
+                "type": "string",
+                "description": "Hechos del caso en texto libre (cronológicos, numerados)."
+              },
+              "fundamentos": {
+                "type": "string",
+                "description": "Fundamentos de derecho deseados (opcional, se infieren del catálogo legal)."
+              },
+              "petitorio": {
+                "type": "string",
+                "description": "Pretensión concreta que se solicita (opcional)."
+              },
+              "rol_usuario": {
+                "type": "string",
+                "enum": ["ABOGADO", "FISCAL", "JUEZ", "CONTADOR"],
+                "description": "Rol del usuario autenticado (del JWT)."
+              }
+            },
+            "required": ["tipo_documento", "materia", "hechos"]
+          },
+          "intencion": "REDACTAR_DOCUMENTO",
+          "modo_fc": "AUTO",
+          "agente_destino": "ia-redactor-escritos",
+          "grounding": "catalogs/codigos-leyes.json",
+          "disclaimer_obligatorio": true,
+          "firma_digital_obligatoria_al_exportar": true,
+          "coste_estimado_usd": 0.1
+        },
+        {
+          "name": "calcular_plazo",
+          "description": "Calcula plazos procesales peruanos (CPC art. 144 dias habiles, NCPP, laboral, contencioso) usando catalogs/plazos-procesales.json y utils/feriados.js, con prorroga automatica a siguiente dia habil. CUANDO USARLA: el usuario pregunta 'cuando vence', 'cuantos dias tengo', 'plazo para apelar/contestar', 'dia habil', 'feriado', 'termino procesal', o pide calcular fecha de vencimiento de un acto procesal. CUANDO NO USARLA: preguntas conceptuales de derecho procesal sin pedido de calculo numerico, ni plazos contractuales privados fuera del catalogo. Ejecutar via plazos.js (POST /api/plazos/calcular) con fecha_inicio y plazo_id o acto_procesal.",
+          "parametersJsonSchema": {
+            "type": "object",
+            "properties": {
+              "acto_procesal": {
+                "type": "string",
+                "description": "Nombre del acto procesal (ej: 'apelacion de sentencia civil', 'contestar demanda laboral'). Se resuelve contra catalogs/plazos-procesales.json."
+              },
+              "plazo_id": {
+                "type": "string",
+                "description": "ID directo del plazo en catalogs/plazos-procesales.json (ej: 'apelacion_civil'), alternativo a acto_procesal."
+              },
+              "fecha_inicio": {
+                "type": "string",
+                "format": "date",
+                "description": "Fecha de inicio del computo (YYYY-MM-DD)."
+              },
+              "tipo_plazo": {
+                "type": "string",
+                "enum": ["habil", "calendario", "administrativo"],
+                "default": "habil",
+                "description": "Tipo de computo: habil (CPC art. 144), calendario o administrativo."
+              }
+            },
+            "required": ["fecha_inicio", "acto_procesal"]
+          },
+          "intencion": "CALCULAR_PLAZO",
+          "modo_fc": "AUTO",
+          "agente_destino": "plazos.js (ruta /calcular)",
+          "grounding": "catalogs/plazos-procesales.json",
+          "consentimiento_internacional": false,
+          "coste_estimado_usd": 0.01
+        },
+        {
+          "name": "analizar_expediente",
+          "description": "Analiza un expediente judicial peruano y devuelve un informe estructurado por subtipo: completo, fortalezas_debilidades, riesgos, estrategia, resumen. Extrae hechos, pruebas, nulidades y base legal (CPC, NCPP, CC, CP). CUANDO USARLA: el usuario pide analizar/revisar/estudiar un expediente existente (por expediente_id), 'analizame este caso', 'que fortalezas tiene', 'cuales son los riesgos', 'que estrategia sugieres', 'resumen del expediente'. CUANDO NO USARLA: preguntas generales de derecho, redaccion de escritos nuevos, ni prediccion de resultado (usar predecir_resultado). Ejecutar con RAG (junior-rag-wrapper.mjs) + agente ia-analista-expedientes.",
+          "parametersJsonSchema": {
+            "type": "object",
+            "properties": {
+              "expediente_id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "UUID del expediente en el sistema."
+              },
+              "tipo_analisis": {
+                "type": "string",
+                "enum": ["completo", "fortalezas_debilidades", "riesgos", "estrategia", "resumen"],
+                "description": "Subtipo de analisis a generar."
+              },
+              "rol_usuario": {
+                "type": "string",
+                "enum": ["ABOGADO", "FISCAL", "JUEZ", "CONTADOR"],
+                "description": "Rol del usuario autenticado (del JWT)."
+              }
+            },
+            "required": ["expediente_id", "tipo_analisis"]
+          },
+          "intencion": "ANALIZAR_EXPEDIENTE",
+          "modo_fc": "AUTO",
+          "agente_destino": "ia-analista-expedientes",
+          "grounding": "RAG (junior-rag-wrapper.mjs)",
+          "consentimiento_internacional": true,
+          "necesita_revision_humana": true,
+          "coste_estimado_usd": 0.05
+        },
+        {
+          "name": "buscar_jurisprudencia",
+          "description": "Busca jurisprudencia peruana en 5 fuentes: PJ (Casaciones), TC (Sentencias y precedentes vinculantes), INDECOPI, SUNARP, MINJUSDH. Requiere grounding (RAG / web_search server tool) y validacion de URLs. CUANDO USARLA: el usuario pide jurisprudencia, precedente vinculante, casacion, sentencia, resolucion sobre un tema; 'busca jurisprudencia sobre', 'que ha dicho el TC sobre', 'precedentes sobre'. CUANDO NO USARLA: si no hay intencion de citar jurisprudencia externa (solo derecho general), ni si el usuario pide analizar un expediente (usar analizar_expediente). NUNCA devolver jurisprudencia sin grounding: si no hay resultados reales, decirlo explicitamente. Ejecutar con skill buscar-jurisprudencia (RAG-optimized) + agente ia-buscador-jurisprudencia.",
+          "parametersJsonSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Consulta o terminos de busqueda juridica."
+              },
+              "fuente": {
+                "type": "string",
+                "enum": ["pj", "tc", "indecopi", "sunarp", "minjus", "auto"],
+                "description": "Fuente preferente para filtrar el RAG. Si el usuario menciona 'del TC', 'casaciones', 'de INDECOPI' en el query sin pasar este parametro, el router lo infiere automaticamente. 'auto' = sin filtro (recorre todas las fuentes)."
+              },
+              "materia": {
+                "type": "string",
+                "enum": ["penal", "civil", "laboral", "constitucional", "comercial", "tributario", "administrativo"],
+                "description": "Materia para clasificar la busqueda (opcional)."
+              },
+              "max_resultados": {
+                "type": "integer",
+                "default": 10,
+                "description": "Limite de resultados a devolver."
+              },
+              "fecha_desde": {
+                "type": "string",
+                "format": "date",
+                "description": "Limite inferior de fecha (opcional)."
+              },
+              "solo_vinculantes": {
+                "type": "boolean",
+                "default": false,
+                "description": "Si true, solo precedentes vinculantes TC."
+              }
+            },
+            "required": ["query"]
+          },
+          "intencion": "BUSCAR_JURISPRUDENCIA",
+          "modo_fc": "AUTO",
+          "agente_destino": "ia-buscador-jurisprudencia",
+          "grounding": "RAG + web_search (server tool)",
+          "consentimiento_internacional": true,
+          "filtro_fuente_rag": true,
+          "mapeo_fuente": {
+            "pj": "casaciones-pj-2026.json",
+            "tc": "sentencias-tc-completas-2026.json",
+            "indecopi": "resoluciones-indecopi-2026.json",
+            "sunarp": "directivas-sunarp-2026.json",
+            "minjus": "normas-minjusdh-2026.json",
+            "auto": null
+          },
+          "coste_estimado_usd": 0.03
+        },
+        {
+          "name": "predecir_resultado",
+          "description": "Predice probabilidad de resultado de un caso judicial basado en patrones de +50,000 sentencias (publicitado 94% accuracy). DISCLAIMER OBLIGATORIO: 'Esto NO es una prediccion certera, es un analisis probabilistico basado en sentencias previas'. CUANDO USARLA: el usuario pregunta 'que probabilidad hay', 'vamos a ganar', 'que resultado esperar', 'predice mi caso', 'porcentaje de exito'. CUANDO NO USARLA: preguntas generales de derecho, analisis de expediente sin pedido de probabilidad, ni para manipular mercado/fraude procesal. NUNCA presentar como verdad absoluta; mostrar nivel de confianza (bajo/medio/alto) y sentencias base. Ejecutar con agente ia-predictor-judicial.",
+          "parametersJsonSchema": {
+            "type": "object",
+            "properties": {
+              "expediente_id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "UUID del expediente en el sistema."
+              },
+              "materia": {
+                "type": "string",
+                "enum": ["penal", "civil", "laboral", "constitucional", "comercial", "tributario", "administrativo"],
+                "description": "Materia del caso (opcional, se infiere del expediente)."
+              },
+              "tipo_prediccion": {
+                "type": "string",
+                "enum": ["probabilidad", "fundamentos", "escenarios"],
+                "default": "probabilidad",
+                "description": "Tipo de output: probabilidad numerica, fundamentos de la prediccion, o escenarios posibles."
+              },
+              "rol_usuario": {
+                "type": "string",
+                "enum": ["ABOGADO", "FISCAL", "JUEZ", "CONTADOR"],
+                "description": "Rol del usuario autenticado (del JWT)."
+              }
+            },
+            "required": ["expediente_id"]
+          },
+          "intencion": "PREDECIR_RESULTADO",
+          "modo_fc": "AUTO",
+          "agente_destino": "ia-predictor-judicial",
+          "grounding": "sentencias previas (base de datos +50k)",
+          "disclaimer_obligatorio": true,
+          "disclaimer_texto": "Esto NO es una prediccion certera, es un analisis probabilistico basado en sentencias previas",
+          "consentimiento_internacional": true,
+          "coste_estimado_usd": 0.08
+        }
+      ]
+    }
+  ]
+}

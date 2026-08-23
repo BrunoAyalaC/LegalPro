@@ -15,7 +15,7 @@ import jwt from 'jsonwebtoken';
 
 // ── Configuración de entorno ──────────────────────────────────────────────────
 process.env.JWT_SECRET = 'test-secret-key-12345-very-long-secret-key-for-test-32-chars';
-process.env.GEMINI_API_KEY = 'fake-gemini-key-for-test';
+process.env.MINIMAX_API_KEY = 'fake-minimax-key-for-test';
 
 // ── Mock db (pg Pool) — necesaria para init del servidor ──────────────────────
 vi.mock('../db.js', () => {
@@ -32,6 +32,11 @@ vi.mock('../db.js', () => {
       connect: vi.fn().mockResolvedValue({ query: queryMock, release: vi.fn() }),
       on: vi.fn(),
     },
+    // FIX R-01: las rutas usan `tenantQuery` además de `db.query`,
+    // apuntamos tenantQuery al mismo queryMock para que los tests existentes
+    // sigan mockeando via mockImplementation.
+    tenantQuery: queryMock,
+    tenantContext: { getStore: () => undefined, run: (_ctx, fn) => fn() },
   };
 });
 

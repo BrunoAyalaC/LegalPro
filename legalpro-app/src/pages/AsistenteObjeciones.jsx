@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import AppIcon from '../components/AppIcon';
+import IADisclaimerBanner from '../components/IADisclaimerBanner';
 import { api } from '../api/client';
 
 export default function AsistenteObjeciones() {
@@ -16,7 +17,9 @@ export default function AsistenteObjeciones() {
     try {
       const prompt = `Como asistente de objeciones NCPP, analiza la siguiente declaración o pregunta del oponente y sugiere el tipo de objeción aplicable con el artículo del NCPP correspondiente: ${situacion}`;
       const data = await api.consulta(prompt, 'general');
-      setResultado(typeof data.resultado === 'string' ? data.resultado : JSON.stringify(data.resultado, null, 2));
+      // /api/ai/chat (Node) responde con `respuesta`; se mantiene fallback a `resultado`.
+      const res = data?.respuesta ?? data?.resultado;
+      setResultado(typeof res === 'string' ? res : JSON.stringify(res ?? data, null, 2));
     } catch {
       setError('Error al conectar con el servidor');
     } finally {
@@ -36,6 +39,9 @@ export default function AsistenteObjeciones() {
     <div className="page-enter">
       <Header title="Objeciones en Vivo" showBack rightAction={<span className="badge badge-danger">LIVE</span>} />
       <div className="px-4 py-6 space-y-6">
+        {/* LPDP Art.21: disclaimer obligatorio, no dismissible (regla dura #10) */}
+        <IADisclaimerBanner variant="redactor" dismissible={false} />
+
         <div className="card bg-red-500/10 border-red-500/20 text-center p-6">
           <AppIcon name="front_hand" size={20} />
           <h2 className="text-lg font-bold">Modo Audiencia</h2>
@@ -58,7 +64,7 @@ export default function AsistenteObjeciones() {
           <div className="card bg-primary/10 border-primary/20">
             <div className="flex items-center gap-2 mb-2">
               <AppIcon name="psychology" size={20} />
-              <span className="text-sm font-bold text-primary">Análisis Gemini</span>
+              <span className="text-sm font-bold text-primary">Análisis IA</span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">{resultado}</p>
           </div>
@@ -84,7 +90,7 @@ export default function AsistenteObjeciones() {
           disabled={loading || !situacion.trim()}
         >
           <AppIcon name={loading ? 'sync' : 'mic'} size={20} />
-          {loading ? ' Analizando con Gemini...' : ' Analizar con Gemini'}
+          {loading ? ' Analizando con DeepSeek V4 Flash...' : ' Analizar con IA'}
         </button>
       </div>
     </div>

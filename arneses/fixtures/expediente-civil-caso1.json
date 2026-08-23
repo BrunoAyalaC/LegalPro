@@ -1,0 +1,38 @@
+{
+  "id": "EXP-CIV-001",
+  "numero_expediente": "05678-2025",
+  "materia": "civil",
+  "tipo_proceso": "CPC",
+  "instancia": "JUZGADO",
+  "partes": {
+    "demandante": {
+      "nombre": "[NOMBRE_DEMANDANTE]",
+      "dni": "[DNI_DEMANDANTE]",
+      "calidad": "demandante"
+    },
+    "demandado": {
+      "nombre": "[NOMBRE_DEMANDADO]",
+      "dni": "[DNI_DEMANDADO]",
+      "calidad": "demandado"
+    },
+    "juez": {
+      "nombre": "[NOMBRE_JUEZ]",
+      "juzgado": "5to Juzgado Civil de Lima"
+    }
+  },
+  "hechos": "El demandado suscribió un contrato de compraventa de inmueble por S/ 350,000 el 15-03-2024, pero no cumplió con el pago del precio pactado en la fecha de vencimiento 30-04-2024.",
+  "pretensiones": {
+    "demandante": "Cumplimiento forzado del contrato e indemnizacion por S/ 50,000 (CC art. 1969)"
+  },
+  "pruebas_ofrecidas": [
+    "Contrato de compraventa firmado",
+    "Testigos",
+    "Correos electronicos entre las partes",
+    "Peritaje grafotecnico"
+  ],
+  "calificacion_juridica": "Incumplimiento contractual (CC art. 1350)",
+  "estado": "EN_TRAMITE",
+  "fecha_inicio": "2025-05-10",
+  "abogado_responsable": "USER-ABOG-001",
+  "valor_petitorio": 350000
+}

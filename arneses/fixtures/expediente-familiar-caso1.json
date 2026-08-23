@@ -1,0 +1,28 @@
+{
+  "id": "EXP-FAM-001",
+  "numero_expediente": "02134-2025",
+  "materia": "familia",
+  "tipo_proceso": "CPCL",
+  "instancia": "JUZGADO",
+  "partes": {
+    "demandante": {
+      "nombre": "[NOMBRE_MADRE]",
+      "dni": "[DNI_MADRE]",
+      "calidad": "demandante"
+    },
+    "demandado": {
+      "nombre": "[NOMBRE_PADRE]",
+      "dni": "[DNI_PADRE]",
+      "calidad": "demandado"
+    }
+  },
+  "hechos": "Madre solicita pension de alimentos de S/ 800 mensuales para 2 menores (8 y 5 anos). Padre tiene trabajo estable con ingresos de S/ 5000.",
+  "pretensiones": {
+    "demandante": "Pension de alimentos S/ 800 mensuales (Ley 28439)"
+  },
+  "calculo_recomendado": {
+    "porcentaje_sobre_ingresos_padre": "20-30%",
+    "pension_minima_recomendada": 1000,
+    "incluye": ["alimentacion", "vestimenta", "educacion", "salud", "recreacion"]
+  }
+}

@@ -1,0 +1,240 @@
+# ═══════════════════════════════════════════════════════════════
+# LegalPro - docker-compose.yml
+# Generado por @devops
+# Orquestación local para desarrollo y pruebas
+#
+# Uso:
+#   docker compose up -d                    # Iniciar todos los servicios
+#   docker compose up -d postgres redis     # Solo infraestructura
+#   docker compose logs -f                  # Ver logs
+#   docker compose down -v                  # Detener y borrar volúmenes
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  # ─── PostgreSQL 15 ──────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: legalpro-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: legalpro
+      POSTGRES_PASSWORD: legalpro_dev
+      POSTGRES_DB: legalpro
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./tools/backup:/backup:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U legalpro -d legalpro"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - legalpro-network
+
+  # ─── Redis 7 ────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: legalpro-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - legalpro-network
+
+  # ─── Node.js Backend API (Express) ──────────────────────────
+  node-api:
+    build:
+      context: .
+      dockerfile: legalpro-app/Dockerfile
+    container_name: legalpro-node-api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      APP_VERSION: 6.10.1
+      # Database
+      DATABASE_URL: postgresql://legalpro:legalpro_dev@postgres:5432/legalpro
+      PGSSLMODE: disable
+      PG_POOL_SIZE: 10
+      PG_STATEMENT_TIMEOUT_MS: 30000
+      PG_IDLE_TIMEOUT_MS: 10000
+      # Redis
+      REDIS_URL: redis://redis:6379
+      REDIS_CACHE_TTL: 86400
+      # Auth (development only - rotar en producción)
+      JWT_SECRET: dev-secret-key-32-chars-minimum-length!!
+      JWT_EXPIRY_SECONDS: 3600
+      JWT_REFRESH_EXPIRY_SECONDS: 2592000
+      JWT_ISSUER: LegalProAPI
+      JWT_AUDIENCE: LegalProClients
+      BCRYPT_ROUNDS: 12
+      # MiniMax AI
+      MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
+      MINIMAX_MODEL_DEFAULT: MiniMax-M3
+      MINIMAX_TEMPERATURE_DEFAULT: 0.2
+      MINIMAX_MAX_TOKENS: 8192
+      MINIMAX_QUOTA_ALERT_USD: 500
+      MINIMAX_BASE_URL: https://api.minimax.io/v1
+      # OpenCode Go (proveedor IA principal)
+      OPENCODE_API_KEY: ${OPENCODE_API_KEY:-}
+      OPENCODE_BASE_URL: https://opencode.ai/api/v1
+      OPENCODE_MODEL: deepseek/deepseek-v4-flash-0731
+      OPENCODE_TEMPERATURE: 0.2
+      OPENCODE_MAX_TOKENS: 8192
+      # CORS
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+      COOKIE_DOMAIN: localhost
+      COOKIE_SECURE: "false"
+      COOKIE_SAMESITE: lax
+      # Rate limiting
+      RATE_LIMIT_MINIMAX_RPM: 60
+      RATE_LIMIT_STANDARD_RPM: 120
+      # Stack de pruebas/E2E: límites holgados (un solo IP genera mucho tráfico).
+      RATE_LIMIT_GLOBAL_MAX: 5000
+      AUTH_RATE_LIMIT_MAX: 200
+      BRUTE_FORCE_MAX_ATTEMPTS: 5
+      BRUTE_FORCE_LOCKOUT_MINUTES: 15
+      IDEMPOTENCY_TTL_SECONDS: 86400
+      # Uploads
+      UPLOADS_DIR: /tmp/legalpro-uploads
+      MAX_UPLOAD_SIZE_MB: 50
+      # Integraciones
+      BCRP_API_URL: https://estadisticas.bcrp.gob.pe/estadisticas/series/api
+      BCRP_CACHE_TTL_SECONDS: 86400
+      SUNAT_API_URL: https://api.sunat.gob.pe
+      SUNAT_TIMEOUT_MS: 10000
+      # Observabilidad
+      LOG_LEVEL: debug
+      CORRELATION_ID_HEADER: X-Correlation-Id
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: development
+      SENTRY_TRACES_SAMPLE_RATE: 0.1
+      OTEL_EXPORTER_OTLP_ENDPOINT: ""
+      OTEL_EXPORTER_OTLP_HEADERS: ""
+      # Features
+      FEATURE_IA_LEGAL: "true"
+      FEATURE_FIRMA_DIGITAL: "false"
+      FEATURE_PAGOS_STRIPE: "false"
+      FEATURE_BCRP: "true"
+      FEATURE_SINOE_MOCK: "true"
+      # URLs internas
+      INTERNAL_DOTNET_API_URL: http://legalpro-dotnet:5000
+      INTERNAL_OWNER_DASHBOARD_URL: http://legalpro-owner:3005
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    volumes:
+      - node-uploads:/tmp/legalpro-uploads
+      # Bind-mount del código para iteración rápida en local (sin reconstruir imagen).
+      - ./legalpro-app/server:/app/server:ro
+    networks:
+      - legalpro-network
+
+  # ─── Frontend Web (React + Vite + Nginx) ────────────────────
+  frontend:
+    build:
+      context: ./legalpro-app
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_NODE_API_URL: http://localhost:3001
+        VITE_DOTNET_API_URL: http://localhost:5000
+        VITE_APK_URL: https://github.com/BrunoAyalaC/Abogacia/releases/download/v1.1.0/LegalPro-v1.1.0.apk
+        VITE_APP_VERSION: 6.10.1
+        VITE_APP_NAME: LegalPro
+        VITE_ENV: development
+    container_name: legalpro-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      node-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - legalpro-network
+
+  # ─── .NET Backend API ───────────────────────────────────────
+  # container_name = legalpro-dotnet → coincide con INTERNAL_DOTNET_API_URL
+  # del servicio node-api (http://legalpro-dotnet:5000).
+  dotnet-api:
+    build:
+      context: ./LegalProBackend_Net
+      dockerfile: Dockerfile
+    container_name: legalpro-dotnet
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5000
+      # Requeridos (ver catalogs/env-vars.md)
+      ConnectionStrings__DefaultConnection: postgresql://legalpro:legalpro_dev@postgres:5432/legalpro
+      Jwt__Key: dev-secret-key-32-chars-minimum-length!!
+      Jwt__Issuer: LegalProAPI
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:5173
+      # Opcional (observabilidad)
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - legalpro-network
+
+  # ─── ALTERNATIVA: imágenes publicadas en Docker Hub (sin build local) ──
+  # Tras publicar vía .github/workflows/docker-hub-publish.yml, reemplaza los
+  # bloques `build:` de node-api / frontend / dotnet-api por `image:`:
+  #
+  #   node-api:
+  #     image: brunoayalac/legalpro-node:latest        # en vez de build: context .
+  #   frontend:
+  #     image: brunoayalac/legalpro-frontend:latest    # en vez de build: + args VITE_*
+  #   dotnet-api:
+  #     image: brunoayalac/legalpro-dotnet:latest      # en vez de build: context ./LegalProBackend_Net
+  #
+  # El resto de la configuración (environment, ports, healthcheck, depends_on)
+  # se mantiene idéntica. Tags disponibles: latest, <version> (ej. 0.9.0), sha-<commit>.
+
+networks:
+  legalpro-network:
+    name: legalpro-network
+    driver: bridge
+
+volumes:
+  pgdata:
+    name: legalpro-pgdata
+  redis-data:
+    name: legalpro-redis-data
+  node-uploads:
+    name: legalpro-node-uploads

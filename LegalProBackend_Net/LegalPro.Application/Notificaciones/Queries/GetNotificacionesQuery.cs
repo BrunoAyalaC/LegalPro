@@ -1,4 +1,5 @@
 using MediatR;
+using LegalPro.Application.Common.Behaviours;
 using Microsoft.EntityFrameworkCore;
 using LegalPro.Application.Common.Interfaces;
 using LegalPro.Domain.Exceptions;
@@ -17,7 +18,10 @@ namespace LegalPro.Application.Notificaciones.Queries;
 //     categoría.
 // ═══════════════════════════════════════════════════════
 
-public class GetNotificacionesQuery : IRequest<NotificacionesResult>;
+public class GetNotificacionesQuery : IRequest<NotificacionesResult>, ITenantRequest
+{
+    public Guid OrganizationId => Guid.Empty;
+}
 
 public record NotificacionDto(
     Guid Id,

@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "periodo": "2026-06",
+    "total_registros": 150
+  },
+  "registros": [
+    {
+      "id": "cons-001",
+      "organization_id": "ORG-PRO-001",
+      "user_id": "USR-ABOG-001",
+      "herramienta": "analizar_expediente",
+      "modelo": "gemini-2.5-flash",
+      "tokens_input": 1247,
+      "tokens_output": 583,
+      "costo_usd": 0.0127,
+      "function_name": "analizar_expediente",
+      "created_at": "2026-06-12T10:00:00Z"
+    },
+    {
+      "id": "cons-002",
+      "organization_id": "ORG-PRO-001",
+      "user_id": "USR-FIS-001",
+      "herramienta": "redactar_escrito",
+      "modelo": "gemini-2.5-flash",
+      "tokens_input": 2541,
+      "tokens_output": 1842,
+      "costo_usd": 0.0421,
+      "function_name": "redactar_escrito",
+      "created_at": "2026-06-12T11:15:00Z"
+    },
+    {
+      "id": "cons-003",
+      "organization_id": "ORG-ENT-001",
+      "user_id": "USR-JUEZ-001",
+      "herramienta": "predecir_resultado",
+      "modelo": "gemini-2.5-pro",
+      "tokens_input": 5210,
+      "tokens_output": 873,
+      "costo_usd": 0.0756,
+      "function_name": "predecir_resultado",
+      "created_at": "2026-06-12T14:30:00Z"
+    }
+  ],
+  "totales": {
+    "total_tokens": 7296,
+    "total_costo_usd": 0.1304,
+    "por_herramienta": {
+      "analizar_expediente": 0.0127,
+      "redactar_escrito": 0.0421,
+      "predecir_resultado": 0.0756
+    },
+    "por_modelo": {
+      "gemini-2.5-flash": 0.0548,
+      "gemini-2.5-pro": 0.0756
+    }
+  }
+}

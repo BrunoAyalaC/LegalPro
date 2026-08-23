@@ -1,0 +1,75 @@
+{
+  "cookies": [
+    {
+      "name": "_fbp",
+      "value": "fb.1.1786068660924.899679453516237362",
+      "domain": ".lpderecho.pe",
+      "path": "/",
+      "expires": 1793845410,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_twpid",
+      "value": "tw.1786068660986.673874338387447707",
+      "domain": ".lpderecho.pe",
+      "path": "/",
+      "expires": 1819764671.004262,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "cf_clearance",
+      "value": "oz7FUlUCv0GgR5vvzEQrLkPjVHu8QwFC82cD_fHj3GQ-1786068660-1.2.1.1-sQ_yFOvVU_q2HMxojFdaX8cN1mDN6.kdzkQHA7bGgLUBdNKF2TewpuY23QKhe_IdmzgE6mSgqGNHggL8tgJre79Rb_F8loXfD72Fs6VGr3FKJfFEF1V2bc7xXhG3UL6E17OKBqpcvR08Pc9vfNlMoa6Go0AG1fGhhUsDlWs7nCv7lbFmG9QY.XbEmLuF9KXkFdPQqqpwKNsgJ8xYL1PYT4Vbb6YVPwAoZbfYOS.EoI9xQv1h4nyecMOfgN5wi8SZ6qKoeorhsgroSVQMHufKMmW4g1ovoeI0Ol26YZXaqhqNXTfK4HODkhQoXFvfAXPNUl2z.dAKZaOCTFsdER6YYAvL7ZRm2xNMc8z0BZqvURs",
+      "domain": ".lpderecho.pe",
+      "path": "/",
+      "expires": 1817604661.144299,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "_gcl_au",
+      "value": "1.1.1648613247.1786068661",
+      "domain": ".lpderecho.pe",
+      "path": "/",
+      "expires": 1793844661,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.51198943.1786068662",
+      "domain": ".lpderecho.pe",
+      "path": "/",
+      "expires": 1820629410.580378,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_tt_enable_cookie",
+      "value": "1",
+      "domain": ".lpderecho.pe",
+      "path": "/",
+      "expires": 1819765410,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ttp",
+      "value": "01KZCZSXQ43CG800G1WWBHMB8P_.tt.1",
+      "domain": ".lpderecho.pe",
+      "path": "/",
+      "expires": 1819765410,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

@@ -2,11 +2,11 @@
 
 ## Cuándo usar
 
-Cuando necesites implementar o mejorar la generación de escritos legales usando Google Gemini SDK (`@google/genai`) con Function Calling.
+Cuando necesites implementar o mejorar la generación de escritos legales usando MiniMax AI SDK (`minimaxClient.js`) con Function Calling.
 
 ## Tipos de Escritos
 
-| Tipo                 | Quién lo usa | Función Gemini                        |
+| Tipo                 | Quién lo usa | Función MiniMax                        |
 | -------------------- | ------------ | ------------------------------------- |
 | Demanda              | ABOGADO      | `redactar_escrito` tipo=demanda       |
 | Contestación         | ABOGADO      | `redactar_escrito` tipo=contestacion  |
@@ -18,12 +18,12 @@ Cuando necesites implementar o mejorar la generación de escritos legales usando
 | Resolución judicial  | JUEZ         | `redactar_escrito` tipo=resolucion    |
 | Informe pericial     | CONTADOR     | `redactar_escrito` tipo=pericial      |
 
-## Implementación con Gemini SDK
+## Implementación con MiniMax SDK
 
 ```javascript
-import { GoogleGenAI, FunctionCallingConfigMode } from "@google/genai";
+import { GoogleGenAI, FunctionCallingConfigMode } from '../utils/minimaxClient.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.MINIMAX_API_KEY });
 
 const redactarEscritoDecl = {
   name: "redactar_escrito",
@@ -70,7 +70,7 @@ const redactarEscritoDecl = {
 };
 
 const response = await ai.models.generateContent({
-  model: "gemini-2.5-flash",
+  model: "MiniMax-M3",
   contents: `Redacta una ${tipo} para el caso: ${hechos}`,
   config: {
     systemInstruction:
@@ -87,8 +87,8 @@ const response = await ai.models.generateContent({
 
 1. Usuario selecciona tipo de escrito en app Android
 2. App envía request → Backend Railway
-3. Backend llama Gemini con Function Calling
-4. Gemini analiza y genera el escrito
+3. Backend llama MiniMax con Function Calling
+4. MiniMax analiza y genera el escrito
 5. Backend guarda en Supabase Storage
 6. App muestra preview y permite editar/descargar
 

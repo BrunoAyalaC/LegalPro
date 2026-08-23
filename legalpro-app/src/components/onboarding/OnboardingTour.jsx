@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, ChevronLeft, ChevronRight, SkipForward,
@@ -33,7 +34,7 @@ const TOURS = {
       target: '[data-tour="redactor"]',
       title: 'Redactor de Escritos con IA',
       description:
-        'Genera demandas, apelaciones y recursos en segundos con Google Gemini. El asistente conoce el CPC, NCPP y jurisprudencia peruana.',
+        'Genera demandas, apelaciones y recursos en segundos con DeepSeek V4 Flash. El asistente conoce el CPC, NCPP y jurisprudencia peruana.',
       icon: PenLine,
       position: 'right',
     },
@@ -211,25 +212,34 @@ function computeTooltipStyle(rect, position, tooltipWidth = 320) {
 ─────────────────────────────────────────────────────────── */
 const TOUR_STORAGE_KEY = 'legalpro_tour_completed';
 
+/** Rutas inmersivas donde el tour no debe bloquear la UI (chat, simulador, etc.) */
+const IMMERSIVE_ROUTES = ['/chat-ia', '/simulador', '/redactor', '/analista'];
+
 export default function OnboardingTour({ role = 'ABOGADO' }) {
+  const location = useLocation();
   const steps = TOURS[role] ?? TOURS.ABOGADO;
+  const isImmersive = IMMERSIVE_ROUTES.some((r) => location.pathname.startsWith(r));
 
   /* Estado */
   const [active, setActive]   = useState(false);
   const [step, setStep]       = useState(0);
   const [rects, setRects]     = useState({});
 
-  /* Determinar si el usuario ya completó el tour */
+  /* Solo iniciar tour en dashboard (no bloquear chat u otras vistas) */
   useEffect(() => {
     try {
       const done = localStorage.getItem(TOUR_STORAGE_KEY);
-      if (!done) {
-        /* Pequeño delay para que el DOM esté listo */
+      if (!done && location.pathname === '/dashboard') {
         const t = setTimeout(() => setActive(true), 1200);
         return () => clearTimeout(t);
       }
     } catch { /* ignore */ }
-  }, []);
+  }, [location.pathname]);
+
+  /* Ocultar overlay si el usuario navega a una ruta inmersiva durante el tour */
+  useEffect(() => {
+    if (active && isImmersive) setActive(false);
+  }, [active, isImmersive]);
 
   /* Recalcular rects cuando cambia el step o el tamaño */
   const recalcRect = useCallback(() => {
@@ -282,7 +292,7 @@ export default function OnboardingTour({ role = 'ABOGADO' }) {
     if (step > 0) setStep(s => s - 1);
   }, [step]);
 
-  if (!active) return null;
+  if (!active || isImmersive) return null;
 
   const current = steps[step];
   if (!current) return null;
