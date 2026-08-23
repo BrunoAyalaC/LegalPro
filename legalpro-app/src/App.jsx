@@ -1,9 +1,23 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { TenantProvider } from './context/TenantContext';
 import { UIProvider } from './context/UIContext';
 import Layout from './components/Layout';
 import AuthGuard from './components/AuthGuard';
+import LoadingScreen from './components/LoadingScreen';
+import ScrollToTop from './components/ScrollToTop';
+
+// FIX UX (2026-08-23): transición de ruta animada. AnimatedRoutes re-monta el
+// contenedor por pathname → fade-in suave entre páginas (el CSS respeta
+// prefers-reduced-motion). ScrollToTop evita llegar a una vista a mitad de scroll.
+function AnimatedRoutes({ children }) {
+  const location = useLocation();
+  return (
+    <div key={location.pathname} className="route-fade-in">
+      {children}
+    </div>
+  );
+}
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Rutas con lazy loading — cada página se carga solo cuando se navega a ella
@@ -55,8 +69,10 @@ export default function App() {
     <UIProvider>
       <TenantProvider>
         <BrowserRouter>
-        <Suspense fallback={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0a0a0f', color: '#06B6D4', fontFamily: 'sans-serif' }}>Cargando...</div>}>
-        <Routes>
+        <ScrollToTop />
+        <Suspense fallback={<LoadingScreen />}>
+        <AnimatedRoutes>
+          <Routes>
           {/* Rutas públicas */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -113,6 +129,7 @@ export default function App() {
           {/* Catch-all 404 — cualquier ruta no registrada (fuera del AuthGuard) */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </AnimatedRoutes>
         </Suspense>
       </BrowserRouter>
       </TenantProvider>

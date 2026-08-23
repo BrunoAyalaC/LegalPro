@@ -137,6 +137,8 @@ export default function ChatIA() {
 
   const messagesEnd = useRef(null);
   const inputRef = useRef(null);
+  // ChatV3: AbortController para el botón "Detener" durante streaming SSE
+  const abortRef = useRef(null);
 
   // Recargar al cambiar de expediente (storageKey distinto)
   useEffect(() => {
@@ -286,39 +288,136 @@ export default function ChatIA() {
     setInput('');
     setLoading(true);
 
+    // FIX ChatV3 (2026-08-23): burbuja AI parcial para streaming token-a-token.
+    const aiTime = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let streamingIdx = -1;
+    const startStreamingBubble = () => {
+      setMessages((prev) => {
+        streamingIdx = prev.length;
+        return [...prev, { role: 'ai', text: '', time: aiTime(), streaming: true }];
+      });
+    };
+    const updateStreamingBubble = (acumulado) => {
+      setMessages((prev) => {
+        if (streamingIdx < 0 || !prev[streamingIdx]) return prev;
+        const copia = [...prev];
+        copia[streamingIdx] = { ...copia[streamingIdx], text: acumulado };
+        return copia;
+      });
+    };
+
     try {
       const historial = messages.map((m) => ({
         role: m.role === 'user' ? 'user' : 'model',
         text: m.text,
       }));
-      const data = await api.chat(mensaje, historial, expedienteId);
+
+      // ── ChatV3: intentar streaming SSE primero, fallback a POST normal ──
+      abortRef.current = new AbortController();
+      startStreamingBubble();
+      let data = null;
+      try {
+        data = await api.chatStream(mensaje, historial, expedienteId, updateStreamingBubble, abortRef.current.signal);
+      } catch (streamErr) {
+        if (streamErr?.name === 'AbortError') throw streamErr; // Detener → tratar como cancelación
+        data = null; // fallo de red/formato → fallback abajo
+      }
+
+      if (!data) {
+        // Fallback clásico (sin streaming)
+        if (streamingIdx >= 0) {
+          setMessages((prev) => prev.filter((_, i) => i !== streamingIdx));
+          streamingIdx = -1;
+        }
+        data = await api.chat(mensaje, historial, expedienteId);
+      }
+
       const respuesta = data?.respuesta ?? data?.texto ?? '';
       // Estructura completa para renderizado polimórfico (TarjetaRespuesta.jsx).
       // El backend (server/utils/intentRouter.js + server/routes/ai.js) puede
       // devolver tipo_respuesta ∈ {'plazo','escrito','analisis','jurisprudencia',
       // 'prediccion','respuesta'} con `data` estructurada por tipo.
       const tipoRespuesta = data?.tipo_respuesta ?? data?.tipo_respuesta ?? 'respuesta';
-      setMessages((prev) => [...prev, {
+      const finalMsg = {
         role: 'ai',
         text: respuesta || 'No se recibió respuesta del asistente.',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        time: aiTime(),
         leyes: data?.leyes ?? data?.referencias ?? null,
         // Payload crudo para TarjetaRespuesta: contiene tipo_respuesta + data + intencion + tokens.
         raw: data,
         tipoRespuesta,
-      }]);
+        citasValidacion: data?.citas_validacion ?? null, // ChatV3: badge anti-alucinación
+      };
+
+      setMessages((prev) => {
+        if (streamingIdx >= 0 && prev[streamingIdx]) {
+          // Consolidar burbuja de streaming en mensaje final
+          const copia = [...prev];
+          copia[streamingIdx] = { ...finalMsg, streaming: false };
+          return copia;
+        }
+        return [...prev, finalMsg];
+      });
     } catch (err) {
-      setMessages((prev) => [...prev, {
-        role: 'ai',
-        text: chatErrorMessage(err),
-        time: 'Error',
-        isError: true,
-      }]);
+      // AbortError por botón Detener: conservar texto parcial como respuesta
+      if (err?.name === 'AbortError') {
+        setMessages((prev) => {
+          if (streamingIdx >= 0 && prev[streamingIdx]?.text) {
+            const copia = [...prev];
+            copia[streamingIdx] = { ...copia[streamingIdx], streaming: false, detenido: true };
+            return copia;
+          }
+          return prev.filter((_, i) => i !== streamingIdx);
+        });
+      } else {
+        // Fallo real: quitar burbuja parcial y mostrar error
+        setMessages((prev) => {
+          const sinParcial = streamingIdx >= 0 ? prev.filter((_, i) => i !== streamingIdx) : prev;
+          return [...sinParcial, {
+            role: 'ai',
+            text: chatErrorMessage(err),
+            time: 'Error',
+            isError: true,
+          }];
+        });
+      }
     } finally {
+      abortRef.current = null;
       setLoading(false);
       inputRef.current?.focus();
     }
   };
+
+  // ChatV3: regenerar la última respuesta AI (reenvía el último mensaje user)
+  const handleRegenerar = useCallback(() => {
+    if (loading) return;
+    const ultimoUser = [...messages].reverse().find((m) => m.role === 'user');
+    if (!ultimoUser) return;
+    setMessages((prev) => {
+      const copia = [...prev];
+      if (copia.length && copia[copia.length - 1].role === 'ai') copia.pop(); // quita última AI
+      return copia;
+    });
+    setTimeout(() => handleSend(ultimoUser.text), 50);
+  }, [messages, loading]);
+
+  // ChatV3: feedback 👍👎 por respuesta (best-effort; cola local si endpoint ausente)
+  const handleFeedback = useCallback(async (msgIndex, rating) => {
+    setMessages((prev) => {
+      const copia = [...prev];
+      if (copia[msgIndex]) copia[msgIndex] = { ...copia[msgIndex], feedback: rating };
+      return copia;
+    });
+    try {
+      await api.feedback?.({ rating, query_hash: messages[msgIndex]?.raw?.query_hash, pagina: 'chat_ia' });
+    } catch {
+      try {
+        const cola = JSON.parse(localStorage.getItem('legalpro_feedback_queue') || '[]');
+        cola.push({ rating, ts: Date.now(), pagina: 'chat_ia' });
+        localStorage.setItem('legalpro_feedback_queue', JSON.stringify(cola.slice(-50)));
+      } catch { /* storage lleno → ignorar */ }
+    }
+  }, [messages]);
 
   // Detecta el tipo de documento a partir de la conversación y habilita la descarga
   const generarDocumento = async () => {
@@ -542,11 +641,15 @@ export default function ChatIA() {
               onToggleLeyes={toggleLeyes}
               onCopy={copyMessage}
               onDownload={(formato) => handleMensajeDownload(formato, msg)}
+              onFeedback={handleFeedback}
+              onRegenerar={handleRegenerar}
+              isLastAi={i === messages.length - 1 && msg.role === 'ai'}
             />
           ))
         )}
 
-        {loading && (
+        {/* ChatV3: indicador typing solo cuando NO hay burbuja de streaming activa */}
+        {loading && !messages.some((m) => m.streaming) && (
           <div className="flex gap-2.5 max-w-[88%]" aria-busy="true" aria-label="LexIA está escribiendo">
             <img src={avatarIA} alt="" loading="lazy" decoding="async" className="ai-avatar w-8 h-8 shrink-0" />
             <div className="chat-ai p-3.5 flex items-center gap-2.5 rounded-2xl rounded-bl-md">

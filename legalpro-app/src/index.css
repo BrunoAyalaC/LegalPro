@@ -1357,3 +1357,45 @@ input::placeholder {
 .icon-shadow-indigo:hover  { box-shadow: 0 8px 32px rgba(99, 102, 241, 0.45),  0 4px 12px rgba(99, 102, 241, 0.25); }
 .icon-shadow-pink:hover    { box-shadow: 0 8px 32px rgba(236, 72, 153, 0.45),  0 4px 12px rgba(236, 72, 153, 0.25); }
 
+
+/* --- UX FLUIDES (2026-08-23) — transiciones de ruta, shimmer, móvil --- */
+
+/* Transición de ruta: fade+slide sutil al navegar */
+.route-fade-in {
+  animation: routeFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes routeFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Shimmer para skeletons (LoadingScreen y estados de carga) */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Safe-area iOS: BottomNav nunca bajo el home indicator */
+.bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Touch targets =44px en navegación táctil (WCAG 2.5.5) */
+@media (pointer: coarse) {
+  .bottom-nav a,
+  .bottom-nav button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Accesibilidad de movimiento: respeta prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .route-fade-in,
+  .anim-fade-in-up,
+  .typing-dot,
+  [class*="animate-"] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

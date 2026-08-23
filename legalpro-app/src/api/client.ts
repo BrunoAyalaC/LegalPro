@@ -360,6 +360,79 @@ export async function chat(
 }
 
 /**
+ * Chat con streaming SSE (token-a-token). FIX ChatV3 (2026-08-23).
+ *
+ * Consume POST /api/ai/consulta/stream (text/event-stream). Formato del
+ * backend: líneas `data: {json}\n\n` con eventos {status:'start'},
+ * {chunk: texto} incrementales y evento final con payload completo
+ * (respuesta/tipo_respuesta/data/citas_validacion).
+ *
+ * @param onDelta callback por cada fragmento de texto recibido
+ * @param signal  AbortSignal para el botón "Detener"
+ * @returns payload final del backend (igual que chat()) o null si el stream
+ *          falló antes de completar → el caller hace fallback a chat()
+ */
+export async function chatStream(
+  mensaje: string,
+  historial: Array<{ role: string; text: string }> = [],
+  expedienteId?: string | null,
+  onDelta?: (textoAcumulado: string) => void,
+  signal?: AbortSignal,
+): Promise<any | null> {
+  try {
+    const res = await fetch(`${NODE_URL}/api/ai/consulta/stream`, {
+      method: 'POST',
+      credentials: 'include', // cookie httpOnly __Secure-Session
+      headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+      body: JSON.stringify({
+        mensaje,
+        historial,
+        expediente_id: expedienteId ?? undefined,
+        tipo: 'chat',
+        disclaimerAceptado: true,
+      }),
+      signal,
+    });
+    if (!res.ok || !res.body) return null;
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let acumulado = '';
+    let finalPayload: any = null;
+
+    // Bucle SSE: separa eventos por \n\n, extrae data: {...}
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const eventos = buffer.split('\n\n');
+      buffer = eventos.pop() ?? ''; // último fragmento incompleto se conserva
+      for (const ev of eventos) {
+        const linea = ev.split('\n').find((l) => l.startsWith('data:'));
+        if (!linea) continue;
+        try {
+          const json = JSON.parse(linea.slice(5).trim());
+          if (typeof json.chunk === 'string') {
+            acumulado += json.chunk;
+            onDelta?.(acumulado);
+          } else if (json.respuesta !== undefined || json.done || json.status === 'complete') {
+            finalPayload = json; // evento final con payload completo
+          }
+        } catch { /* línea no-JSON (keep-alive) → ignorar */ }
+      }
+    }
+
+    // Si el stream terminó sin payload final pero acumulamos texto, sintetiza.
+    if (!finalPayload && acumulado) finalPayload = { respuesta: acumulado, tipo_respuesta: 'respuesta' };
+    return finalPayload;
+  } catch (err: any) {
+    if (err?.name === 'AbortError') throw err; // Detener ≠ fallback
+    return null; // cualquier otro fallo → caller usa chat() normal
+  }
+}
+
+/**
  * Detecta el tipo de documento legal a partir de la conversación del chat.
  *
  * SIEMPRE envía `disclaimerAceptado: true`: el backend

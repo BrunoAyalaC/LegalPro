@@ -32,6 +32,9 @@ function MensajeImpl({
   onToggleLeyes,
   onCopy,
   onDownload,
+  onFeedback,
+  onRegenerar,
+  isLastAi,
 }) {
   const isUser = msg.role === 'user';
 
@@ -75,6 +78,14 @@ function MensajeImpl({
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
           ) : (
             <>
+              {/* ChatV3: cursor ▍ durante streaming (texto parcial, sin markdown parseado a medias) */}
+              {msg.streaming ? (
+                <p className="text-sm leading-relaxed whitespace-pre-wrap text-slate-200">
+                  {msg.text}
+                  <span className="inline-block w-[2px] h-4 bg-cyan-400 align-middle animate-pulse ml-0.5" aria-hidden="true" />
+                </p>
+              ) : (
+              <>
               <TarjetaRespuesta
                 respuesta={msg.raw || { respuesta: msg.text, tipo_respuesta: 'respuesta', data: { leyes: msg.leyes } }}
                 onDownload={onDownload}
@@ -87,6 +98,8 @@ function MensajeImpl({
                   }}
                 />
               )}
+              </>
+              )}
             </>
           )}
 
@@ -96,14 +109,45 @@ function MensajeImpl({
                 <AppIcon name="warning" size={10} />
                 Borrador IA — requiere revisión profesional
               </p>
-              <button
-                type="button"
-                onClick={() => onCopy(msg.text)}
-                className="sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 text-[10px] text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-opacity"
-                aria-label="Copiar respuesta"
-              >
-                <AppIcon name="content_copy" size={12} /> Copiar
-              </button>
+              <div className="flex items-center gap-2.5">
+                {/* ChatV3: badge citas validadas (anti-alucinación runtime) */}
+                {msg.citasValidacion?.total > 0 && (
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                      (msg.citasValidacion.ratio ?? 0) >= 0.8
+                        ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
+                        : 'bg-amber-500/10 border-amber-500/25 text-amber-300'
+                    }`}
+                    title={msg.citasValidacion.sospechosas?.length ? `Sospechosas: ${msg.citasValidacion.sospechosas.map((s) => s.match).join(', ')}` : undefined}
+                  >
+                    {(msg.citasValidacion.ratio ?? 0) >= 0.8 ? '✓' : '⚠'} Citas {msg.citasValidacion.verificadas}/{msg.citasValidacion.total}
+                  </span>
+                )}
+                {msg.detenido && <span className="text-[10px] text-orange-300/80">⏹ Detenida</span>}
+                {/* ChatV3: feedback 👍👎 */}
+                {!msg.streaming && onFeedback && (
+                  <span className="flex items-center gap-1" role="group" aria-label="Calificar respuesta">
+                    <button type="button" onClick={() => onFeedback(index, 'up')} aria-label="Respuesta útil"
+                      className={`text-[11px] transition-colors ${msg.feedback === 'up' ? 'text-emerald-400' : 'text-slate-500 hover:text-emerald-400'}`}>👍</button>
+                    <button type="button" onClick={() => onFeedback(index, 'down')} aria-label="Respuesta poco útil"
+                      className={`text-[11px] transition-colors ${msg.feedback === 'down' ? 'text-red-400' : 'text-slate-500 hover:text-red-400'}`}>👎</button>
+                  </span>
+                )}
+                {!msg.streaming && onRegenerar && isLastAi && (
+                  <button type="button" onClick={onRegenerar} aria-label="Regenerar respuesta"
+                    className="sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 text-[10px] text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-opacity">
+                    ↻ Regenerar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onCopy(msg.text)}
+                  className="sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 text-[10px] text-slate-400 hover:text-cyan-300 flex items-center gap-1 transition-opacity"
+                  aria-label="Copiar respuesta"
+                >
+                  <AppIcon name="content_copy" size={12} /> Copiar
+                </button>
+              </div>
             </div>
           )}
 
