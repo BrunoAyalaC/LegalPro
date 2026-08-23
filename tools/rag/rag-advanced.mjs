@@ -6,26 +6,34 @@
  * 1. Descompone la pregunta en sub-queries (DeepSeek V4 Flash vía opencodeClient)
  * 2. Busca cada sub-query con retrieve()
  * 3. Fusiona con Reciprocal Rank Fusion (RRF)
- * 4. Reranquea con scoring híbrido (RRF + keyword overlap + posición + longitud)
+ * 4. Reranquea: API BGE reranker (RERANKER_API_URL) → fallback heurístico
+ *    (RRF + keyword overlap + posición + longitud). FIX RAG-SOTA-GAP1.
  *
  * Uso:
  *   import { buscarAvanzado } from './tools/rag/rag-advanced.mjs';
  *   const results = await buscarAvanzado('despido arbitrario sin pago de CTS', { materia: 'laboral' });
  *
- * Scoring final (pesos suman 1.0):
+ * Scoring final heurístico (pesos suman 1.0):
  *   score_final = rrf_norm * 0.60 + keyword * 0.25 + posicion * 0.10 + longitud * 0.05
+ *   (con RERANKER_API_URL configurado el orden lo decide el cross-encoder;
+ *    cada chunk lleva rerank_score + reranker:'bge-api'|'heuristico')
  *
  * Fallbacks de robustez:
  *   - Si DeepSeek no está configurado o falla -> usa la consulta original sola
  *   - Si una sub-query falla -> el resto continúa (allSettled)
+ *   - Si la API de rerank falla -> heurístico local (fail-open, nunca lanza)
  *   - Si ninguna sub-query devuelve resultados -> []
  *
- * @version 1.0.0
- * @date 2026-08-06
+ * @version 1.1.0
+ * @date 2026-08-22
  */
 
 import { pathToFileURL } from 'node:url';
 import { retrieve } from './retrieve.mjs';
+// FIX RAG-SOTA-GAP1 (2026-08-22): reranker especializado (API BGE → fallback
+// heurístico compartido). La lógica de reranquear() vive ahora en
+// tools/rag/reranker.mjs (reranquearHeuristico) para evitar duplicación.
+import { rerank, reranquearHeuristico } from './reranker.mjs';
 
 // FIX DEPLOY (2026-08-22): import agnóstico al layout. En el repo local tools/
 // vive junto a legalpro-app/ (../../legalpro-app/server/...), pero en el
@@ -132,6 +140,11 @@ export function reciprocalRankFusion(listasResultados, k = DEFAULTS.rrfK) {
 /**
  * Reranking: combina RRF score con keyword overlap, posición promedio y longitud.
  *
+ * FIX RAG-SOTA-GAP1 (2026-08-22): la implementación se extrajo a
+ * tools/rag/reranker.mjs (reranquearHeuristico) como helper compartido con el
+ * reranker especializado. Delegación 1:1 — comportamiento idéntico
+ * (score_final = rrf*0.60 + keyword*0.25 + posicion*0.10 + longitud*0.05).
+ *
  * @param {Array<{id, rrf_score}>} resultadosFusionados - Salida de reciprocalRankFusion
  * @param {string} consultaOriginal - Consulta del usuario (para keyword overlap)
  * @param {object} detalles - Mapa id -> resultado completo de retrieve()
@@ -139,58 +152,7 @@ export function reciprocalRankFusion(listasResultados, k = DEFAULTS.rrfK) {
  * @returns {Array} - Top-K reranqueados
  */
 export function reranquear(resultadosFusionados, consultaOriginal, detalles, options = {}) {
-  const { topK = DEFAULTS.topK, ranksPorId = new Map(), pesos = DEFAULTS.pesos } = options;
-
-  const queryTerms = consultaOriginal.toLowerCase().split(/\s+/).filter((t) => t.length > 3);
-  const maxRrf = resultadosFusionados.reduce((max, f) => Math.max(max, f.rrf_score), 0) || 1;
-
-  return resultadosFusionados
-    .map((f) => {
-      const detalle = detalles[f.id] || {};
-      const content = (detalle.content || '').toLowerCase();
-      const length = content.length;
-
-      // 1. Keyword overlap: proporción de términos de la consulta presentes en el chunk
-      const keywordMatches = queryTerms.filter((t) => content.includes(t)).length;
-      const keywordScore = queryTerms.length ? keywordMatches / queryTerms.length : 0;
-
-      // 2. Posición: rank promedio en todas las listas (mejor rank -> score alto)
-      const ranks = ranksPorId.get(f.id) || [detalle.rank || DEFAULTS.subQueryTopK];
-      const avgRank = ranks.reduce((a, b) => a + b, 0) / ranks.length;
-      const positionScore = Math.max(0, 1 - (avgRank - 1) / DEFAULTS.subQueryTopK);
-
-      // 3. Longitud: óptimo en [300, 3000] chars; castigo fuera del rango
-      let lengthScore = 0;
-      if (length > 0) {
-        if (length < DEFAULTS.longitudOptimaMin) {
-          lengthScore = length / DEFAULTS.longitudOptimaMin;
-        } else if (length > DEFAULTS.longitudOptimaMax) {
-          lengthScore = DEFAULTS.longitudOptimaMax / length;
-        } else {
-          lengthScore = 1;
-        }
-      }
-
-      // 4. RRF normalizado a [0, 1] para comparabilidad con las demás señales
-      const rrfNorm = f.rrf_score / maxRrf;
-
-      const score_final =
-        rrfNorm * pesos.rrf +
-        keywordScore * pesos.keyword +
-        positionScore * pesos.posicion +
-        lengthScore * pesos.longitud;
-
-      return {
-        ...f,
-        ...detalle,
-        rrf_norm: rrfNorm,
-        keyword_matches: keywordMatches,
-        avg_rank: avgRank,
-        score_final: Number(score_final.toFixed(4)),
-      };
-    })
-    .sort((a, b) => b.score_final - a.score_final)
-    .slice(0, topK);
+  return reranquearHeuristico(resultadosFusionados, consultaOriginal, detalles, options);
 }
 
 /**
@@ -251,7 +213,31 @@ export async function buscarAvanzado(consulta, options = {}) {
   }
 
   // 5. Rerank y top-K
-  const finales = reranquear(fusionados, consulta, detalles, { topK, ranksPorId });
+  // FIX RAG-SOTA-GAP1 (2026-08-22): reranker especializado ANTES del heurístico
+  // histórico (informe rag.txt §9: "reranking es una de las inversiones con
+  // mejor retorno"). Orden de intentos:
+  //   (a) API BGE reranker (RERANKER_API_URL + RERANKER_API_KEY, timeout 8s)
+  //   (b) fallback heurístico compartido dentro de rerank() (misma lógica que
+  //       reranquear()) — fail-open, NUNCA lanza.
+  // Si el resultado trae rerank_score numérico se usa ese orden; si no (o si
+  // algo inesperado falla), se cae al heurístico existente. Los campos
+  // degraded/boosted_score viajan dentro de los candidatos (spread de detalles)
+  // y el paso 6 re-aplica degraded desde la fuente igual que antes.
+  let finales;
+  try {
+    const candidatos = fusionados.map((f) => ({ ...f, ...(detalles[f.id] || {}) }));
+    const reranked = await rerank(consulta, candidatos, { topK });
+    const usable =
+      Array.isArray(reranked) &&
+      reranked.length > 0 &&
+      reranked.every((r) => typeof r.rerank_score === 'number');
+    finales = usable
+      ? reranked
+      : reranquear(fusionados, consulta, detalles, { topK, ranksPorId });
+  } catch {
+    // Fail-open duro: el pipeline de búsqueda nunca se detiene por el reranker.
+    finales = reranquear(fusionados, consulta, detalles, { topK, ranksPorId });
+  }
 
   // 6. FIX P0-F2 propagación: heredar degraded desde los chunks fuente.
   //    Si un chunk apareció degradado en CUALQUIER sub-query, mantiene el flag.

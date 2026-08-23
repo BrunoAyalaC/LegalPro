@@ -32,6 +32,10 @@ import { buscarAvanzado } from '../../../tools/rag/rag-advanced.mjs';
 import { hybridScore } from '../../../tools/rag/junior-rag-wrapper.mjs';
 // Audit event JURISPRUDENCE_RETRIEVED (trazabilidad LPDP / LOPJ).
 import { logAudit } from '../utils/audit.js';
+// Validador de citas legales en RUNTIME (anti-alucinación): cada cita generada
+// por la IA se verifica contra catalogs/codigos-leyes.json antes de devolverla.
+// Best-effort: NUNCA bloquea la respuesta, solo marca y agrega métricas.
+import { validarRespuestaIA } from '../utils/validadorCitas.js';
 
 const router = Router();
 const tokenRepo = new TokenRepository(db);
@@ -262,6 +266,31 @@ function aplicarDisclaimerChatDirecto(respuesta) {
   return `${respuesta}\n\n${DISCLAIMER_CHAT_DIRECTO}`;
 }
 
+// ─── Validación de citas IA (anti-alucinación, best-effort) ──────────────────
+// Valida las citas legales del texto contra catalogs/codigos-leyes.json.
+// Reglas: ratio < 0.5 Y citas_total >= 2 → aviso_degradacion_citas (frontend
+// muestra "confirmar en SPIJ"). NUNCA lanza: cualquier fallo devuelve {} y la
+// respuesta sale sin métricas (fail-open).
+async function validarCitasRespuestaBestEffort(texto, logger) {
+  try {
+    const v = await validarRespuestaIA(texto);
+    const out = {
+      citas_validacion: {
+        total: v.citas_total,
+        verificadas: v.verificadas,
+        ratio: v.ratio_verificacion,
+      },
+    };
+    if (v.citas_total >= 2 && v.ratio_verificacion < 0.5) {
+      out.aviso_degradacion_citas = 'Algunas citas no pudieron verificarse contra el catálogo — confirmar en SPIJ';
+    }
+    return out;
+  } catch (err) {
+    logger?.warn('[VALIDADOR-CITAS] Validación falló (best-effort, no bloquea):', err?.message);
+    return {};
+  }
+}
+
 // ─── POST /api/ai/chat ────────────────────────────────────────────────────────
 // Versión del formato cacheado en /chat. Al cambiar la estructura de la respuesta
 // (tipo_respuesta, intencion, fase_enrutamiento, data) se hace BUMP para NO servir
@@ -401,6 +430,10 @@ router.post('/chat', iaTransferenciaGuard, idempotencyMiddleware(), quotaMiddlew
       if (enrutado.fase === 'fase1-texto') {
         respuestaEnrutada = aplicarDisclaimerChatDirecto(respuestaEnrutada);
       }
+      // Anti-alucinación: validar citas del texto final contra el catálogo de
+      // normas (best-effort, nunca bloquea). Se cachea junto al payload para
+      // que los hits posteriores sirvan las mismas métricas.
+      const validacionCitas = await validarCitasRespuestaBestEffort(respuestaEnrutada, req.logger);
       // Contrato de respuesta enrutada para la UI: tipo_respuesta + intencion +
       // fase_enrutamiento + data (shape estructurado por tool; null si es texto directo).
       const payloadEnrutado = {
@@ -409,6 +442,7 @@ router.post('/chat', iaTransferenciaGuard, idempotencyMiddleware(), quotaMiddlew
         intencion: intentDetectado || null,
         fase_enrutamiento: enrutado.fase || null,
         data: enrutado.data ?? null,
+        ...validacionCitas,
       };
       set(cacheKey, payloadEnrutado, 7200);
 
@@ -513,7 +547,10 @@ router.post('/chat', iaTransferenciaGuard, idempotencyMiddleware(), quotaMiddlew
     // catalogs/disclaimers-ia.json vía getDisclaimer('disclaimer_general')).
     respuesta = aplicarDisclaimerChatDirecto(respuesta);
 
-    set(cacheKey, { respuesta, tipo_respuesta: 'respuesta', intencion: null, fase_enrutamiento: 'directo', data: null }, 7200);
+    // Anti-alucinación: validar citas del texto final (best-effort, fail-open).
+    const validacionCitasDirecto = await validarCitasRespuestaBestEffort(respuesta, req.logger);
+
+    set(cacheKey, { respuesta, tipo_respuesta: 'respuesta', intencion: null, fase_enrutamiento: 'directo', data: null, ...validacionCitasDirecto }, 7200);
 
     mensajeRepo.guardarParMensajes(req.user.sub, orgId, expediente_id ?? null, mensaje, respuesta).catch(() => {});
 
@@ -550,6 +587,7 @@ router.post('/chat', iaTransferenciaGuard, idempotencyMiddleware(), quotaMiddlew
       intencion: null,
       fase_enrutamiento: 'directo',
       data: null,
+      ...validacionCitasDirecto,
       tokens: response.usageMetadata?.totalTokenCount ?? null,
     }, req, model || MODEL));
   } catch (err) {

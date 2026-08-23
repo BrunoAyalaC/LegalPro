@@ -327,6 +327,58 @@ function buildCompositeText(doc) {
 // METADATA RICA POR CHUNK
 // ==========================================
 
+// FIX RAG-SOTA-GAP2 (2026-08-22): Parent-Child Retrieval (informe rag.txt §7,
+// "Parent-document: Precision child + context parent — Muy recomendado").
+// Cada chunk (hijo) lleva metadata.parent_text = contexto del contenedor
+// (padre): para códigos de leyes, nombre de la norma + referencia del
+// artículo siguiente si existe; para otros documentos, título del
+// documento/sección. Máximo 300 chars. retrieve.mjs lo propaga como
+// chunk.parent_text y buildAugmentedPrompt lo antepone como línea
+// `[Contexto: ...]` → el generador recibe hijo preciso + padre contextual.
+const PARENT_TEXT_MAX_CHARS = 300;
+
+/** Colapsa whitespace y trunca a PARENT_TEXT_MAX_CHARS (con elipsis). */
+function truncarParentText(texto) {
+  const t = String(texto || '').replace(/\s+/g, ' ').trim();
+  if (t.length <= PARENT_TEXT_MAX_CHARS) return t || null;
+  return t.substring(0, PARENT_TEXT_MAX_CHARS - 1).trimEnd() + '…';
+}
+
+/**
+ * Construye el parent_text de un chunk según su documento contenedor.
+ *
+ * @param {object} doc - Documento del catálogo (norma/casación/resolución...)
+ * @param {object} chunk - Chunk generado por chunkHibrido/buildChunks
+ * @param {object} [ctx] - { numerosArticulo: [{n, raw}] } solo para chunks
+ *   tipo 'articulo' provenientes de texto completo (permite referenciar el
+ *   artículo siguiente dentro de la misma norma).
+ * @returns {string|null} parent_text (<= 300 chars) o null si no hay título
+ */
+function buildParentText(doc, chunk, ctx = {}) {
+  const partes = [];
+  const nombreNorma = doc.nombre || doc.titulo || doc.caso || doc.acto || null;
+  if (nombreNorma) {
+    partes.push(nombreNorma);
+    if (doc.numero) partes.push(`(${doc.numero})`);
+  }
+
+  // "Título del artículo siguiente si existe": en chunks tipo articulo de un
+  // código, se añade la referencia del siguiente artículo de la misma norma
+  // (delimita dónde termina el extracto del hijo).
+  if (chunk.metadata?.tipo === 'articulo' && Array.isArray(ctx.numerosArticulo)) {
+    const actual = Number.parseFloat(chunk.metadata.numero);
+    if (Number.isFinite(actual)) {
+      const siguiente = ctx.numerosArticulo.find((p) => p.n > actual);
+      if (siguiente) partes.push(`· sigue Artículo ${siguiente.raw}`);
+    }
+  }
+
+  // Otros documentos: título de sección (chunkPorSeccion setea metadata.titulo)
+  if (partes.length === 0 && chunk.metadata?.titulo) partes.push(chunk.metadata.titulo);
+
+  return partes.length > 0 ? truncarParentText(partes.join(' ')) : null;
+}
+
 function buildBaseMetadata(doc, sourceFile, catalogKey) {
   return {
     source: sourceFile,
@@ -344,7 +396,7 @@ function buildBaseMetadata(doc, sourceFile, catalogKey) {
   };
 }
 
-function enrichChunk(chunk, doc, baseMeta) {
+function enrichChunk(chunk, doc, baseMeta, parentCtx = null) {
   const metadata = { ...baseMeta, ...chunk.metadata };
   if (!metadata.articulo) {
     if (chunk.metadata.numero) metadata.articulo = String(chunk.metadata.numero);
@@ -352,6 +404,9 @@ function enrichChunk(chunk, doc, baseMeta) {
     else if (doc.articulo_cp) metadata.articulo = String(doc.articulo_cp);
   }
   metadata.chunk_tipo = chunk.metadata.tipo || 'documento';
+  // FIX RAG-SOTA-GAP2: contexto del contenedor (padre) para parent-child retrieval
+  const parentText = buildParentText(doc, chunk, parentCtx || {});
+  if (parentText) metadata.parent_text = parentText;
   return { id: chunk.id, content: chunk.content, metadata };
 }
 
@@ -376,7 +431,15 @@ function buildChunks(doc, sourceFile, catalogKey) {
   const fullText = doc.texto_completo || doc.texto || doc.cuerpo || doc.contenido_normativo;
   if (fullText && typeof fullText === 'string' && fullText.trim().length > 0) {
     const chunks = chunkHibrido(fullText, { tipo: 'codigo', codigo: doc.id || doc.nombre });
-    if (chunks.length > 0) return chunks.map((c) => enrichChunk(c, doc, baseMeta));
+    if (chunks.length > 0) {
+      // FIX RAG-SOTA-GAP2: índice de artículos de la norma para referenciar
+      // el "artículo siguiente" en parent_text (solo chunks tipo articulo).
+      const numerosArticulo = chunks
+        .map((c) => ({ n: Number.parseFloat(c.metadata?.numero), raw: String(c.metadata?.numero || '') }))
+        .filter((p) => Number.isFinite(p.n))
+        .sort((a, b) => a.n - b.n);
+      return chunks.map((c) => enrichChunk(c, doc, baseMeta, { numerosArticulo }));
+    }
   }
 
   // 2) CÓDIGO con artículos más citados (sin texto completo)

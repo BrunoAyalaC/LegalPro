@@ -704,6 +704,12 @@ function mapRows(rows, labels) {
       metadata: row.metadata,
       similarity: parseFloat(row[simCol].toFixed(4))
     };
+    // FIX RAG-SOTA-GAP2 (2026-08-22): propagar el contexto del contenedor
+    // (parent-child retrieval). El indexer guarda metadata.parent_text
+    // (nombre de la norma + artículo siguiente / título del documento);
+    // buildAugmentedPrompt lo antepone como línea `[Contexto: ...]`.
+    const parentText = row.metadata?.parent_text;
+    if (parentText) result.parent_text = String(parentText);
     // Breakdown para auditoría/trazabilidad (opcional)
     if (semCol && row[semCol] != null) result.semanticSimilarity = parseFloat(row[semCol].toFixed(4));
     if (kwCol && row[kwCol] != null) result.keywordScore = parseFloat(row[kwCol].toFixed(4));
@@ -1035,6 +1041,11 @@ export async function retrieve(query, options = {}) {
 /**
  * Construye un prompt aumentado con citaciones para el LLM.
  *
+ * FIX RAG-SOTA-GAP2 (2026-08-22): parent-child retrieval (informe rag.txt §7).
+ * Si el chunk trae parent_text (contexto del contenedor indexado por
+ * index-todos.mjs), se antepone la línea `[Contexto: ...]` antes del texto:
+ * el generador recibe el hijo preciso + el padre contextual.
+ *
  * @param {string} query - Consulta del usuario
  * @param {string} systemInstruction - Instrucción de sistema
  * @param {Array} chunks - Chunks relevantes
@@ -1042,10 +1053,10 @@ export async function retrieve(query, options = {}) {
  */
 export function buildAugmentedPrompt(query, systemInstruction, chunks) {
   const context = chunks
-    .map(
-      (chunk, i) =>
-        `[${i + 1}] FUENTE: ${chunk.source} | SIMILARIDAD: ${(chunk.similarity * 100).toFixed(1)}%\n${chunk.content}\n`
-    )
+    .map((chunk, i) => {
+      const parentLine = chunk.parent_text ? `[Contexto: ${chunk.parent_text}]\n` : '';
+      return `[${i + 1}] FUENTE: ${chunk.source} | SIMILARIDAD: ${(chunk.similarity * 100).toFixed(1)}%\n${parentLine}${chunk.content}\n`;
+    })
     .join('\n---\n\n');
 
   const prompt = `${systemInstruction}
