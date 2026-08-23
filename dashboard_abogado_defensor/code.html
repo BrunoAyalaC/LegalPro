@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard Abogado Defensor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "accent-gold": "#d4af37",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Header -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-slate-200 dark:border-slate-800">
+<div class="text-primary flex size-10 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined text-3xl">gavel</span>
+</div>
+<div class="flex-1 px-3">
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Estrategia de Defensa</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">Exp. 00425-2023-JR-PE</p>
+</div>
+<div class="flex w-12 items-center justify-end">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+<!-- Success Probabilities Row -->
+<div class="flex flex-wrap gap-4 p-4">
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-5 bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal">Probabilidad de Éxito</p>
+<span class="material-symbols-outlined text-primary">trending_up</span>
+</div>
+<p class="text-slate-900 dark:text-slate-100 tracking-tight text-3xl font-bold leading-tight">82%</p>
+<p class="text-emerald-500 text-sm font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">arrow_upward</span> +4.2% esta semana
+                </p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-5 bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal">Control Acusación</p>
+<span class="material-symbols-outlined text-accent-gold">event</span>
+</div>
+<p class="text-slate-900 dark:text-slate-100 tracking-tight text-3xl font-bold leading-tight">08</p>
+<p class="text-rose-500 text-sm font-medium leading-normal">Días restantes</p>
+</div>
+</div>
+<!-- Strategy Summary Card -->
+<div class="px-4 mb-4">
+<div class="bg-primary/10 dark:bg-primary/20 rounded-xl p-4 border border-primary/20">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1">auto_awesome</span>
+<div>
+<h4 class="font-bold text-primary text-sm uppercase tracking-wider">Análisis Estratégico</h4>
+<p class="text-slate-700 dark:text-slate-300 text-sm mt-1">El Fiscal ha omitido la pericia de parte en su fáctica. Existe una ventana para solicitar el sobreseimiento por atipicidad relativa.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Sections -->
+<div class="px-4 space-y-6 pb-24">
+<!-- Section: Pruebas por Ofrecer -->
+<div>
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold">Pruebas por Ofrecer</h3>
+<button class="text-primary text-sm font-bold">Ver Todo</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+<div class="size-10 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-sm">Informe Antropológico Social</p>
+<p class="text-xs text-slate-500">Pendiente de firma digital</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</div>
+<div class="flex items-center gap-3 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+<div class="size-10 rounded bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">video_library</span>
+</div>
+<div class="flex-1">
+<p class="font-semibold text-sm">CCTV - Local Comercial A-12</p>
+<p class="text-xs text-slate-500">Analizado - Relevante</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">more_vert</span>
+</div>
+</div>
+</div>
+<!-- Section: Debilidades del Fiscal -->
+<div>
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-3 flex items-center gap-2">
+                    Debilidades del Fiscal
+                    <span class="bg-rose-100 text-rose-600 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Crítico</span>
+</h3>
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+<div class="p-4 border-b border-slate-100 dark:border-slate-700">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-rose-500">error</span>
+<div>
+<p class="text-sm font-bold">Cadena de Custodia Deficiente</p>
+<p class="text-xs text-slate-500 mt-1">El acta de incautación presenta una discrepancia de 45 minutos entre el hallazgo y el lacrado.</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-rose-500">priority_high</span>
+<div>
+<p class="text-sm font-bold">Contradicción en Testimonial 03</p>
+<p class="text-xs text-slate-500 mt-1">El testigo clave se contradice con su declaración preliminar respecto a la iluminación.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Access Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center gap-2">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">library_books</span>
+</div>
+<p class="text-xs font-bold uppercase tracking-tighter text-slate-500 dark:text-slate-400">Jurisprudencia</p>
+<p class="text-sm font-semibold">Casaciones Exoneratorias</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center gap-2">
+<div class="size-12 rounded-full bg-accent-gold/10 flex items-center justify-center text-accent-gold">
+<span class="material-symbols-outlined">calculate</span>
+</div>
+<p class="text-xs font-bold uppercase tracking-tighter text-slate-500 dark:text-slate-400">Utilidades</p>
+<p class="text-sm font-semibold">Calculadora de Beneficios</p>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-0 w-full flex flex-col z-20">
+<div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">folder_open</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Casos</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">track_changes</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Estrategia</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">description</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Documentos</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Perfil</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Monitor de Notificaciones SINOE IA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto overflow-x-hidden">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">gavel</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight">SINOE IA</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400">Asistente Legal Avanzado</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="relative p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-red-500"></span>
+</button>
+</div>
+</div>
+<!-- Summary Stats -->
+<div class="flex gap-3">
+<div class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl shadow-sm">
+<p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Total Notificaciones</p>
+<div class="flex items-end justify-between">
+<span class="text-2xl font-bold">128</span>
+<span class="text-xs text-green-500 font-medium flex items-center"><span class="material-symbols-outlined text-sm">trending_up</span> 12%</span>
+</div>
+</div>
+<div class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl shadow-sm">
+<p class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Plazos por Vencer</p>
+<div class="flex items-end justify-between">
+<span class="text-2xl font-bold text-red-500">5</span>
+<span class="text-[10px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded font-bold">CRÍTICO</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Filters -->
+<div class="p-4">
+<h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">Filtro por Especialidad</h3>
+<div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold whitespace-nowrap shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-sm">all_inclusive</span> Todos
+                </button>
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold whitespace-nowrap">
+<span class="material-symbols-outlined text-sm">balance</span> Civil
+                </button>
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold whitespace-nowrap">
+<span class="material-symbols-outlined text-sm">gavel</span> Penal
+                </button>
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold whitespace-nowrap">
+<span class="material-symbols-outlined text-sm">work</span> Laboral
+                </button>
+</div>
+</div>
+<!-- Notifications Feed -->
+<main class="flex-1 p-4 space-y-4 pb-24">
+<!-- Card 1 -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">CIVIL</span>
+<span class="text-[10px] text-slate-400">Hoy, 10:45 AM</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-1">Exp. 00452-2023-0-1801-JR-CI-01</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 flex items-center">
+<span class="material-symbols-outlined text-sm mr-1">account_balance</span> 1er Juzgado Especializado Civil - Lima
+                    </p>
+<div class="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 mb-4 border-l-2 border-primary">
+<div class="flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+<span class="text-[10px] font-bold text-primary uppercase">Resumen Inteligente</span>
+</div>
+<p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                            "Se declara fundada la excepción de prescripción extintiva deducida por la parte demandada. Se ordena el archivo definitivo del proceso una vez consentida la resolución."
+                        </p>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 uppercase font-semibold">Plazo Procesal</span>
+<div class="flex items-center gap-1 text-red-500 font-bold text-sm">
+<span class="material-symbols-outlined text-sm">timer</span>
+                                3 días para apelar
+                            </div>
+</div>
+<button class="flex items-center gap-1 text-primary text-xs font-bold hover:underline">
+<span class="material-symbols-outlined text-sm">download</span> Descargar Anexos
+                        </button>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary text-white py-2 rounded-lg text-xs font-bold">Ver Detalles</button>
+<button class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg">
+<span class="material-symbols-outlined text-sm">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">PENAL</span>
+<span class="text-[10px] text-slate-400">Ayer, 04:20 PM</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-1">Exp. 08912-2022-4-1501-JR-PE-02</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 flex items-center">
+<span class="material-symbols-outlined text-sm mr-1">account_balance</span> 2do Juzgado de Investigación Preparatoria
+                    </p>
+<div class="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 mb-4 border-l-2 border-primary">
+<div class="flex items-center gap-1 mb-1">
+<span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+<span class="text-[10px] font-bold text-primary uppercase">Resumen Inteligente</span>
+</div>
+<p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                            "Auto que señala fecha y hora para la audiencia de control de acusación. Programada para el día 25 de Octubre a las 09:00 hrs vía Google Meet."
+                        </p>
+</div>
+<div class="flex items-center justify-between mb-4">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 uppercase font-semibold">Estado de Plazo</span>
+<div class="flex items-center gap-1 text-green-500 font-bold text-sm">
+<span class="material-symbols-outlined text-sm">event</span>
+                                En agenda (15 días)
+                            </div>
+</div>
+<button class="flex items-center gap-1 text-primary text-xs font-bold hover:underline">
+<span class="material-symbols-outlined text-sm">download</span> Descargar Anexos
+                        </button>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary text-white py-2 rounded-lg text-xs font-bold">Ver Detalles</button>
+<button class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg">
+<span class="material-symbols-outlined text-sm">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm opacity-80">
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">LABORAL</span>
+<span class="text-[10px] text-slate-400">12 Oct, 11:15 AM</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-1">Exp. 01134-2023-0-1801-JR-LA-10</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-3 flex items-center">
+<span class="material-symbols-outlined text-sm mr-1">account_balance</span> 10mo Juzgado de Trabajo de Lima
+                    </p>
+<div class="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 mb-4 border-l-2 border-slate-300 dark:border-slate-600">
+<div class="flex items-center gap-1 mb-1 text-slate-500">
+<span class="material-symbols-outlined text-sm">history</span>
+<span class="text-[10px] font-bold uppercase">Lectura Previa</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-500 leading-relaxed italic">
+                            "Resolución que admite a trámite la demanda de indemnización por daños y perjuicios. Se corre traslado por 10 días."
+                        </p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 rounded-lg text-xs font-bold">Ver Historial</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-20">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">home</span>
+<span class="text-[10px] font-bold">Inicio</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] font-medium">Expedientes</span>
+</a>
+<div class="relative -top-6">
+<button class="h-12 w-12 rounded-full bg-primary text-white shadow-lg shadow-primary/40 flex items-center justify-center border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium">Reportes</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</nav>
+</div>
+</body></html>
