@@ -1,0 +1,14 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "node server/index.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 10
+healthcheckInterval = 30
+restartPolicyType = "ALWAYS"
+
+[[volumes]]
+mountPath = "/app/uploads"
+directoryPath = "uploads"

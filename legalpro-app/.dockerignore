@@ -1,0 +1,12 @@
+﻿node_modules
+dist
+build
+.git
+e2e
+test-results
+playwright-report
+playwright-report-e2e
+coverage
+*.log
+.env
+.env.*
