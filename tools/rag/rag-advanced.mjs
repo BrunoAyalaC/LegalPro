@@ -248,7 +248,14 @@ export async function buscarAvanzado(consulta, options = {}) {
   // 7. FIX 2026-08-22 (MEDIUM): umbral del caller aplicado SOLO aquí,
   //    post-rerank, sobre el score final (no sobre scores inflados ni
   //    recortando sub-queries). Sin threshold (null/0) → sin filtro.
-  return finales.filter((r) => !threshold || (r.score_final ?? r.similarity ?? 0) >= threshold);
+  //    FIX GOLDEN-SET (2026-08-23): si hubo chunks degradados (modo hash),
+  //    el umbral se adapta al espacio hash (CONFIG.umbralDegradado en
+  //    retrieve.mjs = 0.20) — el threshold 0.70 asume embeddings reales.
+  const huboDegraded = finales.some((r) => r.degraded);
+  const umbralFinal = huboDegraded
+    ? Math.min(threshold ?? 0.70, 0.20)
+    : (threshold ?? 0.70);
+  return finales.filter((r) => !umbralFinal || (r.score_final ?? r.similarity ?? 0) >= umbralFinal);
 }
 
 // CLI para test

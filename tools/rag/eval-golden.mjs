@@ -293,6 +293,10 @@ async function main() {
     console.error('❌ DATABASE_URL no configurada. Usa --dry-run para validar solo estructura.');
     process.exit(1);
   }
+  // FIX GOLDEN-SET (2026-08-23): el corpus productivo vive en rag_vectors_v2.
+  // Sin este default el evaluador consultaba la tabla v1 vacía → 0% hit rate
+  // falso (el golden set hizo su trabajo: expuso el desajuste de configuración).
+  process.env.RAG_USE_V2 ??= 'true';
   if (process.env.NODE_ENV === 'production' && process.env.ALLOW_EVAL_PROD !== '1') {
     console.error('❌ NODE_ENV=production sin ALLOW_EVAL_PROD=1: evaluador bloqueado (cada query consume embeddings/LLM).');
     process.exit(1);

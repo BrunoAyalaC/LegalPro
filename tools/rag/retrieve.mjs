@@ -98,6 +98,13 @@ const CONFIG = {
     semantic: parseFloat(process.env.RAG_DEGRADED_WEIGHT_SEMANTIC || '0.4'),
     keyword: parseFloat(process.env.RAG_DEGRADED_WEIGHT_KEYWORD || '0.6')
   },
+  // FIX GOLDEN-SET (2026-08-23): umbral dependiente del modo. El threshold del
+  // caller (0.70 default) está calibrado para embeddings REALES (coseno de
+  // relevantes: 0.6-0.9). En modo hash la similitud absoluta vive en 0.05-0.35
+  // → el mismo umbral mata resultados correctos (golden set: 0% hit rate).
+  // Regla del informe SOTA §5: "similarity no es confidence" — el umbral se
+  // adapta al espacio; la honestidad sigue garantizada por degraded:true.
+  umbralDegradado: parseFloat(process.env.RAG_UMBRAL_DEGRADADO || '0.20'),
   // Peso del boost TF-IDF local sobre el score final (0 = desactivado).
   // Se aplica SOLO cuando el embedding de la query cayó al fallback hash.
   keywordBoostWeight: parseFloat(process.env.RAG_KEYWORD_BOOST_WEIGHT || '0.25'),
@@ -857,14 +864,17 @@ export async function retrieveHybrid(query, options = {}) {
   let weights = normalizeWeights(weightSemantic, weightKeyword);
   // FIX P0-F3 (2026-08-21): { vector, esHash } local — sin race condition.
   const { vector: queryEmbedding, esHash } = await generateEmbedding(query, { miniMax: table === CONFIG.tableV2 });
+  // FIX GOLDEN-SET (2026-08-23): umbral efectivo dependiente del modo.
+  let umbralEfectivo = threshold;
   if (esHash) {
     weights = normalizeWeights(CONFIG.degradedWeights.semantic, CONFIG.degradedWeights.keyword);
+    umbralEfectivo = Math.min(threshold, CONFIG.umbralDegradado);
   }
   const vectorStr = `[${queryEmbedding.join(',')}]`;
 
   // 2. Parámetros: $1 vector, $2 query full-text, $3 umbral coseno, $4 LIMIT
   //    (los filtros se agregan después: $5, $6, ...)
-  const params = [vectorStr, query, threshold, topK];
+  const params = [vectorStr, query, umbralEfectivo, topK];
   const whereSQL = buildFilterWhere(filter, params);
 
   // 3. Búsqueda híbrida:
@@ -912,8 +922,8 @@ export async function retrieveHybrid(query, options = {}) {
   }
 
   results = results.filter((r) => {
-    if ((r.similarity ?? 0) >= threshold) return true;
-    if (esHash && (r.boosted_score ?? 0) >= threshold) {
+    if ((r.similarity ?? 0) >= umbralEfectivo) return true;
+    if (esHash && (r.boosted_score ?? 0) >= umbralEfectivo) {
       r.degraded = true; // solo superó el umbral vía boost léxico
       return true;
     }
