@@ -354,10 +354,17 @@ export function createAiAdapter() {
   // Override explícito válido + key presente → respetar.
   if (explicit === 'openrouter' && aiConfig.hasOpenrouter) return createOpenRouterAdapter();
   if (explicit === 'opencode' && aiConfig.hasOpencode) return createOpenCodeAdapter();
-  if (explicit === 'minimax' && aiConfig.hasMinimax) return createMinimaxAdapter();
 
-  // Modo 'auto' (o flag inválido) → usar la prioridad.
+  // FIX NO-MINIMAX (2026-08-23): MiniMax eliminado como proveedor por decisión
+  // de producto. La cadena auto es SOLO: openrouter > opencode. Si ninguno
+  // tiene key → 503 IA_NO_DISPONIBLE (fail-closed, sin fallback legacy).
   if (info.name === 'openrouter') return createOpenRouterAdapter();
   if (info.name === 'opencode') return createOpenCodeAdapter();
-  return createMinimaxAdapter();
+
+  const err = new Error(
+    'El servicio de IA no está disponible. Proveedores activos: OpenCode (OPENCODE_API_KEY) u OpenRouter (OPENROUTER_API_KEY). MiniMax fue retirado.'
+  );
+  err.status = 503;
+  err.code = 'IA_NO_DISPONIBLE';
+  throw err;
 }

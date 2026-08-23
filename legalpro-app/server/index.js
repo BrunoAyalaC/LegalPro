@@ -336,21 +336,26 @@ export const authLimiter = rateLimit({
   },
 });
 
-// ── RATE LIMITING MINIMAX — 10 req/min por IP (costo en tokens) ───────────────
+// ── RATE LIMITING IA — 10 req/min por IP (costo en tokens) ───────────────────
+// FIX NO-MINIMAX (2026-08-23): renombrado a iaLimiter (proveedor-neutro).
+// Se conserva el export minimaxLimiter como alias deprecated para no romper
+// imports existentes; remover en próxima major.
 // Distribuido via Redis para costo controlado en despliegue multi-instancia
-export const minimaxLimiter = rateLimit({
+export const iaLimiter = rateLimit({
   windowMs: 60 * 1000,
   limit: 10,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
-  store: createDistributedStore('rl:minimax', 60 * 1000),
+  store: createDistributedStore('rl:ia', 60 * 1000),
   skip: () => isTest,
   handler: (_req, res) => res.status(429).json({
     success: false,
     error: 'Límite de solicitudes IA alcanzado. Intente nuevamente en 1 minuto.',
-    code: 'MINIMAX_RATE_LIMIT',
+    code: 'IA_RATE_LIMIT',
   }),
 });
+/** @deprecated Usar iaLimiter */
+export const minimaxLimiter = iaLimiter;
 
 // ── STRIPE WEBHOOK (DEBE ir ANTES de express.json() para preservar raw body) ──
 // Stripe necesita el payload raw para verificar HMAC; express.json() consumiria el stream.
@@ -367,9 +372,13 @@ async function checkDb() {
   } catch { return false; }
 }
 
-async function checkMiniMax() {
-  return !!process.env.MINIMAX_API_KEY;
+// FIX NO-MINIMAX (2026-08-23): healthcheck de IA ahora es proveedor-neutro
+// (OpenCode u OpenRouter configurados = IA disponible).
+async function checkIA() {
+  return !!(process.env.OPENCODE_API_KEY || process.env.OPENROUTER_API_KEY);
 }
+/** @deprecated Usar checkIA */
+const checkMiniMax = checkIA;
 
 async function checkRedis() {
   try {

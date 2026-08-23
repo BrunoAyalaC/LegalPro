@@ -1,10 +1,10 @@
-name: Docker Hub Publish
+﻿name: Docker Hub Publish
 
-# Publica imágenes en Docker Hub (además del flujo GHCR de docker-publish.yml)
+# Publica imÃ¡genes en Docker Hub (ademÃ¡s del flujo GHCR de docker-publish.yml)
 # Requiere secrets del repo:
-#   DOCKERHUB_USERNAME — usuario de Docker Hub (brunoayalac)
-#   DOCKERHUB_TOKEN    — Access Token generado en hub.docker.com
-# Imágenes producidas:
+#   DOCKERHUB_USERNAME â€” usuario de Docker Hub (brunoayalac)
+#   DOCKERHUB_TOKEN    â€” Access Token generado en hub.docker.com
+# ImÃ¡genes producidas:
 #   docker.io/brunoayala97/legalpro-frontend:{latest,<version>,sha-<short>}
 #   docker.io/brunoayala97/legalpro-node-api:{latest,<version>,sha-<short>}
 #   docker.io/brunoayala97/legalpro-dotnet:{latest,<version>,sha-<short>}
@@ -24,11 +24,11 @@ env:
   OWNER: brunoayala97
 
 jobs:
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   # 1. FRONTEND SPA (nginx:alpine)
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   docker-frontend:
-    name: Docker Hub — Frontend SPA
+    name: Docker Hub â€” Frontend SPA
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
@@ -46,7 +46,7 @@ jobs:
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker meta — frontend
+      - name: Docker meta â€” frontend
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -61,7 +61,7 @@ jobs:
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
-      - name: Build & push — Frontend SPA
+      - name: Build & push â€” Frontend SPA
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -80,11 +80,11 @@ jobs:
             VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}
             VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   # 2. BACKEND NODE API (node:20-alpine)
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   docker-node:
-    name: Docker Hub — Node API
+    name: Docker Hub â€” Node API
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
@@ -102,7 +102,7 @@ jobs:
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker meta — node
+      - name: Docker meta â€” node
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -117,7 +117,7 @@ jobs:
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
-      - name: Build & push — Node API
+      - name: Build & push â€” Node API
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -130,11 +130,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   # 3. BACKEND .NET API (aspnet:8.0)
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   docker-dotnet:
-    name: Docker Hub — .NET API
+    name: Docker Hub â€” .NET API
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
@@ -152,7 +152,7 @@ jobs:
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker meta — dotnet
+      - name: Docker meta â€” dotnet
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -167,7 +167,7 @@ jobs:
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
-      - name: Build & push — .NET API
+      - name: Build & push â€” .NET API
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -180,11 +180,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   # 4. OWNER DASHBOARD (admin SaaS multi-tenant)
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   docker-owner-dashboard:
-    name: Docker Hub — Owner Dashboard
+    name: Docker Hub â€” Owner Dashboard
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
@@ -202,7 +202,7 @@ jobs:
       - name: Setup Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker meta — owner-dashboard
+      - name: Docker meta â€” owner-dashboard
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -217,7 +217,7 @@ jobs:
             org.opencontainers.image.licenses=MIT
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
-      - name: Build & push — Owner Dashboard
+      - name: Build & push â€” Owner Dashboard
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -230,9 +230,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ──────────────────────────────────────────────────────────────
-  # RESUMEN — tabla de digests publicados
-  # ──────────────────────────────────────────────────────────────
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  # RESUMEN â€” tabla de digests publicados
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   publish-summary:
     name: Resumen de publicacion
     runs-on: ubuntu-latest
@@ -242,7 +242,7 @@ jobs:
       - name: Generar resumen con digests
         run: |
           {
-            echo "# Docker Hub — Publicacion (${{ github.ref_name }})"
+            echo "# Docker Hub â€” Publicacion (${{ github.ref_name }})"
             echo ""
             echo "| Imagen | Digest |"
             echo "|--------|--------|"

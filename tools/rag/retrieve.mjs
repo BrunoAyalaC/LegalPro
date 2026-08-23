@@ -1,11 +1,11 @@
-#!/usr/bin/env node
+//#!/usr/bin/env node
 /**
- * RAG Retriever - Búsqueda híbrida (semántica + full-text) para LegalPro
+ * RAG Retriever - BÃºsqueda hÃ­brida (semÃ¡ntica + full-text) para LegalPro
  *
- * Realiza búsqueda en la base vectorial pgvector combinando dos señales:
+ * Realiza bÃºsqueda en la base vectorial pgvector combinando dos seÃ±ales:
  *
- *   1. SEMÁNTICA: similitud coseno del embedding (pgvector <=>)
- *   2. KEYWORD:   full-text de PostgreSQL con configuración 'spanish'
+ *   1. SEMÃNTICA: similitud coseno del embedding (pgvector <=>)
+ *   2. KEYWORD:   full-text de PostgreSQL con configuraciÃ³n 'spanish'
  *                 (to_tsvector + ts_rank + plainto_tsquery)
  *
  * El score final es una media ponderada configurable:
@@ -20,21 +20,21 @@
  *   en lugar de abrir/crear un pg.Client nuevo por cada llamada. Cada Client
  *   nuevo paga un round-trip de TCP+TLS (~50-150ms en Railway) que se
  *   multiplica en endpoints como /jurisprudencia (1 retrieve/request) y
- *   panel-expertos (1 retrieve × N especialistas). El pool es lazy y seguro
+ *   panel-expertos (1 retrieve Ã— N especialistas). El pool es lazy y seguro
  *   para tests (cierre con `await closeRetrievePool()`).
  *
  * FIX 2026-08-08 (perf): cache distribuido opcional (Redis) por clave
  *   estable (query+topK+threshold+filter+tabla). TTL corto configurable
- *   vía RAG_RETRIEVE_CACHE_TTL (default 300s = 5min) para mantener
+ *   vÃ­a RAG_RETRIEVE_CACHE_TTL (default 300s = 5min) para mantener
  *   coherencia cuando se reindexa el corpus. Invalida con
  *   `await invalidateRetrieveCache()` cuando se actualizan los embeddings.
  *
- * FIX 2026-08-12 (semántica degradada): hashEmbedding ahora usa
- *   tokenización español + bigramas + trigramas de caracteres + IDF léxico
- *   embebido + normalización L2 [0,1] (1536 dims, compatible vector(1536)).
- *   Así, chunks con términos legales similares obtienen similitud coseno > 0
+ * FIX 2026-08-12 (semÃ¡ntica degradada): hashEmbedding ahora usa
+ *   tokenizaciÃ³n espaÃ±ol + bigramas + trigramas de caracteres + IDF lÃ©xico
+ *   embebido + normalizaciÃ³n L2 [0,1] (1536 dims, compatible vector(1536)).
+ *   AsÃ­, chunks con tÃ©rminos legales similares obtienen similitud coseno > 0
  *   (ej. "demanda de alimentos" vs "alimentos" > 0.5) sin llamar a ninguna
- *   API. Además, cuando el embedding de la query cae al fallback hash
+ *   API. AdemÃ¡s, cuando el embedding de la query cae al fallback hash
  *   (`fueHashFallback()`), retrieveHybrid rebalancea pesos hacia keyword
  *   (RAG_DEGRADED_WEIGHT_*) y aplica `applyKeywordBoost` (TF-IDF local de
  *   tokens+bigramas) sobre el resultado.
@@ -76,21 +76,21 @@ const CONFIG = {
   // ==========================================
   // HYBRID SEARCH (BM25 full-text + vectorial)
   // ==========================================
-  // Configuración de búsqueda full-text de PostgreSQL.
-  // 'spanish' es la configuración de texto predefinida de PostgreSQL
-  // usada para stemming/stopwords del español (ya usada en init.sql).
+  // ConfiguraciÃ³n de bÃºsqueda full-text de PostgreSQL.
+  // 'spanish' es la configuraciÃ³n de texto predefinida de PostgreSQL
+  // usada para stemming/stopwords del espaÃ±ol (ya usada en init.sql).
   ftsConfig: process.env.RAG_FTS_CONFIG || 'spanish',
 
-  // Pesos de la combinación híbrida (deben sumar 1).
-  // 0.6 semántico + 0.4 keyword: prioriza relevancia semántica pero
-  // da peso a coincidencia exacta de términos técnicos legales.
+  // Pesos de la combinaciÃ³n hÃ­brida (deben sumar 1).
+  // 0.6 semÃ¡ntico + 0.4 keyword: prioriza relevancia semÃ¡ntica pero
+  // da peso a coincidencia exacta de tÃ©rminos tÃ©cnicos legales.
   hybridWeights: {
     semantic: parseFloat(process.env.RAG_WEIGHT_SEMANTIC || '0.6'),
     keyword: parseFloat(process.env.RAG_WEIGHT_KEYWORD || '0.4')
   },
 
-  // FIX 2026-08-12: en modo degradado (embeddings placeholder/hash) la señal
-  // semántica es débil, así que se rebalancea el peso hacia la señal keyword
+  // FIX 2026-08-12: en modo degradado (embeddings placeholder/hash) la seÃ±al
+  // semÃ¡ntica es dÃ©bil, asÃ­ que se rebalancea el peso hacia la seÃ±al keyword
   // (full-text ts_rank + boost TF-IDF local). Configurable por env:
   //   RAG_DEGRADED_WEIGHT_SEMANTIC / RAG_DEGRADED_WEIGHT_KEYWORD (default 0.4/0.6)
   //   RAG_KEYWORD_BOOST=0 desactiva el boost post-query (para comparativas)
@@ -99,18 +99,18 @@ const CONFIG = {
     keyword: parseFloat(process.env.RAG_DEGRADED_WEIGHT_KEYWORD || '0.6')
   },
   // FIX GOLDEN-SET (2026-08-23): umbral dependiente del modo. El threshold del
-  // caller (0.70 default) está calibrado para embeddings REALES (coseno de
+  // caller (0.70 default) estÃ¡ calibrado para embeddings REALES (coseno de
   // relevantes: 0.6-0.9). En modo hash la similitud absoluta vive en 0.05-0.35
-  // → el mismo umbral mata resultados correctos (golden set: 0% hit rate).
-  // Regla del informe SOTA §5: "similarity no es confidence" — el umbral se
+  // â†’ el mismo umbral mata resultados correctos (golden set: 0% hit rate).
+  // Regla del informe SOTA Â§5: "similarity no es confidence" â€” el umbral se
   // adapta al espacio; la honestidad sigue garantizada por degraded:true.
   umbralDegradado: parseFloat(process.env.RAG_UMBRAL_DEGRADADO || '0.20'),
   // Peso del boost TF-IDF local sobre el score final (0 = desactivado).
-  // Se aplica SOLO cuando el embedding de la query cayó al fallback hash.
+  // Se aplica SOLO cuando el embedding de la query cayÃ³ al fallback hash.
   keywordBoostWeight: parseFloat(process.env.RAG_KEYWORD_BOOST_WEIGHT || '0.25'),
 
-  // Normalización del ts_rank. La doc oficial de PostgreSQL indica que
-  // ts_rank NO está normalizado a [0,1]; la opción 32 (rank/(rank+1))
+  // NormalizaciÃ³n del ts_rank. La doc oficial de PostgreSQL indica que
+  // ts_rank NO estÃ¡ normalizado a [0,1]; la opciÃ³n 32 (rank/(rank+1))
   // escala el resultado al rango [0,1] para poder ponderarlo contra
   // la similitud coseno. Ver https://www.postgresql.org/docs/current/textsearch-controls.html
   ftsRankNormalization: parseInt(process.env.RAG_FTS_RANK_NORMALIZATION || '32', 10)
@@ -122,14 +122,14 @@ const CONFIG = {
 
 // FIX 2026-08-12: flag de modo degradado. `generateEmbedding` lo marca cuando
 // el vector devuelto proviene del fallback hash (no de un proveedor real).
-// `retrieveHybrid` lo lee para ajustar dinámicamente el peso keyword (TF-IDF)
-// y aplicar un boost post-query cuando la señal semántica es placeholder.
+// `retrieveHybrid` lo lee para ajustar dinÃ¡micamente el peso keyword (TF-IDF)
+// y aplicar un boost post-query cuando la seÃ±al semÃ¡ntica es placeholder.
 //
-// FIX P0-F3 (2026-08-21): el flag global mutable tenía RACE CONDITION bajo
-// concurrencia (query A hash podía leer `false` seteado por query B real).
+// FIX P0-F3 (2026-08-21): el flag global mutable tenÃ­a RACE CONDITION bajo
+// concurrencia (query A hash podÃ­a leer `false` seteado por query B real).
 // Ahora generateEmbedding retorna { vector, esHash } y las decisiones se
 // toman con el valor LOCAL de cada llamada. El global se mantiene SOLO para
-// backward-compat del export fueHashFallback() (deprecado para lógica interna).
+// backward-compat del export fueHashFallback() (deprecado para lÃ³gica interna).
 let _ultimoEmbeddingFueHash = false;
 
 /** @deprecated Usar el `esHash` retornado por generateEmbedding. Solo para compat. */
@@ -139,43 +139,16 @@ export function fueHashFallback() {
 
 /**
  * Genera el embedding de un texto.
- * FIX P0-F3: retorna { vector, esHash } — sin estado global compartido.
+ * FIX P0-F3: retorna { vector, esHash } â€” sin estado global compartido.
  * @returns {Promise<{vector: number[], esHash: boolean}>}
  */
-async function generateEmbedding(text, { miniMax = false } = {}) {
-  // Indexer V2: MiniMax embo-01 (1536 dims) cuando la tabla v2 está activa
-  if (miniMax || (process.env.RAG_USE_V2 === 'true' && process.env.MINIMAX_API_KEY)) {
-    try {
-      const res = await fetch(CONFIG.minimaxEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.MINIMAX_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: CONFIG.minimaxModel,
-          texts: [text.substring(0, 8000)],
-          type: 'query'
-        })
-      });
-      if (!res.ok) throw new Error(`MiniMax error: ${res.status}`);
-      const data = await res.json();
-      if (data.vectors && data.vectors[0]) {
-        _ultimoEmbeddingFueHash = false; // backward-compat only
-        return { vector: data.vectors[0], esHash: false };
-      }
-      throw new Error('MiniMax embedding fallo');
-    } catch (e) {
-      // FIX 2026-08-07: si MiniMax falla (rate limit 1002, caída), degradar a
-      // hash determinístico en lugar de lanzar error (el retrieval híbrido
-      // full-text + keywords sigue funcionando).
-      if (process.env.RAG_HASH_FALLBACK !== 'false') {
-        _ultimoEmbeddingFueHash = true; // backward-compat only
-        return { vector: hashEmbedding(text, CONFIG.embeddingDimensions || 1536), esHash: true };
-      }
-      throw e;
-    }
-  }
+async function generateEmbedding(text) {
+  // FIX NO-MINIMAX (2026-08-23): rama MiniMax embo-01 ELIMINADA por decisiÃ³n
+  // de producto. Cadena activa: OpenAI â†’ Gemini â†’ hashEmbedding (local).
+  // âš ï¸ El corpus productivo estÃ¡ indexado con hashEmbedding (--mode=hash):
+  // cambiar el proveedor de embeddings SIN reindexar produce mixed-space.
+  // Para migrar: 1) elegir proveedor, 2) reindexar TODO, 3) actualizar
+  // embedding_model/version por chunk, 4) reciÃ©n entonces quitar el guard.
 
   if (process.env.OPENAI_API_KEY) {
     const res = await fetch('https://api.openai.com/v1/embeddings', {
@@ -213,11 +186,11 @@ async function generateEmbedding(text, { miniMax = false } = {}) {
     return { vector: data.embedding.values, esHash: false };
   }
 
-  // FALLBACK DETERMINÍSTICO (FIX 2026-08-07): cuando ningún proveedor de
-  // embeddings está disponible (MiniMax rate-limited, Gemini suspendida, sin
-  // OPENAI_API_KEY), se genera un vector 1536-dim determinístico basado en el
-  // texto. FIX 2026-08-12: ahora con tokenización español + bigramas +
-  // trigramas + IDF (ver hashEmbedding) para mejorar la precisión semántica
+  // FALLBACK DETERMINÃSTICO (FIX 2026-08-07): cuando ningÃºn proveedor de
+  // embeddings estÃ¡ disponible (MiniMax rate-limited, Gemini suspendida, sin
+  // OPENAI_API_KEY), se genera un vector 1536-dim determinÃ­stico basado en el
+  // texto. FIX 2026-08-12: ahora con tokenizaciÃ³n espaÃ±ol + bigramas +
+  // trigramas + IDF (ver hashEmbedding) para mejorar la precisiÃ³n semÃ¡ntica
   // del modo degradado. Compatible con los placeholders ya indexados en
   // rag_vectors_v2 (rango [0,1], 1536 dims).
   _ultimoEmbeddingFueHash = true; // backward-compat only
@@ -226,51 +199,51 @@ async function generateEmbedding(text, { miniMax = false } = {}) {
 }
 
 // ==========================================
-// HASH EMBEDDING SEMÁNTICO-LIGERO (FIX 2026-08-12)
+// HASH EMBEDDING SEMÃNTICO-LIGERO (FIX 2026-08-12)
 // ==========================================
 //
-// Fallback determinístico sin API externa (MiniMax rate-limited, sin
-// OPENAI_API_KEY). Mejora la precisión del retrieval degradado frente al
+// Fallback determinÃ­stico sin API externa (MiniMax rate-limited, sin
+// OPENAI_API_KEY). Mejora la precisiÃ³n del retrieval degradado frente al
 // hash 1-token anterior:
 //
-//   1. Tokenización del español: lowercase, sin acentos (NFD), stopwords y
-//      términos jurídicos ultra-frecuentes con IDF bajo.
-//   2. Features: tokens (peso TF·IDF) + bigramas de tokens consecutivos
-//      (contexto local) + trigramas de caracteres (capturan raíces
+//   1. TokenizaciÃ³n del espaÃ±ol: lowercase, sin acentos (NFD), stopwords y
+//      tÃ©rminos jurÃ­dicos ultra-frecuentes con IDF bajo.
+//   2. Features: tokens (peso TFÂ·IDF) + bigramas de tokens consecutivos
+//      (contexto local) + trigramas de caracteres (capturan raÃ­ces
 //      compartidas: "aliment-" en "alimentos"/"alimentario").
-//   3. IDF léxico embebido (sin librerías): términos legales que aparecen en
-//      casi todos los chunks bajan su peso; términos distintivos pesan más.
+//   3. IDF lÃ©xico embebido (sin librerÃ­as): tÃ©rminos legales que aparecen en
+//      casi todos los chunks bajan su peso; tÃ©rminos distintivos pesan mÃ¡s.
 //   4. Hashing posicional FNV-1a a dims fijas (default 1536 = vector(1536)).
-//   5. Normalización L2 → componentes en [0,1]; como todos los pesos son no
+//   5. NormalizaciÃ³n L2 â†’ componentes en [0,1]; como todos los pesos son no
 //      negativos, la similitud coseno de pgvector se comporta como un
-//      TF-IDF coseno clásico (norma=1 → coseno = producto punto ponderado).
+//      TF-IDF coseno clÃ¡sico (norma=1 â†’ coseno = producto punto ponderado).
 //
-// Con este esquema, chunks con términos legales similares obtienen similitud
+// Con este esquema, chunks con tÃ©rminos legales similares obtienen similitud
 // coseno > 0 (p.ej. "demanda de alimentos" vs "alimentos" > 0.5), lo que
-// mejora el retrieval híbrido (semántica + full-text) sin llamar a ninguna API.
-// La dimensión 1536 se mantiene para compatibilidad con la columna vector(1536)
+// mejora el retrieval hÃ­brido (semÃ¡ntica + full-text) sin llamar a ninguna API.
+// La dimensiÃ³n 1536 se mantiene para compatibilidad con la columna vector(1536)
 // de rag_vectors_v2 y con los placeholders ya almacenados (rango [0,1]).
 
-// Stopwords del español (vocabulario cerrado, sin dependencias).
+// Stopwords del espaÃ±ol (vocabulario cerrado, sin dependencias).
 const STOPWORDS_ES = new Set([
   'de', 'la', 'el', 'en', 'y', 'a', 'los', 'del', 'se', 'las', 'por', 'un', 'para',
-  'con', 'no', 'una', 'su', 'al', 'lo', 'como', 'más', 'mas', 'pero', 'sus', 'le',
+  'con', 'no', 'una', 'su', 'al', 'lo', 'como', 'mÃ¡s', 'mas', 'pero', 'sus', 'le',
   'ya', 'o', 'este', 'si', 'porque', 'esta', 'entre', 'cuando', 'muy', 'sin',
-  'sobre', 'también', 'tambien', 'me', 'hasta', 'hay', 'donde', 'que', 'es',
-  'son', 'fue', 'ser', 'tiene', 'haber', 'estar', 'está', 'estan', 'están', 'ha',
+  'sobre', 'tambiÃ©n', 'tambien', 'me', 'hasta', 'hay', 'donde', 'que', 'es',
+  'son', 'fue', 'ser', 'tiene', 'haber', 'estar', 'estÃ¡', 'estan', 'estÃ¡n', 'ha',
   'han', 'fue', 'era', 'fue', 'son', 'ello', 'ella', 'ellos', 'ellas', 'usted',
   'ustedes', 'nos', 'os', 'les', 'mis', 'tus', 'sus', 'su', 'mi', 'tu', 'cada',
   'uno', 'una', 'unos', 'unas', 'otro', 'otra', 'otros', 'otras', 'todo', 'toda',
   'todos', 'todas', 'cual', 'cuales', 'quien', 'quienes', 'ante', 'bajo',
-  'cabe', 'contra', 'desde', 'durante', 'mediante', 'según', 'segun', 'tras',
-  'tambien', 'tampoco', 'asi', 'así', 'aun', 'aún', 'bien', 'solo', 'sólo'
+  'cabe', 'contra', 'desde', 'durante', 'mediante', 'segÃºn', 'segun', 'tras',
+  'tambien', 'tampoco', 'asi', 'asÃ­', 'aun', 'aÃºn', 'bien', 'solo', 'sÃ³lo'
 ]);
 
-// IDF léxico embebido: términos jurídicos que aparecen en casi todos los
-// chunks del corpus legal (df alto → idf bajo). Los términos NO listados
-// obtienen idf = 1.0 (máximo), por lo que los términos distintivos del
-// derecho (alimentos, prescripción, desalojo, peculado…) pesan más que los
-// genéricos (artículo, ley, derecho, proceso…).
+// IDF lÃ©xico embebido: tÃ©rminos jurÃ­dicos que aparecen en casi todos los
+// chunks del corpus legal (df alto â†’ idf bajo). Los tÃ©rminos NO listados
+// obtienen idf = 1.0 (mÃ¡ximo), por lo que los tÃ©rminos distintivos del
+// derecho (alimentos, prescripciÃ³n, desalojo, peculadoâ€¦) pesan mÃ¡s que los
+// genÃ©ricos (artÃ­culo, ley, derecho, procesoâ€¦).
 const IDF_LEGAL = {
   articulo: 0.30, art: 0.30, ley: 0.32, codigo: 0.35, derecho: 0.38, norma: 0.40,
   proceso: 0.40, tribunal: 0.42, sentencia: 0.42, persona: 0.45, estado: 0.45,
@@ -283,20 +256,20 @@ const IDF_LEGAL = {
 
 /**
  * Normaliza texto: lowercase + quita acentos (NFD) + conserva solo
- * alfanuméricos (incluye ñ/ü) + colapsa espacios.
+ * alfanumÃ©ricos (incluye Ã±/Ã¼) + colapsa espacios.
  */
 export function normalizarEspanol(text) {
   return String(text || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9ñü]+/g, ' ')
+    .replace(/[^a-z0-9Ã±Ã¼]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 /**
- * Tokeniza texto en español para el hash embedding: palabras de >= 2 chars
+ * Tokeniza texto en espaÃ±ol para el hash embedding: palabras de >= 2 chars
  * excluyendo stopwords. Devuelve el array de tokens (preserva orden y
  * duplicados para bigramas y frecuencias).
  */
@@ -306,13 +279,13 @@ export function tokenizarEspanol(text) {
   return norm.split(' ').filter((t) => t.length >= 2 && !STOPWORDS_ES.has(t));
 }
 
-/** IDF ligero de un token (1.0 para términos distintivos, < 1 para genéricos). */
+/** IDF ligero de un token (1.0 para tÃ©rminos distintivos, < 1 para genÃ©ricos). */
 function idfDeTermino(token) {
   const v = IDF_LEGAL[token];
   return typeof v === 'number' ? v : 1.0;
 }
 
-/** Peso TF: 1 + log(frecuencia) (frecuencia 1 → peso 1, frecuencia 3 → ~2.1). */
+/** Peso TF: 1 + log(frecuencia) (frecuencia 1 â†’ peso 1, frecuencia 3 â†’ ~2.1). */
 function pesoTF(frecuencia) {
   return 1 + Math.log(frecuencia || 1);
 }
@@ -328,52 +301,52 @@ function hashFNV1a(str) {
 }
 
 /**
- * Stemming ligero SIN librerías para el hash embedding.
+ * Stemming ligero SIN librerÃ­as para el hash embedding.
  *
- * Normaliza variantes flexivas/derivativas comunes del español legal a una
- * raíz aproximada, para que "alimentos"/"alimentaria"/"alimenticia" → "aliment"
- * y "prescripción"/"prescriptivo" compartan la misma posición de token.
+ * Normaliza variantes flexivas/derivativas comunes del espaÃ±ol legal a una
+ * raÃ­z aproximada, para que "alimentos"/"alimentaria"/"alimenticia" â†’ "aliment"
+ * y "prescripciÃ³n"/"prescriptivo" compartan la misma posiciÃ³n de token.
  *
- * Reglas (conservadoras, solo si queda raíz >= 4):
- *   - quitar -aria/-ario  (alimentaria → aliment)
- *   - quitar -mente       (legalmente → legal)
- *   - quitar -s/-es plural (alimentos → alimento, casaciones → casacion)
- *   - quitar -dad/-idad   (nulidad → nuli, solidaridad → solidari)
+ * Reglas (conservadoras, solo si queda raÃ­z >= 4):
+ *   - quitar -aria/-ario  (alimentaria â†’ aliment)
+ *   - quitar -mente       (legalmente â†’ legal)
+ *   - quitar -s/-es plural (alimentos â†’ alimento, casaciones â†’ casacion)
+ *   - quitar -dad/-idad   (nulidad â†’ nuli, solidaridad â†’ solidari)
  *
- * IMPORTANTE: se aplica a la MISMA función tanto en queries como en chunks
- * (hashEmbedding es el único punto), por lo que la consistencia del espacio
- * vectorial se mantiene aunque la raíz no sea lingüísticamente perfecta.
+ * IMPORTANTE: se aplica a la MISMA funciÃ³n tanto en queries como en chunks
+ * (hashEmbedding es el Ãºnico punto), por lo que la consistencia del espacio
+ * vectorial se mantiene aunque la raÃ­z no sea lingÃ¼Ã­sticamente perfecta.
  */
 export function stemLigeroEspanol(token) {
   if (typeof token !== 'string' || token.length < 5) return token;
   let s = token;
 
-  if (s.length >= 9 && s.endsWith('mente')) s = s.slice(0, -5);   // juridicamente → juridic
-  if (s.length >= 7 && s.endsWith('aria')) s = s.slice(0, -4);    // alimentaria → aliment
-  else if (s.length >= 7 && s.endsWith('ario')) s = s.slice(0, -4); // alimentario → aliment
-  if (s.length >= 6 && (s.endsWith('idad') || s.endsWith('edad'))) s = s.slice(0, -4); // nulidad → nuli
+  if (s.length >= 9 && s.endsWith('mente')) s = s.slice(0, -5);   // juridicamente â†’ juridic
+  if (s.length >= 7 && s.endsWith('aria')) s = s.slice(0, -4);    // alimentaria â†’ aliment
+  else if (s.length >= 7 && s.endsWith('ario')) s = s.slice(0, -4); // alimentario â†’ aliment
+  if (s.length >= 6 && (s.endsWith('idad') || s.endsWith('edad'))) s = s.slice(0, -4); // nulidad â†’ nuli
 
-  // Plural: -es / -s sobre vocal (deja raíz >= 4)
-  if (s.length >= 5 && s.endsWith('es')) s = s.slice(0, -2);      // casaciones → casacion
-  else if (s.length >= 5 && /[aeiouáéíóú]s$/.test(s)) s = s.slice(0, -1); // alimentos → alimento
+  // Plural: -es / -s sobre vocal (deja raÃ­z >= 4)
+  if (s.length >= 5 && s.endsWith('es')) s = s.slice(0, -2);      // casaciones â†’ casacion
+  else if (s.length >= 5 && /[aeiouÃ¡Ã©Ã­Ã³Ãº]s$/.test(s)) s = s.slice(0, -1); // alimentos â†’ alimento
 
-  // Vocal final de género (-o/-a/-e) para unificar masculino/femenino:
-  // alimentos → aliment, demanda → demand, precario → precari.
-  // Solo si la raíz resultante queda >= 4 (conservador con palabras cortas).
-  if (s.length >= 5 && /[aeiouáéíóú]$/.test(s)) s = s.slice(0, -1);
+  // Vocal final de gÃ©nero (-o/-a/-e) para unificar masculino/femenino:
+  // alimentos â†’ aliment, demanda â†’ demand, precario â†’ precari.
+  // Solo si la raÃ­z resultante queda >= 4 (conservador con palabras cortas).
+  if (s.length >= 5 && /[aeiouÃ¡Ã©Ã­Ã³Ãº]$/.test(s)) s = s.slice(0, -1);
 
   return s.length >= 4 ? s : token;
 }
 
 /**
- * Genera un embedding determinístico (hash) de dimensión fija a partir del
- * texto, con tokenización español + stemming ligero + bigramas + trigramas
- * + IDF léxico embebido.
+ * Genera un embedding determinÃ­stico (hash) de dimensiÃ³n fija a partir del
+ * texto, con tokenizaciÃ³n espaÃ±ol + stemming ligero + bigramas + trigramas
+ * + IDF lÃ©xico embebido.
  *
- * - dims default 1536 → compatible con vector(1536) de rag_vectors_v2.
+ * - dims default 1536 â†’ compatible con vector(1536) de rag_vectors_v2.
  * - Todos los pesos son no negativos y el vector se normaliza por L2:
  *   componentes en [0,1] y coseno = producto punto ponderado (TF-IDF coseno).
- * - Determinístico: el mismo texto produce SIEMPRE el mismo vector.
+ * - DeterminÃ­stico: el mismo texto produce SIEMPRE el mismo vector.
  */
 export function hashEmbedding(text, dims = 1536) {
   const vec = new Array(dims).fill(0);
@@ -381,23 +354,23 @@ export function hashEmbedding(text, dims = 1536) {
   const raices = tokens.map(stemLigeroEspanol);
 
   if (tokens.length === 0) {
-    // Texto sin tokens útiles (solo stopwords/números): sesgo determinístico
+    // Texto sin tokens Ãºtiles (solo stopwords/nÃºmeros): sesgo determinÃ­stico
     // para que no sea un vector cero (evita coseno indefinido en pgvector).
     vec[hashFNV1a('legalpro:empty') % dims] = 1.0;
     return vec;
   }
 
-  // Frecuencias por raíz (para TF).
+  // Frecuencias por raÃ­z (para TF).
   const freqs = new Map();
   for (const r of raices) freqs.set(r, (freqs.get(r) || 0) + 1);
 
-  // 1) TOKENS (raíz): peso TF·IDF en posición derivada de la raíz.
+  // 1) TOKENS (raÃ­z): peso TFÂ·IDF en posiciÃ³n derivada de la raÃ­z.
   for (const [r, f] of freqs) {
     const pos = hashFNV1a('T:' + r) % dims;
     vec[pos] += pesoTF(f) * idfDeTermino(r);
   }
 
-  // 2) BIGRAMAS de tokens consecutivos (sobre raíces): contexto local.
+  // 2) BIGRAMAS de tokens consecutivos (sobre raÃ­ces): contexto local.
   for (let i = 0; i + 1 < raices.length; i++) {
     const a = raices[i];
     const b = raices[i + 1];
@@ -406,8 +379,8 @@ export function hashEmbedding(text, dims = 1536) {
     vec[pos] += 0.7 * idf;
   }
 
-  // 3) TRIGRAMAS de caracteres de la raíz: capturan raíces morfológicas
-  //    compartidas ("aliment" aparece en "alimentos", "alimentaria"…).
+  // 3) TRIGRAMAS de caracteres de la raÃ­z: capturan raÃ­ces morfolÃ³gicas
+  //    compartidas ("aliment" aparece en "alimentos", "alimentaria"â€¦).
   for (const r of raices) {
     if (r.length < 3) continue;
     const idf = idfDeTermino(r);
@@ -419,7 +392,7 @@ export function hashEmbedding(text, dims = 1536) {
     }
   }
 
-  // 4) Normalización L2 → norma 1. Componentes no negativos ⇒ [0,1].
+  // 4) NormalizaciÃ³n L2 â†’ norma 1. Componentes no negativos â‡’ [0,1].
   let norm = 0;
   for (let i = 0; i < dims; i++) norm += vec[i] * vec[i];
   norm = Math.sqrt(norm);
@@ -457,7 +430,7 @@ export function cosineSimilarity(a, b) {
 // llamada crea el pool; las siguientes lo reutilizan. Tests pueden cerrarlo
 // con `await closeRetrievePool()` para shutdown limpio.
 //
-// SSL: reutilizamos la misma política que db.js — PGSSLMODE=disable desactiva
+// SSL: reutilizamos la misma polÃ­tica que db.js â€” PGSSLMODE=disable desactiva
 // TLS, el resto exige cifrado (con rejectUnauthorized=false salvo verify-*).
 let _pool = null;
 function getPool() {
@@ -470,9 +443,9 @@ function getPool() {
     ssl: process.env.PGSSLMODE === 'disable'
       ? false
       : { rejectUnauthorized: false },
-    // Pool pequeño: el retrieve es CPU-bound (tsvector+embedding), no
+    // Pool pequeÃ±o: el retrieve es CPU-bound (tsvector+embedding), no
     // necesita 20 conexiones como el backend principal. 5 evita contention
-    // con db.js en Railway free tier (límite ~20 conexiones total).
+    // con db.js en Railway free tier (lÃ­mite ~20 conexiones total).
     max: parseInt(process.env.RAG_RETRIEVE_POOL_SIZE || '5', 10),
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 5_000,
@@ -500,17 +473,17 @@ export async function closeRetrievePool() {
 // ==========================================
 //
 // Cachea el resultado crudo de retrieveHybrid/retrieveVectorial (antes del
-// hybridScore). El hybridScore se ejecuta DESPUÉS del retrieve, en el wrapper,
-// así que cachear el retrieve reduce trabajo de DB y de embedding generation.
+// hybridScore). El hybridScore se ejecuta DESPUÃ‰S del retrieve, en el wrapper,
+// asÃ­ que cachear el retrieve reduce trabajo de DB y de embedding generation.
 //
 // La clave es estable: query (lowercase+trim) + topK + threshold + filter
 // ordenado + tabla. NO incluye weights porque la rama SQL los usa directo.
-// Los embeddings placeholder (hash) son determinísticos para el mismo texto,
-// así que cachear es seguro incluso en modo degradado.
+// Los embeddings placeholder (hash) son determinÃ­sticos para el mismo texto,
+// asÃ­ que cachear es seguro incluso en modo degradado.
 let _redisModule = null;
 async function getRedisClient() {
   if (CONFIG.retrieveCacheDisabled) return null;
-  if (_redisModule !== null) return _redisModule; // null = ya intentó y falló
+  if (_redisModule !== null) return _redisModule; // null = ya intentÃ³ y fallÃ³
   if (!process.env.REDIS_URL) {
     _redisModule = null;
     return null;
@@ -530,7 +503,7 @@ async function getRedis() {
   if (CONFIG.retrieveCacheDisabled) return null;
   if (_redisClient && _redisClient.status === 'ready') return _redisClient;
   if (_redisClient) {
-    // Reconectar si estaba caído (status: 'reconnecting'|'close'|'end')
+    // Reconectar si estaba caÃ­do (status: 'reconnecting'|'close'|'end')
     try { await _redisClient.quit(); } catch { /* ignore */ }
     _redisClient = null;
   }
@@ -542,7 +515,7 @@ async function getRedis() {
       lazyConnect: false,
       enableOfflineQueue: false,
     });
-    _redisClient.on('error', () => { /* silencioso — fail-open */ });
+    _redisClient.on('error', () => { /* silencioso â€” fail-open */ });
     return _redisClient;
   } catch {
     return null;
@@ -568,13 +541,13 @@ function buildRetrieveCacheKey(query, options, table) {
     'tab', table,
     // FIX 2026-08-22 (LOW): discriminar modo embedding vs hash-fallback para
     // que un cache generado con embeddings reales no se sirva en modo degradado
-    // (y viceversa). `table` ya está en la clave ('tab').
+    // (y viceversa). `table` ya estÃ¡ en la clave ('tab').
     // TODO: idealmente incluir el `esHash` REAL del embedding de esta query,
-    // pero generateEmbedding() corre DESPUÉS del cache lookup — no disponible
-    // aquí. El flag env es el proxy más barato y determinístico.
+    // pero generateEmbedding() corre DESPUÃ‰S del cache lookup â€” no disponible
+    // aquÃ­. El flag env es el proxy mÃ¡s barato y determinÃ­stico.
     'm', process.env.RAG_FORCE_HASH === 'true' ? 'hash' : 'emb',
   ].join('|');
-  // Hash determinístico (mismo patrón que redis-cache.mjs)
+  // Hash determinÃ­stico (mismo patrÃ³n que redis-cache.mjs)
   return CONFIG.retrieveCachePrefix + createHash('sha256').update(norm).digest('hex');
 }
 
@@ -608,7 +581,7 @@ async function setCachedRetrieve(key, value) {
 
 /**
  * Invalida todas las claves del cache de retrieve (usar tras reindexar corpus).
- * Implementa SCAN no KEYS para no bloquear Redis en producción.
+ * Implementa SCAN no KEYS para no bloquear Redis en producciÃ³n.
  */
 export async function invalidateRetrieveCache() {
   if (CONFIG.retrieveCacheDisabled) return 0;
@@ -633,10 +606,10 @@ export async function invalidateRetrieveCache() {
 // ==========================================
 
 /**
- * Normaliza los pesos híbridos a sumatoria 1 (evita pesos > 1 por config).
+ * Normaliza los pesos hÃ­bridos a sumatoria 1 (evita pesos > 1 por config).
  *
- * @param {number} semantic - Peso de la señal semántica
- * @param {number} keyword - Peso de la señal keyword/full-text
+ * @param {number} semantic - Peso de la seÃ±al semÃ¡ntica
+ * @param {number} keyword - Peso de la seÃ±al keyword/full-text
  * @returns {{ semantic: number, keyword: number }} Pesos normalizados
  */
 function normalizeWeights(semantic, keyword) {
@@ -654,15 +627,15 @@ function normalizeWeights(semantic, keyword) {
  *   - tipo: 'codigo' | 'articulo' | 'norma' | 'jurisprudencia' | 'resolucion' | ...
  *   - materia: 'penal' | 'civil' | 'laboral' | 'tributario' | ...
  *   - codigo: id de la norma (ej: 'cp', 'cc', 'cpc', 'ncpp')
- *   - articulo: número de artículo (ej: '473')
+ *   - articulo: nÃºmero de artÃ­culo (ej: '473')
  *   - vigente: true | false
  *   - relevancia: 'ALTA' | 'MEDIA' | 'BAJA'
  *   - source: archivo fuente (ej: 'codigos-leyes.json')
  *   - url: fuente oficial (parcial)
  *
  * @param {object} filter - Filtros por metadata (ej: {materia: 'penal', codigo: 'cpc'})
- * @param {Array} params - Array de parámetros existente (se muta)
- * @returns {string} Clausula WHERE (vacía si no hay filtros)
+ * @param {Array} params - Array de parÃ¡metros existente (se muta)
+ * @returns {string} Clausula WHERE (vacÃ­a si no hay filtros)
  */
 function buildFilterWhere(filter, params) {
   const whereClauses = [];
@@ -694,7 +667,7 @@ function buildFilterWhere(filter, params) {
 }
 
 /**
- * Mapea filas SQL a la estructura de resultado estándar.
+ * Mapea filas SQL a la estructura de resultado estÃ¡ndar.
  *
  * @param {Array} rows - Filas de PostgreSQL
  * @param {object} labels - Etiquetas de columnas (similarity, semantic, keyword)
@@ -713,11 +686,11 @@ function mapRows(rows, labels) {
     };
     // FIX RAG-SOTA-GAP2 (2026-08-22): propagar el contexto del contenedor
     // (parent-child retrieval). El indexer guarda metadata.parent_text
-    // (nombre de la norma + artículo siguiente / título del documento);
-    // buildAugmentedPrompt lo antepone como línea `[Contexto: ...]`.
+    // (nombre de la norma + artÃ­culo siguiente / tÃ­tulo del documento);
+    // buildAugmentedPrompt lo antepone como lÃ­nea `[Contexto: ...]`.
     const parentText = row.metadata?.parent_text;
     if (parentText) result.parent_text = String(parentText);
-    // Breakdown para auditoría/trazabilidad (opcional)
+    // Breakdown para auditorÃ­a/trazabilidad (opcional)
     if (semCol && row[semCol] != null) result.semanticSimilarity = parseFloat(row[semCol].toFixed(4));
     if (kwCol && row[kwCol] != null) result.keywordScore = parseFloat(row[kwCol].toFixed(4));
     if (row.score != null) result.score = parseFloat(row.score.toFixed(4));
@@ -729,17 +702,17 @@ function mapRows(rows, labels) {
  * Boost TF-IDF local (sin BD): re-rankea los chunks retornados por el SQL
  * con una similitud keyword ligera entre la query y el contenido del chunk.
  *
- * Por qué: en modo degradado (embeddings hash placeholder) la señal semántica
- * es débil, y aunque el SQL ya combina ts_rank (full-text de PostgreSQL), un
- * boost local con tokenización español + bigramas refuerza la coincidencia de
- * términos técnicos legales que el embedding hash puede sub-pesar.
+ * Por quÃ©: en modo degradado (embeddings hash placeholder) la seÃ±al semÃ¡ntica
+ * es dÃ©bil, y aunque el SQL ya combina ts_rank (full-text de PostgreSQL), un
+ * boost local con tokenizaciÃ³n espaÃ±ol + bigramas refuerza la coincidencia de
+ * tÃ©rminos tÃ©cnicos legales que el embedding hash puede sub-pesar.
  *
- * Fórmula (configurable):
+ * FÃ³rmula (configurable):
  *   final = original * (1 - w) + keywordLocal * w
  *   con w = CONFIG.keywordBoostWeight (default 0.25)
  *   keywordLocal = overlap de tokens + bigramas entre query y chunk (0..1)
  *
- * NO rompe el retrieval: solo recalcula `similarity` (y añade breakdown
+ * NO rompe el retrieval: solo recalcula `similarity` (y aÃ±ade breakdown
  * `keyword_boost`) conservando el resto de campos del chunk.
  *
  * @param {Array} results - Chunks de retrieveHybrid/retrieveVectorial
@@ -754,7 +727,7 @@ export function applyKeywordBoost(results, query) {
   const queryTokens = tokenizarEspanol(query);
   if (queryTokens.length === 0) return results;
 
-  // Bigramas de la query (contexto local de 2 términos).
+  // Bigramas de la query (contexto local de 2 tÃ©rminos).
   const queryBigrams = [];
   for (let i = 0; i + 1 < queryTokens.length; i++) {
     queryBigrams.push(`${queryTokens[i]} ${queryTokens[i + 1]}`);
@@ -775,7 +748,7 @@ export function applyKeywordBoost(results, query) {
     }
     const bigramHits = queryBigrams.filter((b) => contentBigramSet.has(b)).length;
 
-    // keywordLocal: 70% tokens + 30% bigramas (misma filosofía que hybridScore
+    // keywordLocal: 70% tokens + 30% bigramas (misma filosofÃ­a que hybridScore
     // del wrapper, pero a nivel de chunk completo y sin cortar en stopwords).
     const keywordLocal = (totalTerms > 0 ? tokenHits / totalTerms : 0) * 0.7
       + (totalBigrams > 0 ? bigramHits / totalBigrams : 0) * 0.3;
@@ -784,10 +757,10 @@ export function applyKeywordBoost(results, query) {
     const boosted = original * (1 - w) + keywordLocal * w;
 
     // FIX P0-F1 (2026-08-21): NO sobrescribir `similarity` con el score
-    // inflado por boost léxico. El threshold debe evaluarse contra la señal
-    // semántica ORIGINAL; el score combinado va en `boosted_score` (solo para
-    // ranking en modo degradado). Así un chunk con similitud semántica 0.05 +
-    // overlap léxico alto NO puede presentarse como "jurisprudencia verificada".
+    // inflado por boost lÃ©xico. El threshold debe evaluarse contra la seÃ±al
+    // semÃ¡ntica ORIGINAL; el score combinado va en `boosted_score` (solo para
+    // ranking en modo degradado). AsÃ­ un chunk con similitud semÃ¡ntica 0.05 +
+    // overlap lÃ©xico alto NO puede presentarse como "jurisprudencia verificada".
     return {
       ...chunk,
       similarity: Number(original.toFixed(4)),
@@ -805,21 +778,21 @@ export function applyKeywordBoost(results, query) {
 }
 
 /**
- * Búsqueda HÍBRIDA: combina similitud coseno (semántica) con full-text
- * de PostgreSQL (ts_rank, config 'spanish') para mejor precisión en
- * términos técnicos legales que el embedding semántico puede sub-pesar.
+ * BÃºsqueda HÃBRIDA: combina similitud coseno (semÃ¡ntica) con full-text
+ * de PostgreSQL (ts_rank, config 'spanish') para mejor precisiÃ³n en
+ * tÃ©rminos tÃ©cnicos legales que el embedding semÃ¡ntico puede sub-pesar.
  *
  * Score final = weightSemantic * coseno + weightKeyword * ts_rank_normalizado
  *
  * @param {string} query - Consulta del usuario
- * @param {object} options - Opciones de búsqueda
- * @param {number} options.topK - Número de resultados (default CONFIG.topK)
- * @param {number} options.threshold - Umbral mínimo de similitud coseno para la rama OR (default CONFIG.similarityThreshold)
+ * @param {object} options - Opciones de bÃºsqueda
+ * @param {number} options.topK - NÃºmero de resultados (default CONFIG.topK)
+ * @param {number} options.threshold - Umbral mÃ­nimo de similitud coseno para la rama OR (default CONFIG.similarityThreshold)
  * @param {object} options.filter - Filtros por metadata (ej: {tipo: 'codigo_legal', materia: 'penal'})
- * @param {number} options.weightSemantic - Peso semántico (default CONFIG.hybridWeights.semantic)
+ * @param {number} options.weightSemantic - Peso semÃ¡ntico (default CONFIG.hybridWeights.semantic)
  * @param {number} options.weightKeyword - Peso keyword (default CONFIG.hybridWeights.keyword)
  * @param {string} options.table - Tabla vectorial (default: rag_vectors_v2 si RAG_USE_V2, si no rag_vectors)
- * @returns {Promise<Array>} - Chunks relevantes con score híbrido
+ * @returns {Promise<Array>} - Chunks relevantes con score hÃ­brido
  */
 export async function retrieveHybrid(query, options = {}) {
   const {
@@ -832,7 +805,7 @@ export async function retrieveHybrid(query, options = {}) {
   } = options;
 
   if (!query || typeof query !== 'string' || query.trim().length === 0) {
-    throw new Error('query debe ser un texto no vacío');
+    throw new Error('query debe ser un texto no vacÃ­o');
   }
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL not configured');
@@ -842,11 +815,11 @@ export async function retrieveHybrid(query, options = {}) {
   const normalization = CONFIG.ftsRankNormalization;
 
   // FIX 2026-08-08: cache distribuido opcional (TTL corto). La clave es estable
-  // por (query, topK, threshold, strategy, weights, filter, table) — NO incluye
+  // por (query, topK, threshold, strategy, weights, filter, table) â€” NO incluye
   // el embedding crudo (1536 floats) para mantener la clave compacta.
-  // FIX 2026-08-22 (CRITICAL): buildRetrieveCacheKey es sync puro — llamada
-  // directa SIN await (un await sobre un string era inocuo, pero inducía a
-  // error y provocó el bug "[object Promise]" en retrieveVectorial).
+  // FIX 2026-08-22 (CRITICAL): buildRetrieveCacheKey es sync puro â€” llamada
+  // directa SIN await (un await sobre un string era inocuo, pero inducÃ­a a
+  // error y provocÃ³ el bug "[object Promise]" en retrieveVectorial).
   const cacheKey = buildRetrieveCacheKey(query, { topK, threshold, strategy: 'hybrid', weightSemantic, weightKeyword, filter }, table);
   const cached = await getCachedRetrieve(cacheKey);
   if (cached) {
@@ -858,12 +831,12 @@ export async function retrieveHybrid(query, options = {}) {
   const pool = getPool();
 
   // FIX 2026-08-12: en modo degradado (embedding hash placeholder) se usa la
-  // configuración degradedWeights (default 0.4 semántico / 0.6 keyword) para
-  // rebalancear hacia el full-text + boost TF-IDF, que es más fiable que la
-  // señal semántica débil. Con proveedor real se mantiene hybridWeights.
+  // configuraciÃ³n degradedWeights (default 0.4 semÃ¡ntico / 0.6 keyword) para
+  // rebalancear hacia el full-text + boost TF-IDF, que es mÃ¡s fiable que la
+  // seÃ±al semÃ¡ntica dÃ©bil. Con proveedor real se mantiene hybridWeights.
   let weights = normalizeWeights(weightSemantic, weightKeyword);
-  // FIX P0-F3 (2026-08-21): { vector, esHash } local — sin race condition.
-  const { vector: queryEmbedding, esHash } = await generateEmbedding(query, { miniMax: table === CONFIG.tableV2 });
+  // FIX P0-F3 (2026-08-21): { vector, esHash } local â€” sin race condition.
+  const { vector: queryEmbedding, esHash } = await generateEmbedding(query);
   // FIX GOLDEN-SET (2026-08-23): umbral efectivo dependiente del modo.
   let umbralEfectivo = threshold;
   if (esHash) {
@@ -872,16 +845,16 @@ export async function retrieveHybrid(query, options = {}) {
   }
   const vectorStr = `[${queryEmbedding.join(',')}]`;
 
-  // 2. Parámetros: $1 vector, $2 query full-text, $3 umbral coseno, $4 LIMIT
-  //    (los filtros se agregan después: $5, $6, ...)
+  // 2. ParÃ¡metros: $1 vector, $2 query full-text, $3 umbral coseno, $4 LIMIT
+  //    (los filtros se agregan despuÃ©s: $5, $6, ...)
   const params = [vectorStr, query, umbralEfectivo, topK];
   const whereSQL = buildFilterWhere(filter, params);
 
-  // 3. Búsqueda híbrida:
+  // 3. BÃºsqueda hÃ­brida:
   //    - Rama full-text: to_tsvector('spanish') @@ plainto_tsquery('spanish', $2)
-  //    - Rama semántica: 1 - (embedding <=> $1::vector) > $3  (OR, rescata términos
-  //      que el full-text no matchea, p.ej. stopwords o sinónimos semánticos)
-  //    - ts_rank con normalización CONFIG.ftsRankNormalization (32 => [0,1])
+  //    - Rama semÃ¡ntica: 1 - (embedding <=> $1::vector) > $3  (OR, rescata tÃ©rminos
+  //      que el full-text no matchea, p.ej. stopwords o sinÃ³nimos semÃ¡nticos)
+  //    - ts_rank con normalizaciÃ³n CONFIG.ftsRankNormalization (32 => [0,1])
   const sql = `
     SELECT
       id,
@@ -907,16 +880,16 @@ export async function retrieveHybrid(query, options = {}) {
   let results = mapRows(rows, { similarity: 'score', semantic: 'semantic_similarity', keyword: 'keyword_score' });
 
   // FIX 2026-08-12: en modo degradado, re-rankeo con boost TF-IDF local
-  // (tokens + bigramas) para reforzar términos técnicos legales. El boost es
-  // determinístico (mismo texto → mismo resultado), así que cachear tras el
+  // (tokens + bigramas) para reforzar tÃ©rminos tÃ©cnicos legales. El boost es
+  // determinÃ­stico (mismo texto â†’ mismo resultado), asÃ­ que cachear tras el
   // boost es seguro. Con proveedor real, results queda sin modificar.
   //
   // FIX P0-F1/F2 (2026-08-21): applyKeywordBoost ya NO sobrescribe `similarity`
   // (va a `boosted_score`). Post-filtro estricto:
-  //   - Pasa `similarity >= threshold` (señal semántica real) → chunk normal.
-  //   - En modo degradado, pasa `boosted_score >= threshold` → chunk DEGRADED
+  //   - Pasa `similarity >= threshold` (seÃ±al semÃ¡ntica real) â†’ chunk normal.
+  //   - En modo degradado, pasa `boosted_score >= threshold` â†’ chunk DEGRADED
   //     (nunca presentable como "jurisprudencia verificada").
-  //   - Lo demás se descarta.
+  //   - Lo demÃ¡s se descarta.
   if (esHash) {
     results = applyKeywordBoost(results, query);
   }
@@ -924,36 +897,36 @@ export async function retrieveHybrid(query, options = {}) {
   results = results.filter((r) => {
     if ((r.similarity ?? 0) >= umbralEfectivo) return true;
     if (esHash && (r.boosted_score ?? 0) >= umbralEfectivo) {
-      r.degraded = true; // solo superó el umbral vía boost léxico
+      r.degraded = true; // solo superÃ³ el umbral vÃ­a boost lÃ©xico
       return true;
     }
     return false;
   });
 
-  // FIX P0-F2/F3 (2026-08-21): si la QUERY se embedió con hash, TODA la
-  // similitud coseno es cross-space potencialmente inválida (corpus puede
+  // FIX P0-F2/F3 (2026-08-21): si la QUERY se embediÃ³ con hash, TODA la
+  // similitud coseno es cross-space potencialmente invÃ¡lida (corpus puede
   // estar indexado con embo-01). Marcar todos los chunks como degraded para
   // que downstream (wrapper/ai.js) reporte rag_verificado:false.
-  // TODO(P1): añadir columna embedding_es_hash a rag_vectors_v2 + filtro SQL
+  // TODO(P1): aÃ±adir columna embedding_es_hash a rag_vectors_v2 + filtro SQL
   // para comparar solo contra chunks del mismo espacio vectorial.
   if (esHash) {
     for (const r of results) r.degraded = true;
   }
 
-  // Cache best-effort (fire-and-forget, NO await para no añadir latencia)
+  // Cache best-effort (fire-and-forget, NO await para no aÃ±adir latencia)
   setCachedRetrieve(cacheKey, results).catch(() => {});
 
   return results;
 }
 
 /**
- * Búsqueda SOLO VECTORIAL (similitud coseno pura).
+ * BÃºsqueda SOLO VECTORIAL (similitud coseno pura).
  * Se mantiene para compatibilidad y para casos donde se requiera
- * exclusivamente la señal semántica.
+ * exclusivamente la seÃ±al semÃ¡ntica.
  *
  * @param {string} query - Consulta del usuario
- * @param {object} options - Opciones de búsqueda
- * @param {number} options.topK - Número de resultados (default CONFIG.topK)
+ * @param {object} options - Opciones de bÃºsqueda
+ * @param {number} options.topK - NÃºmero de resultados (default CONFIG.topK)
  * @param {number} options.threshold - Umbral de similitud (default CONFIG.similarityThreshold)
  * @param {object} options.filter - Filtros por metadata (ej: {tipo: 'codigo_legal', materia: 'penal'})
  * @param {string} options.table - Tabla vectorial (default: rag_vectors_v2 si RAG_USE_V2, si no rag_vectors)
@@ -968,14 +941,14 @@ export async function retrieveVectorial(query, options = {}) {
   } = options;
 
   if (!query || typeof query !== 'string' || query.trim().length === 0) {
-    throw new Error('query debe ser un texto no vacío');
+    throw new Error('query debe ser un texto no vacÃ­o');
   }
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL not configured');
   }
 
-  // FIX 2026-08-08 (perf): cache distribuido + pg.Pool singleton (mismo patrón
-  // que retrieveHybrid) — ver comentarios arriba para justificación detallada.
+  // FIX 2026-08-08 (perf): cache distribuido + pg.Pool singleton (mismo patrÃ³n
+  // que retrieveHybrid) â€” ver comentarios arriba para justificaciÃ³n detallada.
   const cacheKey = buildRetrieveCacheKey(query, { topK, threshold, strategy: 'vectorial', filter }, table);
   const cached = await getCachedRetrieve(cacheKey);
   if (cached) {
@@ -985,18 +958,18 @@ export async function retrieveVectorial(query, options = {}) {
   const pool = getPool();
 
   // 1. Generar embedding de la query
-  // FIX P0-F3: { vector, esHash } local — sin race condition.
-  const { vector: queryEmbedding, esHash } = await generateEmbedding(query, { miniMax: table === CONFIG.tableV2 });
+  // FIX P0-F3: { vector, esHash } local â€” sin race condition.
+  const { vector: queryEmbedding, esHash } = await generateEmbedding(query);
   const vectorStr = `[${queryEmbedding.join(',')}]`;
 
-  // 2. Parámetros: $1 vector, $2 LIMIT, $3 umbral coseno (los filtros se
-  //    agregan después vía buildFilterWhere, que indexa dinámicamente).
+  // 2. ParÃ¡metros: $1 vector, $2 LIMIT, $3 umbral coseno (los filtros se
+  //    agregan despuÃ©s vÃ­a buildFilterWhere, que indexa dinÃ¡micamente).
   // FIX 2026-08-22 (MEDIUM): threshold parametrizado como $3 (igual que
-  // retrieveHybrid) — antes se interpolaba crudo (${threshold}) en el SQL.
+  // retrieveHybrid) â€” antes se interpolaba crudo (${threshold}) en el SQL.
   const params = [vectorStr, topK, threshold];
   const whereSQL = buildFilterWhere(filter, params);
 
-  // 3. Búsqueda por similitud coseno
+  // 3. BÃºsqueda por similitud coseno
   const sql = `
     SELECT
       id,
@@ -1014,8 +987,8 @@ export async function retrieveVectorial(query, options = {}) {
   const { rows } = await pool.query(sql, params);
   const results = mapRows(rows, { similarity: 'similarity' });
 
-  // FIX P0-F2/F3 (2026-08-21): query hash → todo el resultado es cross-space
-  // potencialmente inválido. Marcar degraded (ver retrieveHybrid).
+  // FIX P0-F2/F3 (2026-08-21): query hash â†’ todo el resultado es cross-space
+  // potencialmente invÃ¡lido. Marcar degraded (ver retrieveHybrid).
   if (esHash) {
     for (const r of results) r.degraded = true;
   }
@@ -1027,15 +1000,15 @@ export async function retrieveVectorial(query, options = {}) {
 }
 
 /**
- * Retriever por defecto: HÍBRIDO (semántica + full-text).
+ * Retriever por defecto: HÃBRIDO (semÃ¡ntica + full-text).
  *
  * Se puede forzar la estrategia vectorial pura con:
  *   retrieve(query, { strategy: 'vectorial' })
  *
  * @param {string} query - Consulta del usuario
- * @param {object} options - Opciones de búsqueda
+ * @param {object} options - Opciones de bÃºsqueda
  * @param {'hybrid'|'vectorial'} options.strategy - Estrategia de retrieval (default 'hybrid')
- * @param {number} options.topK - Número de resultados (default 5)
+ * @param {number} options.topK - NÃºmero de resultados (default 5)
  * @param {number} options.threshold - Umbral de similitud (default 0.75)
  * @param {object} options.filter - Filtros por metadata (ej: {tipo: 'codigo_legal', materia: 'penal'})
  * @returns {Promise<Array>} - Chunks relevantes con score
@@ -1051,13 +1024,13 @@ export async function retrieve(query, options = {}) {
 /**
  * Construye un prompt aumentado con citaciones para el LLM.
  *
- * FIX RAG-SOTA-GAP2 (2026-08-22): parent-child retrieval (informe rag.txt §7).
+ * FIX RAG-SOTA-GAP2 (2026-08-22): parent-child retrieval (informe rag.txt Â§7).
  * Si el chunk trae parent_text (contexto del contenedor indexado por
- * index-todos.mjs), se antepone la línea `[Contexto: ...]` antes del texto:
+ * index-todos.mjs), se antepone la lÃ­nea `[Contexto: ...]` antes del texto:
  * el generador recibe el hijo preciso + el padre contextual.
  *
  * @param {string} query - Consulta del usuario
- * @param {string} systemInstruction - Instrucción de sistema
+ * @param {string} systemInstruction - InstrucciÃ³n de sistema
  * @param {Array} chunks - Chunks relevantes
  * @returns {object} - Prompt y sources
  */
@@ -1079,8 +1052,8 @@ ${query}
 
 INSTRUCCIONES:
 - Basa tu respuesta EXCLUSIVAMENTE en el contexto normativo proporcionado.
-- Cita las fuentes con formato [N] donde N es el número de fuente.
-- NUNCA inventes artículos o leyes.
+- Cita las fuentes con formato [N] donde N es el nÃºmero de fuente.
+- NUNCA inventes artÃ­culos o leyes.
 - Si no encuentras la respuesta en el contexto, di "No encuentro base normativa suficiente".
 - Incluye los 4 disclaimers IA obligatorios.
 - Idioma: es-PE.
@@ -1113,19 +1086,19 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       if (k && v) filter[k.trim()] = v.trim();
     }
   }
-  console.log(`🔍 Buscando (${strategy}): "${query}"`);
-  if (useV2) console.log(`📦 Tabla: rag_vectors_v2 (MiniMax)`);
-  if (Object.keys(filter).length > 0) console.log(`🔎 Filtros: ${JSON.stringify(filter)}`);
+  console.log(`ðŸ” Buscando (${strategy}): "${query}"`);
+  if (useV2) console.log(`ðŸ“¦ Tabla: rag_vectors_v2 (MiniMax)`);
+  if (Object.keys(filter).length > 0) console.log(`ðŸ”Ž Filtros: ${JSON.stringify(filter)}`);
   console.log('');
 
   retrieve(query, { topK: 5, strategy, table: useV2 ? 'rag_vectors_v2' : undefined, filter })
     .then((results) => {
       if (results.length === 0) {
-        console.log('❌ Sin resultados relevantes');
+        console.log('âŒ Sin resultados relevantes');
         process.exit(1);
       }
 
-      console.log(`✅ ${results.length} resultados encontrados:\n`);
+      console.log(`âœ… ${results.length} resultados encontrados:\n`);
       results.forEach((r) => {
         const breakdown =
           r.semanticSimilarity != null
@@ -1133,7 +1106,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
             : '';
         console.log(`[${r.rank}] ${r.source} (score: ${(r.similarity * 100).toFixed(1)}%${breakdown})`);
         console.log(`    ID: ${r.id}`);
-        if (r.metadata?.materia) console.log(`    Materia: ${r.metadata.materia} | Artículo: ${r.metadata.articulo || '-'} | Vigente: ${r.metadata.vigente}`);
+        if (r.metadata?.materia) console.log(`    Materia: ${r.metadata.materia} | ArtÃ­culo: ${r.metadata.articulo || '-'} | Vigente: ${r.metadata.vigente}`);
         console.log(`    ${r.content.substring(0, 200)}...`);
         console.log('');
       });
@@ -1141,7 +1114,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       process.exit(0);
     })
     .catch((err) => {
-      console.error('💥 Error:', err.message);
+      console.error('ðŸ’¥ Error:', err.message);
       process.exit(1);
     });
 }
