@@ -4,6 +4,13 @@ import tailwindcss from '@tailwindcss/vite'
 import viteCompression from 'vite-plugin-compression'
 
 export default defineConfig({
+  resolve: {
+    // El repo mezcla dos linajes (client.js viejo vs client.ts canónico,
+    // TenantContext/UIContext .jsx vs .tsx). La versión TS es el superset:
+    // resolvemos .ts/.tsx ANTES que .js/.jsx para que '../api/client' y
+    // '../context/*' apunten siempre a la implementación completa.
+    extensions: ['.mts', '.ts', '.tsx', '.mjs', '.js', '.jsx', '.json'],
+  },
   plugins: [
     react(),
     tailwindcss(),

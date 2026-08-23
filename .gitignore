@@ -1,0 +1,42 @@
+# ── Secretos (NUNCA commitear) ──────────────────────────────
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+datos.txt
+
+# ── Dependencias / builds ───────────────────────────────────
+node_modules/
+**/node_modules/
+dist/
+build/
+**/dist/
+**/build/
+*.apk
+
+# ── Android (artefactos e IDE) ──────────────────────────────
+LegalProAndroid/.gradle/
+LegalProAndroid/.idea/
+LegalProAndroid/.kotlin/
+LegalProAndroid/app/build/
+LegalProAndroid/build/
+LegalProAndroid/local.properties
+
+# ── Test/artefactos ─────────────────────────────────────────
+.playwright-mcp/
+playwright-report/
+test-results/
+test-results-prod/
+coverage/
+
+# ── Logs ────────────────────────────────────────────────────
+*.log
+audit-run-*.log
+
+# ── IDE/OS ──────────────────────────────────────────────────
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
