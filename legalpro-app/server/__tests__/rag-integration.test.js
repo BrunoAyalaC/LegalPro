@@ -101,6 +101,7 @@ vi.mock('../../../tools/rag/retrieve.mjs', async (importOriginal) => {
 let retrieve;
 let buildAugmentedPrompt;
 let consultarBaseLegal;
+let rerank;
 
 beforeAll(async () => {
   const retrieveMod = await import('../../../tools/rag/retrieve.mjs');
@@ -109,6 +110,10 @@ beforeAll(async () => {
 
   const wrapperMod = await import('../../../tools/rag/junior-rag-wrapper.mjs');
   consultarBaseLegal = wrapperMod.consultarBaseLegal;
+
+  // FIX RAG-SOTA-GAP1/GAP2: cobertura del reranker especializado
+  const rerankerMod = await import('../../../tools/rag/reranker.mjs');
+  rerank = rerankerMod.rerank;
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -284,6 +289,138 @@ describe('RAG Integration - Cache Multi-tier (vía consultarBaseLegal)', () => {
     expect(r.necesita_revision_humana).toBe(true);
     expect(r.sistema_origen).toBe('RAG-LegalPro-v1');
     expect(r.disclaimers_obligatorios).toHaveLength(4);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. GAP-1: Reranker especializado (reranker.mjs — API BGE + fallback heurístico)
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('RAG Integration - Reranker especializado (GAP-1)', () => {
+
+  test('Fallback heurístico: marca reranker:"heuristico", rerank_score numérico y respeta topK', async () => {
+    // Sin env de API → ruta heurística garantizada
+    const prevUrl = process.env.RERANKER_API_URL;
+    const prevKey = process.env.RERANKER_API_KEY;
+    delete process.env.RERANKER_API_URL;
+    delete process.env.RERANKER_API_KEY;
+
+    try {
+      const chunks = [
+        { id: 'a', content: 'La prescripción adquisitiva de bienes inmuebles requiere posesión prolongada.', rrf_score: 0.01 },
+        { id: 'b', content: 'Disposiciones generales del proceso contencioso administrativo.', rrf_score: 0.01 },
+        { id: 'c', content: 'Bienes y plazos dentro del proceso civil.', rrf_score: 0.01 },
+      ];
+      // rrf_score iguales → rrf_norm constante → el orden lo decide el
+      // keyword overlap con la query ('prescripción adquisitiva bienes inmuebles')
+      const out = await rerank('prescripción adquisitiva bienes inmuebles', chunks, { topK: 2 });
+
+      expect(out).toHaveLength(2);
+      out.forEach((r) => {
+        expect(typeof r.rerank_score).toBe('number');
+        expect(['bge-api', 'heuristico']).toContain(r.reranker);
+      });
+      expect(out.every((r) => r.reranker === 'heuristico')).toBe(true);
+      // El chunk con mayor overlap léxico (4/4 términos) debe quedar primero,
+      // y el chunk sin overlap ('b') debe quedar fuera del top-2
+      expect(out[0].id).toBe('a');
+      expect(out.map((r) => r.id)).not.toContain('b');
+    } finally {
+      if (prevUrl !== undefined) process.env.RERANKER_API_URL = prevUrl;
+      if (prevKey !== undefined) process.env.RERANKER_API_KEY = prevKey;
+    }
+  });
+
+  test('API BGE configurada: usa relevance_score, ordena DESC y marca reranker:"bge-api"', async () => {
+    const prevUrl = process.env.RERANKER_API_URL;
+    const prevKey = process.env.RERANKER_API_KEY;
+    process.env.RERANKER_API_URL = 'https://rerank.test/v1/rerank';
+    process.env.RERANKER_API_KEY = 'test-key';
+
+    // Mock fetch: el índice 1 tiene mayor relevancia → debe quedar primero
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        results: [
+          { index: 0, relevance_score: 0.10 },
+          { index: 1, relevance_score: 0.95 },
+        ],
+      }),
+    })));
+
+    try {
+      const chunks = [
+        { id: 'x', content: 'chunk menos relevante', rrf_score: 0.01 },
+        { id: 'y', content: 'chunk más relevante', rrf_score: 0.02 },
+      ];
+      const out = await rerank('consulta', chunks, { topK: 10 });
+
+      expect(out[0].id).toBe('y');
+      expect(out[0].reranker).toBe('bge-api');
+      expect(out[0].rerank_score).toBeCloseTo(0.95, 5);
+      expect(out[1].id).toBe('x');
+    } finally {
+      vi.unstubAllGlobals();
+      if (prevUrl === undefined) delete process.env.RERANKER_API_URL; else process.env.RERANKER_API_URL = prevUrl;
+      if (prevKey === undefined) delete process.env.RERANKER_API_KEY; else process.env.RERANKER_API_KEY = prevKey;
+    }
+  });
+
+  test('Fail-open: si la API falla (fetch lanza), cae al heurístico sin lanzar', async () => {
+    const prevUrl = process.env.RERANKER_API_URL;
+    const prevKey = process.env.RERANKER_API_KEY;
+    process.env.RERANKER_API_URL = 'https://rerank.test/v1/rerank';
+    process.env.RERANKER_API_KEY = 'test-key';
+
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('network down'); }));
+
+    try {
+      const chunks = [{ id: 'z', content: 'plazo para contestar demanda', rrf_score: 0.01 }];
+      const out = await rerank('contestar demanda', chunks, { topK: 5 });
+      expect(out).toHaveLength(1);
+      expect(out[0].reranker).toBe('heuristico');
+    } finally {
+      vi.unstubAllGlobals();
+      if (prevUrl === undefined) delete process.env.RERANKER_API_URL; else process.env.RERANKER_API_URL = prevUrl;
+      if (prevKey === undefined) delete process.env.RERANKER_API_KEY; else process.env.RERANKER_API_KEY = prevKey;
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. GAP-2: Parent-Child Retrieval (parent_text en buildAugmentedPrompt)
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('RAG Integration - Parent-Child Retrieval (GAP-2)', () => {
+
+  test('Chunk con parent_text antepone línea [Contexto: ...] antes del contenido', () => {
+    const chunks = [
+      {
+        id: 'cc-art-1989',
+        source: 'codigos-leyes.json',
+        content: 'La prescripción ordinaria se produce por el transcurso de 10 años.',
+        similarity: 0.9,
+        parent_text: 'Código Civil (Decreto Legislativo 295) · sigue Artículo 1990',
+      },
+    ];
+
+    const { prompt } = buildAugmentedPrompt('prescripción', 'sys', chunks);
+
+    expect(prompt).toContain('[Contexto: Código Civil (Decreto Legislativo 295) · sigue Artículo 1990]');
+    // El padre va ANTES del texto del hijo dentro del mismo bloque
+    const idxCtx = prompt.indexOf('[Contexto:');
+    const idxContent = prompt.indexOf('La prescripción ordinaria');
+    expect(idxCtx).toBeGreaterThan(-1);
+    expect(idxCtx).toBeLessThan(idxContent);
+  });
+
+  test('Chunk sin parent_text NO añade línea [Contexto:] (backward-compat)', () => {
+    const chunks = [
+      { id: 'a', source: 'A', content: 'contenido A', similarity: 0.85 },
+    ];
+    const { prompt } = buildAugmentedPrompt('q', 'sys', chunks);
+    expect(prompt).not.toContain('[Contexto:');
+    expect(prompt).toContain('contenido A');
   });
 });
 

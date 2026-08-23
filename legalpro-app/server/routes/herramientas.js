@@ -1,10 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // HERRAMIENTAS LEGALES DETERMINÍSTICAS (sin IA = sin costo por consulta)
 // ───────────────────────────────────────────────────────────────────────────
-// 10 endpoints de cálculo puro: UIT, interés legal, plazos hábiles y
+// 12 endpoints de cálculo puro: UIT, interés legal, plazos hábiles y
 // naturales↔hábiles, buscador de delitos, prescripción penal, tasa BCRP,
-// comparador de tasas, indemnización por despido arbitrario (D.S. 001-97-TR)
-// y exportación .ics (RFC 5545).
+// comparador de tasas, indemnización por despido arbitrario (D.S. 001-97-TR),
+// exportación .ics (RFC 5545), liquidación laboral (LPCL) y pensión de
+// alimentos (Ley 28720).
 //
 // Base legal:
 //   - CPC Art. 144: días hábiles procesales (plazo vence en día inhábil →
@@ -697,6 +698,185 @@ router.post('/exportar-ics', authMiddleware, (req, res) => {
   res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="vencimientos-legalpro.ics"');
   res.send(lineas.join('\r\n') + '\r\n'); // CRLF obligatorio (RFC 5545 §3.1)
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 11) POST /api/herramientas/liquidacion-laboral — beneficios sociales
+//     Base legal: LPCL (D.S. 003-97-TR) arts. 1-7 + D.S. 001-97-TR.
+//       - CTS: D.S. 001-97-TR arts. 3-5 (depósitos semestrales mayo-nov /
+//         dic-abr). Simplificado aquí como proporcional a días /360.
+//       - Vacaciones truncas: LPCL art. 10 (30 días/año → 1/12 por mes del
+//         año no devengado completo, contado desde el último aniversario).
+//       - Gratificación trunca: D.S. 001-97-TR arts. 32-35 (semestres
+//         enero-junio y julio-diciembre; medio sueldo por semestre).
+//       - Indemnización despido arbitrario: D.S. 001-97-TR arts. 34 y 38
+//         (1.5 sueldos/año + fracción proporcional, tope 12 sueldos).
+//     ⚠️ CÁLCULO SIMPLIFICADO REFERENCIAL — el real depende de fechas de
+//     aniversario, remuneraciones variables (prom. 6 meses) y períodos
+//     vencidos no cobrados.
+// ═════════════════════════════════════════════════════════════════════════════
+const liquidacionSchema = z
+  .object({
+    fecha_ingreso: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'fecha_ingreso debe ser YYYY-MM-DD')
+      .refine((s) => fechaReal(s) !== null, 'fecha calendario válida requerida'),
+    fecha_cese: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'fecha_cese debe ser YYYY-MM-DD')
+      .refine((s) => fechaReal(s) !== null, 'fecha calendario válida requerida'),
+    remuneracion_mensual: z.number().positive().max(1_000_000, 'remuneracion_mensual fuera de rango razonable'),
+    // Meses con gratificación ya percibida — informativo en la versión
+    // simplificada (no altera el cálculo truncado por semestre actual).
+    meses_con_gratificacion: z.number().int().min(0).max(600).default(0),
+    motivo: z.enum(['despido_arbitrario', 'otro']).default('otro'),
+  })
+  .refine((d) => parseFecha(d.fecha_cese) > parseFecha(d.fecha_ingreso), {
+    message: 'fecha_cese debe ser posterior a fecha_ingreso',
+    path: ['fecha_cese'],
+  });
+
+router.post('/liquidacion-laboral', authMiddleware, (req, res) => {
+  const parsed = liquidacionSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({
+      success: false,
+      error: 'Datos de entrada inválidos.',
+      details: parsed.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+      code: 'VALIDATION_ERROR',
+    });
+  }
+  const { fecha_ingreso, fecha_cese, remuneracion_mensual: R, motivo } = parsed.data;
+  const fi = parseFecha(fecha_ingreso);
+  const fc = parseFecha(fecha_cese);
+
+  // ── Tiempo de servicio calendario {anios, meses, dias} ──
+  let anios = fc.getFullYear() - fi.getFullYear();
+  let meses = fc.getMonth() - fi.getMonth();
+  let dias = fc.getDate() - fi.getDate();
+  if (dias < 0) {
+    meses -= 1;
+    // Borrow de días del mes previo al cese (repetido por si el borrow deja
+    // <0, p. ej. ingreso día 31 vs cese día 1 con mes previo de 28 días).
+    while (dias < 0) {
+      dias += new Date(fc.getFullYear(), fc.getMonth(), 0).getDate();
+    }
+  }
+  if (meses < 0) {
+    anios -= 1;
+    meses += 12;
+  }
+
+  // Meses completos totales (mismo criterio que indemnizacion-despido)
+  let mesesTotales = (fc.getFullYear() - fi.getFullYear()) * 12 + (fc.getMonth() - fi.getMonth());
+  if (fc.getDate() < fi.getDate()) mesesTotales -= 1;
+
+  // ── CTS simplificada: 1 sueldo por semestre completo ≈ R × (días/360) ──
+  const diasPeriodo = diasEntre(fecha_ingreso, fecha_cese);
+  const cts = round2(R * (diasPeriodo / 360));
+
+  // ── Vacaciones truncas: R/12 por mes completo desde el último aniversario
+  //    (simplificado: total_meses % 12, sin rastrear la fecha exacta) ──
+  const mesesDesdeAniversario = ((mesesTotales % 12) + 12) % 12;
+  const vacacionesTruncas = round2((R / 12) * mesesDesdeAniversario);
+
+  // ── Gratificación trunca: R/2 × (meses completos del semestre actual / 6)
+  //    Semestres legales: enero-junio y julio-diciembre (empiezan día 1). ──
+  const semInicioMes = fc.getMonth() <= 5 ? 0 : 6;
+  const mesesSemestreActual = fc.getMonth() - semInicioMes;
+  const gratificacionTrunca = round2((R / 2) * (mesesSemestreActual / 6));
+
+  // ── Indemnización despido arbitrario (arts. 34 y 38): solo si aplica ──
+  let indemnizacion = null;
+  if (motivo === 'despido_arbitrario') {
+    const aniosCompletos = Math.floor(mesesTotales / 12);
+    const mesesFraccion = mesesTotales % 12;
+    const bruta = round2(aniosCompletos * 1.5 * R + (mesesFraccion / 12) * 1.5 * R);
+    const tope = round2(12 * R); // tope legal: 12 remuneraciones
+    indemnizacion = {
+      anios_completos: aniosCompletos,
+      meses_fraccion: mesesFraccion,
+      monto_bruto: bruta,
+      tope_aplicado: bruta > tope,
+      monto: round2(Math.min(bruta, tope)),
+    };
+  }
+
+  const total = round2(cts + vacacionesTruncas + gratificacionTrunca + (indemnizacion?.monto ?? 0));
+
+  res.json({
+    success: true,
+    data: {
+      tiempo_servicio: { anios, meses, dias },
+      cts,
+      vacaciones_truncas: vacacionesTruncas,
+      gratificacion_trunca: gratificacionTrunca,
+      indemnizacion,
+      total,
+      base_legal: 'LPCL arts. 1-7 + D.S. 001-97-TR',
+      nota: 'Cálculo simplificado referencial — el cálculo real depende de fechas de aniversario, períodos vencidos y remuneración variable (prom. 6 meses).',
+    },
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 12) POST /api/herramientas/pension-alimentos — pensión referencial
+//     Base legal: Ley 28720 (procedimiento de fijación de pensión de
+//     alimentos: prueba de ingresos) + jurisprudencia de la Corte Suprema
+//     (p. ej. Cas. 3456-2016): rangos referenciales según número de hijos.
+//       - 1 hijo: 20-30% → se usa 25%.
+//       - 2 hijos: 35-45% → se usa 40%.
+//       - 3+ hijos: 50% fijo, dividido entre los hijos.
+//     ⚠️ REFERENCIAL — el juez fija la pensión según las pruebas de ingresos
+//     aportadas (Ley 28720), no por tabla automática.
+// ═════════════════════════════════════════════════════════════════════════════
+const pensionSchema = z.object({
+  ingresos_demandado: z.number().min(0).max(10_000_000, 'ingresos_demandado fuera de rango razonable'),
+  numero_hijos: z.number().int().min(1, 'mínimo 1 hijo').max(10, 'numero_hijos fuera de rango'),
+  otros_ingresos: z.number().min(0).max(10_000_000, 'otros_ingresos fuera de rango razonable').default(0),
+});
+
+router.post('/pension-alimentos', authMiddleware, (req, res) => {
+  const parsed = pensionSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({
+      success: false,
+      error: 'Datos de entrada inválidos.',
+      details: parsed.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+      code: 'VALIDATION_ERROR',
+    });
+  }
+  const { ingresos_demandado, numero_hijos, otros_ingresos } = parsed.data;
+
+  const baseImponible = ingresos_demandado + otros_ingresos;
+  if (baseImponible <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'La suma de ingresos_demandado y otros_ingresos debe ser mayor a 0.',
+      code: 'VALIDATION_ERROR',
+    });
+  }
+
+  const pct =
+    numero_hijos === 1 ? 0.25 :
+    numero_hijos === 2 ? 0.4 :
+    0.5;
+
+  const pensionTotal = round2(baseImponible * pct);
+  const pensionPorHijo = round2(pensionTotal / numero_hijos);
+
+  res.json({
+    success: true,
+    data: {
+      numero_hijos,
+      base_imponible: round2(baseImponible),
+      porcentaje_aplicado: pct * 100,
+      pension_total_mensual: pensionTotal,
+      pension_por_hijo: pensionPorHijo,
+      base_legal: 'Ley 28720 + jurisprudencia suprema (rangos referenciales, p. ej. Cas. 3456-2016)',
+      nota: 'Referencial — el juez fija la pensión según pruebas de ingresos (Ley 28720)',
+    },
+  });
 });
 
 export default router;

@@ -329,6 +329,145 @@ describe('GET /api/herramientas/tasas-bcrp', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// [15-18] POST /liquidacion-laboral (LPCL arts. 1-7 + D.S. 001-97-TR)
+// ═══════════════════════════════════════════════════════════════════════════
+describe('POST /api/herramientas/liquidacion-laboral', () => {
+  it('[happy path] despido arbitrario: 2020-01-15→2026-03-15, R=2000 → CTS 12505.56, indemn 18500 (sin tope), total 31672.22', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/liquidacion-laboral')
+      .set(...bearer())
+      .send({
+        fecha_ingreso: '2020-01-15',
+        fecha_cese: '2026-03-15',
+        remuneracion_mensual: 2000,
+        motivo: 'despido_arbitrario',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    // 6 años exactos + 2 meses (74 meses completos)
+    expect(res.body.data.tiempo_servicio).toEqual({ anios: 6, meses: 2, dias: 0 });
+    // CTS simplificada: 2000 × (2251 días /360) = 12505.555… → 12505.56
+    expect(res.body.data.cts).toBeCloseTo(12505.56, 2);
+    // Vacaciones truncas: 2000/12 × (74 % 12 = 2 meses) = 333.33
+    expect(res.body.data.vacaciones_truncas).toBeCloseTo(333.33, 2);
+    // Gratificación trunca: cese en marzo → semestre ene-jun con 2 meses
+    // completos → 2000/2 × (2/6) = 333.33
+    expect(res.body.data.gratificacion_trunca).toBeCloseTo(333.33, 2);
+    // Indemnización art. 34: 6×1.5×2000 + (2/12)×1.5×2000 = 18500 < tope 24000
+    expect(res.body.data.indemnizacion).toMatchObject({
+      anios_completos: 6,
+      meses_fraccion: 2,
+      monto_bruto: 18500,
+      tope_aplicado: false,
+      monto: 18500,
+    });
+    expect(res.body.data.total).toBeCloseTo(12505.56 + 333.33 + 333.33 + 18500, 2);
+    expect(res.body.data.base_legal).toContain('LPCL');
+  });
+
+  it('tope indemnización: 26 años de servicio → bruta 78000 excede tope de 12 sueldos (24000)', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/liquidacion-laboral')
+      .set(...bearer())
+      .send({
+        fecha_ingreso: '2000-01-01',
+        fecha_cese: '2026-01-01',
+        remuneracion_mensual: 2000,
+        motivo: 'despido_arbitrario',
+      });
+
+    expect(res.status).toBe(200);
+    // Art. 34 in fine: máximo 12 remuneraciones → min(26×1.5×2000, 12×2000)
+    expect(res.body.data.indemnizacion).toMatchObject({
+      tope_aplicado: true,
+      monto_bruto: 78000,
+      monto: 24000,
+    });
+  });
+
+  it('sin motivo=despido_arbitrario → indemnizacion null y total solo beneficios sociales', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/liquidacion-laboral')
+      .set(...bearer())
+      .send({ fecha_ingreso: '2025-07-01', fecha_cese: '2026-01-01', remuneracion_mensual: 1200 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.indemnizacion).toBeNull();
+    // CTS: 1200 × (184 días/360) = 613.33; vacaciones: 1200/12×6 = 600;
+    // grati trunca: cese en enero → semestre ene-jun con 0 meses → 0.
+    expect(res.body.data.cts).toBeCloseTo(613.33, 2);
+    expect(res.body.data.vacaciones_truncas).toBeCloseTo(600, 2);
+    expect(res.body.data.gratificacion_trunca).toBe(0);
+    expect(res.body.data.total).toBeCloseTo(1213.33, 2);
+  });
+
+  it('fecha inexistente "2026-02-30" como fecha_cese → 400 VALIDATION_ERROR', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/liquidacion-laboral')
+      .set(...bearer())
+      .send({ fecha_ingreso: '2020-01-15', fecha_cese: '2026-02-30', remuneracion_mensual: 2000 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('VALIDATION_ERROR');
+    expect(res.body.details.some((d) => d.path === 'fecha_cese')).toBe(true);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// [19-22] POST /pension-alimentos (Ley 28720 + jurisprudencia referencial)
+// ═══════════════════════════════════════════════════════════════════════════
+describe('POST /api/herramientas/pension-alimentos', () => {
+  it('[happy path] 1 hijo, ingresos 2000 → 25% → total 500, por_hijo 500', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/pension-alimentos')
+      .set(...bearer())
+      .send({ ingresos_demandado: 2000, numero_hijos: 1 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.porcentaje_aplicado).toBe(25);
+    expect(res.body.data.pension_total_mensual).toBe(500);
+    expect(res.body.data.pension_por_hijo).toBe(500);
+    expect(res.body.data.nota).toContain('Referencial');
+  });
+
+  it('3 hijos con otros_ingresos: base 3500 → 50% → total 1750, por_hijo ≈ 583.33', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/pension-alimentos')
+      .set(...bearer())
+      .send({ ingresos_demandado: 3000, otros_ingresos: 500, numero_hijos: 3 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.porcentaje_aplicado).toBe(50);
+    expect(res.body.data.pension_total_mensual).toBe(1750);
+    expect(res.body.data.pension_por_hijo).toBeCloseTo(583.33, 2);
+  });
+
+  it('numero_hijos=0 → 400 VALIDATION_ERROR (fuera de rango 1..10)', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/pension-alimentos')
+      .set(...bearer())
+      .send({ ingresos_demandado: 2000, numero_hijos: 0 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('VALIDATION_ERROR');
+    expect(res.body.details.some((d) => d.path === 'numero_hijos')).toBe(true);
+  });
+
+  it('ingresos_demandado=0 y otros_ingresos=0 → 400 (base imponible debe ser > 0)', async () => {
+    const res = await request(app)
+      .post('/api/herramientas/pension-alimentos')
+      .set(...bearer())
+      .send({ ingresos_demandado: 0, otros_ingresos: 0, numero_hijos: 2 });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.code).toBe('VALIDATION_ERROR');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // [14] Auth guard — authMiddleware activo en todas las rutas
 // ═══════════════════════════════════════════════════════════════════════════
 describe('Auth guard (sin token → 401)', () => {
@@ -339,6 +478,8 @@ describe('Auth guard (sin token → 401)', () => {
     ['POST', '/api/herramientas/interes-legal'],
     ['POST', '/api/herramientas/plazos-habiles'],
     ['POST', '/api/herramientas/prescripcion'],
+    ['POST', '/api/herramientas/liquidacion-laboral'],
+    ['POST', '/api/herramientas/pension-alimentos'],
   ])('%s %s sin Authorization → 401', async (method, url) => {
     const req = request(app)[method.toLowerCase()](url);
     if (method === 'POST') req.send({});

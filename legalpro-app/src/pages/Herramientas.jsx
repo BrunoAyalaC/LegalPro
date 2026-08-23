@@ -4,8 +4,8 @@ import {
   BarChart3, Scale, BookOpen, FileEdit, TrendingUp, Mic2,
   HelpCircle, Hand, Bell, GitCompare, Shield, FileStack,
   AlertTriangle, FileSearch, MessageSquareDot, Sliders, Users,
-  Percent, Gavel, Hourglass, ArrowRightLeft,
-  CalendarClock, BriefcaseBusiness
+  Percent, Gavel, Hourglass, ArrowRightLeft, Calculator,
+  CalendarClock, BriefcaseBusiness, CalendarDays
 } from 'lucide-react';
 
 const herramientas = [
@@ -33,7 +33,10 @@ const herramientas = [
   { to: '/conversor-uit',         icon: ArrowRightLeft,title: 'Conversor UIT',          desc: 'Montos en soles a UITs',              badge: 'CALC', glow: 'shadow-sky-500/25',     accent: 'bg-sky-500/15 text-sky-400',       gradient: 'from-sky-600/20 to-blue-600/10' },
   { to: '/conversor-plazos',      icon: CalendarClock,      title: 'Conversor de Plazos',     desc: 'Días naturales ↔ hábiles (Art. 144)', badge: 'CALC', glow: 'shadow-teal-500/25',    accent: 'bg-teal-500/15 text-teal-400',     gradient: 'from-teal-600/20 to-cyan-600/10' },
   { to: '/indemnizacion-despido', icon: BriefcaseBusiness,  title: 'Indemnización Despido',   desc: 'Despido arbitrario D.S. 001-97-TR',   badge: 'CALC', glow: 'shadow-emerald-500/25', accent: 'bg-emerald-500/15 text-emerald-400', gradient: 'from-emerald-600/20 to-green-600/10' },
+  { to: '/liquidacion-laboral',   icon: Calculator,         title: 'Liquidación Laboral',     desc: 'CTS, vacaciones y gratificaciones',   badge: 'CALC', glow: 'shadow-lime-500/25',    accent: 'bg-lime-500/15 text-lime-400',       gradient: 'from-lime-600/20 to-emerald-600/10' },
+  { to: '/pension-alimentos',     icon: Scale,              title: 'Pensión de Alimentos',    desc: '% referencial según nº de hijos',     badge: 'CALC', glow: 'shadow-pink-500/25',    accent: 'bg-pink-500/15 text-pink-400',       gradient: 'from-pink-600/20 to-rose-600/10' },
   { to: '/tasas-comparativo',     icon: Percent,            title: 'Comparador de Tasas',     desc: 'Moratoria BCRP vs remunerativa vs CC',badge: 'CALC', glow: 'shadow-violet-500/25',  accent: 'bg-violet-500/15 text-violet-400', gradient: 'from-violet-600/20 to-purple-600/10' },
+  { to: '/calendario-mensual',    icon: CalendarDays,       title: 'Calendario Mensual',      desc: 'Vista mensual de vencimientos con drag & drop', badge: 'CAL', glow: 'shadow-sky-500/25', accent: 'bg-sky-500/15 text-sky-400', gradient: 'from-sky-600/20 to-blue-600/10' },
 ];
 
 const container = {

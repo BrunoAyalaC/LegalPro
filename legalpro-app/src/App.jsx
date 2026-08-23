@@ -51,6 +51,7 @@ const Landing                 = lazy(() => import('./pages/Landing'));
 const PanelCreditos           = lazy(() => import('./pages/PanelCreditos'));
 const CalculadoraPlazos       = lazy(() => import('./pages/CalculadoraPlazos'));
 const CalendarioVencimientos  = lazy(() => import('./pages/CalendarioVencimientos'));
+const CalendarioMensual       = lazy(() => import('./pages/CalendarioMensual'));
 const Clientes                = lazy(() => import('./pages/Clientes'));
 const Contador                = lazy(() => import('./pages/Contador'));
 const CalendarioPlazos        = lazy(() => import('./pages/CalendarioPlazos'));
@@ -60,6 +61,8 @@ const PrescripcionCaducidad   = lazy(() => import('./pages/PrescripcionCaducidad
 const ConversorUIT            = lazy(() => import('./pages/ConversorUIT'));
 const ConversorPlazos         = lazy(() => import('./pages/ConversorPlazos'));
 const IndemnizacionDespido    = lazy(() => import('./pages/IndemnizacionDespido'));
+const LiquidacionLaboral      = lazy(() => import('./pages/LiquidacionLaboral'));
+const PensionAlimentos        = lazy(() => import('./pages/PensionAlimentos'));
 const TasasComparativo        = lazy(() => import('./pages/TasasComparativo'));
 const Privacidad              = lazy(() => import('./pages/Privacidad'));
 const NotFound                = lazy(() => import('./pages/NotFound'));
@@ -104,6 +107,7 @@ export default function App() {
           <Route path="/creditos" element={<PanelCreditos />} />
           <Route path="/calculadora-plazos" element={<CalculadoraPlazos />} />
           <Route path="/calendario-vencimientos" element={<CalendarioVencimientos />} />
+          <Route path="/calendario-mensual" element={<CalendarioMensual />} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/contador" element={<Contador />} />
           <Route path="/calendario-plazos" element={<CalendarioPlazos />} />
@@ -114,6 +118,8 @@ export default function App() {
           <Route path="/conversor-uit" element={<ConversorUIT />} />
           <Route path="/conversor-plazos" element={<ConversorPlazos />} />
           <Route path="/indemnizacion-despido" element={<IndemnizacionDespido />} />
+          <Route path="/liquidacion-laboral" element={<LiquidacionLaboral />} />
+          <Route path="/pension-alimentos" element={<PensionAlimentos />} />
           <Route path="/tasas-comparativo" element={<TasasComparativo />} />
           {/* Chat IA y detalle: dentro del Layout para tener sidebar en desktop */}
           <Route path="/chat" element={<Navigate to="/chat-ia" replace />} />

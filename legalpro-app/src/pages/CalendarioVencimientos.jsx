@@ -23,7 +23,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Calendar, ChevronLeft, ChevronRight, AlertTriangle,
+  Calendar, CalendarDays, ChevronLeft, ChevronRight, AlertTriangle,
   Clock, FileText, Bell, Filter, CheckCircle2, GripVertical,
   Download,
 } from 'lucide-react';
@@ -364,6 +364,15 @@ export default function CalendarioVencimientos() {
           >
             Hoy
           </button>
+          {/* Enlace a la vista mensual interactiva */}
+          <Link
+            to="/calendario-mensual"
+            className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-sm inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-cyan-500/60 whitespace-nowrap"
+            aria-label="Abrir vista mensual del calendario"
+          >
+            <CalendarDays className="w-4 h-4" aria-hidden="true" />
+            Vista mensual
+          </Link>
           {/* Exportar vencimientos visibles del mes a calendario (.ics) */}
           {delMes.length === 0 ? (
             <span

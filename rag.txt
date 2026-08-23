@@ -1,0 +1,4787 @@
+RAG en producción en 2026: estado del arte, arquitectura, seguridad, evaluación y stack recomendado
+
+Fecha de corte de la investigación: 22 de agosto de 2026 (22/08/2026).
+
+Método y criterio de evidencia
+
+Este informe prioriza, en este orden: papers peer-reviewed y proceedings oficiales; documentación técnica y repositorios oficiales; benchmarks reproducibles; documentación de proveedores; experiencias de ingeniería y producción; y, finalmente, preprints cuando representan avances demasiado recientes para haber pasado todavía por revisión formal.
+
+Para no mezclar fuerza de evidencia, utilizaré estas etiquetas:
+
+[Paper]: publicación peer-reviewed.
+
+[Preprint]: arXiv/OpenReview u otra investigación todavía no consolidada.
+
+[Docs]: documentación oficial.
+
+[Repo]: repositorio oficial.
+
+[Vendor benchmark]: resultado publicado por el fabricante; útil, pero debe reproducirse.
+
+[Producción]: evidencia o patrón documentado de operación real.
+
+[Juicio de ingeniería]: recomendación derivada de combinar la evidencia; requiere benchmark propio antes de convertirla en decisión irreversible.
+
+Una conclusión atraviesa todo el informe:
+
+En 2026, “hacer RAG” ya no significa vectorizar chunks y hacer Top-K. El sistema competitivo es un pipeline de recuperación, autorización, ranking, construcción de evidencia, generación, verificación y evaluación; y los componentes más sofisticados —GraphRAG, agentes, query decomposition, memoria o retrieval durante generación— deben activarse selectivamente.
+
+Respuesta ejecutiva: qué construiría hoy
+
+Si empezara desde cero el 22/08/2026, construiría la siguiente arquitectura base:
+
+                                  ┌─────────────────────────────┐
+                                  │ Identity / Tenant / ACL     │
+                                  └──────────────┬──────────────┘
+                                                 │
+Documentos ──► parsing estructural ──► provenance│
+             │                                   │
+             ├─► chunk/block hierarchy           │
+             ├─► metadata / ACL                   │
+             ├─► embeddings versionados           │
+             ├─► lexical index                    │
+             └─► optional visual/multivector      │
+                                                 ▼
+Query
+  │
+  ├─► autorización + risk/intent routing
+  ├─► query normalization
+  ├─► [opcional] rewrite / decomposition / HyDE
+  │
+  ├─► lexical retrieval ─────────────┐
+  ├─► dense retrieval ───────────────┼─► RRF/fusión
+  ├─► [opcional] graph retrieval ────┤
+  └─► [opcional] visual retrieval ───┘
+                                      │
+                                      ▼
+                                  Reranker
+                                      │
+                       parent/section expansion
+                                      │
+                         dedupe + evidence selection
+                                      │
+                           context construction
+                                      │
+                                      ▼
+                                  Generator
+                                      │
+                              atomic claims
+                                      │
+                       claim ↔ evidence verification
+                                      │
+                           citation verification
+                                      │
+                      calibrated evidence sufficiency
+                               / uncertainty
+                              │           │
+                              ▼           ▼
+                           Answer       Abstain
+                              │
+                     citations resolved by
+                       backend provenance
+
+Mi stack inicial sería Python + FastAPI + PostgreSQL 18 + pgvector 0.8.6, con lexical search y dense retrieval ejecutados en paralelo, RRF como fusión inicial y un reranker encima. PostgreSQL 18 incorpora, entre otras mejoras, async I/O y mejoras de índices; pgvector 0.8.x añadió iterative scans para búsquedas ANN filtradas y la versión 0.8.6 estaba publicada el 29/07/2026. citeturn627173search0turn627173search3turn542814search0
+
+Para embeddings no elegiría por leaderboard global. Haría un bake-off con unas pocas opciones: voyage-context-4 para documentos predominantemente textuales, porque contextualiza los embeddings de chunks con el documento completo; Gemini Embedding 2 si el corpus es realmente multimodal; y Qwen3-Embedding/BGE-M3/Jina/Nomic si privacidad, self-hosting o control de licencia dominan la decisión. voyage-context-4 apareció el 29/06/2026; Gemini Embedding 2 alcanzó GA en abril de 2026 y comparte espacio para texto, imágenes, vídeo, audio y PDF. citeturn704650search3turn256435search1turn819980search4turn374092search1
+
+Para reranking: Cohere Rerank v4 Pro o Voyage rerank-2.5 si se acepta API; Qwen3-Reranker si necesito ejecución local; Jina reranker v3.5 merece evaluación por su combinación de 0.6B, ventana larga y listwise ranking, aunque su licencia debe revisarse para explotación comercial. citeturn243358search0turn583502search4turn243358search12turn319668search0
+
+El generador debe estar detrás de una interfaz de proveedores. En agosto de 2026 hay modelos de contexto muy largo y distintas relaciones coste/calidad —OpenAI GPT-5.6 family, Claude 5 family y Gemini 3.x, entre otros—, por lo que no diseñaría la arquitectura alrededor de un modelo único: elegiría el modelo “balanced” ganador de un benchmark privado y reservaría un modelo más costoso para consultas complejas o verificación de alto riesgo. citeturn557392search13turn477689search0turn557392search8
+
+La decisión más importante no sería, sin embargo, el LLM. Sería esta:
+
+Ninguna respuesta material debería salir porque “el modelo parece seguro”. Debe salir porque el sistema ha recuperado suficiente evidencia autorizada y cada afirmación importante puede vincularse a evidencia que realmente la respalda.
+
+1. Evolución de RAG hasta 2026
+
+El RAG seminal de Lewis et al. integraba memoria paramétrica y memoria no paramétrica recuperada para tareas intensivas en conocimiento. citeturn585623search7 Dense Passage Retrieval había demostrado en paralelo que un dual encoder podía hacer dense retrieval competitivo para QA. citeturn585623search1
+
+La evolución desde:
+
+Question → Embedding → Vector Search → Top-K chunks → LLM
+
+puede resumirse así:
+
+Arquitectura
+
+Funcionamiento
+
+Qué mejora
+
+Coste/complejidad
+
+Madurez 2026
+
+Cuándo usar / evitar
+
+Naive RAG
+
+1 embedding, ANN, Top-K
+
+Baseline
+
+Baja
+
+ADOPT sólo como baseline
+
+Prototipos; evitar como arquitectura final
+
+Advanced RAG
+
+hybrid, reranking, better chunking, context
+
+Recall + precision
+
+Media
+
+ADOPT
+
+Default empresarial
+
+Modular RAG
+
+retrieval/query/ranking/generation desacoplados
+
+Control y evaluabilidad
+
+Media
+
+ADOPT
+
+Default de arquitectura
+
+Corrective RAG / CRAG
+
+evalúa retrieval y corrige/rebusca
+
+Recuperaciones pobres
+
+Media-alta
+
+TRIAL
+
+Cuando el corpus/retrieval es ruidoso; no siempre-on
+
+Adaptive-RAG
+
+clasifica complejidad y decide 0/1/múltiples retrievals
+
+Reduce coste innecesario
+
+Media
+
+TRIAL→ADOPT como patrón
+
+Sistemas heterogéneos
+
+Self-RAG
+
+retrieval bajo demanda + reflection tokens
+
+Factualidad y autocontrol
+
+Alta; entrenamiento específico
+
+Investigación madura
+
+Inspiración arquitectónica más que drop-in
+
+RAPTOR / hierarchical
+
+árbol de clusters/resúmenes y retrieval multinivel
+
+Preguntas globales/long-doc
+
+Ingesta mayor
+
+TRIAL
+
+Libros, contratos, dossiers largos
+
+Agentic RAG
+
+agente decide búsquedas, herramientas y stop
+
+Multi-hop/adaptabilidad
+
+Alta latencia/riesgo
+
+TRIAL
+
+Sólo consultas realmente complejas
+
+GraphRAG
+
+entidades, relaciones, comunidades, summaries
+
+Global sensemaking
+
+Ingesta muy alta
+
+TRIAL
+
+Corpus relacional/global; evitar FAQ normal
+
+Knowledge-Graph RAG
+
+consulta/traversal explícito de KG + vectores
+
+Multi-hop estructurado
+
+Alta
+
+TRIAL/ADOPT según dominio
+
+Compliance, biomedicina, fraude, intelligence
+
+Multimodal RAG
+
+recupera texto+imagen+layout/audio/video
+
+Evidencia visual
+
+Media-alta
+
+ADOPT/TRIAL
+
+PDFs, slides, diagrams, media
+
+Conversational RAG
+
+condensa estado/turnos antes de recuperar
+
+Pronombres/contexto de diálogo
+
+Media
+
+ADOPT
+
+Asistentes
+
+Long-context RAG
+
+retrieval reduce corpus y LC lee un bloque amplio
+
+Menos fragmentación
+
+Coste tokens
+
+ADOPT
+
+Excelente combinación actual
+
+Memory-augmented
+
+episodic/semantic/user/agent memory independiente
+
+Continuidad temporal
+
+Alta gobernanza
+
+TRIAL
+
+Agentes persistentes
+
+Reasoning-aware retrieval
+
+retriever entrenado para consultas que requieren inferencias
+
+Multi-hop/STEM/código
+
+Media-alta
+
+TRIAL
+
+Consultas de reasoning
+
+Retrieval during generation
+
+el propio proceso generativo dispara búsquedas
+
+Retrieval más dinámico
+
+Alta
+
+ASSESS
+
+Frontera 2026
+
+Hybrid systems
+
+routing entre varias de las anteriores
+
+Mejor Pareto coste/calidad
+
+Alta inicial
+
+ADOPT
+
+Arquitectura que recomiendo
+
+Self-RAG fue publicado en ICLR 2024 y propone decidir cuándo recuperar y utilizar tokens de reflexión para evaluar relevancia y soporte. citeturn857853search0 Adaptive-RAG, NAACL 2024, enruta según complejidad entre no retrieval, single-step e iterative retrieval. citeturn857853search1 RAPTOR construye un árbol recursivo de clusters/resúmenes para recuperar a distintos niveles. citeturn857853academia38
+
+Microsoft GraphRAG popularizó en 2024 el pipeline de extracción de entidades/relaciones, community detection y community summaries para responder preguntas globales sobre corpus. Sin embargo, su propio repositorio se describe en 2026 como proyecto de investigación mayoritariamente en maintenance mode y advierte que indexing puede ser caro; siguió recibiendo releases 3.1.x durante 2026. Esto es una buena ilustración de por qué relevancia investigadora ≠ componente que deba ser default en producción. citeturn782834search2turn782834search1turn782834search4
+
+2. Investigaciones e innovaciones 2024–2026
+
+Lo que realmente cambió
+
+2024 fue, en gran medida, el año de hacer el retrieval adaptativo, jerárquico y autocorrectivo. 2025 desplazó la frontera hacia reasoning-aware retrieval, multimodal document retrieval, late interaction eficiente y agentic/test-time retrieval. En 2026 la tendencia más visible es retrieval como parte del proceso de reasoning, embeddings contextuales/multimodales mucho más fuertes, parsers VLM especializados, verificación de evidencia y routing basado en coste.
+
+Innovación
+
+Año
+
+Problema que resuelve
+
+Mejora reportada / idea
+
+Madurez
+
+Paper/docs
+
+Repo/implementación
+
+Uso recomendado
+
+Self-RAG
+
+2024
+
+Recuperar siempre o confiar ciegamente
+
+Retrieval + reflection on-demand
+
+Research mature
+
+citeturn857853search0
+
+oficial en paper
+
+Inspiración para adaptive retrieval
+
+Adaptive-RAG
+
+2024
+
+Mismo pipeline para todo
+
+Enruta por complejidad
+
+Alta como patrón
+
+citeturn857853search1
+
+starsuzi/Adaptive-RAG
+
+Routing simple/complex
+
+RAPTOR
+
+2024
+
+Long-doc/global questions
+
+Árbol recursivo multi-level
+
+Media
+
+citeturn857853academia38
+
+oficial
+
+Long documents
+
+CRAG
+
+2024
+
+Retrieval incorrecto
+
+Evaluador + corrective retrieval
+
+Media
+
+citeturn857853academia37
+
+investigación
+
+Queries difíciles
+
+Contextual Retrieval
+
+2024
+
+Chunk pierde contexto
+
+Contextual embeddings+BM25
+
+Vendor-evidence fuerte
+
+citeturn630768search1
+
+Anthropic recipe
+
+Documentos fragmentables
+
+Late Chunking
+
+2024
+
+Embedding aislado del chunk
+
+Encode full doc before pooling chunks
+
+Media
+
+citeturn475807academia12
+
+Jina/research
+
+Embedders long-context
+
+GraphRAG
+
+2024
+
+Preguntas globales/relaciones
+
+Communities + summaries
+
+Media
+
+citeturn782834search2
+
+Microsoft GraphRAG
+
+Corpus global/relacional
+
+ColPali
+
+2025
+
+OCR pierde layout/visuals
+
+Retrieval directo de páginas-imagen
+
+Alta en multimodal R&D
+
+citeturn857853search36
+
+ColPali
+
+PDFs visuales
+
+VisRAG
+
+2025
+
+Retrieval multimodal documental
+
+Recuperación visual end-to-end
+
+Media
+
+citeturn377160search2
+
+research
+
+Visual docs
+
+Speculative RAG
+
+2025
+
+Coste de reasoning sobre docs
+
+Drafts especializados + verifier
+
+Media
+
+citeturn377160search1
+
+research
+
+High-accuracy experimentation
+
+ReasonIR
+
+2025
+
+Dense retrieval superficial
+
+Retriever entrenado con reasoning/hard negatives
+
+Media-alta
+
+citeturn779918academia25
+
+abierto
+
+STEM/código/multi-hop
+
+MUVERA
+
+2025
+
+Multi-vector search caro
+
+FDE + MIPS + exact rerank
+
+Media
+
+citeturn779918search0turn779918search1
+
+Google research
+
+Escalar late interaction
+
+Search-o1
+
+2025
+
+Reasoning necesita buscar iterativamente
+
+Search durante reasoning
+
+Experimental
+
+citeturn405028academia35
+
+research
+
+Agentic reasoning
+
+Mem0
+
+2025–26
+
+Contexto histórico ilimitado
+
+extracción/consolidación/memory retrieval
+
+Media
+
+citeturn907887search1turn907887search4
+
+Mem0
+
+Assistants persistentes
+
+voyage-context-4
+
+2026
+
+Chunk embeddings pierden doc context
+
+Chunk embedding condicionado por doc
+
+Nueva/alta promesa
+
+citeturn704650search3
+
+API
+
+Texto empresarial
+
+Gemini Embedding 2
+
+2026
+
+Espacios separados por modalidad
+
+Unified text/image/video/audio/PDF embeddings
+
+Nueva/alta
+
+citeturn256435search1turn256435search3
+
+Google API
+
+Multimodal
+
+Jina v5 omni
+
+2026
+
+Unified multimodal self/service
+
+text/image/audio/video
+
+Nueva
+
+citeturn319668search3
+
+Jina
+
+Multimodal trial
+
+Jina reranker v3.5
+
+2026
+
+Listwise reranking caro
+
+0.6B, long context/listwise
+
+Nueva
+
+citeturn319668search0
+
+Jina
+
+Evaluar local/API
+
+pg_textsearch 1.0
+
+2026
+
+BM25 dentro de Postgres
+
+BM25 + Block-Max WAND
+
+Nueva/GA
+
+citeturn957175search2turn957175search5
+
+Tiger Data
+
+Trial sobre PostgreSQL
+
+Milvus 3.0
+
+2026
+
+Scale/lake-native retrieval
+
+External Collection, new sparse index, schema evol.
+
+Nueva
+
+citeturn415083search12
+
+Milvus
+
+Very large scale
+
+Query-decomp bandit
+
+2026
+
+Demasiadas/peores subqueries
+
+Exploration/exploitation
+
+Paper
+
+citeturn405028search0
+
+research
+
+Multi-hop
+
+PROGRAM
+
+2026
+
+Query decomposition genérica
+
+Programs logical/causal/temporal + pruning
+
+Paper
+
+citeturn405028search1
+
+research
+
+Complex QA
+
+STEM
+
+2026
+
+Semantic retrieval insuficiente para hops
+
+semantic→structural KG retrieval
+
+Paper
+
+citeturn405028search3
+
+research
+
+Multi-hop KG
+
+ParallaxRAG
+
+2026
+
+Un único embedding space limita relaciones
+
+Multi-view graph retrieval
+
+Paper
+
+citeturn405028search5
+
+research
+
+KG R&D
+
+FlowRAG
+
+2026
+
+Graph retrieval rígido
+
+Frequency-aware multigranularity graph flow
+
+Paper
+
+citeturn405028search7
+
+research
+
+Graph retrieval
+
+RAG-on-a-Diet
+
+2026
+
+Usar modelo grande en cada hop
+
+RL routing al modelo suficiente más barato
+
+Paper
+
+citeturn405028search8
+
+research
+
+Cost-aware agents
+
+GRIP
+
+2026
+
+Retrieval separado de generación
+
+Retrieval as generation; trigger/rewrite/stop tokens
+
+Paper
+
+citeturn405028search9
+
+research
+
+Frontier/ASSESS
+
+SR-RAG
+
+2026
+
+KG global caro
+
+Grafo simbólico on-the-fly
+
+Paper
+
+citeturn405028search11
+
+research
+
+Multi-hop selective
+
+FRANQ
+
+2026
+
+Confundir factuality con faithfulness
+
+Faithfulness-aware uncertainty
+
+Paper
+
+citeturn967623search12
+
+research
+
+Abstention/eval
+
+RLSeek
+
+2026
+
+Hallucination detection poco grounded
+
+Evidence-seeking span verification
+
+Paper
+
+citeturn628648search6
+
+research
+
+Verification R&D
+
+PaddleOCR-VL 1.5
+
+2026
+
+Layout/OCR complejo
+
+Document VLM robusto
+
+Alta promesa
+
+citeturn246525search5turn246525search7
+
+PaddleOCR
+
+Parsing local
+
+Mistral OCR 4/4.1
+
+2026
+
+Provenance/layout/OCR
+
+bboxes, labels, block confidences
+
+GA/preview
+
+citeturn244023search4turn244023search6
+
+API
+
+Cloud parsing
+
+Los números publicados por vendors —por ejemplo, las mejoras de Contextual Retrieval, MUVERA o nuevos embeddings— son señales útiles, no sustitutos de un benchmark de dominio. Anthropic, por ejemplo, reportó reducciones sustanciales de retrieval failure con contextual retrieval y reranking, pero sigue siendo un benchmark diseñado por el propio proveedor. citeturn630768search1
+
+3. Anti-hallucination: una taxonomía útil de fallos
+
+RAG no elimina alucinaciones. Lo que hace es crear una ruta para aportar evidencia externa. El sistema sigue pudiendo fallar en cada transición.
+
+Fallo
+
+Ejemplo
+
+Cómo medirlo
+
+Técnicas principales
+
+Retrieval failure
+
+El pasaje correcto no entra en candidatos
+
+Recall@K, evidence recall
+
+hybrid, query rewrite, decomposition, better embedding, hard negatives
+
+Ranking failure
+
+Está en candidatos pero #38
+
+MRR/nDCG/rank of gold
+
+cross-encoder/listwise reranker
+
+Context failure
+
+Se trae evidencia correcta pero se corta/mezcla mal
+
+context precision/coverage
+
+parent expansion, dedupe, ordering, context compression
+
+Reasoning failure
+
+Contexto suficiente, inferencia equivocada
+
+conditional accuracy given gold context
+
+stronger reasoner, decomposition, structured reasoning
+
+Generation failure
+
+Modelo añade datos no soportados
+
+faithfulness, grounded claim rate
+
+evidence-constrained generation, claim verifier
+
+Citation failure
+
+Cita existe pero no demuestra la frase
+
+citation precision/recall
+
+claim→citation entailment
+
+La investigación en attribution ya es suficientemente extensa para distinguir factual correctness de attribution/faithfulness: una afirmación puede ser verdadera en el mundo y, sin embargo, no estar apoyada por las fuentes recuperadas. El survey ACL 2026 sobre attribution/citation/quotation analiza 134 trabajos y más de 300 métricas, lo que también evidencia que la evaluación sigue fragmentada. citeturn967623search0
+
+MiniCheck, EMNLP 2024, explora un fact-checker de 770M orientado a groundedness y reporta resultados comparables a evaluadores mucho mayores en su benchmark a un coste muy inferior. citeturn628648search38 ALCE ya había separado citation correctness y completeness como dimensiones de evaluación. citeturn628648search3
+
+En 2025–26 aparecen técnicas más granulares: post-correction basada en atomic claims, interleaved claim/reference generation, verificación evidence-aligned y modelos que buscan explícitamente evidencia para detectar hallucination spans. citeturn628648search2turn628648search7turn628648search4turn628648search6
+
+Técnicas que considero más eficaces
+
+Alta evidencia / alto ROI:
+
+aumentar Recall@K antes de tocar prompts;
+
+reranking;
+
+reducir contexto distractor;
+
+generación explícitamente limitada a fuentes;
+
+provenance estructurada;
+
+verificación de claims atómicos;
+
+abstention calibrada;
+
+benchmark con preguntas no contestables.
+
+Útiles pero no suficientes por sí solas:
+
+“responde sólo con las fuentes”;
+
+self-verification por el mismo modelo;
+
+un similarity threshold;
+
+LLM-as-a-judge sin calibración;
+
+chain-of-thought más largo;
+
+añadir más documentos.
+
+4. Arquitectura anti-hallucination recomendada
+
+La arquitectura propuesta por la pregunta es esencialmente correcta, pero yo insertaría authorization antes del retrieval y separaría evidence sufficiency de confidence general:
+
+Pregunta
+  ↓
+Identity / tenant / ACL
+  ↓
+Risk + intent classification
+  ↓
+Query normalization
+  ↓
+[conditional] rewrite / decomposition
+  ↓
+ACL-filtered lexical + dense retrieval
+  ↓
+Fusion
+  ↓
+Reranking
+  ↓
+Evidence sufficiency #1
+  ↓
+Parent/section expansion
+  ↓
+Deduplication + diversity
+  ↓
+Context construction
+  ↓
+Generation with evidence IDs
+  ↓
+Atomic claim extraction
+  ↓
+Claim → evidence entailment
+  ↓
+Contradiction + source-conflict check
+  ↓
+Citation resolution/verification
+  ↓
+Calibrated evidence sufficiency #2
+  ↓
+Answer / Retry / Clarify / Abstain
+
+Qué pasos aportan valor casi siempre
+
+Hybrid retrieval, reranking, provenance, evidence selection, citation resolution backend, evals y ACL pre-retrieval.
+
+Qué pasos deben ser condicionales
+
+Query rewriting puede empeorar nombres propios, IDs o queries exactas. Decomposition añade coste y errores para preguntas simples. GraphRAG tiene sentido para global/multi-hop queries. LLM verification es demasiado costosa para usar un modelo frontier en toda afirmación de toda consulta. Agent loops deben tener presupuesto y stop conditions.
+
+La arquitectura óptima es por tanto adaptive/modular, no una cadena fija de 15 LLM calls.
+
+5. Abstention: cómo conseguir un “no hay suficiente evidencia”
+
+El error clásico es:
+
+if cosine_similarity < 0.8:
+    abstain()
+
+Eso carece de interpretación probabilística. Un cosine de 0.8 no significa 80% de confianza, y su distribución cambia con modelo, normalización, dominio, longitud y query.
+
+Construiría un clasificador calibrado de evidence sufficiency con features como:
+
+max reranker score
+mean top-3 reranker score
+dense/lexical rank agreement
+distance between #1 and #2
+gold-like evidence coverage proxy
+number of independent sources
+entailment minimum/mean
+contradiction score
+source authority
+freshness
+query ambiguity
+retrieval retry result
+
+Y estimaría:
+
+P(evidence_is_sufficient | retrieval + verification signals)
+
+El threshold se selecciona en un conjunto etiquetado de producción para maximizar una curva risk vs coverage, no por intuición.
+
+FRANQ refuerza precisamente la necesidad de uncertainty sensible a faithfulness y no sólo factuality. citeturn967623search12
+
+Fiabilidad relativa
+
+Método
+
+Fiabilidad
+
+Comentario
+
+Similarity threshold
+
+Baja
+
+Señal útil, no confianza
+
+Reranker threshold
+
+Media
+
+Mejor alineado con relevance; aun no calibrado
+
+NLI/entailment
+
+Media-alta
+
+Excelente feature; errores de dominio permanecen
+
+LLM judge
+
+Media
+
+Flexible pero sesgado/inestable
+
+Multi-signal calibrated model
+
+Alta
+
+Mi opción base
+
+Conformal/selective prediction
+
+Alta si assumptions/dataset funcionan
+
+Muy interesante en high-stakes
+
+Human escalation
+
+Máxima para casos críticos
+
+Costosa
+
+Evaluaría Brier score, ECE, selective accuracy y risk-coverage, no sólo accuracy.
+
+6. Citaciones verificables
+
+La cita correcta se crea durante ingestion, no durante generación.
+
+Cada bloque debería preservar como mínimo:
+
+document_id
+document_version
+content_hash
+canonical_url/source_uri
+page_number
+section_path
+paragraph_id / block_id
+char_start / char_end
+bbox
+table/figure id
+media timestamp_start/end
+parser_name
+parser_version
+ingested_at
+
+El LLM no debería escribir libremente:
+
+“Fuente: ejemplo.com, página 17”
+
+Debería producir:
+
+{
+  "claims": [
+    {
+      "text": "La política entró en vigor en enero.",
+      "evidence_ids": ["chunk_0182", "chunk_0934"]
+    }
+  ]
+}
+
+El backend resuelve chunk_0182 a:
+
+Policy_2026.pdf
+version=3
+page=17
+section=4.2
+block=para_17_04
+bbox=(...)
+SHA256=...
+
+Después se verifica:
+
+claim → cited evidence → entails / contradicts / insufficient
+
+Citation precision: porcentaje de citas que realmente soportan la afirmación.
+
+Citation completeness/recall: porcentaje de claims materiales para los que existe soporte citado.
+
+ALCE y la literatura posterior demuestran por qué ambas dimensiones deben mantenerse separadas. citeturn628648search3turn967623search0
+
+7. Retrieval moderno
+
+La mejor arquitectura general no es “elige sparse o dense”. Es una cascada.
+
+Técnica
+
+Fortalezas
+
+Debilidades
+
+Rol 2026
+
+BM25 / lexical
+
+IDs, nombres, códigos, términos raros
+
+Paráfrasis
+
+Candidate generator
+
+PostgreSQL FTS
+
+Integración relacional
+
+No es BM25
+
+Candidate generator
+
+SPLADE
+
+Sparse learned expansion
+
+Index/storage/train complexity
+
+Especializado
+
+Dense bi-encoder
+
+Semántica, paráfrasis
+
+Confunde entidades/near negatives
+
+Candidate generator
+
+Multi-vector
+
+Gran granularidad semántica
+
+Memoria/compute
+
+High-quality retrieval
+
+ColBERT
+
+Late interaction efectiva
+
+Index mayor
+
+Premium retrieval
+
+Hierarchical
+
+Global/local doc relations
+
+Más ingesta
+
+Long docs
+
+Parent-document
+
+Precision child + context parent
+
+Requiere buen hierarchy
+
+Muy recomendado
+
+Metadata-filtered
+
+Seguridad/domains/dates
+
+Puede degradar ANN si mal indexado
+
+Obligatorio
+
+Multi-stage
+
+barato→caro
+
+Más componentes
+
+Default recomendado
+
+BEIR mostró tempranamente que BM25 sigue siendo un baseline sorprendentemente robusto y que los métodos más complejos presentan trade-offs entre generalización, calidad y eficiencia. citeturn984675academia24
+
+SPLADE aprende sparse expansion manteniendo compatibilidad con índices invertidos, mientras Two-Step SPLADE explora cascadas para reducir latencia. citeturn907887search0turn907887academia63
+
+ColBERT introdujo late interaction token-level y ColBERTv2 redujo fuertemente el footprint manteniendo su ventaja de granularidad. citeturn115972academia37turn779918search2
+
+MUVERA es especialmente interesante: aproxima multi-vector similarity mediante Fixed Dimensional Encodings para candidate generation y refina posteriormente con scoring multi-vector exacto. Google reporta reducciones de candidatos y latencia importantes frente a PLAID; por ser resultados de los autores, deben reproducirse. citeturn779918search0turn779918search1
+
+8. Hybrid Search
+
+Mi recomendación
+
+lexical top 100–300
+        +
+dense top 100–300
+        ↓
+       RRF
+        ↓
+rerank top 30–100
+        ↓
+evidence top 5–12
+
+BM25 + embeddings
+
+Es probablemente el baseline de producción más difícil de superar consistentemente porque cubre errores complementarios:
+
+lexical gana en CVE-2026-xxxx, SKU, nombres, cláusulas y strings exactos;
+
+dense gana en paráfrasis e intención;
+
+reranker decide entre candidatos complejos.
+
+Reciprocal Rank Fusion
+
+RRF(d) = Σ 1 / (k + rank_i(d))
+
+Lo usaría como default inicial porque no exige calibrar score scales heterogéneas.
+
+Weighted score fusion
+
+Puede ser superior si se normalizan los scores y existen relevance judgments suficientes para elegir pesos. El problema es que BM25 y cosine/cross-encoder scores no son directamente comparables.
+
+Learned fusion
+
+Tiene potencial para ganar cuando se dispone de miles de queries etiquetadas o click/feedback data fiable. Añade drift, training y observabilidad.
+
+Qdrant documenta actualmente tanto RRF como DBSF y explícitamente advierte que ninguno gana universalmente. citeturn791297search2 Weaviate usa por defecto relative-score fusion en su hybrid search moderno. citeturn834541search0 Elasticsearch y OpenSearch incorporan RRF/hybrid retrieval nativamente. citeturn906448search1turn284645search0
+
+Conclusión: RRF + reranker es el baseline equilibrado. Sólo reemplazaría RRF por learned fusion después de demostrar ganancia estadísticamente significativa en un benchmark propio.
+
+9. Reranking: estado del arte práctico
+
+El reranker suele ser una de las inversiones con mejor retorno porque puede aplicarse sólo a 20–100 candidatos.
+
+Opción
+
+Tipo
+
+Calidad
+
+Latencia
+
+Idiomas/contexto
+
+Local/API
+
+Observación
+
+Cohere Rerank 4 Pro
+
+neural reranker
+
+Muy alta
+
+Media
+
+100+ idiomas, 32k
+
+API
+
+Default premium citeturn243358search0
+
+Cohere Rerank 4 Fast
+
+neural
+
+Alta
+
+Baja
+
+multilingüe
+
+API
+
+Latency-sensitive
+
+Voyage rerank-2.5
+
+instruction-aware
+
+Muy alta según vendor
+
+Media
+
+32k
+
+API
+
+Evaluar vs Cohere citeturn583502search4
+
+Qwen3-Reranker-8B
+
+instruction-aware
+
+Alta
+
+GPU alta
+
+100+ idiomas, 32k
+
+Local
+
+Privacy/high-quality citeturn243358search12
+
+Qwen3 0.6B/4B
+
+idem
+
+Cost/quality scalable
+
+Menor
+
+multilingüe
+
+Local
+
+Excelente bake-off
+
+Jina reranker v3.5
+
+listwise
+
+Vendor reports strong
+
+Buena para 0.6B
+
+131k/24 langs
+
+Local/API
+
+Revisar licencia citeturn319668search0
+
+BGE reranker v2-m3
+
+cross-encoder
+
+Sólida
+
+Buena
+
+multilingual
+
+Local
+
+Baseline open
+
+Cross-encoder
+
+Mejor calidad por par query-document que un bi-encoder, pero O(N) forward passes.
+
+Late interaction
+
+ColBERT amortiza embeddings documentales y hace scoring token-level eficiente.
+
+LLM reranking
+
+Puede ser excelente para criterios semánticos complicados, pero caro y sensible a posición/prompt.
+
+Pairwise vs listwise
+
+Pairwise tiene coste cuadrático si se hace exhaustivamente. Listwise puede considerar interdependencias entre candidatos, pero introduce position/context effects. Para producción prefiero un reranker especializado antes que un frontier LLM salvo casos excepcionales.
+
+10. Embeddings en agosto de 2026
+
+No hay un “mejor embedding” universal.
+
+Modelo/familia
+
+Puntos fuertes
+
+Debilidad
+
+Uso
+
+OpenAI text-embedding-3-large
+
+estable, buen multilingual baseline
+
+text-only; 2024
+
+stack OpenAI existente
+
+Gemini Embedding 001
+
+fuerte multilingual
+
+sucedido parcialmente por nueva generación
+
+text
+
+Gemini Embedding 2
+
+multimodal nativo, 100+ langs, MRL
+
+API/vendor
+
+multimodal
+
+Voyage 4
+
+shared embedding space, MRL/quantization
+
+API excepto nano
+
+enterprise text/code
+
+voyage-context-4
+
+contexto documental
+
+nueva, vendor benchmark
+
+long documents
+
+voyage-code-4
+
+código
+
+especializada
+
+code RAG
+
+Cohere Embed 4
+
+multimodal/MRL
+
+API
+
+enterprise multimodal
+
+Qwen3 Embedding
+
+multilingual, tamaños 0.6–8B
+
+infra local
+
+self-host
+
+BGE-M3
+
+dense+sparse+multi-vector
+
+más complejo
+
+versatile self-host
+
+Jina Embeddings v4/v5
+
+multimodal/late-interaction/long context
+
+licencia/product mix
+
+multimodal
+
+Nomic Embed v2 MoE
+
+open, multilingual, MRL
+
+benchmark propio necesario
+
+open-source
+
+OpenAI continúa describiendo text-embedding-3-large como su embedding más capaz, con 3072 dimensiones y posibilidad de reducir dimensionalidad. citeturn256435search9turn256435search10
+
+Voyage 4 introdujo un espacio compartido que permite incluso utilizar modelos diferentes en query y document side sin necesariamente reindexar, y voyage-context-4 lleva explícitamente el contexto del documento al embedding del chunk. citeturn704650search1turn704650search3
+
+Gemini Embedding 2 unifica texto, imagen, vídeo, audio y PDF en el mismo espacio y soporta dimensionalidades recortables mediante Matryoshka Representation Learning. citeturn256435search1turn256435search3
+
+Benchmarks
+
+MTEB ha crecido mucho más allá de un leaderboard de sentence embeddings y en 2026 incluye más de mil idiomas y múltiples modalidades/domains. citeturn984675search5 MIRACL sigue siendo referencia importante para retrieval multilingüe, con 18 idiomas y decenas de miles de queries/relevance judgments. citeturn984675search0
+
+Matryoshka embeddings
+
+Permiten truncar una representación entrenada para mantener utilidad en prefijos de menor dimensión. Muy útil para:
+
+768/1024 → 256 dims
+
+cuando memoria/cache/index bandwidth es crítica.
+
+Quantization / binary embeddings
+
+Son especialmente atractivos en 100M–1B vectors: recuperar en versión cuantizada y rescoring en precisión completa.
+
+Asymmetric retrieval
+
+Query y document no son distribuciones equivalentes. Task prompts, query encoders especializados o incluso shared-space models de diferente tamaño pueden ser mejores que usar exactamente la misma ruta para ambos.
+
+Regla práctica
+
+El benchmark correcto es:
+
+MTEB/BEIR/MIRACL para shortlist
+                    ↓
+tu corpus + tus preguntas + tus hard negatives
+                    ↓
+Recall@K / nDCG / latency / index size / cost
+
+11. PostgreSQL + pgvector en 2026
+
+¿Puede PostgreSQL ser la base principal de un RAG serio?
+
+Sí. Para una gran proporción de sistemas empresariales, mi respuesta es claramente sí.
+
+Especialmente cuando:
+
+documentos y permisos ya son relacionales;
+
+seguridad/RLS es crítica;
+
+existen decenas de miles a decenas de millones de chunks, no miles de millones;
+
+se quiere una única capa transaccional;
+
+la carga es principalmente read-heavy con ingestion controlada;
+
+el equipo domina PostgreSQL.
+
+pgvector soporta exact nearest-neighbor por defecto y ANN mediante HNSW e IVFFlat. Su documentación caracteriza HNSW como mejor trade-off speed/recall, a cambio de más memoria y build time; IVFFlat construye más rápido y usa menos memoria, pero exige entrenamiento/tuning. citeturn542814search0turn542814search6
+
+Desde pgvector 0.8.x, iterative scans mejoran especialmente el escenario ANN + filtros, donde el filtrado aplicado después del scan puede producir menos resultados que los solicitados. citeturn542814search3
+
+Precisión importante: PostgreSQL FTS no es BM25
+
+PostgreSQL nativo utiliza tsvector, tsquery y funciones como ts_rank/ts_rank_cd; no implementa BM25 como ranking nativo. citeturn957175search0turn957175search13
+
+Si BM25 exacto dentro de PostgreSQL es importante, en 2026 existen opciones como:
+
+pg_textsearch 1.0, GA en marzo de 2026, con BM25/Block-Max WAND; citeturn957175search2turn957175search5
+
+ParadeDB pg_search, extensión basada en Tantivy orientada a BM25/full-text/faceted/hybrid search. citeturn957175search1turn957175search8
+
+Ambas añaden dependency/licensing/operational considerations. Empezaría con FTS nativo si cumple; sólo introduciría la extensión si el benchmark lexical demuestra valor.
+
+Esquema recomendado
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE rag_document (
+    id              uuid PRIMARY KEY,
+    tenant_id       uuid NOT NULL,
+    source_uri      text NOT NULL,
+    title           text,
+    version         bigint NOT NULL,
+    content_sha256  bytea NOT NULL,
+    parser          text NOT NULL,
+    parser_version  text NOT NULL,
+    ingested_at     timestamptz NOT NULL DEFAULT now(),
+
+    UNIQUE (tenant_id, source_uri, version)
+);
+
+CREATE TABLE rag_chunk (
+    id                uuid PRIMARY KEY,
+    tenant_id         uuid NOT NULL,
+    document_id       uuid NOT NULL
+                      REFERENCES rag_document(id) ON DELETE CASCADE,
+
+    ordinal           integer NOT NULL,
+    section_path      text[],
+    page_from         integer,
+    page_to           integer,
+    block_ids         text[],
+    bbox              jsonb,
+
+    text              text NOT NULL,
+    parent_text       text,
+    metadata          jsonb NOT NULL DEFAULT '{}'::jsonb,
+
+    search_tsv tsvector GENERATED ALWAYS AS (
+        setweight(
+            to_tsvector(
+                'simple',
+                coalesce(array_to_string(section_path, ' '), '')
+            ),
+            'A'
+        ) ||
+        setweight(
+            to_tsvector('simple', coalesce(text, '')),
+            'B'
+        )
+    ) STORED,
+
+    embedding         vector(1024),
+    embedding_model   text NOT NULL,
+    embedding_version text NOT NULL,
+    content_hash      bytea NOT NULL,
+
+    deleted_at        timestamptz
+);
+
+CREATE INDEX rag_chunk_tenant_document_idx
+    ON rag_chunk (tenant_id, document_id);
+
+CREATE INDEX rag_chunk_fts_idx
+    ON rag_chunk USING gin (search_tsv);
+
+CREATE INDEX rag_chunk_embedding_hnsw_idx
+    ON rag_chunk
+    USING hnsw (embedding vector_cosine_ops)
+    WITH (m = 16, ef_construction = 128);
+
+Para corpus exclusivamente español cambiaría simple por una configuración lingüística apropiada cuando stemming mejore el benchmark. Para corpus técnico multilingual/identifiers, simple puede preservar tokens que un stemmer destruiría.
+
+Row-Level Security
+
+ALTER TABLE rag_document ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rag_document FORCE ROW LEVEL SECURITY;
+
+ALTER TABLE rag_chunk ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rag_chunk FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY rag_document_tenant_policy
+ON rag_document
+USING (
+    tenant_id =
+    current_setting('app.tenant_id', true)::uuid
+);
+
+CREATE POLICY rag_chunk_tenant_policy
+ON rag_chunk
+USING (
+    tenant_id =
+    current_setting('app.tenant_id', true)::uuid
+);
+
+Las políticas RLS son una defensa fuerte, pero la aplicación debe usar un role no propietario de las tablas y los tests deben comprobar fail-closed behavior. citeturn542814search1
+
+Hybrid RRF con SQL
+
+WITH
+q AS (
+    SELECT plainto_tsquery('simple', :query) AS tsq
+),
+
+lexical AS (
+    SELECT
+        c.id,
+        row_number() OVER (
+            ORDER BY ts_rank_cd(c.search_tsv, q.tsq) DESC
+        ) AS rank
+    FROM rag_chunk c
+    CROSS JOIN q
+    WHERE c.tenant_id = :tenant_id
+      AND c.deleted_at IS NULL
+      AND c.search_tsv @@ q.tsq
+    ORDER BY ts_rank_cd(c.search_tsv, q.tsq) DESC
+    LIMIT 100
+),
+
+semantic AS (
+    SELECT
+        c.id,
+        row_number() OVER (
+            ORDER BY c.embedding <=> CAST(:query_embedding AS vector)
+        ) AS rank
+    FROM rag_chunk c
+    WHERE c.tenant_id = :tenant_id
+      AND c.deleted_at IS NULL
+    ORDER BY c.embedding <=> CAST(:query_embedding AS vector)
+    LIMIT 100
+),
+
+rrf AS (
+    SELECT
+        id,
+        SUM(score) AS score
+    FROM (
+        SELECT id, 1.0 / (60.0 + rank) AS score
+        FROM lexical
+
+        UNION ALL
+
+        SELECT id, 1.0 / (60.0 + rank) AS score
+        FROM semantic
+    ) s
+    GROUP BY id
+)
+
+SELECT c.*, rrf.score
+FROM rrf
+JOIN rag_chunk c USING (id)
+ORDER BY rrf.score DESC
+LIMIT 60;
+
+El tenant_id explícito es defensa en profundidad además del RLS.
+
+Tuning
+
+HNSW es mi default a partir de corpus donde exact scan deja de cumplir SLO. Para pequeños corpus probaría exact search antes de asumir ANN. pgvector señala que exact search proporciona perfect recall y documenta partial indexes/partitioning e iterative scans para filtros. citeturn542814search0turn542814search3
+
+12. PostgreSQL frente a vector/search databases
+
+No existe una comparación throughput/latency universal que sea técnicamente honesta: hardware, dimensiones, recall target, filtering selectivity y update rate cambian completamente el resultado.
+
+Sistema
+
+Mayor fortaleza
+
+Hybrid/filtering
+
+Scale
+
+Ops
+
+Mi recomendación
+
+Postgres + pgvector
+
+Transacciones, joins, RLS
+
+Muy bueno
+
+Alto
+
+Bajo-medio
+
+Default enterprise
+
+Qdrant
+
+vector/multivector + filters
+
+Excelente
+
+Alto
+
+Medio
+
+Vector-first
+
+Pinecone
+
+managed/serverless
+
+Excelente
+
+Muy alto
+
+Muy bajo
+
+Si zero-ops domina
+
+Weaviate
+
+producto integrado hybrid
+
+Excelente
+
+Alto
+
+Medio
+
+Developer-friendly
+
+Milvus 3
+
+distributed/lake-native/GPU
+
+Excelente
+
+Muy alto
+
+Alto
+
+100M–1B+
+
+Elasticsearch
+
+lexical/search enterprise
+
+Excelente
+
+Muy alto
+
+Medio-alto
+
+Search-first
+
+OpenSearch
+
+OSS/cloud search
+
+Excelente
+
+Muy alto
+
+Medio-alto
+
+Search-first/AWS
+
+Vespa
+
+ranking programable multi-stage
+
+Excelente
+
+Muy alto
+
+Alto
+
+Expert IR teams
+
+LanceDB
+
+lakehouse/embedded/multivector
+
+Bueno
+
+Alto
+
+Bajo-medio
+
+Data/AI native
+
+Chroma
+
+DX/simple integrated retrieval
+
+Bueno
+
+Peq→med/validar grande
+
+Bajo
+
+Prototipo/small-medium
+
+Qdrant tiene dense+sparse, RRF/DBSF, nested multistage queries, multivector/ColBERT y filtering orientado al retrieval. citeturn791297search0turn791297search2turn791297search9
+
+Pinecone ofrece hybrid dense+sparse y namespaces por tenant, interesante para managed multitenancy. citeturn834541search1turn834541search2
+
+Milvus ya combinaba dense, sparse/BM25 y multivector, y Milvus 3.0, publicado el 29/07/2026, representa un cambio importante hacia una arquitectura lake-native y un sparse index renovado. citeturn699803search1turn699803search3turn415083search12
+
+Vespa es especialmente fuerte cuando se quiere escribir ranking pipelines propios con múltiples fases y combinar BM25/nearest-neighbor en expresiones arbitrarias. citeturn364550search9turn364550search10
+
+Regla de decisión
+
+¿Necesitas ACID + RLS + metadata relational?
+    → PostgreSQL
+
+¿Search lexical es el producto?
+    → Elasticsearch / OpenSearch
+
+¿Vector-first + sophisticated payload filters?
+    → Qdrant
+
+¿No quieres administrar nada?
+    → Pinecone
+
+¿100M–1B+, distributed/GPU/lake architecture?
+    → Milvus / Vespa / Elastic/OpenSearch / managed vector
+
+¿Ranking custom extremadamente sofisticado?
+    → Vespa
+
+13. Escalabilidad
+
+Estos valores son heurísticas de ingeniería, no fronteras matemáticas:
+
+Chunks
+
+Arquitectura razonable
+
+10k
+
+Exact vector search puede bastar
+
+100k
+
+Exact aún puede funcionar; ANN opcional
+
+1M
+
+HNSW/ANN normalmente merece la pena
+
+10M
+
+PostgreSQL sigue siendo viable con tuning/partitioning/read replicas
+
+100M
+
+Benchmark obligatorio; motor distribuido frecuentemente reduce riesgo operacional
+
+1B
+
+Arquitectura distribuida/tiered/quantized prácticamente inevitable
+
+Lo que importa de verdad es:
+
+N vectors
+× embedding dimension
+× bytes/component
+× replication factor
+× index overhead
+× QPS
+× recall target
+× filter selectivity
+× write/update rate
+
+pgvector estima la representación básica de vector aproximadamente como 4*d + overhead bytes antes del índice. citeturn542814search0
+
+En 100M+ reducir de 1536 a 256–512 dimensiones mediante MRL, half precision o quantization puede cambiar por completo el coste económico.
+
+14. Chunking moderno
+
+No existe un “chunk size óptimo”.
+
+Una revisión/evaluación amplia de 2026 concluye que el mejor método depende fuertemente de tarea y corpus; métodos estructurales relativamente simples pueden superar estrategias LLM más costosas y los beneficios de técnicas contextuales varían entre in-corpus e in-document retrieval. citeturn475807academia14
+
+Documento
+
+Estrategia recomendada
+
+Manual técnico
+
+headings + semantic boundaries + parent-child
+
+Contratos/legal
+
+clause/section-aware + parent context
+
+Papers
+
+section/paragraph + tables/figures linked
+
+Narrative
+
+recursive/semantic
+
+Código
+
+AST/symbol/class/function-aware
+
+Tabla
+
+objeto de tabla + rows/cells, no text split arbitrario
+
+Slides
+
+slide + visual regions + speaker notes
+
+Chat
+
+turn/session + episodic facts
+
+FAQ
+
+pregunta+respuesta como unidad
+
+Scans
+
+layout blocks después de OCR/VLM
+
+Fixed
+
+Barato y reproducible, útil como baseline. Malo cuando rompe tablas, listas, cláusulas o conceptos.
+
+Recursive
+
+Muy buen baseline general cuando usa headings/paragraphs/sentences antes de tokens.
+
+Semantic chunking
+
+Puede mejorar límites, pero añade inference y no siempre gana.
+
+Structure-aware
+
+Mi default para documentos empresariales.
+
+Contextual chunking
+
+Añade un encabezado/contexto generado:
+
+"This chunk is from section 5.2 of the ACME security policy..."
+
+antes de embed/index. Anthropic reportó mejoras fuertes en sus evaluaciones. citeturn630768search1
+
+Late chunking
+
+Procesa una secuencia larga para conservar contexto token-level y luego agrega representaciones por chunk. citeturn475807academia12
+
+Parent-child
+
+Una de las técnicas más infravaloradas:
+
+retrieve precise child
+        ↓
+return child + enough parent/section
+
+Da precisión al retrieval sin privar al generador del entorno lógico.
+
+Proposition-based
+
+Excelente granularidad para facts atómicos, pero aumenta unidades, costes y puede destruir matices del documento original. La usaría como índice secundario, no como única representación.
+
+15. Document parsing
+
+El parsing es probablemente el componente con mayor diferencia entre una demo RAG y un sistema realmente fiable.
+
+Principio
+
+No convertiría un PDF directamente en:
+
+pdf → markdown → chunks
+
+como única representación.
+
+Construiría un document block graph:
+
+Document
+ ├─ section
+ │   ├─ paragraph
+ │   ├─ list
+ │   ├─ table
+ │   │   ├─ row/cell coordinates
+ │   ├─ figure
+ │   │   ├─ caption
+ │   │   └─ image asset
+ │   └─ equation
+ └─ provenance(page,bbox,...)
+
+Herramientas
+
+Herramienta
+
+Fortalezas
+
+Coste/licencia
+
+Estado 2026
+
+Recomendación
+
+Docling
+
+layout, tables, formulas, unified structure/provenance, muchos formatos
+
+OSS/MIT
+
+Muy activo
+
+ADOPT citeturn977199search0turn977199search8
+
+MinerU 3.1
+
+VLM + PDFs/Office + charts/tables
+
+OSS/custom license
+
+Muy activo
+
+TRIAL/ADOPT citeturn812509search6
+
+Unstructured
+
+amplia integración + PDF strategies
+
+OSS/commercial
+
+Maduro
+
+ADOPT citeturn246525search4
+
+Marker
+
+Markdown/JSON/HTML, equations/tables
+
+pesos con restricciones NC salvo waiver
+
+Maduro
+
+Revisar licencia citeturn812509search0
+
+PaddleOCR-VL 1.5
+
+111 languages, VLM document understanding
+
+Apache/open
+
+Muy prometedor
+
+TRIAL citeturn246525search5
+
+olmOCR
+
+scans, equations, tables, handwriting
+
+Apache
+
+Maduro emergente
+
+TRIAL citeturn812509search8
+
+Mistral OCR 4
+
+API, boxes/structure
+
+pago
+
+GA
+
+ADOPT cloud citeturn244023search4
+
+Mistral OCR 4.1
+
+block confidence + labels
+
+pago
+
+Preview
+
+TRIAL citeturn244023search6
+
+LlamaParse V2
+
+tiers fast→agentic, version pinning
+
+API
+
+Maduro
+
+ADOPT cloud citeturn244023search7
+
+Docling sigue con releases activas en agosto de 2026 y soporta PDF, DOCX, PPTX, XLSX, HTML, imágenes y otros formatos, preservando layout/reading order y elementos estructurales. citeturn977199search0turn977199search8
+
+Mi producción ideal usaría:
+
+local structured parser
+        ↓ confidence low?
+cloud/VLM fallback
+        ↓
+cross-parser QA sample
+
+El parser y su versión deben formar parte de la version lineage del corpus.
+
+16. Multimodal RAG
+
+Hay dos estrategias distintas.
+
+A. Parse-first
+
+image/PDF
+  ↓
+OCR + layout + tables + captions
+  ↓
+text/multimodal embeddings
+
+Mejor para citations, compliance y extracción estructurada.
+
+B. Visual retrieval
+
+page image → visual multi-vector embedding
+                     ↓
+                 retrieval
+                     ↓
+               multimodal LLM
+
+ColPali mostró que representar páginas como imágenes y utilizar multi-vector late interaction puede superar pipelines basados sólo en OCR en benchmarks documentales visuales. citeturn857853search36 VisRAG investiga una dirección similar de visual document retrieval. citeturn377160search2
+
+Mi arquitectura
+
+Usaría ambas representaciones:
+
+page
+ ├── structured text/table index
+ └── visual page/region index
+
+y fusionaría resultados. Así no obligo un gráfico o diagrama a convertirse en una mala descripción textual.
+
+Para vídeo/audio:
+
+asset_id
+timestamp_start
+timestamp_end
+transcript
+speaker
+visual scene embedding
+audio embedding
+
+La llegada de embeddings multimodales unificados como Gemini Embedding 2 y las nuevas familias Jina reduce parte de la complejidad de mantener espacios separados. citeturn256435search1turn319668search3
+
+17. Query understanding
+
+No ejecutaría query rewriting indiscriminadamente.
+
+Routing inicial
+
+exact identifier?     → lexical-heavy
+simple factual?       → normal hybrid
+ambiguous follow-up?  → conversational rewrite
+multi-hop?            → decompose
+global thematic?      → hierarchical/GraphRAG
+visual question?      → visual retrieval
+fresh/current?        → approved web/fresh datasource
+insufficient?         → one retry → abstain
+
+Query expansion
+
+Útil con terminología sinónima; peligrosa con entidades exactas.
+
+Multi-query
+
+Generar varias formulaciones mejora recall pero multiplica coste y puede reducir precision.
+
+HyDE
+
+HyDE genera un documento hipotético y utiliza su embedding para buscar documentos reales. El paper ACL 2023 mostró fuertes resultados zero-shot sin relevance labels. citeturn585623search0turn585623search6
+
+No lo usaría por defecto en preguntas factuales con IDs/nombres, porque la hipótesis generada puede desviar el retrieval.
+
+Step-back
+
+Genera una abstracción/principio general antes del reasoning; el trabajo original reportó mejoras en varias tareas reasoning-intensive. citeturn115972academia36 Es más interesante para reasoning que como rewrite universal de búsqueda.
+
+Decomposition
+
+La evolución 2026 es especialmente interesante: ya no se limita a “pide al LLM 3 subpreguntas”. EACL 2026 estudia explícitamente el trade-off exploration/exploitation y PROGRAM usa programas lógicos/temporales/causales con active pruning. citeturn405028search0turn405028search1
+
+18. Agentic RAG
+
+El agente puede decidir:
+
+need_retrieval?
+which index?
+which modality?
+rewrite?
+decompose?
+retrieve again?
+verify?
+stop?
+
+Eso es potente, pero crea un nuevo problema:
+
+probability of error per decision
+× number of decisions
+× tool side effects
+
+Un SoK publicado en 2026 caracteriza Agentic RAG en términos de planning/orchestration/memory/tools y subraya riesgos de hallucination compounding, retrieval misalignment, memory poisoning y cascading tool vulnerabilities. citeturn377160academia14
+
+Diseño recomendado
+
+max_search_rounds = 3
+max_subqueries = 5
+max_tool_calls = 8
+max_context_tokens = ...
+cost_budget = ...
+
+Con stop rules deterministas.
+
+Cuándo usarlo
+
+multi-hop;
+
+reconciliar varias fuentes;
+
+queries ambiguas que requieren exploración;
+
+federated retrieval;
+
+análisis científico/legal complejo.
+
+Cuándo evitarlo
+
+búsqueda FAQ;
+
+latency <1 s;
+
+workloads repetitivos;
+
+high-stakes sin trazabilidad;
+
+cuando una SQL query estructurada resuelve mejor el problema.
+
+Agentic RAG debe ser un route, no el único runtime.
+
+19. GraphRAG y Knowledge-Graph RAG
+
+GraphRAG sirve para preguntas que los chunks locales no representan bien:
+
+¿Cuáles son los principales temas y cómo se conectan?
+¿Qué actores aparecen juntos en distintos documentos?
+¿Qué patrones globales hay en el corpus?
+
+Pipeline típico:
+
+documents
+ ↓
+entity extraction
+ ↓
+relation extraction
+ ↓
+graph
+ ↓
+community detection
+ ↓
+community summaries
+ ↓
+local/global retrieval
+
+Microsoft GraphRAG es la implementación más visible, pero su coste de indexing y el estado de mantenimiento ya mencionado hacen que no lo elegiría como default universal. citeturn782834search1turn782834search2
+
+HippoRAG 2, ICML 2025, explora una memoria inspirada en grafos con Personalized PageRank para multi-hop retrieval. citeturn475807search4
+
+Los trabajos 2026 tienden a evitar el coste de un único grafo global: STEM, ParallaxRAG, FlowRAG y SR-RAG exploran distintas representaciones, proyecciones y grafos construidos dinámicamente. citeturn405028search3turn405028search5turn405028search7turn405028search11
+
+Conclusión
+
+Use GraphRAG when the graph is part of the problem. Do not manufacture a graph because “GraphRAG sounds advanced”.
+
+20. Memory
+
+RAG y memory no son lo mismo.
+
+Tipo
+
+Qué almacena
+
+Lifetime
+
+RAG corpus
+
+conocimiento externo
+
+corpus lifetime
+
+Working/short-term
+
+estado actual
+
+conversación/task
+
+Episodic
+
+eventos/interacciones
+
+largo
+
+Semantic
+
+hechos consolidados
+
+largo
+
+User memory
+
+preferencias/hechos del usuario
+
+governed
+
+Agent memory
+
+decisiones/tool outcomes/state
+
+task/long
+
+LongMemEval evalúa extraction, multi-session reasoning, temporal reasoning, knowledge updates y abstention, y documenta degradaciones importantes cuando los asistentes deben operar sobre historias largas. citeturn289473academia12
+
+Mem0 propone extracción/consolidación selectiva frente a reenviar todo el historial; su documentación de 2026 advierte además que la plataforma gestionada contiene optimizaciones distintas del OSS, algo importante al comparar benchmarks. citeturn907887search1turn907887search4
+
+Graphiti/Zep representa conocimiento temporal en un graph memory y ha ganado relevancia para agent memory, aunque su historial también ilustra que estos componentes necesitan la misma disciplina de seguridad que cualquier datastore; Graphiti tuvo un advisory de Cypher injection. citeturn294399search6turn294399search4
+
+Para hechos mutables almacenaría:
+
+fact
+valid_from
+valid_until
+observed_at
+source
+confidence
+supersedes
+
+No “memoria permanente” sin temporalidad.
+
+21. Context engineering
+
+En 2026, el problema deja de ser “cuántos tokens caben” y pasa a ser:
+
+¿Cuál es el conjunto mínimo de evidencia que maximiza respuesta correcta y verificable?
+
+Pipeline:
+
+reranked candidates
+ ↓
+drop exact duplicates
+ ↓
+near-duplicate consolidation
+ ↓
+source diversity
+ ↓
+parent/section expansion
+ ↓
+remove low-information boilerplate
+ ↓
+group by source/topic
+ ↓
+dynamic token allocation
+ ↓
+position/order optimization
+
+Lost in the Middle
+
+El trabajo Lost in the Middle, TACL 2024, mostró una sensibilidad significativa a la posición del contenido relevante, con degradación cuando la información queda en ciertas posiciones intermedias. citeturn289473search0 Investigaciones posteriores han intentado calibrar positional attention bias. citeturn289473search3
+
+Regla práctica
+
+No llenaría un contexto de 1M tokens porque existe.
+
+Para consultas simples:
+
+6–10 high-quality evidence blocks
+
+puede ser mejor que 100 chunks semi-relevantes.
+
+El número debe derivarse del benchmark.
+
+22. Long Context vs RAG
+
+La evidencia no respalda ninguno de estos slogans:
+
+"long context mató a RAG"
+"RAG siempre es mejor"
+
+Un estudio de 2024 encontró que long-context puede superar RAG con recursos suficientes, mientras RAG es mucho más económico, y propone un Self-Route híbrido. citeturn830026academia36 Otros análisis encuentran que añadir más pasajes produce inicialmente mejoras y después degradación, en parte por hard negatives. citeturn830026academia39
+
+
+
+Long Context
+
+RAG
+
+LC + RAG
+
+Coste corpus grande
+
+Alto
+
+Bajo
+
+Medio
+
+Latencia
+
+Alta
+
+Baja-media
+
+Media
+
+Actualización conocimiento
+
+Reenvío
+
+Índice
+
+Índice
+
+Exact provenance
+
+Difícil
+
+Fácil
+
+Fácil
+
+Global reasoning
+
+Bueno
+
+Variable
+
+Muy bueno
+
+Noise resistance
+
+Variable
+
+Buena si retrieval bueno
+
+Mejor
+
+ACL
+
+Costoso de empaquetar
+
+Natural
+
+Natural
+
+Scale
+
+Malo para corpus enorme
+
+Excelente
+
+Excelente
+
+Recomendación 2026
+
+Retrieve broadly; read deeply.
+
+RAG selecciona un subconjunto y el long-context model recibe documentos/padres bastante amplios dentro de ese subconjunto.
+
+23. Caching
+
+Separaría seis caches:
+
+Cache
+
+Key correcta
+
+Riesgo
+
+Embedding cache
+
+content_hash + model/version
+
+stale embedding
+
+Query embedding
+
+normalized query + model/version
+
+privacy
+
+Retrieval cache
+
+tenant + ACL digest + corpus version + query
+
+cross-tenant leak
+
+Semantic cache
+
+semantic query + permissions + corpus revision
+
+false equivalence
+
+Prompt cache
+
+stable prefix/model
+
+provider-specific
+
+Response cache
+
+query + auth + corpus/evidence versions
+
+stale answer
+
+KV cache
+
+model/chunk representation
+
+GPU memory
+
+Los proveedores actuales soportan distintas formas de prompt caching; además, trabajos como TurboRAG exploran precomputar KV caches de chunks para reducir time-to-first-token en RAG. citeturn830026search1turn830026search2
+
+Nunca compartir semantic/retrieval cache entre tenants salvo que la clave incorpore de forma inequívoca el security scope.
+
+24. Seguridad específica de RAG
+
+Retrieved content debe ser tratado como untrusted data.
+
+Los ataques ya no son puramente teóricos. Papers 2025 estudian corpus poisoning, indirect instructional manipulation, multi-hop poisoning e incluso ataques de membership inference contra datos privados de RAG. citeturn471611search0turn471611search3turn471611search8turn471611search6
+
+Riesgo
+
+Defensa
+
+Indirect prompt injection
+
+separar instructions de evidence; no ejecutar instrucciones recuperadas
+
+Poisoned docs
+
+source trust, approval, signatures/hashes, anomaly monitoring
+
+Data exfiltration
+
+tool allowlist + egress policy
+
+Cross-tenant retrieval
+
+RLS + mandatory predicates + namespace/shard
+
+ACL bypass
+
+permission filtering antes del Top-K final
+
+Embedding attack
+
+lexical corroboration + reranking + source diversity
+
+Sensitive leakage
+
+classification/redaction + access-aware generation
+
+Malicious URL/content
+
+sandbox parsing; no active content
+
+Tool injection
+
+no secrets in prompt; least privilege
+
+Cache leak
+
+permission-scoped cache keys
+
+ACL 2026 CARE investiga robustez frente a retrieval noise/documentos fabricados mediante adversarial RL, señal de que robustness frente a evidencia hostil está pasando a ser un área propia de RAG. citeturn967623search2
+
+25. Multi-tenancy
+
+Mi principio sería:
+
+Un documento no autorizado nunca debe convertirse en candidato que el LLM pueda ver.
+
+No:
+
+retrieve global top 100
+        ↓
+filter tenant
+
+sino:
+
+security scope
+    ↓
+search only authorized universe
+
+Para permisos internos:
+
+document_acl (
+    tenant_id,
+    document_id,
+    principal_type,
+    principal_id,
+    permission
+)
+
+En queries críticas:
+
+tenant_id
+AND document ACL/group membership
+AND document status/version
+AND data classification
+
+RLS actúa como segunda barrera. Application-level mandatory filtering actúa como primera. En un vector DB usaría namespace/shard/payload filters equivalentes.
+
+Qdrant ofrece tenant-aware payload/shard patterns y Pinecone namespaces por tenant. citeturn791297search1turn834541search2
+
+Para tenants enormes consideraría partition/shard dedicado; para miles de pequeños tenants, un shared index con tenant filter suele ser más práctico. Debe medirse la interacción entre filtering selectivity y ANN recall.
+
+26. Observabilidad
+
+La unidad de observación no es sólo el LLM call; es el retrieval trace.
+
+Debe registrarse:
+
+trace_id
+tenant/security scope hash
+query
+rewrite/decomposition
+retrievers used
+candidate IDs
+scores/ranks
+fusion contributions
+reranker scores
+evidence selected
+context tokens
+generator/model/version
+claims
+citation verification
+abstention reason
+cache hits
+latency per stage
+tokens
+cost
+feedback
+
+Herramienta
+
+Mejor para
+
+Observación
+
+OpenTelemetry/OpenInference
+
+estándar de instrumentación
+
+ADOPT como substrate
+
+Phoenix
+
+OSS tracing + evals
+
+Excelente self-host
+
+Langfuse
+
+OSS tracing/prompt/eval
+
+Excelente self-host/product
+
+LangSmith
+
+LangChain/LangGraph
+
+Muy integrado
+
+Braintrust
+
+datasets/experiments/scorers
+
+Muy fuerte para eval workflow
+
+Arize
+
+managed observability/eval
+
+Enterprise
+
+W&B/Weave
+
+equipos ya en W&B
+
+Integración ML amplia
+
+OpenTelemetry ya define semánticas específicas para GenAI retrieval, incluyendo atributos de documentos y queries, aunque la propia especificación recuerda que ciertos campos pueden contener información sensible. citeturn271157search14turn271157search17
+
+Phoenix utiliza OpenInference/OTel y combina tracing, retrieval/response evaluation y experiments. citeturn264587search0turn264587search2 Langfuse ofrece tracing/evals/prompt management/datasets con opción OSS. citeturn264587search1 Braintrust enfatiza datasets versionados, experiments y scorers. citeturn264587search8turn264587search9
+
+27. Evaluación
+
+Retrieval
+
+Recall@K
+Precision@K
+Hit Rate
+MRR
+MAP
+nDCG
+
+Para RAG, Recall@K del evidence set suele ser el primer KPI: si la evidencia necesaria nunca entra, ningún prompt puede repararlo.
+
+Generation
+
+answer correctness
+faithfulness
+factuality
+answer relevance
+completeness
+citation correctness
+citation completeness
+
+End-to-end
+
+Añadiría:
+
+selective accuracy
+unsupported-claim rate
+abstention precision/recall
+task success
+p50/p95/p99 latency
+cost/query
+human escalation rate
+cross-tenant leakage = 0
+prompt-injection success
+freshness correctness
+
+RAGAS propuso evaluación automatizada por dimensiones de context relevance, faithfulness y answer quality. citeturn115972search0 ARES añade synthetic data, lightweight judges y pequeñas cantidades de human annotations. citeturn656448search0 RAGChecker propone diagnóstico fino de retrieval y generation y fue aceptado en NeurIPS 2024 Datasets & Benchmarks. citeturn656448search7
+
+Benchmark propio
+
+Construiría inicialmente 300–2,000 preguntas cuidadosamente revisadas, estratificadas por:
+
+simple factual
+exact identifiers
+semantic paraphrase
+multihop
+temporal
+conflicting sources
+long document
+table/chart
+multilingual
+unanswerable
+ambiguous
+permission denied
+prompt injection
+stale version
+hard negative
+
+Cada pregunta debe tener evidence IDs, no solamente una respuesta de referencia.
+
+La evaluación debe ejecutarse en CI contra una baseline congelada.
+
+28. LLM-as-a-Judge
+
+Es útil, pero no es ground truth.
+
+Problemas documentados:
+
+position bias;
+
+verbosity bias;
+
+self-preference/model-family preference;
+
+order sensitivity;
+
+stochasticity;
+
+prompt sensitivity;
+
+contamination;
+
+judge reasoning errors.
+
+Estudios han encontrado position bias sistemático en comparaciones y self-preference relacionada con familiaridad/perplexity. citeturn319668academia37turn319668academia36 Incluso debate multi-agent puede amplificar ciertos sesgos en vez de cancelarlos. citeturn319668academia38
+
+Mitigación
+
+human-calibrated judge
+randomize A/B order
+blind model/provider identity
+structured rubric
+multiple deterministic checks first
+repeat only borderline cases
+audit disagreement
+
+Para citation entailment prefiero un verifier especializado/NLI antes de preguntarle vagamente a otro LLM “¿está bien la respuesta?”.
+
+29. Synthetic datasets
+
+Synthetic data es excelente para ampliar un test set, no para sustituir el ground truth humano.
+
+Generaría automáticamente:
+
+answerable query + exact source span
+unanswerable query
+ambiguous query
+multi-hop query requiring documents A+B
+wrong-date query
+wrong-jurisdiction near negative
+entity collision
+acronym/typo
+table question
+visual question
+permission-negative query
+adversarial prompt-injection document
+
+Después aplicaría sampling humano.
+
+RAGAS actualmente incorpora test-set generation y ARES utiliza synthetic generation dentro de su enfoque evaluativo. citeturn319668search8turn656448search0
+
+30. Hard negatives
+
+Son imprescindibles.
+
+Ejemplos:
+
+correct: Policy 2026, section 4
+negative: Policy 2024, same title
+
+correct: ACME Inc., Peru
+negative: ACME Corp., Chile
+
+correct: CVE-2026-1234
+negative: CVE-2026-1235
+
+correct: clause 8.1, employment contract
+negative: identical clause text, wrong jurisdiction
+
+Un sistema que obtiene 95% Recall@10 en corpus limpio puede caer violentamente al introducir near-duplicates y distractors.
+
+ReasonIR y otras líneas recientes usan precisamente challenging/hard negatives para entrenar retrieval orientado a reasoning. citeturn779918academia25
+
+Los hard negatives deben entrar en:
+
+embedding evaluation;
+
+reranker training/eval;
+
+query rewrite eval;
+
+citation evaluation;
+
+adversarial security testing.
+
+31. Frameworks actuales
+
+Framework
+
+Fortaleza
+
+Debilidad
+
+Recomendación
+
+LangChain
+
+enorme integración
+
+superficie/dependency churn
+
+Integrations, no core domain logic
+
+LangGraph
+
+stateful workflows/agents
+
+más runtime complexity
+
+Muy bueno para agentic routes
+
+LlamaIndex
+
+document/index abstractions
+
+abstractions pueden filtrar detalles
+
+Doc-heavy prototypes/products
+
+Haystack
+
+explicit pipelines
+
+ecosistema menor
+
+Muy bueno para RAG pipeline
+
+DSPy
+
+optimizar LM programs
+
+curva mental diferente
+
+Offline optimization
+
+Semantic Kernel
+
+.NET/MS enterprise
+
+menos natural Python-first
+
+Microsoft/.NET
+
+PydanticAI
+
+typed Python agents
+
+más nuevo
+
+Muy atractivo Python
+
+Agno
+
+agent runtime
+
+ecosistema cambiante
+
+Trial
+
+Mastra
+
+TypeScript agent stack
+
+TS-centric
+
+Trial
+
+LangChain 1.x tiene ahora una política estable/LTS/SemVer, pero parte de sus paquetes históricos como langchain-community y langchain-experimental fueron archivados en 2026. También existen advisories de seguridad, de modo que pinning y dependency review importan. citeturn334759search1turn334759search7turn334759search13turn334759search3
+
+LangGraph sigue activo como capa de workflows stateful. citeturn334759search14turn334759search8
+
+Mi criterio
+
+Mantendría propio:
+
+retrieval SQL
+ACL logic
+ranking/fusion
+evidence schemas
+citation resolver
+evaluation datasets
+calibration
+
+Usaría frameworks para:
+
+provider adapters
+tool orchestration
+workflow state
+tracing integrations
+
+Esto reduce lock-in y hace los experimentos reproducibles.
+
+32. Repositorios GitHub relevantes
+
+Las estrellas son snapshots aproximados observados durante la investigación y no deben interpretarse como superioridad técnica.
+
+Proyecto
+
+Stars aprox.
+
+Actividad observada
+
+Función
+
+Madurez
+
+Recomendación
+
+LangChain
+
+~143k
+
+Activo 2026
+
+LLM framework
+
+Alta
+
+ADOPT selectivo citeturn334759search0
+
+LlamaIndex
+
+~51k
+
+Jul 2026
+
+data/RAG framework
+
+Alta
+
+ADOPT selectivo citeturn334759search9
+
+LangGraph
+
+muy alta ecosistema LC
+
+Ago 2026
+
+agent/workflow
+
+Alta
+
+ADOPT routed citeturn334759search8
+
+DSPy
+
+~36k
+
+activo
+
+LM programming
+
+Alta research
+
+TRIAL/ADOPT citeturn365770search0
+
+Haystack
+
+~26k
+
+activo
+
+pipelines/RAG
+
+Alta
+
+ADOPT citeturn365770search7
+
+Semantic Kernel
+
+~28k
+
+activo
+
+enterprise agents
+
+Alta
+
+ADOPT .NET citeturn365770search3
+
+Qdrant
+
+~34k
+
+activo
+
+vector DB
+
+Alta
+
+ADOPT citeturn415083search2
+
+Milvus
+
+~45k
+
+v3 Jul 2026
+
+distributed vector DB
+
+Alta
+
+ADOPT large-scale citeturn415083search7turn415083search12
+
+Vespa
+
+~7k
+
+activo
+
+search/ranking engine
+
+Muy alta
+
+ADOPT expert teams citeturn364550search13
+
+Microsoft GraphRAG
+
+~35k
+
+maintenance/releases
+
+GraphRAG
+
+Research
+
+TRIAL citeturn782834search1
+
+Graphiti
+
+~30k
+
+Ago 20 2026
+
+temporal graph memory
+
+Media-alta
+
+TRIAL citeturn294399search6
+
+Docling
+
+~60k
+
+Ago 2026
+
+parsing
+
+Alta
+
+ADOPT citeturn977199search8
+
+MinerU
+
+~63k
+
+2026 active
+
+document parsing
+
+Alta emergente
+
+TRIAL/ADOPT citeturn812509search6
+
+DeepEval
+
+~17k
+
+activo 2026
+
+LLM/RAG eval
+
+Alta
+
+ADOPT/TRIAL citeturn319668search1
+
+Langfuse
+
+~29k
+
+activo
+
+observability
+
+Alta
+
+ADOPT citeturn264587search1
+
+Phoenix
+
+~10k
+
+activo
+
+traces/evals
+
+Alta
+
+ADOPT citeturn264587search0
+
+ParadeDB
+
+~9k
+
+Jul 2026
+
+Postgres search/BM25
+
+Media-alta
+
+TRIAL citeturn957175search8
+
+ColBERT
+
+consolidado
+
+maintained research
+
+late interaction
+
+Alta
+
+TRIAL/ADOPT specialized citeturn115972search7
+
+HyDE
+
+research repo
+
+estable
+
+query transformation
+
+Research
+
+Conditional citeturn585623search6
+
+Un estudio de ecosistemas de agentes en 2026 también sirve como recordatorio de que stars no capturan contributor density, retention ni estabilidad del mantenimiento. citeturn171178academia30
+
+33. Papers imprescindibles
+
+Fundamentos
+
+Paper
+
+Año/autores
+
+Idea/valor práctico
+
+Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks
+
+2020, Lewis et al.
+
+Fundamento RAG: memoria paramétrica + recuperada. citeturn585623search7
+
+Dense Passage Retrieval
+
+2020, Karpukhin et al.
+
+Dual-encoder dense retrieval. citeturn585623search1
+
+ColBERT
+
+2020, Khattab & Zaharia
+
+Late interaction. citeturn115972academia37
+
+BEIR
+
+2021
+
+Benchmark cross-domain y robust baseline perspective. citeturn984675academia24
+
+ColBERTv2
+
+2022
+
+Late interaction más eficiente. citeturn779918search2
+
+HyDE
+
+2023, Gao et al.
+
+Zero-shot retrieval mediante hypothetical documents. citeturn585623search0
+
+RAG/adaptive/context
+
+Paper
+
+Importancia
+
+Self-RAG, ICLR 2024
+
+Retrieval bajo demanda + reflection. citeturn857853search0
+
+Adaptive-RAG, NAACL 2024
+
+Routing por complejidad. citeturn857853search1
+
+RAPTOR, ICLR 2024
+
+Hierarchical recursive retrieval. citeturn857853academia38
+
+CRAG, 2024
+
+Corrective retrieval. citeturn857853academia37
+
+Lost in the Middle, TACL 2024
+
+Context position effects. citeturn289473search0
+
+Late Chunking, 2024
+
+Context before chunk pooling. citeturn475807academia12
+
+Retrieval frontier
+
+Paper
+
+Importancia
+
+ReasonIR, 2025
+
+Reasoning-trained retriever. citeturn779918academia25
+
+MUVERA, 2025
+
+Scalable approximate multi-vector retrieval. citeturn779918search1
+
+ColPali, ICLR 2025
+
+Visual page retrieval. citeturn857853search36
+
+Speculative RAG, ICLR 2025
+
+Draft specialists + verification. citeturn377160search1
+
+Query Decomposition Exploration/Exploitation, EACL 2026
+
+Principled decomposition. citeturn405028search0
+
+PROGRAM, ACL 2026
+
+Program-guided multi-hop retrieval. citeturn405028search1
+
+GRIP, ACL 2026
+
+Retrieval as part of generation control. citeturn405028search9
+
+Hallucination/citation
+
+Paper
+
+Importancia
+
+ALCE, EMNLP 2023
+
+Citation evaluation. citeturn628648search3
+
+MiniCheck, EMNLP 2024
+
+Efficient grounding verifier. citeturn628648search38
+
+Ground Every Sentence, NAACL Findings 2025
+
+Claim/reference interleaving. citeturn628648search7
+
+RAC, EMNLP Findings 2025
+
+Atomic claim post-correction. citeturn628648search2
+
+Attribution/Citation/Quotation Survey, ACL 2026
+
+Estado general del campo. citeturn967623search0
+
+RLSeek, ACL 2026
+
+Evidence-seeking hallucination detection. citeturn628648search6
+
+FRANQ, ACL Findings 2026
+
+Faithfulness-aware uncertainty. citeturn967623search12
+
+Memory/evaluation
+
+Paper
+
+Importancia
+
+RAGAS, EACL 2024
+
+Reference-free RAG evaluation. citeturn115972search0
+
+ARES, NAACL 2024
+
+Synthetic + judge + human calibration. citeturn656448search0
+
+RAGChecker, NeurIPS 2024
+
+Fine-grained diagnosis. citeturn656448search7
+
+LongMemEval
+
+Long-term assistant memory benchmark. citeturn289473academia12
+
+Mem0
+
+Selective/consolidated agent memory. citeturn907887search1
+
+34. Herramientas emergentes 2025–2026
+
+Las que considero más relevantes y menos “obvias” son:
+
+document-contextual embeddings;
+
+multimodal shared embedding spaces;
+
+reasoning-aware retrievers;
+
+fixed-dimensional approximation de multi-vector retrieval;
+
+tiny/long-context listwise rerankers;
+
+Postgres-native BM25 extensions;
+
+VLM document parsers sub-1B/1B;
+
+retrieval-as-generation;
+
+program-guided retrieval;
+
+faithfulness-aware uncertainty;
+
+temporal knowledge-graph memories;
+
+per-hop model routing;
+
+KV-cache RAG.
+
+No todas están listas para producción. Varias pertenecen todavía a TRIAL/ASSESS.
+
+Innovaciones importantes que probablemente no conozco
+
+voyage-context-4: embeddings de cada chunk condicionados por el contexto del documento, disponibles desde junio de 2026. citeturn704650search3
+
+Gemini Embedding 2: un único espacio multimodal para texto/imágenes/audio/vídeo/PDF. citeturn256435search1
+
+MUVERA: Fixed Dimensional Encodings para convertir candidate generation multi-vector en MIPS más manejable. citeturn779918search0
+
+GRIP: retrieval tratado como una acción generativa que puede dispararse/reformularse/pararse durante decoding. citeturn405028search9
+
+PROGRAM: programas de retrieval especializados en razonamiento lógico, temporal y causal con pruning. citeturn405028search1
+
+SR-RAG: construcción simbólica del grafo on-the-fly en vez de precomputar un KG global completo. citeturn405028search11
+
+RAG-on-a-Diet: RL para elegir por hop el modelo más pequeño suficiente. citeturn405028search8
+
+FRANQ: uncertainty que distingue “esto puede ser verdadero” de “esto está respaldado por mi evidencia”. citeturn967623search12
+
+RLSeek: detector de hallucination spans que aprende a buscar/citar evidencia. citeturn628648search6
+
+pg_textsearch 1.0: BM25/Block-Max WAND como extensión PostgreSQL moderna. citeturn957175search2
+
+Jina reranker v3.5: 0.6B listwise, ventana 131k, publicado en julio de 2026. citeturn319668search0
+
+Milvus 3.0: arquitectura lake-native y sparse retrieval rediseñado. citeturn415083search12
+
+PaddleOCR-VL 1.5: document VLM compacto orientado a layout robusto y 111 idiomas. citeturn246525search5
+
+Mistral OCR 4.1: block-level labels/bounding boxes/confidence para provenance más precisa. citeturn244023search6
+
+TurboRAG: KV caches precomputados por chunks para reducir TTFT. citeturn830026search1
+
+Graphiti: knowledge graph temporal como memoria para agentes, distinto de GraphRAG estático. citeturn294399search6
+
+ReasonIR/ReasonEmbed: recuperación entrenada específicamente para reasoning en vez de similitud semántica superficial. citeturn779918academia25turn779918academia24
+
+FlowRAG/ParallaxRAG: retrieval de grafos con múltiples vistas/granularidades en lugar de un único embedding graph. citeturn405028search5turn405028search7
+
+Evidence-aligned entity verification: verificación granular diseñada específicamente para hallucinations en RAG. citeturn628648search4
+
+Asymmetric shared-space retrieval: modelos distintos para query/document manteniendo compatibilidad de embedding space, como en Voyage 4. citeturn704650search1
+
+35. Arquitectura RAG propuesta para producción
+
+Data plane
+
+Sources
+   ↓
+Connectors
+   ↓
+Malware/content scanning
+   ↓
+Parser router
+   ↓
+Structured Document Model
+   ↓
+Cleaning / normalization
+   ↓
+Block + hierarchy extraction
+   ↓
+Provenance
+   ↓
+ACL / metadata
+   ↓
+Chunk/parent construction
+   ↓
+ ┌────────────────────┬─────────────────┬────────────────┐
+ │ lexical index      │ dense embedding │ visual/multi   │
+ └────────────────────┴─────────────────┴────────────────┘
+   ↓
+Versioned publication
+
+Query plane
+
+AuthN/AuthZ
+ ↓
+Intent + risk routing
+ ↓
+Query processing
+ ↓
+parallel retrieval
+ ↓
+fusion
+ ↓
+rerank
+ ↓
+evidence builder
+ ↓
+LLM generation
+ ↓
+claim verification
+ ↓
+citation resolution
+ ↓
+confidence calibration
+ ↓
+answer / abstain
+
+Control plane
+
+model registry
+embedding versions
+parser versions
+corpus versions
+evaluation datasets
+experiments
+deployment config
+feature flags
+SLOs
+security policies
+
+Esta separación es importante: actualizar embeddings no debería requerir reescribir la lógica de permisos; cambiar de reranker no debería afectar citation provenance.
+
+36. Implementación de referencia
+
+Estructuras Python
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Protocol
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+
+class AuthContext(BaseModel):
+    tenant_id: UUID
+    user_id: UUID
+    groups: set[UUID] = set()
+
+
+class Evidence(BaseModel):
+    id: UUID
+    document_id: UUID
+    document_version: int
+    text: str
+
+    source_uri: str
+    page_from: int | None = None
+    page_to: int | None = None
+    section_path: list[str] = []
+    block_ids: list[str] = []
+
+    retrieval_score: float | None = None
+    rerank_score: float | None = None
+
+
+class Claim(BaseModel):
+    text: str
+    evidence_ids: list[UUID] = Field(min_length=1)
+
+
+class GeneratedAnswer(BaseModel):
+    answer: str
+    claims: list[Claim]
+
+
+class VerifiedClaim(BaseModel):
+    claim: Claim
+    entailment: float
+    contradiction: float
+    supported: bool
+
+Interfaces desacopladas
+
+class Embedder(Protocol):
+    async def query_embedding(self, text: str) -> list[float]: ...
+    async def document_embeddings(
+        self,
+        chunks: list[str],
+        *,
+        document_context: str | None = None,
+    ) -> list[list[float]]: ...
+
+
+class Retriever(Protocol):
+    async def retrieve(
+        self,
+        query: str,
+        query_vector: list[float],
+        auth: AuthContext,
+        limit: int,
+    ) -> list[Evidence]: ...
+
+
+class Reranker(Protocol):
+    async def rerank(
+        self,
+        query: str,
+        evidence: list[Evidence],
+        limit: int,
+    ) -> list[Evidence]: ...
+
+
+class Generator(Protocol):
+    async def generate(
+        self,
+        question: str,
+        evidence: list[Evidence],
+    ) -> GeneratedAnswer: ...
+
+
+class Verifier(Protocol):
+    async def verify(
+        self,
+        claim: Claim,
+        evidence: list[Evidence],
+    ) -> VerifiedClaim: ...
+
+Ingestion idempotente
+
+async def ingest_document(source, parser, embedder, repository):
+    raw = await source.read()
+    sha = sha256(raw).digest()
+
+    if await repository.content_exists(source.tenant_id, source.uri, sha):
+        return
+
+    doc = await parser.parse(raw)
+
+    blocks = normalize_blocks(doc.blocks)
+    chunks = build_structure_aware_chunks(blocks)
+
+    texts = [c.embedding_text for c in chunks]
+
+    embeddings = await embedder.document_embeddings(
+        texts,
+        document_context=doc.context_for_embedding,
+    )
+
+    async with repository.transaction():
+        version = await repository.next_document_version(
+            source.tenant_id,
+            source.uri,
+        )
+
+        document_id = await repository.insert_document(
+            source=source,
+            version=version,
+            sha=sha,
+            parser=parser.name,
+            parser_version=parser.version,
+        )
+
+        await repository.insert_chunks(
+            document_id=document_id,
+            chunks=chunks,
+            embeddings=embeddings,
+        )
+
+        await repository.activate_document_version(
+            document_id=document_id
+        )
+
+El nuevo document version sólo debe activarse después de que chunks/embeddings/FTS estén completos.
+
+Query path
+
+async def answer_question(question: str, auth: AuthContext):
+    route = await router.classify(question)
+
+    query = question
+
+    if route.requires_rewrite:
+        query = await rewrite_query(question)
+
+    query_vector = await embedder.query_embedding(query)
+
+    candidates = await retriever.retrieve(
+        query=query,
+        query_vector=query_vector,
+        auth=auth,
+        limit=120,
+    )
+
+    ranked = await reranker.rerank(
+        query,
+        candidates,
+        limit=30,
+    )
+
+    evidence = build_evidence_context(
+        ranked,
+        max_items=10,
+        expand_parents=True,
+        deduplicate=True,
+    )
+
+    if not sufficiency_gate.pre_generation(question, evidence):
+        return abstention(
+            "No existe suficiente información en las fuentes "
+            "para responder con seguridad."
+        )
+
+    draft = await generator.generate(question, evidence)
+
+    verification = await verify_all_claims(
+        draft.claims,
+        evidence,
+    )
+
+    decision = confidence_calibrator.predict(
+        question=question,
+        evidence=evidence,
+        verification=verification,
+    )
+
+    if decision.abstain:
+        return abstention(
+            "No existe suficiente información en las fuentes "
+            "para responder con seguridad."
+        )
+
+    return citation_resolver.materialize(
+        draft,
+        verification,
+        evidence,
+    )
+
+FastAPI
+
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+
+class QueryRequest(BaseModel):
+    question: str
+
+
+@app.post("/v1/rag/query")
+async def query_endpoint(
+    req: QueryRequest,
+    auth: AuthContext = Depends(authenticate),
+):
+    async with db.begin() as conn:
+        # SET LOCAL lives only for the transaction.
+        await conn.execute(
+            text("SELECT set_config('app.tenant_id', :tenant, true)"),
+            {"tenant": str(auth.tenant_id)},
+        )
+
+        return await rag_service.answer(
+            question=req.question,
+            auth=auth,
+            conn=conn,
+        )
+
+En producción añadiría deadlines, cancellation, circuit breakers, idempotency para ingestion, retry sólo para errores transitorios, structured logging y OpenTelemetry.
+
+37. Rendimiento
+
+Presupuesto de latencia orientativo
+
+No son garantías de vendors, sino targets de ingeniería para una arquitectura equilibrada y warm:
+
+Etapa
+
+Target aproximado
+
+auth/routing local
+
+2–15 ms
+
+embedding query
+
+10–100 ms
+
+lexical retrieval
+
+5–50 ms
+
+vector retrieval
+
+5–60 ms
+
+fusion
+
+<5 ms
+
+rerank 30–80 docs
+
+10–200 ms
+
+context build
+
+2–20 ms
+
+LLM TTFT
+
+0.2–1.5+ s
+
+generation
+
+normalmente dominante
+
+local NLI verifier
+
+10–100 ms
+
+frontier LLM verifier
+
+0.2 s–varios s
+
+Un pipeline equilibrado puede apuntar aproximadamente a sub-3 s TTFT / pocos segundos de respuesta completa, mientras un high-precision multi-hop/verifier pipeline puede tardar bastante más.
+
+Throughput
+
+batch embeddings durante ingestion;
+
+async I/O;
+
+connection pooling;
+
+bulk insert/COPY;
+
+separate workers;
+
+GPU batching para reranker local;
+
+index build separado;
+
+replicas de lectura;
+
+admission control;
+
+per-tenant quotas;
+
+bounded agent concurrency.
+
+PostgreSQL
+
+PgBouncer y un pool pequeño por service instance suelen ser más sanos que miles de conexiones directas. Añadiría read replicas para retrieval si la consistencia requerida lo permite y PITR/backups probados, no sólo configurados.
+
+38. Optimización coste/calidad
+
+Económica
+
+Docling/Paddle local
+Postgres + pgvector + native FTS
+RRF
+small local embedding
+small reranker
+economical LLM
+verifier sólo en low-confidence
+
+Ideal para alto volumen.
+
+Equilibrada — mi default
+
+structured parser
+contextual/high-quality embedding
+Postgres hybrid
+RRF
+strong fast reranker
+balanced frontier LLM
+local/small claim verifier
+adaptive high-end verifier
+OTel + eval CI
+
+Alta precisión
+
+multi-index hybrid
+reasoning-aware/decomposition routes
+premium reranker
+strong LLM
+atomic claim verification
+conflict detection
+multi-source evidence
+strict abstention
+
+Enterprise
+
+Alta precisión más:
+
+HA / replicas / DR
+RLS + ABAC/RBAC
+KMS/secrets
+audit logs
+SLO/error budgets
+security red-team
+data residency
+human escalation
+versioned model/data registry
+continuous eval
+
+39. Anti-patterns de RAG en 2026
+
+Vector search como único retriever.
+
+Chunks de 500 tokens porque un tutorial lo dijo.
+
+Top-K elegido sin medir Recall@K.
+
+Confundir similarity con confidence.
+
+No utilizar lexical baseline.
+
+No utilizar reranker aunque candidate recall sea alto y final precision baja.
+
+Enviar 50–100 chunks “por seguridad”.
+
+Generar URLs/page numbers libremente con el LLM.
+
+Filtrar ACL después del retrieval global.
+
+No versionar documentos.
+
+Sobrescribir embeddings durante migración.
+
+No almacenar embedding model/version.
+
+Convertir PDFs complejos a plain text y perder tablas/layout.
+
+Evaluar sólo la respuesta, no el retrieval.
+
+Evaluar únicamente con synthetic questions fáciles.
+
+No añadir hard negatives.
+
+Tratar LLM-as-a-judge como verdad.
+
+GraphRAG para cualquier corpus.
+
+Agent loop para cualquier pregunta.
+
+Long context = meter el corpus completo.
+
+Semantic chunking porque “suena más avanzado”.
+
+Elegir embedding por el primer puesto MTEB.
+
+Cambiar embedding/reranker/LLM simultáneamente.
+
+No mantener un baseline reproducible.
+
+No almacenar provenance de parser.
+
+Confiar en prompt “no hallucinate”.
+
+Permitir que retrieved text modifique system/tool instructions.
+
+Compartir caches entre security scopes.
+
+No manejar source conflicts/version freshness.
+
+Hacer retries agentic sin budget/stop condition.
+
+No medir p95/p99.
+
+Hacer ANN incluso cuando exact scan ya cumple SLO.
+
+Duplicar el mismo documento/version y contar esas copias como “corroboración”.
+
+Tratar citations como decoración.
+
+No tener una clase explícita de unanswerable en evaluación.
+
+40. Mitos sobre RAG
+
+Afirmación
+
+Veredicto
+
+Razón
+
+Más contexto siempre es mejor
+
+Falso
+
+Noise/hard negatives/position effects. citeturn830026academia39turn289473search0
+
+Un embedding mejor soluciona retrieval
+
+Falso
+
+Parsing, lexical, ACL, chunking, ranking siguen importando
+
+Vector DB es obligatoria
+
+Falso
+
+PostgreSQL/Elastic/etc. pueden resolverlo
+
+RAG elimina hallucinations
+
+Falso
+
+Generation y citation pueden fallar
+
+Más chunks aumenta accuracy
+
+Falso
+
+Puede introducir distractors
+
+cosine=0.8 significa 80% confidence
+
+Falso
+
+Score no calibrado
+
+BM25 está obsoleto
+
+Falso
+
+Sigue siendo complementario/robusto citeturn984675academia24
+
+GraphRAG es mejor que vector RAG
+
+Depende
+
+Resuelve otra clase de preguntas
+
+Long context elimina RAG
+
+Falso
+
+Coste, ACL, freshness y noise persisten
+
+Reranker siempre mejora
+
+Depende
+
+Un mal/mismatched reranker puede empeorar
+
+Agentic RAG es el nuevo default
+
+Falso/Depende
+
+Debe ser route selectivo
+
+Semantic chunking gana siempre
+
+Falso
+
+Evaluaciones 2026 muestran fuerte dependencia de tarea citeturn475807academia14
+
+Un modelo más grande siempre verifica mejor
+
+Depende
+
+Grounding-specific small verifiers pueden ser eficientes citeturn628648search38
+
+41. Problemas abiertos al 22/08/2026
+
+Citation entailment perfectamente fiable.
+
+Confidence/calibration portable entre dominios.
+
+Multi-hop retrieval sin explosión de búsquedas.
+
+Distinguir retrieval failure de reasoning failure automáticamente.
+
+Knowledge temporal y versiones contradictorias.
+
+Fuente verdadera frente a varias fuentes consistentes pero equivocadas.
+
+Document poisoning.
+
+Indirect prompt injection.
+
+Robustez de ANN bajo filtros ACL muy restrictivos.
+
+Multimodal provenance granular.
+
+Evaluation contamination.
+
+Judge drift/bias.
+
+Continuous corpus updates sin inconsistencias.
+
+Forgetting/updates en agent memory.
+
+Privacy-preserving memory.
+
+Cross-lingual retrieval para low-resource languages.
+
+Citation/completeness para respuestas de synthesis.
+
+Cost-optimal routing.
+
+End-to-end uncertainty decomposition.
+
+Comparabilidad real de vector DB benchmarks.
+
+Handling de near-duplicate/versioned documents.
+
+Reindexing de embeddings sin downtime.
+
+Benchmark-to-production distribution shift.
+
+Determinar automáticamente cuándo Graph/agentic retrieval merece el coste.
+
+Verificación de tablas/gráficos/ecuaciones, no sólo texto.
+
+42. Radar tecnológico 2026
+
+ADOPT
+
+Hybrid lexical+dense.
+
+RRF baseline.
+
+Reranking.
+
+Structure-aware parsing.
+
+Provenance/citation IDs.
+
+PostgreSQL+pgvector para workloads apropiados.
+
+HNSW con benchmark.
+
+RLS/ACL pre-retrieval.
+
+Parent-child retrieval.
+
+Context deduplication.
+
+Hard negatives.
+
+Golden evaluation set.
+
+OpenTelemetry tracing.
+
+Calibrated abstention.
+
+Versioned embeddings/parsers/documents.
+
+Claim-level citation verification.
+
+TRIAL
+
+Contextual document embeddings.
+
+Reasoning-aware retrievers.
+
+Multimodal page retrieval.
+
+ColBERT/MUVERA-style multi-vector.
+
+pg_textsearch.
+
+Jina reranker v3.5.
+
+PaddleOCR-VL.
+
+Agentic retrieval para multi-hop.
+
+Graphiti temporal memory.
+
+GraphRAG para global analysis.
+
+Learned fusion.
+
+KV-cached RAG.
+
+ASSESS
+
+GRIP retrieval-as-generation.
+
+PROGRAM and program-guided retrieval.
+
+SR-RAG/on-the-fly symbolic graphs.
+
+RL per-hop model routing.
+
+FlowRAG/ParallaxRAG.
+
+Full autonomous retrieval agents.
+
+Sophisticated uncertainty research methods antes de calibración real.
+
+HOLD
+
+Vector-only production RAG.
+
+Global GraphRAG por defecto.
+
+Similarity score como confidence.
+
+Unmanaged LLM-generated citations.
+
+“stuff everything into 1M context”.
+
+Unversioned embeddings.
+
+Retrieval-after-authorization filtering.
+
+Archived/legacy framework packages como dependencia central.
+
+Self-evaluation del mismo LLM como único guardrail.
+
+43. Resultado final
+
+A. Las 20 conclusiones más importantes
+
+Hybrid retrieval es el default razonable en 2026.
+
+Recall y ranking deben evaluarse independientemente del LLM.
+
+Parsing es parte del retrieval.
+
+Provenance debe diseñarse desde ingestion.
+
+Reranking tiene uno de los mejores ROI del pipeline.
+
+RRF es un excelente baseline antes de learned fusion.
+
+Similarity no es confidence.
+
+Abstention debe calibrarse.
+
+Citations deben verificarse a nivel de claim.
+
+PostgreSQL+pgvector sí puede soportar un RAG empresarial serio.
+
+PostgreSQL FTS nativo no es BM25.
+
+Más contexto puede empeorar el resultado.
+
+Long context complementa RAG; no lo reemplaza.
+
+Agentic RAG debe activarse selectivamente.
+
+GraphRAG es especializado, no universal.
+
+Reasoning-aware retrieval es una de las fronteras reales de 2025–26.
+
+Contextual embeddings son una innovación particularmente importante de 2026.
+
+Multimodal page retrieval ya merece pruebas de producción en corpus visuales.
+
+Seguridad debe imponerse durante retrieval, no después.
+
+Eval datasets, hard negatives y tracing son infraestructura de producto, no extras.
+
+B. Las 20 innovaciones más relevantes
+
+Self-RAG.
+
+Adaptive-RAG.
+
+RAPTOR.
+
+Contextual Retrieval.
+
+Late Chunking.
+
+GraphRAG.
+
+ColPali.
+
+ReasonIR.
+
+MUVERA.
+
+Speculative RAG.
+
+Long-term structured agent memory.
+
+Gemini Embedding 2.
+
+voyage-context-4.
+
+GRIP.
+
+PROGRAM.
+
+SR-RAG.
+
+FRANQ.
+
+RLSeek.
+
+VLM document parsers.
+
+Native PostgreSQL BM25 extensions.
+
+C. Técnicas que cambiaron significativamente entre 2024 y 2026
+
+Embeddings: de sentence/chunk vectors independientes a contextual, multimodal, MRL, quantized y shared/asymmetric spaces.
+
+Retrieval: de dense ANN a hybrid + reasoning-aware + multivector + adaptive multi-hop.
+
+Chunking: de elegir 500 vs 1000 tokens a estructura, contextualización y late chunking.
+
+GraphRAG: de hype generalista a tecnología especializada.
+
+Agents: de “autonomous agent” a routing presupuestado y verificable.
+
+Document parsing: de OCR/layout heuristics a VLM document understanding.
+
+Hallucination: de prompt guardrails a atomic evidence verification.
+
+Evaluation: de answer correctness a retrieval/faithfulness/citations/selective risk.
+
+D. Técnicas sobrevaloradas
+
+Agentic RAG en toda consulta.
+
+GraphRAG como default.
+
+Semantic chunking universal.
+
+Headline MTEB score.
+
+LLM-as-a-judge como ground truth.
+
+Gigantic contexts como sustituto de retrieval.
+
+Similarity thresholds para confidence.
+
+Multi-query indiscriminado.
+
+Self-reflection sin verificadores externos.
+
+E. Técnicas infravaloradas
+
+BM25/lexical retrieval.
+
+Exact search para corpus pequeños.
+
+Parent-child retrieval.
+
+Hard negatives.
+
+Document parsing QA.
+
+Provenance.
+
+RLS.
+
+Versioning.
+
+Negative/unanswerable evaluation.
+
+Calibration.
+
+Duplicate/version conflict handling.
+
+Evidence diversity.
+
+F. Herramientas recomendadas
+
+Parsing: Docling; PaddleOCR-VL/MinerU para evaluación local; Mistral OCR/LlamaParse como cloud fallback.
+
+Relational/vector: PostgreSQL 18 + pgvector 0.8.6.
+
+Lexical: PostgreSQL FTS inicialmente; pg_textsearch/ParadeDB si BM25 medido lo justifica.
+
+Vector-specialized: Qdrant.
+
+Very-large distributed: Milvus/Vespa/Elastic/OpenSearch según workload.
+
+Embeddings: voyage-context-4, Gemini Embedding 2, Qwen3/BGE-M3/Jina según modalidad/privacy.
+
+Reranking: Cohere 4, Voyage 2.5, Qwen3-Reranker; evaluar Jina v3.5.
+
+Observability: OpenTelemetry + Phoenix o Langfuse.
+
+Evaluation: RAGAS + DeepEval/Phoenix/Braintrust, pero sobre un benchmark propio.
+
+Agent orchestration: LangGraph o typed custom/PydanticAI.
+
+G. Repositorios imprescindibles
+
+pgvector.
+
+Docling.
+
+Qdrant.
+
+Milvus.
+
+Vespa.
+
+ColBERT.
+
+LangGraph.
+
+LlamaIndex.
+
+Haystack.
+
+DSPy.
+
+Phoenix.
+
+Langfuse.
+
+DeepEval.
+
+RAGAS.
+
+Microsoft GraphRAG.
+
+Graphiti.
+
+MinerU.
+
+PaddleOCR.
+
+ParadeDB.
+
+HyDE.
+
+H. Papers imprescindibles
+
+Mi shortlist mínima sería:
+
+RAG — Lewis et al., 2020. citeturn585623search7
+
+DPR — Karpukhin et al., 2020. citeturn585623search1
+
+ColBERT — Khattab & Zaharia, 2020. citeturn115972academia37
+
+BEIR. citeturn984675academia24
+
+ColBERTv2. citeturn779918search2
+
+HyDE. citeturn585623search0
+
+Self-RAG. citeturn857853search0
+
+Adaptive-RAG. citeturn857853search1
+
+RAPTOR. citeturn857853academia38
+
+Lost in the Middle. citeturn289473search0
+
+ALCE. citeturn628648search3
+
+MiniCheck. citeturn628648search38
+
+RAGAS. citeturn115972search0
+
+RAGChecker. citeturn656448search7
+
+ReasonIR. citeturn779918academia25
+
+MUVERA. citeturn779918search1
+
+ColPali. citeturn857853search36
+
+PROGRAM. citeturn405028search1
+
+GRIP. citeturn405028search9
+
+FRANQ. citeturn967623search12
+
+I. Arquitectura RAG recomendada en 2026
+
+Structured ingestion
+  → lossless provenance
+  → structure-aware chunk hierarchy
+  → versioned lexical+dense(+visual) indexes
+  → tenant/ACL constrained retrieval
+  → lexical+dense parallel search
+  → RRF
+  → neural reranker
+  → parent expansion + dedupe
+  → dynamic evidence budget
+  → generation with evidence IDs
+  → atomic claim verification
+  → citation verification
+  → calibrated evidence sufficiency
+  → answer / abstention
+  → continuous traces + evaluation
+
+Con routes especiales:
+
+multi-hop      → decomposition/agent
+global         → GraphRAG
+visual         → visual retrieval
+current/fresh  → approved fresh source
+low evidence   → one corrective pass
+still low      → abstain
+
+J. Arquitectura PostgreSQL recomendada
+
+PostgreSQL 18
+├─ canonical documents
+├─ document versions
+├─ chunks/blocks
+├─ JSONB metadata
+├─ ACL/RBAC/ABAC
+├─ RLS
+├─ GIN FTS
+├─ pgvector 0.8.6
+│   └─ HNSW
+├─ optional pg_textsearch/pg_search
+├─ embedding/version registry
+├─ PITR/backups
+├─ read replica(s)
+└─ PgBouncer
+
+Usaría una sola tabla/índice compartido para tenants normales y aislamiento físico/particiones/DBs dedicados sólo cuando tamaño, regulación o SLO lo requieran.
+
+K. Estrategia anti-hallucination recomendada
+
+1. maximize evidence recall
+2. rerank
+3. eliminate distractors
+4. require evidence IDs
+5. generate
+6. atomize claims
+7. entailment/contradiction verify
+8. verify citation completeness
+9. calibrate evidence sufficiency
+10. abstain if threshold not met
+
+Para queries de alto riesgo:
+
++ independent second-source preference
++ source authority/freshness
++ stronger verifier
++ human escalation
+
+L. Stack tecnológico recomendado
+
+Language        Python 3.12+
+API             FastAPI + Pydantic
+DB              PostgreSQL 18
+Vector          pgvector 0.8.6 / HNSW
+Lexical         PostgreSQL GIN FTS
+                → BM25 extension only if benchmark justifies it
+ORM/driver      SQLAlchemy async + psycopg
+Parser          Docling
+Fallback parser PaddleOCR-VL / Mistral OCR / LlamaParse
+Embedding       benchmark:
+                voyage-context-4
+                Gemini Embedding 2
+                Qwen3/BGE-M3/Jina local
+Fusion          RRF
+Reranker        Cohere 4 / Voyage 2.5 / Qwen3
+LLM             provider abstraction;
+                balanced frontier winner on internal eval
+Verification    NLI/MiniCheck-like + strong LLM fallback
+Workflow        plain Python first; LangGraph for agent routes
+Tracing         OpenTelemetry/OpenInference
+UI/observ.      Phoenix or Langfuse
+Evaluation      custom golden set + RAGAS/DeepEval/Braintrust
+Cache           Redis where justified
+Queue           durable job queue/message bus for ingestion
+Deployment      containers/Kubernetes or managed equivalent
+Security        RLS + RBAC/ABAC + KMS + audit + egress controls
+
+M. Roadmap de implementación
+
+Fase 1 — MVP
+
+Docling
+→ structure-aware chunks
+→ Postgres+pgvector
+→ dense retrieval
+→ citations via provenance
+→ baseline eval set
+
+No agentes. No GraphRAG.
+
+Fase 2 — Retrieval robusto
+
+Añadir:
+
+FTS
+RRF
+reranker
+parent-child
+metadata filtering
+hard negatives
+embedding bake-off
+
+Objetivo: maximizar Recall@K y nDCG antes de optimizar el generador.
+
+Fase 3 — Evaluación
+
+Construir:
+
+500–2,000 curated queries
+gold evidence
+unanswerable set
+hard negatives
+multilingual
+security tests
+RAG regression CI
+production sampling
+
+Fase 4 — Anti-hallucination
+
+Añadir:
+
+structured claims
+claim↔evidence verifier
+citation precision/recall
+evidence sufficiency
+calibration
+abstention
+
+Fase 5 — Producción
+
+Añadir:
+
+RLS
+RBAC/ABAC
+HA
+PITR
+OTel
+SLOs
+cost accounting
+rate limits
+circuit breakers
+document/version lifecycle
+security red-team
+
+Fase 6 — Escalabilidad
+
+Sólo después de medir:
+
+HNSW tuning
+read replicas
+partitioning
+quantization/MRL
+distributed vector/search database if necessary
+GPU batching
+tiered indexes
+
+No migraría a una vector DB especializada sólo porque el número de filas llegó a un umbral redondo.
+
+Fase 7 — Optimización avanzada
+
+Experimentaría de forma routeada con:
+
+contextual embeddings
+reasoning-aware retrieval
+multi-vector/ColBERT/MUVERA
+visual retrieval
+adaptive decomposition
+GraphRAG
+temporal agent memory
+KV-cached RAG
+learned fusion
+retrieval-as-generation
+per-hop model routing
+
+Cada técnica entra únicamente si mejora un KPI definido.
+
+Decisión final
+
+Si tuviera que construir hoy, 22 de agosto de 2026, un RAG empresarial que deba ser preciso, rápido, económico, observable, seguro, escalable y resistente a alucinaciones, no empezaría por un agente ni por GraphRAG ni por la vector database “más avanzada”.
+
+Empezaría por PostgreSQL 18 + pgvector 0.8.6, porque permite mantener documentos, versiones, metadata, ACL, RLS y vectores en un mismo sistema transaccional y es suficientemente fuerte para una enorme fracción de cargas empresariales. Mantendría FTS lexical + dense retrieval en paralelo, fusionado mediante RRF y seguido de un reranker especializado. Sólo migraría retrieval a Qdrant/Elastic/OpenSearch/Milvus/Vespa/Pinecone cuando los benchmarks de escala o funcionalidad lo exigieran. citeturn627173search0turn627173search3turn791297search2turn906448search1
+
+Convertiría document parsing y provenance en componentes de primera clase. Para texto/documentos empresariales, Docling sería mi baseline local; añadiría PaddleOCR-VL/MinerU o un parser cloud cuando confidence/layout lo justifique. Las releases de 2026 muestran que document understanding VLM está avanzando suficientemente rápido como para que un diseño modular de parsers sea especialmente importante. citeturn977199search8turn246525search5turn812509search6
+
+No seleccionaría embeddings por marca. Para corpus predominantemente documental evaluaría especialmente voyage-context-4, porque los contextual document embeddings atacan directamente uno de los defectos estructurales del RAG clásico: que un chunk aislado pierde información sobre su función en el documento. Para multimodal evaluaría Gemini Embedding 2. Para self-hosting probaría Qwen3/BGE-M3/Jina/Nomic. La victoria sólo se concede en mi benchmark de evidence recall y hard negatives. citeturn704650search3turn256435search1turn819980search4turn374092search1
+
+Usaría un reranker porque candidate retrieval y final relevance son problemas diferentes. El default API saldría de un bake-off Cohere Rerank 4 vs Voyage rerank-2.5; el default self-host de Qwen3-Reranker/BGE/Jina según licencias y GPU disponible. citeturn243358search0turn583502search4turn243358search12
+
+Usaría long context después de retrieval, no en lugar de retrieval. La evidencia disponible muestra tanto ventajas del contexto largo cuando los recursos sobran como degradación por distractores, hard negatives y posición. citeturn830026academia36turn830026academia39turn289473search0
+
+Usaría Agentic RAG sólo para consultas que demuestren necesitarlo: multi-hop, reconciliación, búsqueda federada o investigación. Le impondría número máximo de hops, tools, tokens, coste y condiciones de parada. Lo mismo con GraphRAG: valioso para relaciones y global sensemaking, innecesariamente caro y complejo para QA local. citeturn377160academia14turn782834search2
+
+Y, por encima de todo, cambiaría la definición de éxito. No preguntaría únicamente:
+
+"¿La respuesta parece buena?"
+
+Preguntaría:
+
+¿recuperamos toda la evidencia necesaria?
+¿los mejores documentos quedaron arriba?
+¿el contexto conservó su significado?
+¿cada claim material está soportado?
+¿cada cita realmente implica el claim?
+¿el sistema sabe cuándo la evidencia es insuficiente?
+¿una persona no autorizada podría recuperar esto?
+¿este cambio superó estadísticamente nuestra baseline?
+
+Ese cambio —de “RAG como búsqueda vectorial” a “RAG como sistema de evidencia verificable”— es, en mi evaluación de la literatura, herramientas y prácticas disponibles hasta el 22/08/2026, la diferencia fundamental entre una demo competente y una plataforma RAG empresarial de producción.
