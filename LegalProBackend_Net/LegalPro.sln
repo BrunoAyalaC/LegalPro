@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegalPro.Api", "LegalPro.Api\LegalPro.Api.csproj", "{48F9CD93-01E0-46CC-9A66-42447D71CC51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegalPro.Application", "LegalPro.Application\LegalPro.Application.csproj", "{17BF2CD6-2CD4-4CDC-8924-357529C233B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegalPro.Domain", "LegalPro.Domain\LegalPro.Domain.csproj", "{2D0CACF3-53A5-44B4-BEF3-579845EA365B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegalPro.Infrastructure", "LegalPro.Infrastructure\LegalPro.Infrastructure.csproj", "{CD4540D4-826D-435B-B4D4-AC72544D9CA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegalPro.UnitTests", "LegalPro.UnitTests\LegalPro.UnitTests.csproj", "{C65B9FE8-02AD-484C-A5A3-D414291E419C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LegalPro.IntegrationTests", "LegalPro.IntegrationTests\LegalPro.IntegrationTests.csproj", "{EEAF53A6-B4CC-45CB-9024-D19516ECB221}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{48F9CD93-01E0-46CC-9A66-42447D71CC51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48F9CD93-01E0-46CC-9A66-42447D71CC51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48F9CD93-01E0-46CC-9A66-42447D71CC51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48F9CD93-01E0-46CC-9A66-42447D71CC51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17BF2CD6-2CD4-4CDC-8924-357529C233B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17BF2CD6-2CD4-4CDC-8924-357529C233B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17BF2CD6-2CD4-4CDC-8924-357529C233B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17BF2CD6-2CD4-4CDC-8924-357529C233B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D0CACF3-53A5-44B4-BEF3-579845EA365B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D0CACF3-53A5-44B4-BEF3-579845EA365B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D0CACF3-53A5-44B4-BEF3-579845EA365B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D0CACF3-53A5-44B4-BEF3-579845EA365B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD4540D4-826D-435B-B4D4-AC72544D9CA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD4540D4-826D-435B-B4D4-AC72544D9CA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD4540D4-826D-435B-B4D4-AC72544D9CA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD4540D4-826D-435B-B4D4-AC72544D9CA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C65B9FE8-02AD-484C-A5A3-D414291E419C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C65B9FE8-02AD-484C-A5A3-D414291E419C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C65B9FE8-02AD-484C-A5A3-D414291E419C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C65B9FE8-02AD-484C-A5A3-D414291E419C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEAF53A6-B4CC-45CB-9024-D19516ECB221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEAF53A6-B4CC-45CB-9024-D19516ECB221}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEAF53A6-B4CC-45CB-9024-D19516ECB221}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEAF53A6-B4CC-45CB-9024-D19516ECB221}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
