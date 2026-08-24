@@ -873,7 +873,7 @@ router.post('/pension-alimentos', authMiddleware, (req, res) => {
       porcentaje_aplicado: pct * 100,
       pension_total_mensual: pensionTotal,
       pension_por_hijo: pensionPorHijo,
-      base_legal: 'Ley 28720 + jurisprudencia suprema (rangos referenciales, p. ej. Cas. 3456-2016)',
+      base_legal: 'Ley 28720 — rangos referenciales por número de hijos (el juez fija según pruebas de ingresos; sin cita de casación específica hasta verificación SPIJ)',
       nota: 'Referencial — el juez fija la pensión según pruebas de ingresos (Ley 28720)',
     },
   });

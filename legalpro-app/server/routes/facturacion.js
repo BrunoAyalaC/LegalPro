@@ -270,7 +270,7 @@ router.get('/:id/pdf', async (req, res, next) => {
     </div>
     <div class="numero">
       <strong>${escapeHtml(r.numero)}</strong><br>
-      <span class="sub">Recibo por Honorarios Electrónicos</span>
+      <span class="sub">Recibo por Honorarios (interno)</span>
     </div>
   </header>
 
@@ -297,7 +297,7 @@ router.get('/:id/pdf', async (req, res, next) => {
     </tfoot>
   </table>
 
-  <footer>Recibo por Honorarios Electrónicos — LegalPro<br>
+  <footer>Recibo por Honorarios — LegalPro (documento interno; NO constituye CPE/RHE ante SUNAT)<br>
   Documento generado electrónicamente · ${escapeHtml(new Date().toLocaleString('es-PE'))}</footer>
 </div>
 </body>

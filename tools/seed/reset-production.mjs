@@ -172,8 +172,8 @@ async function main() {
 
     await c.query(
       `INSERT INTO notificaciones_sinoe (usuario_id, organization_id, expediente_numero, tipo_notificacion, titulo, contenido, fecha_notificacion, urgencia, creado_en)
-       VALUES ($1,$2,'EXP-2026-0001','RESOLUCION','Admite demanda','Se admite a trámite.', NOW(), 'alta', NOW()),
-              ($1,$2,'EXP-2026-0003','CITACION','Citación audiencia','Audiencia programada.', NOW() + interval '5 days', 'media', NOW())`,
+       VALUES ($1,$2,'EXP-2026-0001','RESOLUCION','[ALERTA INTERNA DEMO — no es notificación del PJ] Admite demanda','Se admite a trámite.', NOW(), 'alta', NOW()),
+              ($1,$2,'EXP-2026-0003','CITACION','[ALERTA INTERNA DEMO — no es notificación del PJ] Citación audiencia','Audiencia programada.', NOW() + interval '5 days', 'media', NOW())`,
       [abogadoId, ORG_ID]);
 
     await c.query(
