@@ -53,6 +53,8 @@ const CalculadoraPlazos       = lazy(() => import('./pages/CalculadoraPlazos'));
 const CalendarioVencimientos  = lazy(() => import('./pages/CalendarioVencimientos'));
 const CalendarioMensual       = lazy(() => import('./pages/CalendarioMensual'));
 const Clientes                = lazy(() => import('./pages/Clientes'));
+const ControlHoras            = lazy(() => import('./pages/ControlHoras'));
+const Facturacion             = lazy(() => import('./pages/Facturacion'));
 const Contador                = lazy(() => import('./pages/Contador'));
 const CalendarioPlazos        = lazy(() => import('./pages/CalendarioPlazos'));
 const CalculadoraIntereses    = lazy(() => import('./pages/CalculadoraIntereses'));
@@ -109,6 +111,8 @@ export default function App() {
           <Route path="/calendario-vencimientos" element={<CalendarioVencimientos />} />
           <Route path="/calendario-mensual" element={<CalendarioMensual />} />
           <Route path="/clientes" element={<Clientes />} />
+          <Route path="/control-horas" element={<ControlHoras />} />
+          <Route path="/facturacion" element={<Facturacion />} />
           <Route path="/contador" element={<Contador />} />
           <Route path="/calendario-plazos" element={<CalendarioPlazos />} />
           {/* Herramientas determinísticas (sin IA) — /api/herramientas/* */}

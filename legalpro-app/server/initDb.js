@@ -291,6 +291,93 @@ export async function initDb() {
         console.error('[initDb] Patch vencimientos_overrides ERROR:', overridesErr.message);
       }
 
+      // Patch 2026-08-23 (ControlHoras): time_logs — minutos trabajados por
+      // abogado (user_id) en un expediente. Espejo de
+      // tools/migrations/2026-08-23-time-logs.sql.
+      //   - Idempotente (CREATE TABLE IF NOT EXISTS): se ejecuta en cada arranque.
+      //   - RLS multi-tenant: defensa en profundidad (además del WHERE explícito).
+      try {
+        await db.query(`
+          CREATE TABLE IF NOT EXISTS time_logs (
+            id              BIGSERIAL    PRIMARY KEY,
+            organization_id UUID         NOT NULL REFERENCES organizaciones(id) ON DELETE CASCADE,
+            user_id         UUID         NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+            expediente_id   UUID         NOT NULL REFERENCES expedientes(id) ON DELETE CASCADE,
+            descripcion     TEXT         NOT NULL,
+            minutos         INTEGER      NOT NULL CHECK (minutos BETWEEN 1 AND 1440),
+            fecha           DATE         NOT NULL,
+            created_at      TIMESTAMPTZ  NOT NULL DEFAULT now()
+          );
+          CREATE INDEX IF NOT EXISTS idx_time_logs_org_user_fecha
+            ON time_logs (organization_id, user_id, fecha);
+          CREATE INDEX IF NOT EXISTS idx_time_logs_expediente
+            ON time_logs (expediente_id);
+
+          ALTER TABLE time_logs ENABLE ROW LEVEL SECURITY;
+          ALTER TABLE time_logs FORCE ROW LEVEL SECURITY;
+
+          DROP POLICY IF EXISTS p_time_logs_all ON time_logs;
+          CREATE POLICY p_time_logs_all ON time_logs
+              FOR ALL
+              USING (organization_id = fn_rls_current_org_id())
+              WITH CHECK (organization_id = fn_rls_current_org_id());
+
+          COMMENT ON TABLE time_logs IS
+            'Control de Horas: minutos trabajados por abogado (user_id) en un expediente. Multi-tenant con RLS.';
+        `);
+        console.log('[initDb] Tabla time_logs + RLS policy verificadas/creadas.');
+      } catch (timeLogsErr) {
+        console.error('[initDb] Patch time_logs ERROR:', timeLogsErr.message);
+      }
+
+      // Patch 2026-08-23 (Facturación de Honorarios): recibos_honorarios —
+      // recibos electrónicos RHE-YYYY-NNNN por organización con IGV 18%
+      // desglosado. Espejo de tools/migrations/2026-08-23-recibos-honorarios.sql.
+      //   - Idempotente (CREATE TABLE IF NOT EXISTS): se ejecuta en cada arranque.
+      //   - UNIQUE(organization_id, numero): secuencial por org sin colisiones.
+      //   - expediente_id ON DELETE SET NULL: el recibo es registro contable,
+      //     NO se borra si desaparece el expediente.
+      //   - RLS ENABLE + FORCE multi-tenant: defensa en profundidad (además
+      //     del WHERE organization_id explícito del router).
+      try {
+        await db.query(`
+          CREATE TABLE IF NOT EXISTS recibos_honorarios (
+            id              BIGSERIAL     PRIMARY KEY,
+            organization_id UUID          NOT NULL REFERENCES organizaciones(id) ON DELETE CASCADE,
+            numero          TEXT          NOT NULL,
+            cliente_nombre  TEXT,
+            cliente_ruc     TEXT,
+            concepto        TEXT,
+            monto_base      NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (monto_base >= 0),
+            igv             NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (igv >= 0),
+            total           NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (total >= 0),
+            expediente_id   UUID          NULL REFERENCES expedientes(id) ON DELETE SET NULL,
+            estado          TEXT          NOT NULL DEFAULT 'emitido'
+                                          CHECK (estado IN ('emitido', 'pagado', 'anulado')),
+            fecha_emision   DATE          NOT NULL DEFAULT CURRENT_DATE,
+            created_at      TIMESTAMPTZ   NOT NULL DEFAULT now(),
+            CONSTRAINT uq_recibos_org_numero UNIQUE (organization_id, numero)
+          );
+          CREATE INDEX IF NOT EXISTS idx_recibos_honorarios_org_fecha
+            ON recibos_honorarios (organization_id, fecha_emision);
+
+          ALTER TABLE recibos_honorarios ENABLE ROW LEVEL SECURITY;
+          ALTER TABLE recibos_honorarios FORCE ROW LEVEL SECURITY;
+
+          DROP POLICY IF EXISTS p_recibos_honorarios_all ON recibos_honorarios;
+          CREATE POLICY p_recibos_honorarios_all ON recibos_honorarios
+              FOR ALL
+              USING (organization_id = fn_rls_current_org_id())
+              WITH CHECK (organization_id = fn_rls_current_org_id());
+
+          COMMENT ON TABLE recibos_honorarios IS
+            'Recibos por Honorarios Electrónicos (RHE-YYYY-NNNN) por organización. IGV 18% desglosado. Feature /api/facturacion.';
+        `);
+        console.log('[initDb] Tabla recibos_honorarios + RLS policy verificadas/creadas.');
+      } catch (recibosErr) {
+        console.error('[initDb] Patch recibos_honorarios ERROR:', recibosErr.message);
+      }
+
       return;
     }
 

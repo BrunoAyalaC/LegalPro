@@ -130,6 +130,10 @@ import notificacionesRoutes from './routes/notificaciones.js';
 import creditosRoutes from './routes/creditos.js';
 import creditosUsoRoutes from './routes/creditos-uso.js';
 import clientesRoutes from './routes/clientes.js';
+// Control de Horas: registro de minutos por abogado/expediente (multi-tenant).
+import horasRoutes from './routes/horas.js';
+// Facturación de Honorarios: recibos RHE multi-tenant (auth+tenant en router).
+import facturacionRoutes from './routes/facturacion.js';
 import adminRoutes from './routes/admin.js';
 import stripeWebhookHandler from './webhooks/stripe-handler.js';
 import plazosRoutes from './routes/plazos.js';
@@ -523,6 +527,16 @@ app.use('/api/organizaciones', organizacionesRoutes);
 app.use('/api/creditos', creditosRoutes);
 app.use('/api/creditos', creditosUsoRoutes);
 app.use('/api/clientes', clientesRoutes);
+// ── CONTROL DE HORAS ──────────────────────────────────────────────────────────
+// authMiddleware + tenantMiddleware dentro del router (patrón clientes.js).
+// GET /api/horas | GET /api/horas/detalle | POST /api/horas/registro
+// DELETE /api/horas/registro/:id | GET /api/horas/resumen
+app.use('/api/horas', horasRoutes);
+// ── FACTURACIÓN DE HONORARIOS ─────────────────────────────────────────────────
+// Recibos RHE-YYYY-NNNN multi-tenant: authMiddleware + tenantMiddleware dentro
+// del router (patrón horas.js). GET lista | POST crea (IGV 18%) |
+// PATCH /:id/estado | GET /:id/pdf (HTML imprimible).
+app.use('/api/facturacion', facturacionRoutes);
 app.use('/api/mis-datos', datosPersonalesRoutes);
 app.use('/api/documentos', documentosRoutes);
 // Ruta única /api/ai (Gemini legacy eliminado 2026-08-01)

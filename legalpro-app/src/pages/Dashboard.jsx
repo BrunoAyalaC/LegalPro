@@ -31,6 +31,7 @@ const QUICK_ACTIONS = [
   { to: '/redactor',            icon: PenLine,           label: 'Redactor' },
   { to: '/buscador',            icon: Search,            label: 'Buscador' },
   { to: '/herramientas',        icon: Wrench,            label: 'Herramientas' },
+  { to: '/control-horas',       icon: Clock,             label: 'Control de horas' },
 ];
 
 const CALC_LINKS = [

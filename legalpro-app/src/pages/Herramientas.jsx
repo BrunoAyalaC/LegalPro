@@ -5,7 +5,7 @@ import {
   HelpCircle, Hand, Bell, GitCompare, Shield, FileStack,
   AlertTriangle, FileSearch, MessageSquareDot, Sliders, Users,
   Percent, Gavel, Hourglass, ArrowRightLeft, Calculator,
-  CalendarClock, BriefcaseBusiness, CalendarDays
+  CalendarClock, BriefcaseBusiness, CalendarDays, Timer, ReceiptText
 } from 'lucide-react';
 
 const herramientas = [
@@ -37,6 +37,9 @@ const herramientas = [
   { to: '/pension-alimentos',     icon: Scale,              title: 'Pensión de Alimentos',    desc: '% referencial según nº de hijos',     badge: 'CALC', glow: 'shadow-pink-500/25',    accent: 'bg-pink-500/15 text-pink-400',       gradient: 'from-pink-600/20 to-rose-600/10' },
   { to: '/tasas-comparativo',     icon: Percent,            title: 'Comparador de Tasas',     desc: 'Moratoria BCRP vs remunerativa vs CC',badge: 'CALC', glow: 'shadow-violet-500/25',  accent: 'bg-violet-500/15 text-violet-400', gradient: 'from-violet-600/20 to-purple-600/10' },
   { to: '/calendario-mensual',    icon: CalendarDays,       title: 'Calendario Mensual',      desc: 'Vista mensual de vencimientos con drag & drop', badge: 'CAL', glow: 'shadow-sky-500/25', accent: 'bg-sky-500/15 text-sky-400', gradient: 'from-sky-600/20 to-blue-600/10' },
+  // Gestión (lectura/escritura de datos propios, sin IA)
+  { to: '/control-horas',         icon: Timer,              title: 'Control de Horas',        desc: 'Timer y horas trabajadas por expediente', badge: 'GESTIÓN', glow: 'shadow-emerald-500/25', accent: 'bg-emerald-500/15 text-emerald-400', gradient: 'from-emerald-600/20 to-teal-600/10' },
+  { to: '/facturacion',           icon: ReceiptText,        title: 'Facturación Honorarios',  desc: 'Recibos RHE con IGV desglosado y PDF',    badge: 'GESTIÓN', glow: 'shadow-emerald-500/25', accent: 'bg-emerald-500/15 text-emerald-400', gradient: 'from-emerald-600/20 to-teal-600/10' },
 ];
 
 const container = {
