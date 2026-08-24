@@ -22,4 +22,6 @@ export const expedienteUpdateSchema = z.object({
   juzgado: z.string().max(200).optional().nullable(),
   tipo: z.enum(['civil', 'penal', 'laboral', 'constitucional', 'familia', 'administrativo']).optional(),
   esUrgente: z.boolean().optional(),
+  // FIX anti-mock A (2026-08-24): resultado real del caso (alimenta KPI tasa_exito).
+  resultado: z.enum(['favorable', 'desfavorable']).nullable().optional(),
 }).strict();

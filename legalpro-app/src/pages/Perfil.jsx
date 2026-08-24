@@ -83,6 +83,18 @@ export default function Perfil() {
   const [oposicionError, setOposicionError] = useState('');
   const [showOposicion, setShowOposicion] = useState(false);
 
+  // ── MFA/TOTP (ADR-004-rev1): /api/auth/mfa/status|setup|verify|disable ──
+  const [mfaEnabled, setMfaEnabled] = useState(null);        // null = cargando
+  const [mfaNoDisponible, setMfaNoDisponible] = useState(false); // flag off / 404
+  const [mfaSetup, setMfaSetup] = useState(null);            // { otpauth, qrUrl }
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaBusy, setMfaBusy] = useState(false);
+  const [mfaError, setMfaError] = useState('');
+  const [mfaMsg, setMfaMsg] = useState('');
+  const [mfaBackupCodes, setMfaBackupCodes] = useState(null); // texto plano UNA vez
+  const [showMfaDisable, setShowMfaDisable] = useState(false);
+  const [mfaDisablePassword, setMfaDisablePassword] = useState('');
+
   // ── Cleanup de timers (logout diferido por revocación crítica) ──
   const revocacionTimerRef = useRef(null);
   useEffect(() => {
@@ -114,6 +126,75 @@ export default function Perfil() {
   useEffect(() => {
     cargarMisDatos();
   }, [cargarMisDatos]);
+
+  // ── MFA: cargar estado al montar ──
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await nodeClient.get('/api/auth/mfa/status');
+        if (!cancelled) setMfaEnabled(!!data?.data?.enabled);
+      } catch {
+        // 404/503 → FEATURE_MFA=false o backend antiguo: sección informativa
+        if (!cancelled) setMfaNoDisponible(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const iniciarMfaSetup = async () => {
+    setMfaError(''); setMfaMsg(''); setMfaBusy(true);
+    try {
+      const { data } = await nodeClient.post('/api/auth/mfa/setup');
+      setMfaSetup(data?.data || null);
+    } catch (err) {
+      setMfaError(err?.response?.data?.error || 'No se pudo iniciar la configuración MFA.');
+    } finally {
+      setMfaBusy(false);
+    }
+  };
+
+  const verificarMfa = async () => {
+    setMfaError(''); setMfaMsg('');
+    if (!/^\d{6}$/.test(mfaCode.trim())) {
+      setMfaError('Ingresa el código de 6 dígitos de tu app autenticadora.');
+      return;
+    }
+    setMfaBusy(true);
+    try {
+      const { data } = await nodeClient.post('/api/auth/mfa/verify', { code: mfaCode.trim() });
+      setMfaEnabled(true);
+      setMfaBackupCodes(data?.data?.backupCodes || []);
+      setMfaSetup(null);
+      setMfaCode('');
+      setMfaMsg('✅ MFA activado correctamente.');
+    } catch (err) {
+      setMfaError(err?.response?.data?.error || 'Código inválido. Intenta nuevamente.');
+    } finally {
+      setMfaBusy(false);
+    }
+  };
+
+  const desactivarMfa = async () => {
+    setMfaError(''); setMfaMsg('');
+    if (!mfaDisablePassword) {
+      setMfaError('Ingresa tu contraseña para confirmar.');
+      return;
+    }
+    setMfaBusy(true);
+    try {
+      await nodeClient.post('/api/auth/mfa/disable', { password: mfaDisablePassword });
+      setMfaEnabled(false);
+      setShowMfaDisable(false);
+      setMfaDisablePassword('');
+      setMfaBackupCodes(null);
+      setMfaMsg('MFA desactivado.');
+    } catch (err) {
+      setMfaError(err?.response?.data?.error || 'No se pudo desactivar MFA.');
+    } finally {
+      setMfaBusy(false);
+    }
+  };
 
   const handleUpdate = async () => {
     if (!nombreEdit.trim()) return;
@@ -555,29 +636,181 @@ export default function Perfil() {
         )}
       </motion.div>
 
-      {/* ── Autenticación de Dos Factores (MFA) ──
-          ADR-004: MFA postergado. Los endpoints /api/auth/mfa/setup|verify|disable
-          NO existen en Node (solo POST /api/auth/login/mfa en auth-login-mfa.js).
-          Antes la sección disparaba 404 silenciosos; ahora muestra estado
-          informativo hasta la iteración MFA dedicada. */}
+      {/* ── Autenticación de Dos Factores (MFA/TOTP) — ADR-004-rev1 ──
+          Endpoints: GET /api/auth/mfa/status | POST setup | POST verify |
+          POST disable (auth-login-mfa.js, montado bajo /api/auth/mfa). */}
       <motion.div variants={item} className="mb-4">
-        <div className="w-full flex items-center gap-3 p-3.5
-          backdrop-blur-xl bg-white/5 border border-white/10
+        <div className="w-full p-3.5 backdrop-blur-xl bg-white/5 border border-white/10
           rounded-2xl transition-all duration-300 shadow-lg">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center
-            shadow-lg border border-white/10">
-            <Shield size={20} />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center
+              shadow-lg border border-white/10">
+              <Shield size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-sm text-white">Autenticación de Dos Factores (MFA)</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {mfaEnabled === null && !mfaNoDisponible && 'Verificando estado…'}
+                {mfaNoDisponible && 'No disponible en este momento.'}
+                {mfaEnabled === false && !mfaNoDisponible && 'Protege tu cuenta con un código TOTP (Google Authenticator, Authy…).'}
+                {mfaEnabled === true && 'Tu cuenta requiere un código de verificación en cada inicio de sesión.'}
+              </p>
+            </div>
+            {!mfaNoDisponible && mfaEnabled !== null && (
+              <span className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-full border shrink-0
+                ${mfaEnabled
+                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25'
+                  : 'bg-slate-500/15 text-slate-400 border-slate-500/25'}`}>
+                {mfaEnabled ? 'Activo' : 'Inactivo'}
+              </span>
+            )}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-white">Autenticación de Dos Factores (MFA)</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              La autenticación de dos factores (MFA) estará disponible próximamente
-            </p>
-          </div>
-          <span className="px-2.5 py-1 text-[10px] font-bold uppercase rounded-full border shrink-0
-            bg-amber-500/15 text-amber-400 border-amber-500/25">
-            Próximamente
-          </span>
+
+          {(mfaError || mfaMsg) && (
+            <div role={mfaError ? 'alert' : 'status'}
+              className={`mt-3 text-[11px] px-3 py-2 rounded-lg border ${
+                mfaError
+                  ? 'bg-red-500/10 border-red-500/25 text-red-400'
+                  : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400'
+              }`}>
+              {mfaError || mfaMsg}
+            </div>
+          )}
+
+          {/* Códigos de respaldo: se muestran UNA sola vez tras verificar */}
+          {mfaBackupCodes && (
+            <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+              <p className="text-xs font-bold text-amber-300 mb-1.5">
+                Guarda estos códigos de respaldo ahora — no se mostrarán de nuevo:
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 font-mono text-[11px] text-amber-200">
+                {mfaBackupCodes.map(c => <span key={c} className="px-1.5 py-0.5 bg-black/30 rounded">{c}</span>)}
+              </div>
+              <button
+                onClick={() => { navigator.clipboard?.writeText(mfaBackupCodes.join('\n')); setMfaMsg('Códigos copiados al portapapeles.'); }}
+                className="mt-2 text-[11px] text-amber-400 underline underline-offset-2 hover:text-amber-300"
+              >
+                Copiar todos
+              </button>
+            </div>
+          )}
+
+          {/* Paso 1: QR + URI otpauth */}
+          {mfaSetup && !mfaEnabled && (
+            <div className="mt-3 p-3 rounded-xl bg-black/20 border border-white/10">
+              <p className="text-xs text-slate-300 mb-2">
+                1. Escanea el QR con tu app autenticadora (o copia el código manualmente):
+              </p>
+              <div className="flex flex-col sm:flex-row items-start gap-3">
+                <img
+                  src={mfaSetup.qrUrl}
+                  alt="Código QR de configuración MFA"
+                  width={140} height={140}
+                  className="rounded-lg bg-white p-1.5 shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <code className="block break-all text-[10px] text-cyan-300 bg-black/40 p-2 rounded-lg select-all">
+                    {mfaSetup.otpauth}
+                  </code>
+                  <button
+                    onClick={() => navigator.clipboard?.writeText(mfaSetup.otpauth)}
+                    className="mt-1.5 text-[11px] text-cyan-400 underline underline-offset-2 hover:text-cyan-300"
+                  >
+                    Copiar código de configuración
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs text-slate-300 mt-3 mb-1.5">2. Ingresa el código de 6 dígitos:</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  value={mfaCode}
+                  onChange={e => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                  onKeyDown={e => { if (e.key === 'Enter') verificarMfa(); }}
+                  placeholder="000000"
+                  aria-label="Código de verificación de 6 dígitos"
+                  className="w-32 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white
+                    tracking-[0.3em] font-mono outline-none focus:border-indigo-500/50"
+                />
+                <button
+                  onClick={verificarMfa}
+                  disabled={mfaBusy}
+                  className="px-4 py-2 rounded-lg bg-indigo-500/15 text-indigo-300 text-xs font-bold
+                    border border-indigo-500/25 hover:bg-indigo-500/25 transition-colors disabled:opacity-50"
+                >
+                  {mfaBusy ? 'Verificando…' : 'Verificar y activar'}
+                </button>
+                <button
+                  onClick={() => { setMfaSetup(null); setMfaCode(''); setMfaError(''); }}
+                  className="px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-slate-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Acciones */}
+          {!mfaNoDisponible && mfaEnabled === false && !mfaSetup && (
+            <button
+              onClick={iniciarMfaSetup}
+              disabled={mfaBusy}
+              className="mt-3 w-full py-2.5 rounded-xl bg-indigo-500/15 text-indigo-300 text-xs font-bold
+                border border-indigo-500/25 hover:bg-indigo-500/25 transition-colors disabled:opacity-50
+                flex items-center justify-center gap-2"
+            >
+              <Shield size={14} />
+              {mfaBusy ? 'Generando…' : 'Activar MFA'}
+            </button>
+          )}
+
+          {mfaEnabled === true && !showMfaDisable && (
+            <button
+              onClick={() => { setShowMfaDisable(true); setMfaError(''); setMfaMsg(''); }}
+              className="mt-3 w-full py-2.5 rounded-xl bg-red-500/10 text-red-400 text-xs font-bold
+                border border-red-500/25 hover:bg-red-500/20 transition-colors"
+            >
+              Desactivar MFA
+            </button>
+          )}
+
+          {showMfaDisable && (
+            <div className="mt-3 p-3 rounded-xl bg-red-500/5 border border-red-500/25">
+              <p className="text-[11px] text-red-300 mb-2">
+                Confirma con tu contraseña para desactivar la verificación en dos pasos:
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={mfaDisablePassword}
+                  onChange={e => setMfaDisablePassword(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') desactivarMfa(); }}
+                  autoComplete="current-password"
+                  placeholder="Contraseña actual"
+                  aria-label="Contraseña para desactivar MFA"
+                  className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm
+                    text-white outline-none focus:border-red-500/50"
+                />
+                <button
+                  onClick={desactivarMfa}
+                  disabled={mfaBusy}
+                  className="px-4 py-2 rounded-lg bg-red-500/20 text-red-300 text-xs font-bold
+                    border border-red-500/30 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                >
+                  {mfaBusy ? '…' : 'Confirmar'}
+                </button>
+                <button
+                  onClick={() => { setShowMfaDisable(false); setMfaDisablePassword(''); }}
+                  className="px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-slate-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
 

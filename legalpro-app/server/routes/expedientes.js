@@ -68,7 +68,7 @@ router.get('/stats', async (req, res, next) => {
   try {
     const orgId = req.organizationId;
 
-    const [tipoResult, estadoResult, resumenResult, activityResult, escritosResult] = await Promise.all([
+    const [tipoResult, estadoResult, resumenResult, activityResult, escritosResult, exitoResult] = await Promise.all([
       tenantQuery(
         `SELECT COALESCE(tipo, 'general') AS tipo, COUNT(*)::INTEGER AS total
            FROM expedientes
@@ -104,6 +104,19 @@ router.get('/stats', async (req, res, next) => {
            AND created_at >= DATE_TRUNC('month', CURRENT_DATE)`,
         [orgId]
       ).catch(() => ({ rows: [{ n: 0 }] })),
+      // FIX anti-mock A (2026-08-24): tasa de éxito REAL — solo expedientes
+      // cerrados/resueltos con resultado registrado. Fail-open a ceros si la
+      // migración 2026-08-24-expedientes-resultado.sql aún no se aplicó
+      // (el endpoint responde tasaExito:null + motivo, nunca un número inventado).
+      tenantQuery(
+        `SELECT COUNT(*) FILTER (WHERE resultado = 'favorable')::INTEGER    AS favorables,
+                COUNT(*) FILTER (WHERE resultado = 'desfavorable')::INTEGER AS desfavorables
+           FROM expedientes
+          WHERE organization_id = $1
+            AND estado IN ('cerrado', 'resuelto')
+            AND resultado IN ('favorable', 'desfavorable')`,
+        [orgId]
+      ).catch(() => ({ rows: [{ favorables: 0, desfavorables: 0 }] })),
     ]);
 
     const tipos = Object.fromEntries(tipoResult.rows.map(({ tipo, total }) => [tipo, total]));
@@ -130,6 +143,17 @@ router.get('/stats', async (req, res, next) => {
     }
 
     const total = resumen.total;
+
+    // FIX anti-mock A (2026-08-24): tasa = favorables / (favorables + desfavorables) * 100.
+    // Con <5 expedientes con resultado NO hay muestra estadística suficiente →
+    // se devuelve null + motivo en vez de un número inventado.
+    const favorables = exitoResult.rows[0]?.favorables ?? 0;
+    const desfavorables = exitoResult.rows[0]?.desfavorables ?? 0;
+    const conResultado = favorables + desfavorables;
+    const tasaExito = conResultado >= 5
+      ? Math.round((favorables / conResultado) * 100)
+      : null;
+
     const stats = {
       total,
       activos:          estados.activo || 0,
@@ -141,7 +165,8 @@ router.get('/stats', async (req, res, next) => {
       familia:          tipos.familia || 0,
       administrativos:  tipos.administrativo || 0,
       escritosMes:      escritosResult.rows[0]?.n ?? 0,
-      tasaExito:        total ? Math.min(95, 60 + Math.floor(total * 2)) : 0,
+      tasaExito,
+      tasaExitoMotivo:  tasaExito === null ? 'datos insuficientes' : null,
       materia,
       activity,
     };
@@ -314,7 +339,7 @@ router.put('/:id', validate(expedienteUpdateSchema), async (req, res, next) => {
   try {
     const orgId = req.organizationId;
     const { id } = req.params;
-    const { titulo, estado, juzgado, tipo, esUrgente } = req.body;
+    const { titulo, estado, juzgado, tipo, esUrgente, resultado } = req.body;
 
     const setClauses = [];
     const params = [];
@@ -336,7 +361,9 @@ router.put('/:id', validate(expedienteUpdateSchema), async (req, res, next) => {
       }
       setClauses.push(`estado = $${idx++}`); params.push(estado.toLowerCase());
     }
-    if (esUrgente !== undefined) { setClauses.push(`es_urgente = $${idx++}`); params.push(Boolean(esUrgente)); }
+    if (esUrgente !== undefined) { setClauses.push(`es_urgente = ${idx++}`); params.push(Boolean(esUrgente)); }
+    // FIX anti-mock A (2026-08-24): registro del resultado real del caso.
+    if (resultado !== undefined) { setClauses.push(`resultado = ${idx++}`); params.push(resultado); }
 
     if (setClauses.length === 0) {
       return res.status(400).json({ error: 'No se enviaron campos para actualizar.' });
@@ -368,7 +395,7 @@ router.patch('/:id', validate(expedienteUpdateSchema), async (req, res, next) =>
   try {
     const orgId = req.organizationId;
     const { id } = req.params;
-    const { titulo, estado, juzgado, tipo, esUrgente } = req.body;
+    const { titulo, estado, juzgado, tipo, esUrgente, resultado } = req.body;
 
     const setClauses = [];
     const params = [];
@@ -390,7 +417,9 @@ router.patch('/:id', validate(expedienteUpdateSchema), async (req, res, next) =>
       }
       setClauses.push(`estado = $${idx++}`); params.push(estado.toLowerCase());
     }
-    if (esUrgente !== undefined) { setClauses.push(`es_urgente = $${idx++}`); params.push(Boolean(esUrgente)); }
+    if (esUrgente !== undefined) { setClauses.push(`es_urgente = ${idx++}`); params.push(Boolean(esUrgente)); }
+    // FIX anti-mock A (2026-08-24): registro del resultado real del caso.
+    if (resultado !== undefined) { setClauses.push(`resultado = ${idx++}`); params.push(resultado); }
 
     if (setClauses.length === 0) {
       return res.status(400).json({ error: 'No se enviaron campos para actualizar.' });

@@ -313,6 +313,32 @@ router.post('/login', async (req, res, next) => {
       return res.status(401).json({ error: 'Credenciales incorrectas.' });
     }
 
+    // ── ADR-004-rev1: challenge MFA SOLO si mfa_enabled=true ────────────────
+    // Este ES el handler vivo de POST /api/auth/login (montado antes que
+    // auth-login-mfa.js en index.js). `SELECT u.*` expone mfa_enabled una vez
+    // aplicada tools/migrations/2026-08-23-mfa-columns.sql; pre-migración la
+    // columna no existe → undefined → falsy → login normal (sin 500).
+    // Kill switch: FEATURE_MFA=false desactiva el segundo factor completo.
+    // El segundo paso vive en POST /api/auth/login/mfa (auth-login-mfa.js).
+    if (process.env.FEATURE_MFA !== 'false' && usuario.mfa_enabled === true) {
+      logAudit('MFA_CHALLENGE', {
+        severity: 'INFO', userId: usuario.id, ip: getRequestIp(req),
+      }).catch(() => {});
+      // Sin token ni cookie: la sesión solo se establece al verificar el
+      // segundo factor. Contrato dual esperado por client.ts login().
+      return res.json({
+        success: true,
+        mfaRequired: true,
+        userId: usuario.id,
+        data: {
+          mfaRequired: true,
+          userId: usuario.id,
+          mfaMethods: ['totp', 'backup'],
+          message: 'MFA token required. Use POST /api/auth/login/mfa',
+        },
+      });
+    }
+
     const org = usuario.org_id
       ? {
           id: usuario.org_id,

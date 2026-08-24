@@ -69,6 +69,27 @@ public static class DependencyInjection
 
         services.AddScoped<IMinimaxService, MinimaxService>();
 
+        // FIX anti-mock B (2026-08-24): cliente HTTP "nodeapi" para consumir el corpus
+        // RAG REAL del backend Node ({NodeApi:BaseUrl}/api/ai/jurisprudencia).
+        // - BaseAddress desde config NodeApi:BaseUrl (si no está configurada, el
+        //   handler CompararPrecedentes hace fail-open → lista vacía → respuesta honesta).
+        // - Timeout 10s (spec ComparadorPrecedentes).
+        // - NodeApiAuthForwardHandler reenvía el JWT del llamador para que Node aplique
+        //   SU RBAC/quota/multi-tenant al usuario real (identidad extremo a extremo).
+        var nodeBaseUrl = configuration["NodeApi:BaseUrl"];
+        services.AddHttpClient("nodeapi", client =>
+        {
+            if (!string.IsNullOrWhiteSpace(nodeBaseUrl))
+                client.BaseAddress = new Uri(nodeBaseUrl.TrimEnd('/') + "/");
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+        })
+        .AddHttpMessageHandler<NodeApiAuthForwardHandler>();
+
+        // FIX anti-mock B: IGeminiClient genérico de texto para prompts anclados que los
+        // handlers construyen con contexto RAG recuperado (ComparadorPrecedentes).
+        services.AddScoped<IGeminiClient>(p => p.GetRequiredService<IMinimaxService>());
+
         // NOTA (2026-08-07 @auditor-performance): el vertical RAG .NET
         // (AiController /api/ai/rag/* + IRagService/RagService) fue ELIMINADO.
         // Escribía en la tabla rag_vectors (v1) que ya no existe en producción y

@@ -116,7 +116,7 @@ import { rateLimit } from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
-import authLoginMfaRoutes from './routes/auth-login-mfa.js';
+import authLoginMfaRoutes, { mfaManagementRouter } from './routes/auth-login-mfa.js';
 import organizacionesRoutes from './routes/organizaciones.js';
 import datosPersonalesRoutes from './routes/datos-personales.js';
 import aiRoutes from './routes/ai.js';
@@ -514,15 +514,26 @@ app.use('/api/documentos/:id', requireTenantAccess('documentos'));
 // Debe ir DESPUÉS de cualquier auth global y ANTES de los routers IA.
 app.use(ragMiddleware);
 
-// ── LOGIN: auth.js maneja /login (DECISIÓN ADR-004: rollout MFA postergado) ──
-// @abogado-chief rechazó activar el router MFA como handler de /login en esta
-// iteración: la BD de producción NO tiene columnas mfa_* (500 en cada login) y
-// el frontend no maneja mfaSetupRequired (rompería el login demo de roles
-// sensibles). auth-login-mfa.js se conserva íntegro para la iteración MFA
-// dedicada (migración columnas + UI /mfa-verificar + feature flag).
+// ── LOGIN + MFA (ADR-004-rev1, revoca el postergamiento de ADR-004) ──────────
+// ADR-004 original rechazó montar el router MFA porque la BD de producción no
+// tenía columnas mfa_* (500 en cada login). REV1: la migración versionada
+// tools/migrations/2026-08-23-mfa-columns.sql (+ espejo idempotente en
+// initDb.js) crea mfa_secret/mfa_enabled/mfa_backup_codes/mfa_enrolled_at,
+// así que el MFA/TOTP queda ACTIVADO:
+//   - authRoutes (auth.js) maneja /login y exige segundo factor SOLO si
+//     usuario.mfa_enabled=true (pre-migración la columna no existe → login
+//     normal, sin 500).
+//   - authLoginMfaRoutes (auth-login-mfa.js) aporta POST /login/mfa (segundo
+//     paso) y POST /refresh (rotación CRIT-03) → SIEMPRE montado.
+//   - Router de gestión MFA bajo /api/auth/mfa (status/setup/verify/disable)
+//     con feature flag de emergencia: FEATURE_MFA=false lo desmonta y el
+//     login vuelve a ser password-only sin redeploy del frontend.
 // Ver ADR: arneses/registry/ADRs/ADR-004-rollout-fix-c01-mfa-postergado.md
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/auth', authLimiter, authLoginMfaRoutes);
+if (process.env.FEATURE_MFA !== 'false') {
+  app.use('/api/auth/mfa', authLimiter, mfaManagementRouter);
+}
 app.use('/api/organizaciones', organizacionesRoutes);
 app.use('/api/creditos', creditosRoutes);
 app.use('/api/creditos', creditosUsoRoutes);

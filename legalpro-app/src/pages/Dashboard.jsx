@@ -96,7 +96,7 @@ const item = {
 };
 
 /* ═══════════════ KPI Card (intacto — mismo estilo V1) ═══════════════ */
-function KpiCard({ icon: Icon, label, value, loading, trend, trendUp, accentColor, glowColor, to }) {
+function KpiCard({ icon: Icon, label, value, displayValue, loading, trend, trendUp, accentColor, glowColor, to, tooltip }) {
   return (
     <motion.div variants={item} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
       <Link to={to || '#'} className="block h-full">
@@ -115,9 +115,16 @@ function KpiCard({ icon: Icon, label, value, loading, trend, trendUp, accentColo
             )}
           </div>
           <div>
-            <p className="text-2xl lg:text-3xl font-extrabold text-white mb-1 tracking-tight flex items-center">
+            <p
+              className="text-2xl lg:text-3xl font-extrabold text-white mb-1 tracking-tight flex items-center"
+              title={tooltip}
+            >
               {loading ? (
                 <span className="inline-block w-6 h-6 rounded-full border-2 border-white/10 border-t-blue-400 animate-spin" />
+              ) : displayValue != null ? (
+                // FIX anti-mock A: valores no numéricos (p.ej. "—" cuando no hay
+                // datos suficientes) no deben pasar por CountUp.
+                <span>{displayValue}</span>
               ) : (
                 <CountUp end={value} duration={1.2} />
               )}
@@ -473,7 +480,12 @@ function normalizeDashboardStats(data) {
   return {
     ...data,
     escritosMes: data.escritosMes ?? 0,
-    tasaExito: data.tasaExito ?? (data.total ? Math.min(95, 60 + Math.floor(data.total * 2)) : 0),
+    // FIX anti-mock A (2026-08-24): la tasa de éxito la calcula el backend con
+    // resultados REALES (favorables/desfavorables de casos cerrados/resueltos).
+    // Si es null (datos insuficientes) se muestra "—" + motivo; NUNCA inventar
+    // un número en cliente como fórmula fallback.
+    tasaExito: data.tasaExito ?? null,
+    tasaExitoMotivo: data.tasaExitoMotivo ?? 'datos insuficientes',
     materia,
     activity,
   };
@@ -562,7 +574,7 @@ export default function Dashboard() {
   }, [resetLayout, toast]);
 
   /* ── Datos (mismos endpoints que V1 + vencimientos) ── */
-  const [stats, setStats] = useState({ total: 0, urgentes: 0, escritosMes: 0, tasaExito: 0 });
+  const [stats, setStats] = useState({ total: 0, urgentes: 0, escritosMes: 0, tasaExito: null, tasaExitoMotivo: 'datos insuficientes' });
   const [loadingStats, setLoadingStats] = useState(true);
   const [creditos, setCreditos] = useState(0);
   const [activityData, setActivityData] = useState([]);
@@ -648,6 +660,21 @@ export default function Dashboard() {
                 <KpiCard icon={FolderOpen} label="Expedientes Activos" value={stats.total || 0} trend="+8% mes" trendUp to="/expedientes" accentColor="bg-blue-500/10 text-blue-400" glowColor="bg-blue-500/10" />
                 <KpiCard icon={AlertTriangle} label="Urgencias Procesales" value={stats.urgentes || 0} trend="Plazos críticos" trendUp={false} to="/calendario-vencimientos" accentColor="bg-red-500/10 text-red-400" glowColor="bg-red-500/10" />
                 <KpiCard icon={FileText} label="Escritos Generados" value={stats.escritosMes || 0} trend="Asistidos por IA" trendUp to="/redactor" accentColor="bg-violet-500/10 text-violet-400" glowColor="bg-violet-500/10" />
+                {/* FIX anti-mock A (2026-08-24): tasa de éxito REAL del backend.
+                    null → "—" + tooltip 'Datos insuficientes (mín. 5 casos resueltos)',
+                    nunca un número inventado. */}
+                <KpiCard
+                  icon={Percent}
+                  label="Tasa de Éxito"
+                  displayValue={stats.tasaExito != null ? `${stats.tasaExito}%` : '—'}
+                  value={0}
+                  tooltip={stats.tasaExito != null ? undefined : 'Datos insuficientes (mín. 5 casos resueltos)'}
+                  trend={stats.tasaExito != null ? 'Casos con resultado' : (stats.tasaExitoMotivo || 'datos insuficientes')}
+                  trendUp={stats.tasaExito != null}
+                  to="/expedientes"
+                  accentColor="bg-emerald-500/10 text-emerald-400"
+                  glowColor="bg-emerald-500/10"
+                />
                 <KpiCard icon={Coins} label="Créditos IA Disponibles" value={creditos} trend="Gemas" trendUp to="/creditos" accentColor="bg-amber-500/10 text-amber-400" glowColor="bg-amber-500/10" />
               </>
             )}

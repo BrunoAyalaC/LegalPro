@@ -222,6 +222,8 @@ CREATE TABLE IF NOT EXISTS expedientes (
     tipo_proceso                TEXT,
     numero_expediente           TEXT,
     es_urgente                  BOOLEAN     NOT NULL DEFAULT FALSE,
+    -- FIX anti-mock A (2026-08-24): espejo de tools/migrations/2026-08-24-expedientes-resultado.sql
+    resultado                   TEXT        CHECK (resultado IN ('favorable', 'desfavorable')),
     es_dato_sensible            BOOLEAN     NOT NULL DEFAULT FALSE,
     contenido_sensible_detectado BOOLEAN    NOT NULL DEFAULT FALSE,
     metadata_sensibilidad       JSONB       NOT NULL DEFAULT '{}',

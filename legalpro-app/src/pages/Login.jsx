@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppIcon from '../components/AppIcon';
 const logoImg = '/landing/assets/img/logo-icon.jpeg';
 import { useTenant } from '../context/TenantContext';
-import { api } from '../api/client';
+import { api, nodeClient, setTokens } from '../api/client';
 
 /* ═══ Datos de los slides de onboarding ════════════════════════ */
 const SLIDES = [
@@ -137,7 +137,7 @@ function OnboardingSlide({ slide, active }) {
 /* ═══ LOGIN PRINCIPAL ══════════════════════════════════════════ */
 export default function Login() {
   const navigate = useNavigate();
-  const { login, isLoading: contextLoading } = useTenant();
+  const { login, refreshToken, isLoading: contextLoading } = useTenant();
 
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail]       = useState('');
@@ -148,6 +148,13 @@ export default function Login() {
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [showPass, setShowPass] = useState(false);
+
+  // ── Segundo paso MFA (ADR-004-rev1): el backend responde { mfaRequired:true,
+  //    userId } cuando usuario.mfa_enabled=true. Se pide código TOTP/backup. ──
+  const [mfaStep, setMfaStep] = useState(false);
+  const [mfaUserId, setMfaUserId] = useState(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaBusy, setMfaBusy] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const [aceptaPrivacidad, setAceptaPrivacidad] = useState(false);
@@ -179,7 +186,16 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const { organizacion } = await login(email, password, remember);
+      const result = await login(email, password, remember);
+      // ADR-004-rev1: credenciales válidas pero usuario con mfa_enabled=true →
+      // segundo paso (código TOTP o backup). No hay token todavía.
+      if (result?.mfaRequired) {
+        setMfaUserId(result.userId ?? null);
+        setMfaCode('');
+        setMfaStep(true);
+        return;
+      }
+      const { organizacion } = result;
       navigate(organizacion ? '/dashboard' : '/setup-organizacion');
     } catch (err) {
       setError(err.message ?? 'Error al iniciar sesión');
@@ -187,6 +203,36 @@ export default function Login() {
       setLoading(false);
     }
   }, [email, password, remember, login, navigate]);
+
+  const handleMfaVerify = useCallback(async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!mfaUserId) { setError('Sesión MFA inválida. Inicia sesión nuevamente.'); setMfaStep(false); return; }
+    const token = mfaCode.replace(/\D/g, '');
+    if (token.length !== 6 && !/^[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(mfaCode.trim())) {
+      setError('Ingresa un código TOTP de 6 dígitos o un código de respaldo.');
+      return;
+    }
+    setMfaBusy(true);
+    try {
+      const { data } = await nodeClient.post('/api/auth/login/mfa', {
+        userId: mfaUserId,
+        mfaToken: mfaCode.trim(),
+      });
+      if (!data?.success || !data?.token) {
+        throw new Error(data?.error || 'Código inválido.');
+      }
+      // Token en memoria; la cookie httpOnly ya la seteó el backend.
+      setTokens(data.token, data.refreshToken ?? '');
+      // Rehidrata estado del contexto desde /api/auth/me (cookie nueva).
+      await refreshToken();
+      navigate(data.organizacion || data.data?.user?.organization_id ? '/dashboard' : '/setup-organizacion');
+    } catch (err) {
+      setError(err?.response?.data?.error || err.message || 'Código inválido.');
+    } finally {
+      setMfaBusy(false);
+    }
+  }, [mfaUserId, mfaCode, refreshToken, navigate]);
 
   const handleRegister = useCallback(async (e) => {
     e.preventDefault();
@@ -417,7 +463,93 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={isRegister ? handleRegister : handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {/* ── Segundo paso MFA (ADR-004-rev1) ──
+                Las credenciales ya fueron validadas; se exige el código
+                TOTP de 6 dígitos (o un backup code XXXX-XXXX). */}
+            {mfaStep && (
+              <form onSubmit={handleMfaVerify} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{
+                  padding: '12px 14px', background: 'rgba(6,182,212,0.08)',
+                  border: '1px solid rgba(6,182,212,0.25)', borderRadius: 10,
+                  fontSize: 13, color: '#67e8f9', display: 'flex', alignItems: 'center', gap: 8,
+                }}>
+                  <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 16 }}>verified_user</span>
+                  Ingresa el código de verificación de tu app autenticadora.
+                </div>
+                <div>
+                  <label htmlFor="mfa-code" style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+                    Código de verificación
+                  </label>
+                  <input
+                    id="mfa-code"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    autoFocus
+                    maxLength={9}
+                    value={mfaCode}
+                    onChange={e => setMfaCode(e.target.value)}
+                    placeholder="000000"
+                    aria-label="Código TOTP de 6 dígitos o código de respaldo"
+                    style={{
+                      width: '100%', boxSizing: 'border-box',
+                      padding: '12px 14px', textAlign: 'center',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.10)',
+                      borderRadius: 12, fontSize: 20, letterSpacing: '0.35em',
+                      color: '#fff', fontFamily: "'JetBrains Mono',monospace",
+                      outline: 'none', transition: 'border-color 0.2s',
+                    }}
+                    onFocus={e => e.target.style.borderColor = 'rgba(6,182,212,0.5)'}
+                    onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.10)'}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={mfaBusy || !mfaCode.trim()}
+                  style={{
+                    width: '100%', padding: '14px',
+                    borderRadius: 12, border: 'none',
+                    cursor: (mfaBusy || !mfaCode.trim()) ? 'not-allowed' : 'pointer',
+                    background: (mfaBusy || !mfaCode.trim())
+                      ? 'rgba(6,182,212,0.4)'
+                      : 'linear-gradient(135deg, #06B6D4 0%, #0891b2 100%)',
+                    color: '#fff', fontSize: 15, fontWeight: 700,
+                    fontFamily: "'Plus Jakarta Sans',sans-serif",
+                    boxShadow: (mfaBusy || !mfaCode.trim()) ? 'none' : '0 4px 20px rgba(6,182,212,0.35)',
+                    transition: 'all 0.2s ease',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  }}
+                >
+                  {mfaBusy ? (
+                    <div style={{
+                      width: 20, height: 20, borderRadius: '50%',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTopColor: '#fff',
+                      animation: 'spin 0.7s linear infinite',
+                    }} />
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>verified_user</span>
+                      Verificar código
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMfaStep(false); setMfaCode(''); setMfaUserId(null); setError(''); }}
+                  style={{
+                    background: 'none', border: 'none', color: 'rgba(255,255,255,0.45)',
+                    fontSize: 12, cursor: 'pointer', textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                  }}
+                >
+                  Volver al inicio de sesión
+                </button>
+              </form>
+            )}
+
+            <form onSubmit={isRegister ? handleRegister : handleLogin} style={{ display: mfaStep ? 'none' : 'flex', flexDirection: 'column', gap: 14 }}>
               {/* Nombre completo (solo registro) */}
               {isRegister && (
                 <div>
@@ -664,7 +796,7 @@ export default function Login() {
             </form>
 
             {/* Toggle login/registro */}
-            <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <div style={{ textAlign: 'center', marginTop: 16, display: mfaStep ? 'none' : 'block' }}>
               <button
                 type="button"
                 onClick={() => { setIsRegister(r => !r); resetForm(); }}

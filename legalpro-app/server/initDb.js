@@ -378,6 +378,36 @@ export async function initDb() {
         console.error('[initDb] Patch recibos_honorarios ERROR:', recibosErr.message);
       }
 
+      // Patch 2026-08-23 (MFA/TOTP, ADR-004-rev1): columnas de autenticación
+      // de dos factores sobre usuarios (tabla GLOBAL por email — sin RLS).
+      // Espejo de tools/migrations/2026-08-23-mfa-columns.sql.
+      //   - Idempotente (ADD COLUMN IF NOT EXISTS): se ejecuta en cada arranque.
+      //   - Sin estas columnas el router MFA devolvería 500 en cada login.
+      try {
+        await db.query(`
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS mfa_secret TEXT;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS mfa_enabled BOOLEAN DEFAULT FALSE;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS mfa_backup_codes TEXT[] DEFAULT NULL;
+          ALTER TABLE usuarios
+            ADD COLUMN IF NOT EXISTS mfa_enrolled_at TIMESTAMPTZ;
+
+          COMMENT ON COLUMN usuarios.mfa_secret IS
+            'Secreto base32 TOTP (MFA). Nunca se devuelve por API tras el setup.';
+          COMMENT ON COLUMN usuarios.mfa_enabled IS
+            'MFA/TOTP activo: TRUE exige segundo factor en POST /api/auth/login (ADR-004-rev1).';
+          COMMENT ON COLUMN usuarios.mfa_backup_codes IS
+            'Códigos de respaldo MFA de un solo uso como hashes SHA-256 (TEXT[]).';
+          COMMENT ON COLUMN usuarios.mfa_enrolled_at IS
+            'Fecha de confirmación del enrolamiento MFA (POST /api/auth/mfa/verify).';
+        `);
+        console.log('[initDb] Columnas MFA (mfa_secret/mfa_enabled/mfa_backup_codes/mfa_enrolled_at) verificadas.');
+      } catch (mfaErr) {
+        console.error('[initDb] Patch MFA ERROR:', mfaErr.message);
+      }
+
       return;
     }
 
