@@ -637,9 +637,20 @@ small, .text-sm {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   border: none;
+  /* FIX A11Y (2026-08-26): outline:none sin reemplazo viola WCAG 2.4.7.
+     Focus visible con anillo cyan + offset (reemplaza el outline eliminado). */
   outline: none;
-  position: relative;
-  overflow: hidden;
+}
+.btn:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+  border-radius: 10px;
 }
 .btn::after {
   content: '';

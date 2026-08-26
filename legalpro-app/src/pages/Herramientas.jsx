@@ -71,8 +71,8 @@ export default function Herramientas() {
         </span>
       </motion.div>
 
-      {/* Grid responsive: 2→3→4 columnas */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
+      {/* Grid responsive mobile-first: 1→2→3→4 columnas (gap rítmico gap-4) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {herramientas.map((h) => {
           const Icon = h.icon;
           return (

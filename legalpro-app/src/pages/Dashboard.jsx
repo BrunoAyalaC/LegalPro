@@ -137,6 +137,26 @@ function KpiCard({ icon: Icon, label, value, displayValue, loading, trend, trend
   );
 }
 
+/* ── Empty state estándar: icono + texto + CTA (auditoría UX 2026-08-26) ── */
+function EmptyHint({ icon: Icon, text, ctaTo, ctaLabel }) {
+  return (
+    <div className="py-6 px-4 flex flex-col items-center text-center gap-2">
+      <span className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+        <Icon size={18} aria-hidden="true" />
+      </span>
+      <p className="text-xs text-slate-400 font-medium">{text}</p>
+      {ctaTo && (
+        <Link
+          to={ctaTo}
+          className="mt-1 inline-flex min-h-[44px] items-center px-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
+        >
+          {ctaLabel}
+        </Link>
+      )}
+    </div>
+  );
+}
+
 function KpiSkeleton() {
   return (
     <div className="backdrop-blur-xl bg-slate-900/40 border border-white/5 rounded-2xl p-5 shadow-lg animate-pulse flex flex-col justify-between h-32">
@@ -318,7 +338,7 @@ function GroupCard({
                   'min-h-[44px] px-3 whitespace-nowrap text-xs font-bold rounded-t-lg border-b-2 transition-colors',
                   i === activeTab
                     ? 'text-cyan-300 border-cyan-400 bg-slate-800/50'
-                    : 'text-slate-500 border-transparent hover:text-slate-300 hover:bg-slate-800/30',
+                    : 'text-slate-400 border-transparent hover:text-slate-300 hover:bg-slate-800/30',
                 ].join(' ')}
               >
                 {WIDGET_DEFS[wid]?.title ?? wid}
@@ -343,7 +363,7 @@ function GroupCard({
                       type="button"
                       onClick={() => onUngroup(group.id, wid)}
                       aria-label={`Sacar ${WIDGET_DEFS[wid]?.title ?? wid} del grupo`}
-                      className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded-lg text-[11px] font-semibold text-slate-500 hover:text-amber-300 hover:bg-slate-800/60 transition-colors"
+                      className="min-h-[44px] px-3 inline-flex items-center gap-1.5 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-amber-300 hover:bg-slate-800/60 transition-colors"
                     >
                       <Ungroup size={13} aria-hidden="true" /> Sacar del grupo
                     </button>
@@ -370,7 +390,8 @@ function VencimientosWidget({ items, loading }) {
     );
   }
   if (!items.length) {
-    return <p className="py-6 text-center text-xs text-slate-400 font-medium">Sin vencimientos en los próximos 90 días.</p>;
+    // CTA: el enlace "Ver calendario completo" contiguo cumple esa función.
+    return <EmptyHint icon={CalendarClock} text="Sin vencimientos en los próximos 90 días." />;
   }
   return (
     <ul className="divide-y divide-slate-800/60 -mx-1">
@@ -424,7 +445,7 @@ function CreditosWidget({ creditos, plan, loading }) {
       <p className="text-[11px] text-slate-400 mb-3">Gemas disponibles para consultas IA.</p>
       <Link
         to="/creditos"
-        className="inline-flex min-h-[44px] items-center px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition-colors"
+        className="inline-flex min-h-[44px] items-center px-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
       >
         Recargar créditos <ChevronRight size={13} aria-hidden="true" className="ml-1" />
       </Link>
@@ -576,6 +597,9 @@ export default function Dashboard() {
   /* ── Datos (mismos endpoints que V1 + vencimientos) ── */
   const [stats, setStats] = useState({ total: 0, urgentes: 0, escritosMes: 0, tasaExito: null, tasaExitoMotivo: 'datos insuficientes' });
   const [loadingStats, setLoadingStats] = useState(true);
+  // Auditoría UX: error visible con reintento (antes el fallo de /stats era silencioso)
+  const [statsError, setStatsError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [creditos, setCreditos] = useState(0);
   const [activityData, setActivityData] = useState([]);
   const [materiaData, setMateriaData] = useState([]);
@@ -597,15 +621,17 @@ export default function Dashboard() {
     let cancelled = false;
     const isAbortError = (err) => err?.name === 'AbortError' || err?.code === 'ERR_CANCELED';
 
+    setLoadingStats(true);
     nodeClient.get('/api/expedientes/stats', { signal: controller.signal })
       .then((r) => {
         if (cancelled) return;
         const data = normalizeDashboardStats(r.data?.data ?? r.data);
         setStats(data);
+        setStatsError(false);
         if (data.activity) setActivityData(data.activity);
         if (data.materia) setMateriaData(data.materia);
       })
-      .catch((err) => { if (!isAbortError(err)) { /* stats quedan en 0 */ } })
+      .catch((err) => { if (!isAbortError(err)) setStatsError(true); })
       .finally(() => { if (!cancelled) setLoadingStats(false); });
 
     nodeClient.get('/api/organizaciones/me', { signal: controller.signal })
@@ -645,7 +671,7 @@ export default function Dashboard() {
       .finally(() => { if (!cancelled) setLoadingVencimientos(false); });
 
     return () => { cancelled = true; controller.abort(); };
-  }, []);
+  }, [reloadKey]);
 
   /* ── Contenido de cada widget (usado suelto y dentro de grupos) ── */
   const renderWidgetContent = useCallback((widgetId) => {
@@ -700,9 +726,14 @@ export default function Dashboard() {
                   }
                 }}
                 disabled={exportLoading || !activityData.length}
-                className="min-h-[44px] px-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold transition-all disabled:opacity-50 flex items-center gap-1.5"
+                className="min-h-[44px] px-3 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold transition-all disabled:opacity-50 flex items-center gap-1.5"
               >
-                <BarChart3 size={13} /> Exportar
+                {exportLoading ? (
+                  <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-cyan-400 animate-spin" aria-label="Exportando" />
+                ) : (
+                  <BarChart3 size={13} />
+                )}
+                Exportar
               </button>
             </div>
             <div className="h-[200px]">
@@ -739,13 +770,18 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${es.bg} ${es.text} ${es.border}`}>{es.label}</span>
-                      <span className="text-[11px] text-slate-500 hidden sm:block">{daysSince(exp.created_at)}d</span>
+                      <span className="text-[11px] text-slate-400 hidden sm:block">{daysSince(exp.created_at)}d</span>
                     </div>
                   </Link>
                 );
               })
             ) : (
-              <div className="p-8 text-center text-slate-400 text-xs font-medium">No hay expedientes recientes registrados.</div>
+              <EmptyHint
+                icon={FolderOpen}
+                text="No hay expedientes recientes registrados."
+                ctaTo="/expedientes"
+                ctaLabel="Ir a Expedientes"
+              />
             )}
             <div className="px-4 py-2.5">
               <Link to="/expedientes" className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 min-h-[44px]">
@@ -766,6 +802,16 @@ export default function Dashboard() {
         );
 
       case 'materia':
+        if (!materiaData.length) {
+          return (
+            <EmptyHint
+              icon={BarChart3}
+              text="Aún no hay expedientes para distribuir por materia."
+              ctaTo="/expedientes"
+              ctaLabel="Ir a Expedientes"
+            />
+          );
+        }
         return (
           <>
             <div className="h-[140px] my-2">
@@ -795,7 +841,12 @@ export default function Dashboard() {
                 </div>
               ))
             ) : (
-              <div className="p-6 text-center text-slate-400 text-xs font-medium">Sin notificaciones SINOE pendientes.</div>
+              <EmptyHint
+                icon={Bell}
+                text="Sin notificaciones SINOE pendientes."
+                ctaTo="/monitor-sinoe"
+                ctaLabel="Abrir Monitor SINOE"
+              />
             )}
             <div className="px-4 py-2.5">
               <Link to="/monitor-sinoe" className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 min-h-[44px]">
@@ -836,7 +887,7 @@ export default function Dashboard() {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white tracking-tight truncate">
+              <h1 className="text-xl lg:text-2xl font-extrabold text-white tracking-tight truncate">
                 {SALUDO}, {nombreCorto}
               </h1>
               {organizacion && (
@@ -858,7 +909,7 @@ export default function Dashboard() {
             type="button"
             onClick={openCommand}
             aria-label="Abrir búsqueda global (Ctrl+K)"
-            className="min-h-[44px] px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold transition-all flex items-center gap-2"
+            className="min-h-[44px] px-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold transition-all flex items-center gap-2"
           >
             <Search size={14} aria-hidden="true" />
             <span className="hidden md:inline">Buscar</span>
@@ -866,7 +917,7 @@ export default function Dashboard() {
           </button>
           <Link
             to="/chat-ia"
-            className="min-h-[44px] px-3 sm:px-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white text-xs font-semibold shadow-md shadow-blue-600/20 transition-all flex items-center gap-1.5"
+            className="min-h-[44px] px-3 sm:px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md shadow-cyan-600/20 transition-all flex items-center gap-1.5"
           >
             <Sparkles size={14} /> <span className="hidden sm:inline">Consultar LexIA</span>
             <span className="sm:hidden">LexIA</span>
@@ -892,7 +943,7 @@ export default function Dashboard() {
 
       {/* ── BARRA DE PERSONALIZACIÓN ─────────────────────────── */}
       <motion.div variants={item} className="flex items-center justify-between gap-3 flex-wrap">
-        <p className="text-[11px] text-slate-500 flex items-center gap-1.5 min-w-0">
+        <p className="text-[11px] text-slate-400 flex items-center gap-1.5 min-w-0">
           <GripVertical size={12} aria-hidden="true" className="shrink-0" />
           {canDrag
             ? 'Arrastra widgets para reordenar; suelta uno sobre otro para agruparlos.'
@@ -903,11 +954,32 @@ export default function Dashboard() {
           type="button"
           onClick={handleReset}
           disabled={!isCustomized}
-          className="min-h-[44px] px-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0"
+          className="min-h-[44px] px-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0"
         >
           <RotateCcw size={13} aria-hidden="true" /> Restaurar layout
         </button>
       </motion.div>
+
+      {/* ── ERROR DE MÉTRICAS: alert accesible + reintento ──── */}
+      {statsError && (
+        <motion.div
+          variants={item}
+          role="alert"
+          className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300"
+        >
+          <span className="flex items-center gap-2 text-xs font-semibold flex-1">
+            <AlertTriangle size={16} aria-hidden="true" className="shrink-0" />
+            No pudimos cargar las métricas del panel. Verifica tu conexión.
+          </span>
+          <button
+            type="button"
+            onClick={() => setReloadKey((k) => k + 1)}
+            className="min-h-[44px] px-4 rounded-xl bg-red-500/15 border border-red-500/30 hover:bg-red-500/25 text-xs font-bold text-red-200 transition-colors shrink-0 self-end sm:self-auto"
+          >
+            Reintentar
+          </button>
+        </motion.div>
+      )}
 
       {/* ── SECCIONES CON HEADERS STICKY + GRID DRAGGABLE ────── */}
       {sections.map((section) => {
@@ -918,7 +990,7 @@ export default function Dashboard() {
             {/* Header sticky bajo el TopBar (h-16) */}
             <div className="sticky top-16 z-20 -mx-4 sm:mx-0 px-4 sm:px-3 py-2 mb-3 rounded-none sm:rounded-xl bg-slate-950/85 backdrop-blur-md border-y sm:border border-slate-800 flex items-center gap-2">
               <nav aria-label="Ruta de sección" className="flex items-center gap-1.5 text-[11px] min-w-0">
-                <Link to="/dashboard" className="text-slate-500 hover:text-slate-300 transition-colors font-semibold">Inicio</Link>
+                <Link to="/dashboard" className="text-slate-400 hover:text-slate-300 transition-colors font-semibold">Inicio</Link>
                 <ChevronRight size={11} aria-hidden="true" className="text-slate-600 shrink-0" />
                 <span className="font-bold text-slate-200 truncate">{section.title}</span>
               </nav>
@@ -995,7 +1067,7 @@ export default function Dashboard() {
 
       {/* ── FOOTER DE CUMPLIMIENTO LEGAL LPDP ────────────────── */}
       <motion.footer variants={item} className="pt-4 border-t border-slate-800/60 text-center">
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-slate-400">
           🛡️ <strong>LegalPro Compliance</strong>: Operación adaptada a la Ley N° 29733 (Protección de Datos Personales de Perú) y estándares internacionales de confidencialidad e IA ética.
         </p>
       </motion.footer>

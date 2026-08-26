@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+﻿import { useState, useRef, useEffect, useCallback } from 'react';
 import DOMPurify from 'dompurify';
 import { useSearchParams, Link } from 'react-router-dom';
 import { FileText } from 'lucide-react';
@@ -15,17 +15,17 @@ import chatVacioWebp from '../assets/empty-states/chat_ia_vacio.webp';
 import { getProviderLabel } from '../lib/iaProviders.js';
 
 const MAX_STORED = 50; // LPDP: limitar PII en storage cliente
-const TTL_MS = 24 * 60 * 60 * 1000; // 24h — expira automático
+const TTL_MS = 24 * 60 * 60 * 1000; // 24h â€” expira automÃ¡tico
 const DISCLAIMER_KEY = 'legalpro_chat_disclaimer_dismissed';
 
 /**
- * Persistencia segura de mensajes — SECURITY P0 + LPDP
- * - sessionStorage (no localStorage) — se limpia al cerrar pestaña
+ * Persistencia segura de mensajes â€” SECURITY P0 + LPDP
+ * - sessionStorage (no localStorage) â€” se limpia al cerrar pestaÃ±a
  * - TTL 24h con envelope { v, ts, expiresAt, messages }
  * - Migra y limpia legacy localStorage si existe
  */
 function loadMessagesSafe(storageKey) {
-  // Migración legacy: si hay datos en localStorage, mover y borrar
+  // MigraciÃ³n legacy: si hay datos en localStorage, mover y borrar
   try {
     const legacy = localStorage.getItem(storageKey);
     if (legacy) {
@@ -63,7 +63,7 @@ function saveMessagesSafe(storageKey, msgs) {
     };
     sessionStorage.setItem(storageKey, JSON.stringify(payload));
   } catch {
-    // QuotaExceeded: intentar guardar solo últimos 20
+    // QuotaExceeded: intentar guardar solo Ãºltimos 20
     try {
       const fallback = {
         v: 1,
@@ -72,16 +72,16 @@ function saveMessagesSafe(storageKey, msgs) {
         messages: msgs.slice(-20),
       };
       sessionStorage.setItem(storageKey, JSON.stringify(fallback));
-    } catch { /* ignore — modo privado */ }
+    } catch { /* ignore â€” modo privado */ }
   }
 }
 
 const QUICK_ACTIONS = [
-  { icon: 'summarize', label: 'Resumir caso', prompt: 'Resume los hechos principales de mi expediente activo más urgente.' },
+  { icon: 'summarize', label: 'Resumir caso', prompt: 'Resume los hechos principales de mi expediente activo mÃ¡s urgente.' },
   { icon: 'find_in_page', label: 'Jurisprudencia', prompt: 'Busca jurisprudencia relevante en materia penal sobre delitos contra el patrimonio.' },
   { icon: 'edit_note', label: 'Redactar', prompt: 'Necesito redactar una demanda de alimentos.' },
-  { icon: 'schedule', label: 'Plazos', prompt: '¿Qué plazos procesales debo considerar para una apelación en un proceso civil?' },
-  { icon: 'trending_up', label: 'Predicción', prompt: 'Predice el resultado probable de un caso de colusión agravada.' },
+  { icon: 'schedule', label: 'Plazos', prompt: 'Â¿QuÃ© plazos procesales debo considerar para una apelaciÃ³n en un proceso civil?' },
+  { icon: 'trending_up', label: 'PredicciÃ³n', prompt: 'Predice el resultado probable de un caso de colusiÃ³n agravada.' },
   { icon: 'psychology', label: 'Estrategia', prompt: 'Genera una estrategia de defensa para un caso de despido arbitrario.' },
 ];
 
@@ -91,16 +91,16 @@ function chatErrorMessage(err) {
   if (status === 403 && err?.response?.data?.code === 'TRANSFERENCIA_INTERNACIONAL_REQUIRED') {
     return 'Debes aceptar la transferencia internacional de datos (LPDP Art. 21) en tu perfil para usar el chat IA.';
   }
-  if (status === 402) return msg || 'Créditos insuficientes. Recarga gemas en Mis Créditos.';
-  if (status === 400) return msg || 'Solicitud inválida. Revisa el mensaje e intenta de nuevo.';
+  if (status === 402) return msg || 'CrÃ©ditos insuficientes. Recarga gemas en Mis CrÃ©ditos.';
+  if (status === 400) return msg || 'Solicitud invÃ¡lida. Revisa el mensaje e intenta de nuevo.';
   if (status === 429) return 'Demasiadas solicitudes. Espera un momento e intenta otra vez.';
   if (msg && /column .* does not exist|relation .* does not exist/i.test(msg)) {
-    return 'Error temporal del servidor. El equipo está aplicando una corrección — intenta en 1 minuto.';
+    return 'Error temporal del servidor. El equipo estÃ¡ aplicando una correcciÃ³n â€” intenta en 1 minuto.';
   }
   if (!err?.response && /network|failed|fetch/i.test(String(err?.message || ''))) {
-    return 'Sin conexión con el servidor. Verifica tu internet e intenta de nuevo.';
+    return 'Sin conexiÃ³n con el servidor. Verifica tu internet e intenta de nuevo.';
   }
-  return msg || 'Error al conectar con LexIA. Verifica tu conexión e intenta de nuevo.';
+  return msg || 'Error al conectar con LexIA. Verifica tu conexiÃ³n e intenta de nuevo.';
 }
 
 export default function ChatIA() {
@@ -119,7 +119,7 @@ export default function ChatIA() {
     try { return !sessionStorage.getItem(DISCLAIMER_KEY); } catch { return true; }
   });
 
-  // ═══ Vincular expediente + generación de documento legal ═══
+  // â•â•â• Vincular expediente + generaciÃ³n de documento legal â•â•â•
   const [expedientes, setExpedientes] = useState([]);
   const [expedienteSeleccionado, setExpedienteSeleccionado] = useState(null);
   const [cargandoExpedientes, setCargandoExpedientes] = useState(false);
@@ -128,16 +128,16 @@ export default function ChatIA() {
   const [documentoGenerado, setDocumentoGenerado] = useState(null);
   const [errorDoc, setErrorDoc] = useState(null);
 
-  // ═══ Contexto del expediente vinculado (materia + número legible) ═══
+  // â•â•â• Contexto del expediente vinculado (materia + nÃºmero legible) â•â•â•
   // Declarado ANTES de los useCallback que lo referencian (handleMensajeDownload)
-  // para evitar TDZ: las dependencias de useCallback se evalúan en el render
+  // para evitar TDZ: las dependencias de useCallback se evalÃºan en el render
   // y acceder a una const en TDZ lanza ReferenceError (P0 chat roto).
   const materiaContexto = expedienteSeleccionado?.tipo ?? undefined;
   const numeroExpediente = expedienteSeleccionado?.numero ?? undefined;
 
   const messagesEnd = useRef(null);
   const inputRef = useRef(null);
-  // ChatV3: AbortController para el botón "Detener" durante streaming SSE
+  // ChatV3: AbortController para el botÃ³n "Detener" durante streaming SSE
   const abortRef = useRef(null);
 
   // Recargar al cambiar de expediente (storageKey distinto)
@@ -150,7 +150,7 @@ export default function ChatIA() {
     saveMessagesSafe(storageKey, messages);
   }, [messages, storageKey]);
 
-  // Limpia mensajes expirados al re-enfocar pestaña (TTL 24h)
+  // Limpia mensajes expirados al re-enfocar pestaÃ±a (TTL 24h)
   useEffect(() => {
     const onFocus = () => {
       try {
@@ -173,7 +173,7 @@ export default function ChatIA() {
 
   useSeo({ title: 'Chat LexIA | LegalPro' });
 
-  // Cargar expedientes disponibles para vincular la conversación
+  // Cargar expedientes disponibles para vincular la conversaciÃ³n
   useEffect(() => {
     let active = true;
     setCargandoExpedientes(true);
@@ -188,12 +188,12 @@ export default function ChatIA() {
             ? data.expedientes
             : [];
         setExpedientes(items);
-        // Si llegamos vía ?expediente_id=..., preseleccionar ese caso
+        // Si llegamos vÃ­a ?expediente_id=..., preseleccionar ese caso
         if (expedienteId && items.some((e) => String(e.id) === String(expedienteId))) {
           setExpedienteSeleccionado(items.find((e) => String(e.id) === String(expedienteId)) ?? null);
         }
       })
-      .catch(() => { /* Sin expedientes: el selector muestra la opción vacía */ })
+      .catch(() => { /* Sin expedientes: el selector muestra la opciÃ³n vacÃ­a */ })
       .finally(() => { if (active) setCargandoExpedientes(false); });
     return () => { active = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -209,7 +209,7 @@ export default function ChatIA() {
   }, []);
 
   const handleClearChat = useCallback(() => {
-    if (!window.confirm('¿Limpiar todo el historial del chat? Esta acción no se puede deshacer.')) return;
+    if (!window.confirm('Â¿Limpiar todo el historial del chat? Esta acciÃ³n no se puede deshacer.')) return;
     setMessages([]);
     setExpandidosLeyes({});
     try { sessionStorage.removeItem(storageKey); localStorage.removeItem(storageKey); } catch { /* ignore */ }
@@ -312,19 +312,19 @@ export default function ChatIA() {
         text: m.text,
       }));
 
-      // ── ChatV3: intentar streaming SSE primero, fallback a POST normal ──
+      // â”€â”€ ChatV3: intentar streaming SSE primero, fallback a POST normal â”€â”€
       abortRef.current = new AbortController();
       startStreamingBubble();
       let data = null;
       try {
         data = await api.chatStream(mensaje, historial, expedienteId, updateStreamingBubble, abortRef.current.signal);
       } catch (streamErr) {
-        if (streamErr?.name === 'AbortError') throw streamErr; // Detener → tratar como cancelación
-        data = null; // fallo de red/formato → fallback abajo
+        if (streamErr?.name === 'AbortError') throw streamErr; // Detener â†’ tratar como cancelaciÃ³n
+        data = null; // fallo de red/formato â†’ fallback abajo
       }
 
       if (!data) {
-        // Fallback clásico (sin streaming)
+        // Fallback clÃ¡sico (sin streaming)
         if (streamingIdx >= 0) {
           setMessages((prev) => prev.filter((_, i) => i !== streamingIdx));
           streamingIdx = -1;
@@ -333,20 +333,20 @@ export default function ChatIA() {
       }
 
       const respuesta = data?.respuesta ?? data?.texto ?? '';
-      // Estructura completa para renderizado polimórfico (TarjetaRespuesta.jsx).
+      // Estructura completa para renderizado polimÃ³rfico (TarjetaRespuesta.jsx).
       // El backend (server/utils/intentRouter.js + server/routes/ai.js) puede
-      // devolver tipo_respuesta ∈ {'plazo','escrito','analisis','jurisprudencia',
+      // devolver tipo_respuesta âˆˆ {'plazo','escrito','analisis','jurisprudencia',
       // 'prediccion','respuesta'} con `data` estructurada por tipo.
       const tipoRespuesta = data?.tipo_respuesta ?? data?.tipo_respuesta ?? 'respuesta';
       const finalMsg = {
         role: 'ai',
-        text: respuesta || 'No se recibió respuesta del asistente.',
+        text: respuesta || 'No se recibiÃ³ respuesta del asistente.',
         time: aiTime(),
         leyes: data?.leyes ?? data?.referencias ?? null,
         // Payload crudo para TarjetaRespuesta: contiene tipo_respuesta + data + intencion + tokens.
         raw: data,
         tipoRespuesta,
-        citasValidacion: data?.citas_validacion ?? null, // ChatV3: badge anti-alucinación
+        citasValidacion: data?.citas_validacion ?? null, // ChatV3: badge anti-alucinaciÃ³n
       };
 
       setMessages((prev) => {
@@ -359,7 +359,7 @@ export default function ChatIA() {
         return [...prev, finalMsg];
       });
     } catch (err) {
-      // AbortError por botón Detener: conservar texto parcial como respuesta
+      // AbortError por botÃ³n Detener: conservar texto parcial como respuesta
       if (err?.name === 'AbortError') {
         setMessages((prev) => {
           if (streamingIdx >= 0 && prev[streamingIdx]?.text) {
@@ -388,20 +388,20 @@ export default function ChatIA() {
     }
   };
 
-  // ChatV3: regenerar la última respuesta AI (reenvía el último mensaje user)
+  // ChatV3: regenerar la Ãºltima respuesta AI (reenvÃ­a el Ãºltimo mensaje user)
   const handleRegenerar = useCallback(() => {
     if (loading) return;
     const ultimoUser = [...messages].reverse().find((m) => m.role === 'user');
     if (!ultimoUser) return;
     setMessages((prev) => {
       const copia = [...prev];
-      if (copia.length && copia[copia.length - 1].role === 'ai') copia.pop(); // quita última AI
+      if (copia.length && copia[copia.length - 1].role === 'ai') copia.pop(); // quita Ãºltima AI
       return copia;
     });
     setTimeout(() => handleSend(ultimoUser.text), 50);
   }, [messages, loading]);
 
-  // ChatV3: feedback 👍👎 por respuesta (best-effort; cola local si endpoint ausente)
+  // ChatV3: feedback ðŸ‘ðŸ‘Ž por respuesta (best-effort; cola local si endpoint ausente)
   const handleFeedback = useCallback(async (msgIndex, rating) => {
     setMessages((prev) => {
       const copia = [...prev];
@@ -415,11 +415,11 @@ export default function ChatIA() {
         const cola = JSON.parse(localStorage.getItem('legalpro_feedback_queue') || '[]');
         cola.push({ rating, ts: Date.now(), pagina: 'chat_ia' });
         localStorage.setItem('legalpro_feedback_queue', JSON.stringify(cola.slice(-50)));
-      } catch { /* storage lleno → ignorar */ }
+      } catch { /* storage lleno â†’ ignorar */ }
     }
   }, [messages]);
 
-  // Detecta el tipo de documento a partir de la conversación y habilita la descarga
+  // Detecta el tipo de documento a partir de la conversaciÃ³n y habilita la descarga
   const generarDocumento = async () => {
     if (!messages.length || detectandoDoc) return;
     setDetectandoDoc(true);
@@ -430,8 +430,8 @@ export default function ChatIA() {
         role: m.role === 'user' ? 'user' : 'model',
         text: m.text,
       }));
-      // La función centralizada SIEMPRE envía disclaimerAceptado: true
-      // (el backend responde 403 DISCLAIMER_REQUIRED si falta — LPDP).
+      // La funciÃ³n centralizada SIEMPRE envÃ­a disclaimerAceptado: true
+      // (el backend responde 403 DISCLAIMER_REQUIRED si falta â€” LPDP).
       const det = await detectarDocumento(conversacion, materiaContexto, expedienteId);
       const payload = det.data?.data ?? det.data ?? {};
       const tipo = payload.tipo || 'escrito_simple';
@@ -454,8 +454,8 @@ export default function ChatIA() {
         role: m.role === 'user' ? 'user' : 'model',
         text: m.text,
       }));
-      // La función centralizada SIEMPRE envía disclaimerAceptado: true
-      // (el backend responde 403 DISCLAIMER_REQUIRED si falta — LPDP)
+      // La funciÃ³n centralizada SIEMPRE envÃ­a disclaimerAceptado: true
+      // (el backend responde 403 DISCLAIMER_REQUIRED si falta â€” LPDP)
       // y devuelve la respuesta Axios completa (data = Blob + headers).
       const resp = await redactarDocumento(
         {
@@ -482,9 +482,9 @@ export default function ChatIA() {
       let mensaje = 'No se pudo generar el archivo para descarga. Intenta de nuevo.';
       try {
         // Con responseType 'blob' axios envuelve los errores JSON del backend
-        // como Blob. Si el servidor respondió content-type application/json
-        // (402 créditos, 403 disclaimer, 500 PDF service, etc.) lo parseamos
-        // para mostrar el mensaje de error real en lugar del genérico.
+        // como Blob. Si el servidor respondiÃ³ content-type application/json
+        // (402 crÃ©ditos, 403 disclaimer, 500 PDF service, etc.) lo parseamos
+        // para mostrar el mensaje de error real en lugar del genÃ©rico.
         const blob = err?.response?.data;
         const contentType = String(err?.response?.headers?.['content-type'] ?? '');
         if (blob instanceof Blob && contentType.includes('application/json')) {
@@ -492,7 +492,7 @@ export default function ChatIA() {
           if (parsed?.error) mensaje = parsed.error;
           else if (parsed?.message) mensaje = parsed.message;
         }
-      } catch { /* Respuesta de error no JSON: conservar mensaje genérico */ }
+      } catch { /* Respuesta de error no JSON: conservar mensaje genÃ©rico */ }
       setErrorDoc(mensaje);
     } finally {
       setDescargandoDoc(null);
@@ -506,7 +506,7 @@ export default function ChatIA() {
       data-testid="chat-shell"
       className="chat-shell flex flex-col flex-1 min-h-0 h-full max-w-4xl mx-auto w-full"
     >
-      <div className="shrink-0 flex items-center justify-between gap-2 px-3 sm:px-4 py-2.5 border-b border-white/8 bg-slate-900/70 backdrop-blur-md">
+      <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2.5 border-b border-white/8 bg-slate-900/70 backdrop-blur-md">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
             <SpriteIcon name="chat" size={26} />
@@ -515,7 +515,7 @@ export default function ChatIA() {
             <h1 className="text-sm sm:text-base font-bold text-white truncate">
               Lex<span className="text-cyan-400">IA</span> Chat
             </h1>
-            <p className="text-[10px] text-slate-400 truncate">Asistente legal · {getProviderLabel('opencode')}</p>
+            <p className="text-[10px] text-slate-400 truncate">Asistente legal Â· {getProviderLabel('opencode')}</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
@@ -537,18 +537,18 @@ export default function ChatIA() {
       </div>
 
       {showDisclaimer ? (
-        <IADisclaimerBanner compact className="mx-3 sm:mx-4 mt-2 shrink-0" onDismiss={dismissDisclaimer} />
+        <IADisclaimerBanner compact className="mx-4 mt-2 shrink-0" onDismiss={dismissDisclaimer} />
       ) : (
         <button
           type="button"
           onClick={() => setShowDisclaimer(true)}
-          className="mx-3 sm:mx-4 mt-2 shrink-0 self-start text-[10px] text-amber-400/80 hover:text-amber-300 flex items-center gap-1"
+          className="mx-4 mt-2 shrink-0 self-start text-[10px] text-amber-400/80 hover:text-amber-300 flex items-center gap-1"
         >
           <AppIcon name="warning" size={12} /> Aviso legal IA
         </button>
       )}
 
-      <div className="shrink-0 flex flex-col sm:flex-row sm:items-center gap-2 px-3 sm:px-4 py-2 border-b border-white/5 bg-slate-900/40">
+      <div className="shrink-0 flex flex-col sm:flex-row sm:items-center gap-2 px-4 py-2 border-b border-white/5 bg-slate-900/40">
         <label
           htmlFor="chat-expediente-select"
           className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-400 font-semibold shrink-0"
@@ -571,17 +571,17 @@ export default function ChatIA() {
           className="w-full sm:max-w-xs text-xs bg-slate-800/80 border border-white/10 rounded-lg px-2.5 py-1.5 text-white outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10 disabled:opacity-50"
         >
           <option value="">
-            {cargandoExpedientes ? 'Cargando expedientes…' : 'Sin caso vinculado'}
+            {cargandoExpedientes ? 'Cargando expedientesâ€¦' : 'Sin caso vinculado'}
           </option>
           {expedientes.map((exp) => (
             <option key={exp.id} value={exp.id}>
-              {exp.numero || 'S/N'} — {exp.titulo || exp.tipo || 'Sin materia'}
+              {exp.numero || 'S/N'} â€” {exp.titulo || exp.tipo || 'Sin materia'}
             </option>
           ))}
         </select>
       </div>
 
-      <div className="shrink-0 flex flex-wrap sm:flex-nowrap gap-2 px-3 sm:px-4 py-2 overflow-x-auto no-scrollbar border-b border-white/5">
+      <div className="shrink-0 flex flex-wrap sm:flex-nowrap gap-2 px-4 py-2 overflow-x-auto no-scrollbar border-b border-white/5">
         {QUICK_ACTIONS.map((a) => (
           <button
             key={a.label}
@@ -601,8 +601,8 @@ export default function ChatIA() {
       <div
         role="log"
         aria-live="polite"
-        aria-label="Historial de conversación con LexIA"
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 sm:px-4 py-3 space-y-4 chat-messages-scroll"
+        aria-label="Historial de conversaciÃ³n con LexIA"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3 space-y-4 chat-messages-scroll"
       >
         {isEmpty ? (
           <div className="empty-state flex flex-col items-center justify-center min-h-[40vh] text-center px-4 py-8">
@@ -614,7 +614,7 @@ export default function ChatIA() {
               Hola, soy <span className="gradient-text">Lex-IA</span>
             </h3>
             <p className="text-sm text-slate-400 max-w-sm mb-6">
-              Tu asistente legal con IA. Elige una acción rápida o escribe tu consulta abajo.
+              Tu asistente legal con IA. Elige una acciÃ³n rÃ¡pida o escribe tu consulta abajo.
             </p>
             <div className="flex flex-wrap justify-center gap-2 max-w-md">
               {QUICK_ACTIONS.slice(0, 4).map((a) => (
@@ -650,7 +650,7 @@ export default function ChatIA() {
 
         {/* ChatV3: indicador typing solo cuando NO hay burbuja de streaming activa */}
         {loading && !messages.some((m) => m.streaming) && (
-          <div className="flex gap-2.5 max-w-[88%]" aria-busy="true" aria-label="LexIA está escribiendo">
+          <div className="flex gap-2.5 max-w-[88%]" aria-busy="true" aria-label="LexIA estÃ¡ escribiendo">
             <img src={avatarIA} alt="" loading="lazy" decoding="async" className="ai-avatar w-8 h-8 shrink-0" />
             <div className="chat-ai p-3.5 flex items-center gap-2.5 rounded-2xl rounded-bl-md">
               <div className="flex gap-1">
@@ -658,7 +658,7 @@ export default function ChatIA() {
                 <div className="typing-dot" />
                 <div className="typing-dot" />
               </div>
-              <span className="text-xs text-slate-400">LexIA analizando…</span>
+              <span className="text-xs text-slate-400">LexIA analizandoâ€¦</span>
             </div>
           </div>
         )}
@@ -676,17 +676,17 @@ export default function ChatIA() {
                 type="button"
                 onClick={() => descargarDocumento('pdf')}
                 disabled={descargandoDoc !== null}
-                className="px-3 py-2 rounded-lg bg-cyan-500 text-slate-950 text-sm font-medium hover:bg-cyan-400 disabled:opacity-60 transition-colors"
+                className="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium disabled:opacity-60 transition-colors"
               >
-                {descargandoDoc === 'pdf' ? 'Generando…' : '⬇️ Descargar PDF'}
+                {descargandoDoc === 'pdf' ? 'Generandoâ€¦' : 'â¬‡ï¸ Descargar PDF'}
               </button>
               <button
                 type="button"
                 onClick={() => descargarDocumento('docx')}
                 disabled={descargandoDoc !== null}
-                className="px-3 py-2 rounded-lg bg-slate-700 text-white text-sm font-medium hover:bg-slate-600 disabled:opacity-60 transition-colors"
+                className="px-3 py-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white text-sm font-medium disabled:opacity-60 transition-colors"
               >
-                {descargandoDoc === 'docx' ? 'Generando…' : '⬇️ Descargar DOCX'}
+                {descargandoDoc === 'docx' ? 'Generandoâ€¦' : 'â¬‡ï¸ Descargar DOCX'}
               </button>
             </div>
           </div>
@@ -694,17 +694,17 @@ export default function ChatIA() {
         <div ref={messagesEnd} className="h-2 shrink-0" />
       </div>
 
-      <div className="shrink-0 p-3 sm:p-4 border-t border-white/8 bg-slate-900/90 backdrop-blur-xl pb-[max(5.5rem,env(safe-area-inset-bottom))] lg:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 p-4 border-t border-white/8 bg-slate-900/90 backdrop-blur-xl pb-[max(5.5rem,env(safe-area-inset-bottom))] lg:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <button
             type="button"
             onClick={generarDocumento}
             disabled={detectandoDoc || !!descargandoDoc || !messages.length}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-purple-500/20 border border-purple-400/30 text-purple-300 text-sm font-medium hover:bg-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="Generar documento legal a partir de la conversación"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            aria-label="Generar documento legal a partir de la conversaciÃ³n"
           >
             <FileText className="w-4 h-4 shrink-0" aria-hidden="true" />
-            {detectandoDoc ? 'Analizando…' : 'Generar Documento'}
+            {detectandoDoc ? 'Analizandoâ€¦' : 'Generar Documento'}
           </button>
           {documentoGenerado && (
             <span className="text-[10px] text-cyan-300/70 flex items-center gap-1">
@@ -716,9 +716,17 @@ export default function ChatIA() {
         {errorDoc && (
           <div
             role="alert"
-            className="mb-2 p-3 rounded-lg bg-red-500/10 border border-red-400/30 text-red-300 text-sm"
+            className="mb-2 p-3 rounded-lg bg-red-500/10 border border-red-400/30 text-red-300 text-sm flex flex-col sm:flex-row sm:items-center gap-2"
           >
-            {errorDoc}
+            <span className="flex-1">{errorDoc}</span>
+            <button
+              type="button"
+              onClick={generarDocumento}
+              disabled={detectandoDoc || !!descargandoDoc}
+              className="min-h-[44px] px-3 rounded-lg bg-red-500/15 border border-red-400/30 hover:bg-red-500/25 text-xs font-bold text-red-200 transition-colors disabled:opacity-50 shrink-0 self-end sm:self-auto"
+            >
+              Reintentar
+            </button>
           </div>
         )}
         <div className="flex items-end gap-2">
@@ -738,23 +746,27 @@ export default function ChatIA() {
               disabled={loading}
               rows={1}
               aria-label="Mensaje al asistente legal"
-              className="flex-1 min-w-0 max-h-32 bg-transparent border-none outline-none resize-none text-base sm:text-sm text-white placeholder:text-slate-500 disabled:opacity-60 leading-relaxed py-1"
-              placeholder="Consulta legal… (Enter envía, Shift+Enter nueva línea)"
+              className="flex-1 min-w-0 max-h-32 bg-transparent border-none outline-none resize-none text-base sm:text-sm text-white placeholder:text-slate-400 disabled:opacity-60 leading-relaxed py-1"
+              placeholder="Consulta legalâ€¦ (Enter envÃ­a, Shift+Enter nueva lÃ­nea)"
             />
           </div>
           <button
             type="button"
             onClick={() => handleSend()}
             disabled={loading || !input.trim()}
-            aria-label="Enviar mensaje"
+            aria-label={loading ? 'Enviando mensaje' : 'Enviar mensaje'}
             className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/25 disabled:opacity-40 active:scale-95 transition-all"
           >
-            <AppIcon name="send" size={20} />
+            {loading ? (
+              <span className="inline-block w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin" aria-hidden="true" />
+            ) : (
+              <AppIcon name="send" size={20} />
+            )}
           </button>
         </div>
         {(expedienteSeleccionado || expedienteId) && (
-          <p className="text-[10px] text-slate-500 mt-2 text-center">
-            Contexto: expediente vinculado ·{' '}
+          <p className="text-[10px] text-slate-400 mt-2 text-center">
+            Contexto: expediente vinculado Â·{' '}
             <Link to="/expedientes" className="text-cyan-400 hover:underline">ver expedientes</Link>
           </p>
         )}
