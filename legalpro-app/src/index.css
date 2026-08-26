@@ -770,11 +770,16 @@ textarea.input {
 /* ══════════════════════════════════════════ */
 .chat-shell {
   width: 100%;
+  /* FIX UX (2026-08-26): altura exacta del contenedor (main h-dvh overflow-hidden
+     en rutas chat) — el área de mensajes scrollea internamente, input fijo abajo. */
+  height: 100%;
+  min-height: 0;
 }
 
 .chat-messages-scroll {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 .chat-ai-content strong {
@@ -1358,9 +1363,9 @@ input::placeholder {
 .icon-shadow-pink:hover    { box-shadow: 0 8px 32px rgba(236, 72, 153, 0.45),  0 4px 12px rgba(236, 72, 153, 0.25); }
 
 
-/* --- UX FLUIDES (2026-08-23) � transiciones de ruta, shimmer, m�vil --- */
+/* --- UX FLUIDES (2026-08-23) � transiciones de ruta, shimmer, m�vil --- */
 
-/* Transici�n de ruta: fade+slide sutil al navegar */
+/* Transici�n de ruta: fade+slide sutil al navegar */
 .route-fade-in {
   animation: routeFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -1379,7 +1384,7 @@ input::placeholder {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Touch targets =44px en navegaci�n t�ctil (WCAG 2.5.5) */
+/* Touch targets =44px en navegaci�n t�ctil (WCAG 2.5.5) */
 @media (pointer: coarse) {
   .bottom-nav a,
   .bottom-nav button {

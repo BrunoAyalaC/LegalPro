@@ -49,8 +49,13 @@ export default function Layout() {
 
       {/* ─── CONTENIDO PRINCIPAL ─── */}
       <div
-        className={`layout-main-shell flex flex-col min-h-dvh min-w-0 transition-all duration-300 ${
+        className={`layout-main-shell flex flex-col min-w-0 transition-all duration-300 ${
           sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'
+        } ${
+          // FIX UX (2026-08-26): en rutas chat el shell debe ser EXACTAMENTE
+          // viewport (h-dvh + overflow-hidden) para que el área de mensajes
+          // scrollee internamente; en el resto, crece con el contenido.
+          isChatRoute ? 'h-dvh overflow-hidden' : 'min-h-dvh'
         }`}
       >
         {/* TopBar */}

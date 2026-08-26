@@ -13,7 +13,7 @@ import ScrollToTop from './components/ScrollToTop';
 function AnimatedRoutes({ children }) {
   const location = useLocation();
   return (
-    <div key={location.pathname} className="route-fade-in">
+    <div key={location.pathname} className="route-fade-in flex-1 min-h-0 flex flex-col w-full">
       {children}
     </div>
   );
