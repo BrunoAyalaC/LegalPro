@@ -64,7 +64,10 @@ COPY --from=build /app/package.json ./
 #   symlink /tools -> /app/tools para que ../../../tools resuelva.
 COPY --from=build /app/catalogs /catalogs
 COPY --from=build /app/tools /app/tools
+# FIX DEPLOY (2026-08-23): el código resuelve catálogos como /app/catalogs
+# (cwd=/app) Y como /catalogs según el módulo — cubrir ambas rutas.
 RUN ln -sfn /app/tools /tools \
+    && ln -sfn /catalogs /app/catalogs \
     && chown -R nodejs:nodejs /app /catalogs /tools
 
 USER nodejs

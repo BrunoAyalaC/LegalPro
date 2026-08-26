@@ -143,14 +143,20 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // ── OpenTelemetry Tracing & Metrics (OTel) — R-01 Fix 2026-08-21 ────────────────
-// Producción: solo OTLP, fail-fast si falta endpoint (sin ConsoleExporter en prod).
+// FIX DEPLOY (2026-08-26): la observabilidad NO tumba producción. Si falta
+// OTEL_EXPORTER_OTLP_ENDPOINT en Production → log warning y continúa sin OTel
+// (fail-open para telemetría; fail-closed se reserva para seguridad/LPDP).
 // Desarrollo: ConsoleExporter para debug local.
 if (builder.Environment.IsProduction())
 {
-    var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]
-        ?? throw new InvalidOperationException("OTEL_EXPORTER_OTLP_ENDPOINT es obligatorio en Production para OTel OTLP.");
-
-    builder.Services.AddOpenTelemetry()
+    var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+    if (string.IsNullOrWhiteSpace(otlpEndpoint))
+    {
+        Console.WriteLine("[otel] WARNING: OTEL_EXPORTER_OTLP_ENDPOINT no configurado — tracing/metrics DESACTIVADOS (el servicio continúa).");
+    }
+    else
+    {
+        builder.Services.AddOpenTelemetry()
         .WithTracing(tracing =>
         {
             tracing
@@ -169,6 +175,7 @@ if (builder.Environment.IsProduction())
                 .AddMeter("LegalPro.Api")
                 .AddOtlpExporter(o => { o.Endpoint = new Uri(otlpEndpoint); });
         });
+    }
 }
 else // Development / Testing / Staging — ConsoleExporter (sin OTLP)
 {
